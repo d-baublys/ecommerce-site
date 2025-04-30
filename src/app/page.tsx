@@ -1,44 +1,35 @@
+import Image from "next/image";
+import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
+import Carousel from "@/components/Carousel";
+
 export default function Home() {
     return (
-        <div className="flex flex-col items-center justify-items-center min-h-screen font-[family-name:var(--font-geist-sans)]">
-            <nav className="flex w-full h-16 bg-yellow-400"></nav>
-            <main className="flex flex-col grow w-full items-center bg-red-400">
-                <div></div>
+        <div className="flex flex-col items-center justify-items-center min-h-screen text-foreground font-[family-name:var(--font-lexend-exa)]">
+            <NavBar />
+            <main className="relative flex flex-col grow w-full items-center bg-background overflow-hidden z-0">
+                <div className="main-product relative grow w-full min-h-[400px]">
+                    <Image
+                        className="object-cover brightness-50"
+                        src="/tshirts.jpg"
+                        alt="Branded t-shirts"
+                        fill
+                    ></Image>
+                    <div className="flex flex-col main-tagline absolute w-full top-1/2 px-(--gutter) text-4xl font-semibold text-white">
+                        Summer 2025 styles here and now.
+                        <a className="mt-8 text-2xl underline" href="">
+                            {"Shop >>>"}
+                        </a>
+                    </div>
+                </div>
+                <div className="featured-outer flex flex-col w-full min-h-[300px] bg-white">
+                    <div className="p-(--gutter) font-semibold">Featured</div>
+                    <div className="featured-inner flex justify-center items-center grow w-full h-full">
+                        <Carousel />
+                    </div>
+                </div>
             </main>
-            <footer className="flex gap-[24px] flex-wrap justify-center items-center w-full min-h-[300px] bg-green-400">
-                <a
-                    className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-                    href="placeholder"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    About
-                </a>
-                <a
-                    className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-                    href="placeholder"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Support
-                </a>
-                <a
-                    className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-                    href="placeholder"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Policies
-                </a>
-                <a
-                    className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-                    href="placeholder"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Sitemap
-                </a>
-            </footer>
+            <Footer />
         </div>
     );
 }
