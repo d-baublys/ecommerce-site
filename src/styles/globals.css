@@ -6,7 +6,9 @@
     --contrasted: #ffffff;
     --nav-shadow: 0 0px 2px rgba(0, 0, 0, 0.33);
     --gutter: 1rem;
-    --carousel-img-w: 200px;
+    --carousel-img-w: min(50vw, 350px);
+    --carousel-img-gap: calc(var(--carousel-img-w) / 4);
+    --carousel-width: min(100vw, 700px);
 }
 
 @theme inline {
