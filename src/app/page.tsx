@@ -15,18 +15,18 @@ export default function Home() {
                         alt="Branded t-shirts"
                         fill
                     ></Image>
-                    <div className="flex flex-col main-tagline absolute w-full top-1/2 px-(--gutter) text-4xl font-semibold text-white">
+                    <div className="flex flex-col main-tagline absolute w-full top-1/2 px-(--gutter) md:px-(--gutter-md) text-4xl font-semibold text-contrasted">
                         Summer 2025 styles here and now.
                         <a className="mt-8 text-2xl underline" href="">
                             {"Shop >>>"}
                         </a>
                     </div>
                 </div>
-                <div className="featured-outer flex flex-col w-full min-h-[300px] bg-white">
-                    <div className="p-(--gutter) font-semibold">Featured</div>
-                    <div className="featured-inner flex justify-center items-center grow w-full h-full">
-                        <Carousel />
+                <div className="featured-outer flex flex-col w-full min-h-[500px] bg-white">
+                    <div className="p-(--gutter) xl:p-(--gutter-md) font-semibold md:text-xl">
+                        Featured
                     </div>
+                    <Carousel />
                 </div>
             </main>
             <Footer />

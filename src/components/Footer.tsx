@@ -1,6 +1,6 @@
 export default function Footer() {
     return (
-        <footer className="flex flex-col gap-[48px] flex-wrap justify-center items-center w-full min-h-[300px] px-(--gutter) bg-background text-contrasted">
+        <footer className="flex flex-col gap-[48px] flex-wrap justify-center items-center w-full min-h-[300px] px-(--gutter) md:px-(--gutter-md) bg-background text-contrasted">
             <div className="flex flex-wrap justify-center items-center gap-[24px]">
                 <a
                     className="flex items-center gap-2 hover:underline hover:underline-offset-4"
