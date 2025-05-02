@@ -19,11 +19,10 @@
     --color-foreground: var(--foreground);
     --color-contrasted: var(--contrasted);
     --color-component-color: var(--component-color);
-    --font-sans: var(--font-lexend-exa);
 }
 
 body {
     background: var(--background);
     color: var(--foreground);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: var(--font-lexend-exa), Arial, Helvetica, sans-serif;
 }

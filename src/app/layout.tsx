@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Lexend_Exa } from "next/font/google";
 import "@/styles/globals.css";
+import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
 
-const sourceSans = Lexend_Exa({ variable: "--font-lexend-exa", subsets: ["latin"] });
+const lexendExa = Lexend_Exa({ variable: "--font-lexend-exa", subsets: ["latin"] });
 
 export const metadata: Metadata = {
     title: "D-Wear",
@@ -16,7 +18,15 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${sourceSans.variable} antialiased`}>{children}</body>
+            <body className={`${lexendExa.variable} antialiased`}>
+                <div className="flex flex-col items-center justify-items-center min-h-screen">
+                    <NavBar />
+                    <main className="relative flex flex-col grow w-full items-center bg-background overflow-hidden z-0">
+                        {children}
+                    </main>
+                    <Footer />
+                </div>
+            </body>
         </html>
     );
 }
