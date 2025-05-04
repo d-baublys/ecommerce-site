@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { IoBagOutline, IoHeartOutline, IoPersonOutline, IoSearchOutline } from "react-icons/io5";
 
@@ -28,7 +29,14 @@ export default function NavBar() {
         >
             <div className="flex lg:grid lg:grid-cols-3 justify-between items-center w-full mx-(--gutter) lg:mx-(--gutter-md)">
                 <div className="flex shrink-0 lg:col-start-2 lg:justify-center mr-(--gutter)">
-                    <Image src="/dbwearopt.svg" alt="DB-Wear logomark" width={120} height={120} />
+                    <Link href={"/"}>
+                        <Image
+                            src="/dbwearopt.svg"
+                            alt="DB-Wear logomark"
+                            width={120}
+                            height={120}
+                        />
+                    </Link>
                 </div>
                 <div className="flex gap-6 lg:col-start-3 lg:justify-end">
                     <div className="hover:scale-125 transition">
