@@ -4,8 +4,9 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { IoChevronBackSharp, IoChevronForwardSharp } from "react-icons/io5";
 import { debounce } from "@/lib/helpers";
-import { featureList } from "@/data";
+import { featureList } from "@/lib/data";
 import RoundedButton from "./RoundedButton";
+import ProductLink from "./ProductLink";
 
 export default function Carousel() {
     const [activeFeatured, setActiveFeatured] = useState(0);
@@ -67,25 +68,26 @@ export default function Carousel() {
                     id="carousel-slider"
                     className="flex overflow-x-hidden gap-(--carousel-img-gap) px-(--carousel-img-w) h-full z-30"
                 >
-                    {featureList.map((imageData, idx) => (
+                    {featureList.map((featuredItem, idx) => (
                         <div
-                            key={idx}
+                            key={featuredItem.product.id}
                             id={`featured-${idx + 1}`}
                             className="relative py-2 min-w-[var(--carousel-img-w)]"
                         >
                             <div className="featured-wrapper h-full snap-center drop-shadow-(--button-shadow) z-0">
                                 <Image
-                                    src={imageData.src}
-                                    alt={imageData.alt}
+                                    src={featuredItem.product.src}
+                                    alt={featuredItem.alt}
                                     fill
                                     sizes="auto"
                                     className="object-cover rounded-2xl"
                                 />
                             </div>
-                            <RoundedButton
-                                className="absolute left-[50%] bottom-1/6 translate-x-[-50%] drop-shadow-(--button-shadow) z-50"
-                                text="Shop"
-                            />
+                            <ProductLink slug={featuredItem.product.slug}>
+                                <RoundedButton className="absolute left-[50%] bottom-1/6 translate-x-[-50%] drop-shadow-(--button-shadow) cursor-pointer hover:scale-105 hover:text-component-color transition z-50">
+                                    Shop
+                                </RoundedButton>
+                            </ProductLink>
                         </div>
                     ))}
                 </div>
