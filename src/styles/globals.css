@@ -2,6 +2,7 @@
 
 :root {
     --background: #071926;
+    --background-lighter: #98a5ae;
     --foreground: #171717;
     --contrasted: #ffffff;
     --component-color: #6a7282;
@@ -17,6 +18,7 @@
 
 @theme inline {
     --color-background: var(--background);
+    --color-background-lighter: var(--background-lighter);
     --color-foreground: var(--foreground);
     --color-contrasted: var(--contrasted);
     --color-component-color: var(--component-color);

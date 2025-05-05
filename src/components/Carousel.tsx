@@ -74,7 +74,7 @@ export default function Carousel() {
                             id={`featured-${idx + 1}`}
                             className="relative py-2 min-w-[var(--carousel-img-w)]"
                         >
-                            <div className="featured-wrapper h-full snap-center drop-shadow-(--button-shadow) z-0">
+                            <div className="featured-wrapper relative h-full snap-center drop-shadow-(--button-shadow) z-0">
                                 <Image
                                     src={featuredItem.product.src}
                                     alt={featuredItem.alt}

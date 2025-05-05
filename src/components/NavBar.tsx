@@ -42,9 +42,11 @@ export default function NavBar() {
                     <div className="hover:scale-125 transition">
                         <IoSearchOutline />
                     </div>
-                    <div className="hover:scale-125 transition">
-                        <IoHeartOutline />
-                    </div>
+                    <Link href={"/wishlist"}>
+                        <div className="hover:scale-125 transition">
+                            <IoHeartOutline />
+                        </div>
+                    </Link>
                     <div className="hover:scale-125 transition">
                         <IoBagOutline />
                     </div>
