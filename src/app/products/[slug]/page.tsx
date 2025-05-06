@@ -1,8 +1,9 @@
 import { productList } from "@/lib/data";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import RoundedButton from "@/components/RoundedButton";
 import { IoBag, IoHeartOutline } from "react-icons/io5";
+import GoButton from "@/components/GoButton";
+import GeneralButton from "@/components/GeneralButton";
 
 export default async function Page({ params }: { params: { slug: string } }) {
     const { slug } = await params;
@@ -58,12 +59,12 @@ export default async function Page({ params }: { params: { slug: string } }) {
                         );
                     })}
                 </select>
-                <RoundedButton className="flex justify-center items-center !bg-green-700 border-green-700 border-2 !text-contrasted gap-2">
+                <GoButton>
                     Add to Bag <IoBag />
-                </RoundedButton>
-                <RoundedButton className="flex justify-center items-center border-2 gap-2">
+                </GoButton>
+                <GeneralButton>
                     Add to Wishlist <IoHeartOutline className="stroked-path" />
-                </RoundedButton>
+                </GeneralButton>
             </div>
         </section>
     );

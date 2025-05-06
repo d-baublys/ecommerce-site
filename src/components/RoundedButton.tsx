@@ -6,7 +6,7 @@ export default function RoundedButton({
     className?: string;
 }) {
     return (
-        <button className={`px-6 py-2 rounded-full bg-contrasted text-foreground ` + classes}>
+        <button className={`flex justify-center items-center px-6 py-2 rounded-full border-2 gap-2 ` + classes}>
             {children}
         </button>
     );

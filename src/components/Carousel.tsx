@@ -4,9 +4,9 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { IoChevronBackSharp, IoChevronForwardSharp } from "react-icons/io5";
 import { debounce } from "@/lib/helpers";
-import { featureList } from "@/lib/data";
-import RoundedButton from "./RoundedButton";
+import { featuredList } from "@/lib/data";
 import ProductLink from "./ProductLink";
+import GeneralButton from "./GeneralButton";
 
 export default function Carousel() {
     const [activeFeatured, setActiveFeatured] = useState(0);
@@ -17,7 +17,7 @@ export default function Carousel() {
         if (isScrolling) return;
         setIsScrolling(true);
         setActiveFeatured((prev) => {
-            return prev !== 0 ? prev - 1 : featureList.length - 1;
+            return prev !== 0 ? prev - 1 : featuredList.length - 1;
         });
     }
 
@@ -25,7 +25,7 @@ export default function Carousel() {
         if (isScrolling) return;
         setIsScrolling(true);
         setActiveFeatured((prev) => {
-            return prev < featureList.length - 1 ? prev + 1 : 0;
+            return prev < featuredList.length - 1 ? prev + 1 : 0;
         });
     }
 
@@ -68,7 +68,7 @@ export default function Carousel() {
                     id="carousel-slider"
                     className="flex overflow-x-hidden gap-(--carousel-img-gap) px-(--carousel-img-w) h-full z-30"
                 >
-                    {featureList.map((featuredItem, idx) => (
+                    {featuredList.map((featuredItem, idx) => (
                         <div
                             key={featuredItem.product.id}
                             id={`featured-${idx + 1}`}
@@ -84,9 +84,9 @@ export default function Carousel() {
                                 />
                             </div>
                             <ProductLink slug={featuredItem.product.slug}>
-                                <RoundedButton className="absolute left-[50%] bottom-1/6 translate-x-[-50%] drop-shadow-(--button-shadow) cursor-pointer hover:scale-105 hover:text-component-color transition z-50">
+                                <GeneralButton className="absolute left-[50%] bottom-1/6 translate-x-[-50%] drop-shadow-(--button-shadow) !border-none cursor-pointer hover:scale-105 hover:text-component-color transition z-50">
                                     Shop
-                                </RoundedButton>
+                                </GeneralButton>
                             </ProductLink>
                         </div>
                     ))}
@@ -127,7 +127,7 @@ export default function Carousel() {
                     id="carousel-dot-container"
                     className="absolute flex items-center gap-[10px] bottom-[calc(50px)] left-[50%] translate-x-[-50%] translate-y-[50%]"
                 >
-                    {featureList.map((_, idx) => (
+                    {featuredList.map((_, idx) => (
                         <button
                             onClick={() => {
                                 setActiveFeatured(idx);

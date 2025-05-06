@@ -29,3 +29,17 @@ type WomensProduct = ProductBase & {
 };
 
 export type ProductType = MensProduct | WomensProduct;
+
+type MensBagItem = {
+    product: MensProduct;
+    size: MensSizes;
+    quantity: number;
+};
+
+type WomensBagItem = {
+    product: WomensProduct;
+    size: WomensSizes;
+    quantity: number;
+};
+
+export type BagItem = MensBagItem | WomensBagItem;

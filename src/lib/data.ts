@@ -84,7 +84,7 @@ export const productList: ProductType[] = [
     },
 ];
 
-export const featureList = [
+export const featuredList = [
     { product: productList[0], alt: "Featured t-shirt 1" },
     { product: productList[1], alt: "Featured t-shirt 2" },
     { product: productList[2], alt: "Featured t-shirt 3" },
