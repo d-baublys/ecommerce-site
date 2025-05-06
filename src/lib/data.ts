@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
-import { ProductType } from "./types";
+import { Product } from "./types";
 
-export const productList: ProductType[] = [
+export const productList: Product[] = [
     {
         id: uuidv4(),
         name: "T-shirt design 1",
@@ -45,7 +45,7 @@ export const productList: ProductType[] = [
         stock: {
             s: 2,
             m: 3,
-            l: 5,
+            l: 0,
             xl: 5,
             xxl: 7,
         },

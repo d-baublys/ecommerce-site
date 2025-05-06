@@ -30,8 +30,8 @@ export default async function Page({ params }: { params: { slug: string } }) {
                     className="aspect-[2/3] w-full md:w-auto md:h-[500px] snap-center drop-shadow-(--button-shadow) z-0"
                 >
                     <Image
-                        src={productData!.src}
-                        alt={productData!.alt}
+                        src={productData.src}
+                        alt={productData.alt}
                         fill
                         sizes="auto"
                         className="object-cover rounded-md"
@@ -47,7 +47,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
                     </option>
                     {Object.keys(productData.stock).map((size, idx) => {
                         const inStock =
-                            productData.stock[size as keyof typeof productData.stock] > 0;
+                            productData.stock[size as keyof typeof productData.stock] !== 0;
                         return (
                             <option
                                 key={idx}

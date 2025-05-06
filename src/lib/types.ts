@@ -1,45 +1,18 @@
-type ProductBase = {
+type Sizes = "xs" | "s" | "m" | "l" | "xl" | "xxl";
+
+export type Product = {
     id: string;
     name: string;
+    gender: "mens" | "womens";
     price: number;
     slug: string;
     src: string;
     alt: string;
+    stock: Partial<Record<Sizes, number>>;
 };
 
-type MensSizes = "s" | "m" | "l" | "xl" | "xxl";
-type WomensSizes = "xs" | "s" | "m" | "l" | "xl";
-
-type MensStock = {
-    [key in MensSizes]: number;
-};
-
-type WomensStock = {
-    [key in WomensSizes]: number;
-};
-
-type MensProduct = ProductBase & {
-    gender: "mens";
-    stock: MensStock;
-};
-
-type WomensProduct = ProductBase & {
-    gender: "womens";
-    stock: WomensStock;
-};
-
-export type ProductType = MensProduct | WomensProduct;
-
-type MensBagItem = {
-    product: MensProduct;
-    size: MensSizes;
+export type BagItem = {
+    product: Product;
+    size: Sizes;
     quantity: number;
 };
-
-type WomensBagItem = {
-    product: WomensProduct;
-    size: WomensSizes;
-    quantity: number;
-};
-
-export type BagItem = MensBagItem | WomensBagItem;
