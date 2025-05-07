@@ -1,0 +1,30 @@
+import { NextResponse } from "next/server";
+import stripe from "@/lib/stripe";
+import { BagItem } from "@/lib/types";
+
+export async function POST(req: Request) {
+    const { bagItems } = await req.json();
+
+    try {
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            mode: "payment",
+            line_items: bagItems.map((bagItem: BagItem) => ({
+                price_data: {
+                    currency: "gbp",
+                    product_data: {
+                        name: bagItem.product.name,
+                    },
+                    unit_amount: bagItem.product.price,
+                },
+                quantity: bagItem.quantity,
+            })),
+            success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success`,
+            cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/cancel`,
+        });
+
+        return NextResponse.json({ url: session.url });
+    } catch {
+        return NextResponse.json({ error: "Stripe session creation failed" }, { status: 500 });
+    }
+}

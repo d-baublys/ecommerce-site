@@ -4,6 +4,7 @@ import GoButton from "@/components/GoButton";
 import ProductTile from "@/components/ProductTile";
 import { productList } from "@/lib/data";
 import { BagItem, Product } from "@/lib/types";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function Page() {
@@ -33,7 +34,13 @@ export default function Page() {
                         handleDelete={handleDelete}
                     />
                 ))}
-                {!emptyBag ? <GoButton>Proceed to Checkout</GoButton> : "Your bag is empty!"}
+                {!emptyBag ? (
+                    <Link href={"/checkout"}>
+                        <GoButton className="cursor-pointer">Proceed to Checkout</GoButton>
+                    </Link>
+                ) : (
+                    "Your bag is empty!"
+                )}
             </div>
         </div>
     );
