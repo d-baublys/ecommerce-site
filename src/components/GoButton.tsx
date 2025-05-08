@@ -12,7 +12,7 @@ export default function GoButton({
     return (
         <RoundedButton
             onClick={onClick}
-            className={`bg-green-700 border-green-700 text-contrasted ` + classes}
+            className={`bg-go-color border-go-color text-contrasted ` + classes}
         >
             {children}
         </RoundedButton>

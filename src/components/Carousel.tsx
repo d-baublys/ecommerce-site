@@ -74,7 +74,7 @@ export default function Carousel() {
                             id={`featured-${idx + 1}`}
                             className="relative py-2 min-w-[var(--carousel-img-w)]"
                         >
-                            <div className="featured-wrapper relative h-full snap-center drop-shadow-(--button-shadow) z-0">
+                            <div className="featured-wrapper relative h-full snap-center drop-shadow-(--tile-shadow) z-0">
                                 <Image
                                     src={featuredItem.product.src}
                                     alt={featuredItem.alt}
@@ -84,7 +84,7 @@ export default function Carousel() {
                                 />
                             </div>
                             <ProductLink slug={featuredItem.product.slug}>
-                                <GeneralButton className="absolute left-[50%] bottom-1/6 translate-x-[-50%] drop-shadow-(--button-shadow) !border-none cursor-pointer hover:scale-105 hover:text-component-color transition z-50">
+                                <GeneralButton className="absolute left-[50%] bottom-1/6 translate-x-[-50%] !border-none z-50">
                                     Shop
                                 </GeneralButton>
                             </ProductLink>

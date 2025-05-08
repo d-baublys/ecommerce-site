@@ -4,7 +4,7 @@ import GoButton from "@/components/GoButton";
 import ProductTile from "@/components/ProductTile";
 import { productList } from "@/lib/data";
 import { BagItem, Product } from "@/lib/types";
-import Link from "next/link";
+import { loadStripe } from "@stripe/stripe-js";
 import { useState } from "react";
 
 export default function Page() {
@@ -21,6 +21,25 @@ export default function Page() {
         setBag(bag.filter((product) => product !== deletedProduct));
     };
 
+    const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
+    const handleCheckout = async () => {
+        const res = await fetch("/api/create-checkout-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                bagItems: placeholder,
+            }),
+        });
+        const data = await res.json();
+        if (data.url) {
+            await stripePromise;
+            window.location.href = data.url;
+        } else {
+            alert("Error starting checkout");
+        }
+    };
+
     return (
         <div className="flex flex-col justify-center items-center grow w-full">
             <div className="flex justify-center items-center w-full p-2 bg-background-lighter text-contrasted font-semibold md:text-xl">
@@ -35,9 +54,7 @@ export default function Page() {
                     />
                 ))}
                 {!emptyBag ? (
-                    <Link href={"/checkout"}>
-                        <GoButton className="cursor-pointer">Proceed to Checkout</GoButton>
-                    </Link>
+                    <GoButton onClick={handleCheckout}>Proceed to Checkout</GoButton>
                 ) : (
                     "Your bag is empty!"
                 )}

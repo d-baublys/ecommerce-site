@@ -27,7 +27,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
             <div className="flex justify-center w-full md:w-1/2 md:m-8">
                 <div
                     id="product-img-wrapper"
-                    className="aspect-[2/3] w-full md:w-auto md:h-[500px] snap-center drop-shadow-(--button-shadow) z-0"
+                    className="aspect-[2/3] w-full md:w-auto md:h-[500px] snap-center drop-shadow-(--tile-shadow) z-0"
                 >
                     <Image
                         src={productData.src}
