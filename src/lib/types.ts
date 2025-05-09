@@ -1,4 +1,4 @@
-type Sizes = "xs" | "s" | "m" | "l" | "xl" | "xxl";
+export type Sizes = "xs" | "s" | "m" | "l" | "xl" | "xxl";
 
 export type Product = {
     id: string;

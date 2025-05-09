@@ -1,13 +1,21 @@
+"use client";
+
 import { productList } from "@/lib/data";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { IoBag, IoHeartOutline } from "react-icons/io5";
 import GoButton from "@/components/GoButton";
 import GeneralButton from "@/components/GeneralButton";
+import { useBagStore } from "@/stores/bagStore";
+import { useState } from "react";
+import { Sizes } from "@/lib/types";
 
-export default async function Page({ params }: { params: { slug: string } }) {
-    const { slug } = await params;
+export default function Page({ params }: { params: { slug: string } }) {
+    const { slug } = params;
+    const [size, setSize] = useState<Sizes>();
     const productData = productList.find((p) => p.slug === slug);
+
+    const addToBag = useBagStore((state) => state.addToBag);
 
     if (!productData) {
         notFound();
@@ -41,7 +49,12 @@ export default async function Page({ params }: { params: { slug: string } }) {
             <div id="product-aside" className="flex flex-col md:w-1/2 min-h-full m-8 gap-8 ">
                 <div>{productData.name}</div>
                 <div className="font-semibold">{getLocalFormatting(productData.price)}</div>
-                <select className="p-2 bg-white border-2 rounded-md" defaultValue={"default"}>
+                <select
+                    className="p-2 bg-white border-2 rounded-md"
+                    defaultValue={"default"}
+                    required
+                    onChange={(e) => setSize(e.target.value as Sizes)}
+                >
                     <option value="default" hidden>
                         Please select a size
                     </option>
@@ -53,13 +66,18 @@ export default async function Page({ params }: { params: { slug: string } }) {
                                 key={idx}
                                 value={size}
                                 className={`${!inStock && "text-component-color"}`}
+                                disabled={!inStock}
                             >
                                 {size.toUpperCase()} {!inStock && " - out of stock"}
                             </option>
                         );
                     })}
                 </select>
-                <GoButton>
+                <GoButton
+                    onClick={() =>
+                        addToBag({ product: productData, size: size as Sizes, quantity: 1 })
+                    }
+                >
                     Add to Bag <IoBag />
                 </GoButton>
                 <GeneralButton>

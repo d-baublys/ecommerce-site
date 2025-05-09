@@ -1,5 +1,6 @@
 "use client";
 
+import { useBagStore } from "@/stores/bagStore";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -7,6 +8,11 @@ import { IoBagOutline, IoHeartOutline, IoPersonOutline, IoSearchOutline } from "
 
 export default function NavBar() {
     const [isScrollingUp, setIsScrollingUp] = useState(false);
+
+    let itemCount = 0;
+    const bag = useBagStore((state) => state.bag);
+
+    bag.forEach((bagItem) => (itemCount += bagItem.quantity));
 
     useEffect(() => {
         let lastScroll = window.scrollY;
@@ -39,21 +45,26 @@ export default function NavBar() {
                     </Link>
                 </div>
                 <div className="flex gap-6 lg:col-start-3 lg:justify-end">
-                    <div className="hover:scale-125 transition">
-                        <IoSearchOutline />
+                    <div>
+                        <IoSearchOutline className="hover:scale-125 transition" />
                     </div>
                     <Link href={"/wishlist"}>
-                        <div className="hover:scale-125 transition">
-                            <IoHeartOutline />
+                        <div>
+                            <IoHeartOutline className="hover:scale-125 transition" />
                         </div>
                     </Link>
                     <Link href={"/bag"}>
-                        <div className="hover:scale-125 transition">
-                            <IoBagOutline />
+                        <div className="relative">
+                            <IoBagOutline className="hover:scale-125 transition" />
+                            {itemCount > 0 && (
+                                <div className="bag-item-count flex justify-center items-center absolute top-[-67%] w-4 aspect-square right-[-67%] [border-radius:50%] bg-red-500 text-contrasted text-[0.67rem]">
+                                    {Math.min(itemCount, 99)}
+                                </div>
+                            )}
                         </div>
                     </Link>
-                    <div className="hover:scale-125 transition">
-                        <IoPersonOutline />
+                    <div>
+                        <IoPersonOutline className="hover:scale-125 transition" />
                     </div>
                 </div>
             </div>

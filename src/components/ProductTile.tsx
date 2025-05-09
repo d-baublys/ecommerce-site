@@ -2,6 +2,7 @@ import { BagItem, Product } from "@/lib/types";
 import Link from "next/link";
 import { IoClose } from "react-icons/io5";
 import Image from "next/image";
+import { useBagStore } from "@/stores/bagStore";
 
 export default function ProductTile({
     dataObj,
@@ -16,6 +17,8 @@ export default function ProductTile({
     const stock = isBagItem ? dataObj.product.stock : null;
     const qtyOptions = isBagItem ? stock![dataObj.size as keyof typeof stock] : null;
     const maxQty = Math.min(qtyOptions ?? 0, 5);
+
+    const updateQuantity = useBagStore((state) => state.updateQuantity);
 
     return (
         <div className="flex h-24 w-full sm:w-1/2 min-w-[300px] sm:min-w-[500px] border-2 p-2">
@@ -47,9 +50,13 @@ export default function ProductTile({
                 />
                 {isBagItem &&
                     (qtyOptions ? (
-                        <select className="h-10 w-10 pl-1 text-xl border-2 rounded-md">
+                        <select
+                            value={dataObj.quantity}
+                            className="h-10 w-10 pl-1 text-xl border-2 rounded-md"
+                            onChange={(e) => updateQuantity(productData.id, Number(e.target.value))}
+                        >
                             {Array.from({ length: maxQty }, (_, idx) => (
-                                <option value={idx} key={idx}>
+                                <option value={idx + 1} key={idx}>
                                     {idx + 1}
                                 </option>
                             ))}

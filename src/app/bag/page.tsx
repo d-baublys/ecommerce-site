@@ -2,24 +2,14 @@
 
 import GoButton from "@/components/GoButton";
 import ProductTile from "@/components/ProductTile";
-import { productList } from "@/lib/data";
-import { BagItem, Product } from "@/lib/types";
+import { useBagStore } from "@/stores/bagStore";
 import { loadStripe } from "@stripe/stripe-js";
-import { useState } from "react";
 
 export default function Page() {
-    const placeholder: BagItem[] = [
-        { product: productList[2], size: "l", quantity: 1 },
-        { product: productList[3], size: "xl", quantity: 1 },
-    ];
-
-    const [bag, setBag] = useState<BagItem[]>(placeholder); // temporary for prototype
+    const bag = useBagStore((state) => state.bag);
+    const removeFromBag = useBagStore((state) => state.removeFromBag);
 
     const emptyBag = bag.length === 0;
-
-    const handleDelete = (deletedProduct: Product | BagItem) => {
-        setBag(bag.filter((product) => product !== deletedProduct));
-    };
 
     const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -28,7 +18,7 @@ export default function Page() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                bagItems: placeholder,
+                bagItems: bag,
             }),
         });
         const data = await res.json();
@@ -48,9 +38,9 @@ export default function Page() {
             <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-4">
                 {bag.map((bagItem) => (
                     <ProductTile
-                        key={bagItem.product!.id}
+                        key={bagItem.product.id}
                         dataObj={bagItem}
-                        handleDelete={handleDelete}
+                        handleDelete={() => removeFromBag(bagItem.product.id)}
                     />
                 ))}
                 {!emptyBag ? (
