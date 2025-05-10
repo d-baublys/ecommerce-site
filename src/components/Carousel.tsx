@@ -70,7 +70,7 @@ export default function Carousel() {
                 >
                     {featuredList.map((featuredItem, idx) => (
                         <div
-                            key={featuredItem.product.id}
+                            key={idx}
                             id={`featured-${idx + 1}`}
                             className="relative py-2 min-w-[var(--carousel-img-w)]"
                         >

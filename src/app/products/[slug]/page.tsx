@@ -12,14 +12,14 @@ import { Sizes } from "@/lib/types";
 
 export default function Page({ params }: { params: { slug: string } }) {
     const { slug } = params;
-    const [size, setSize] = useState<Sizes>();
     const productData = productList.find((p) => p.slug === slug);
-
-    const addToBag = useBagStore((state) => state.addToBag);
 
     if (!productData) {
         notFound();
     }
+
+    const [size, setSize] = useState<Sizes>();
+    const addToBag = useBagStore((state) => state.addToBag);
 
     function getLocalFormatting(price: number) {
         return Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
@@ -51,6 +51,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                 <div className="font-semibold">{getLocalFormatting(productData.price)}</div>
                 <select
                     className="p-2 bg-white border-2 rounded-md"
+                    value={size}
                     defaultValue={"default"}
                     required
                     onChange={(e) => setSize(e.target.value as Sizes)}
@@ -58,17 +59,17 @@ export default function Page({ params }: { params: { slug: string } }) {
                     <option value="default" hidden>
                         Please select a size
                     </option>
-                    {Object.keys(productData.stock).map((size, idx) => {
+                    {Object.keys(productData.stock).map((productSize, idx) => {
                         const inStock =
-                            productData.stock[size as keyof typeof productData.stock] !== 0;
+                            productData.stock[productSize as keyof typeof productData.stock] !== 0;
                         return (
                             <option
                                 key={idx}
-                                value={size}
+                                value={productSize}
                                 className={`${!inStock && "text-component-color"}`}
                                 disabled={!inStock}
                             >
-                                {size.toUpperCase()} {!inStock && " - out of stock"}
+                                {productSize.toUpperCase()} {!inStock && " - out of stock"}
                             </option>
                         );
                     })}

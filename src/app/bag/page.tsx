@@ -36,9 +36,9 @@ export default function Page() {
                 My Bag
             </div>
             <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-4">
-                {bag.map((bagItem) => (
+                {bag.map((bagItem, idx) => (
                     <ProductTile
-                        key={bagItem.product.id}
+                        key={idx}
                         dataObj={bagItem}
                         handleDelete={() => removeFromBag(bagItem.product.id)}
                     />

@@ -14,23 +14,38 @@ export const useBagStore = create<BagStore>((set) => {
         bag: [],
         addToBag: (newItem) => {
             return set((state) => {
+                const { product, size, quantity } = newItem;
+                const currStock = product.stock[size];
+
+                if (!currStock) return state;
+
                 const existing = state.bag.find(
-                    (currItem) =>
-                        currItem.product.id === newItem.product.id && currItem.size === newItem.size
+                    (bagItem) => bagItem.product.id === product.id && bagItem.size === size
                 );
 
                 if (existing) {
+                    if (
+                        existing.quantity >=
+                        Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY)
+                    )
+                        return state;
+
+                    product.stock[size]! -= quantity;
+
                     return {
                         bag: state.bag.map((existingItem) => {
-                            return existingItem.product.id === newItem.product.id
+                            return existingItem.product.id === product.id &&
+                                existingItem.size === size
                                 ? {
-                                      ...existingItem,
-                                      quantity: existingItem.quantity + newItem.quantity,
+                                      ...existing,
+                                      quantity: existingItem.quantity + quantity,
                                   }
                                 : existingItem;
                         }),
                     };
                 }
+                product.stock[size]! -= quantity;
+
                 return { bag: [...state.bag, newItem] };
             });
         },

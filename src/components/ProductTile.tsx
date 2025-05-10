@@ -16,7 +16,10 @@ export default function ProductTile({
 
     const stock = isBagItem ? dataObj.product.stock : null;
     const qtyOptions = isBagItem ? stock![dataObj.size as keyof typeof stock] : null;
-    const maxQty = Math.min(qtyOptions ?? 0, 5);
+    const maxQty = Math.min(
+        qtyOptions ?? 0,
+        Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY)
+    );
 
     const updateQuantity = useBagStore((state) => state.updateQuantity);
 
