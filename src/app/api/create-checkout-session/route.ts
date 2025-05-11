@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import stripe from "@/lib/stripe";
-import { BagItem } from "@/lib/types";
+import { BagItem } from "@/lib/definitions";
 
 export async function POST(req: Request) {
     const { bagItems } = await req.json();

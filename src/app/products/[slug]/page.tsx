@@ -4,11 +4,11 @@ import { productList } from "@/lib/data";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { IoBag, IoHeartOutline } from "react-icons/io5";
-import GoButton from "@/components/GoButton";
-import GeneralButton from "@/components/GeneralButton";
+import GoButton from "@/ui/components/GoButton";
+import GeneralButton from "@/ui/components/GeneralButton";
 import { useBagStore } from "@/stores/bagStore";
 import { useState } from "react";
-import { Sizes } from "@/lib/types";
+import { Sizes } from "@/lib/definitions";
 
 export default function Page({ params }: { params: { slug: string } }) {
     const { slug } = params;
@@ -35,7 +35,7 @@ export default function Page({ params }: { params: { slug: string } }) {
             <div className="flex justify-center w-full md:w-1/2 md:m-8">
                 <div
                     id="product-img-wrapper"
-                    className="aspect-[2/3] w-full md:w-auto md:h-[500px] snap-center drop-shadow-(--tile-shadow) z-0"
+                    className="relative aspect-[2/3] w-full md:w-auto md:h-[500px] snap-center drop-shadow-(--tile-shadow) z-0"
                 >
                     <Image
                         src={productData.src}

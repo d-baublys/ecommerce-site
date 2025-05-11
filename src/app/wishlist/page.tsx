@@ -1,8 +1,8 @@
 "use client";
 
-import ProductTile from "@/components/ProductTile";
+import ProductTile from "@/ui/components/ProductTile";
 import { productList } from "@/lib/data";
-import { BagItem, Product } from "@/lib/types";
+import { BagItem, Product } from "@/lib/definitions";
 import { useState } from "react";
 
 export default function Page() {

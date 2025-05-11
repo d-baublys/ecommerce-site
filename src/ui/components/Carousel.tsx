@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { IoChevronBackSharp, IoChevronForwardSharp } from "react-icons/io5";
-import { debounce } from "@/lib/helpers";
+import { debounce } from "@/lib/utils";
 import { featuredList } from "@/lib/data";
 import ProductLink from "./ProductLink";
 import GeneralButton from "./GeneralButton";

@@ -1,7 +1,7 @@
 "use client";
 
-import GoButton from "@/components/GoButton";
-import ProductTile from "@/components/ProductTile";
+import GoButton from "@/ui/components/GoButton";
+import ProductTile from "@/ui/components/ProductTile";
 import { useBagStore } from "@/stores/bagStore";
 import { loadStripe } from "@stripe/stripe-js";
 

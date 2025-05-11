@@ -1,4 +1,4 @@
-import { BagItem, Product } from "@/lib/types";
+import { BagItem, Product } from "@/lib/definitions";
 import Link from "next/link";
 import { IoClose } from "react-icons/io5";
 import Image from "next/image";

@@ -1,4 +1,4 @@
-import { BagItem } from "@/lib/types";
+import { BagItem } from "@/lib/definitions";
 import { create } from "zustand";
 
 type BagStore = {

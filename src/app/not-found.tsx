@@ -1,4 +1,4 @@
-import GeneralButton from "@/components/GeneralButton";
+import GeneralButton from "@/ui/components/GeneralButton";
 import Link from "next/link";
 
 export default function NotFound() {

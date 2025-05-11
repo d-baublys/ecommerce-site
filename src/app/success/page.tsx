@@ -1,4 +1,4 @@
-import GeneralButton from "@/components/GeneralButton";
+import GeneralButton from "@/ui/components/GeneralButton";
 import stripe from "@/lib/stripe";
 import Link from "next/link";
 import { notFound } from "next/navigation";

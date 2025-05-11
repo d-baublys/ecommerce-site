@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Carousel from "@/components/Carousel";
+import Carousel from "@/ui/components/Carousel";
 
 export default function Home() {
     return (

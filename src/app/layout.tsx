@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { Lexend_Exa } from "next/font/google";
-import "@/styles/globals.css";
-import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer";
-
-const lexendExa = Lexend_Exa({ variable: "--font-lexend-exa", subsets: ["latin"] });
+import "@/ui/styles/globals.css";
+import NavBar from "@/ui/components/NavBar";
+import Footer from "@/ui/components/Footer";
+import { lexendExa } from "@/ui/fonts";
 
 export const metadata: Metadata = {
     title: "D-Wear",
