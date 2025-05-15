@@ -4,11 +4,15 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { IoChevronBackSharp, IoChevronForwardSharp } from "react-icons/io5";
 import { debounce } from "@/lib/utils";
-import { featuredList } from "@/lib/data";
 import ProductLink from "./ProductLink";
 import GeneralButton from "./GeneralButton";
+import { Product } from "@/lib/definitions";
 
-export default function Carousel() {
+export default function Carousel({
+    featuredList,
+}: {
+    featuredList: { product: Product; alt: string }[];
+}) {
     const [activeFeatured, setActiveFeatured] = useState(0);
     const activeFeaturedRef = useRef(0);
     const [isScrolling, setIsScrolling] = useState(false);

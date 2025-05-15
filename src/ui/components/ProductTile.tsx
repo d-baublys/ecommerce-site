@@ -8,13 +8,13 @@ export default function ProductTile({
     dataObj,
     handleDelete,
 }: {
-    dataObj: Product | BagItem;
+    dataObj: Product | BagItem & { stock: number };
     handleDelete: (item: Product | BagItem) => void;
 }) {
     const isBagItem = "quantity" in dataObj;
     const productData = isBagItem ? dataObj.product : dataObj;
 
-    const stock = isBagItem ? dataObj.product.stock : null;
+    const stock = isBagItem ? dataObj.stock : null;
     const qtyOptions = isBagItem ? stock![dataObj.size as keyof typeof stock] : null;
     const maxQty = Math.min(
         qtyOptions ?? 0,

@@ -1,7 +1,18 @@
 import Image from "next/image";
 import Carousel from "@/ui/components/Carousel";
+import { fetchData } from "@/lib/utils";
 
-export default function Home() {
+export default async function Home() {
+    const productList = await fetchData();
+
+    const featuredList = [
+        { product: productList[0], alt: "Featured t-shirt 1" },
+        { product: productList[1], alt: "Featured t-shirt 2" },
+        { product: productList[2], alt: "Featured t-shirt 3" },
+        { product: productList[3], alt: "Featured t-shirt 4" },
+        { product: productList[4], alt: "Featured t-shirt 5" },
+    ];
+
     return (
         <>
             <div className="main-product relative grow w-full min-h-[400px]">
@@ -22,7 +33,7 @@ export default function Home() {
                 <div className="p-(--gutter) xl:p-(--gutter-md) font-semibold md:text-xl">
                     Featured
                 </div>
-                <Carousel />
+                <Carousel featuredList={featuredList} />
             </div>
         </>
     );
