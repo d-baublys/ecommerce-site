@@ -21,7 +21,13 @@ export default function Page() {
             </div>
             <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-4">
                 {wishlist.map((product, idx) => {
-                    return <ProductTile key={idx} dataObj={product} handleDelete={handleDelete} />;
+                    return (
+                        <ProductTile
+                            key={idx}
+                            dataObj={product}
+                            handleDelete={() => handleDelete(product)}
+                        />
+                    );
                 })}
                 {emptyWishlist && "Your wishlist is empty!"}
             </div>

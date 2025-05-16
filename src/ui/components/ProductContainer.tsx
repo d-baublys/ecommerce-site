@@ -11,6 +11,7 @@ import GeneralButton from "./GeneralButton";
 
 export default function ProductContainer({ productData }: { productData: Product }) {
     const [size, setSize] = useState<Sizes>();
+    const bag = useBagStore((state) => state.bag);
     const addToBag = useBagStore((state) => state.addToBag);
 
     function getLocalFormatting(price: number) {
@@ -51,16 +52,27 @@ export default function ProductContainer({ productData }: { productData: Product
                         Please select a size
                     </option>
                     {Object.keys(productData.stock).map((productSize, idx) => {
-                        const inStock =
-                            productData.stock[productSize as keyof typeof productData.stock] !== 0;
+                        const backendStock =
+                            productData.stock[productSize as keyof typeof productData.stock];
+
+                        const existing = bag.find(
+                            (bagItem) =>
+                                bagItem.product.id === productData.id &&
+                                bagItem.size === productSize
+                        );
+
+                        const bagQuantity = existing?.quantity ?? 0;
+
+                        const netStock = backendStock! - bagQuantity;
+
                         return (
                             <option
                                 key={idx}
                                 value={productSize}
-                                className={`${!inStock && "text-component-color"}`}
-                                disabled={!inStock}
+                                className={`${!netStock && "text-component-color"}`}
+                                disabled={!netStock}
                             >
-                                {productSize.toUpperCase()} {!inStock && " - out of stock"}
+                                {productSize.toUpperCase()} {!netStock && " - out of stock"}
                             </option>
                         );
                     })}

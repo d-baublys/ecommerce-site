@@ -38,8 +38,12 @@ export default function Page() {
 
     if (!latestData) return;
 
-    const bagItemsMap = new Map(bag.map((bagItem) => [bagItem.product.id, bagItem]));
-    const mergedItems = latestData!.map((item) => ({...bagItemsMap.get(item.id) , ...item}));
+    const latestDataMap = new Map(latestData.map((item) => [item.id, item.stock]));
+    const mergedItems = bag.map((item) => {
+        const latestSizeStock = latestDataMap.get(item.product.id)?.[item.size] ?? 0;
+
+        return { ...item, latestSizeStock };
+    });
 
     const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -70,7 +74,7 @@ export default function Page() {
                     <ProductTile
                         key={idx}
                         dataObj={mergedItem}
-                        handleDelete={() => removeFromBag(mergedItem.product!.id)}
+                        handleDelete={() => removeFromBag(mergedItem.product!.id, mergedItem.size)}
                     />
                 ))}
                 {!emptyBag ? (

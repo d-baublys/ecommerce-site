@@ -8,18 +8,14 @@ export default function ProductTile({
     dataObj,
     handleDelete,
 }: {
-    dataObj: Product | BagItem & { stock: number };
-    handleDelete: (item: Product | BagItem) => void;
+    dataObj: Product | (BagItem & { latestSizeStock: number });
+    handleDelete: () => void;
 }) {
     const isBagItem = "quantity" in dataObj;
     const productData = isBagItem ? dataObj.product : dataObj;
 
-    const stock = isBagItem ? dataObj.stock : null;
-    const qtyOptions = isBagItem ? stock![dataObj.size as keyof typeof stock] : null;
-    const maxQty = Math.min(
-        qtyOptions ?? 0,
-        Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY)
-    );
+    const stock = isBagItem ? dataObj.latestSizeStock : null;
+    const maxQty = Math.min(stock ?? 0, Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY));
 
     const updateQuantity = useBagStore((state) => state.updateQuantity);
 
@@ -47,16 +43,15 @@ export default function ProductTile({
                 </div>
             </Link>
             <div className="flex flex-col justify-between items-end h-full w-24 text-2xl">
-                <IoClose
-                    onClick={() => handleDelete(dataObj)}
-                    className="translate-x-1 cursor-pointer"
-                />
+                <IoClose onClick={handleDelete} className="translate-x-1 cursor-pointer" />
                 {isBagItem &&
-                    (qtyOptions ? (
+                    (stock ? (
                         <select
                             value={dataObj.quantity}
                             className="h-10 w-10 pl-1 text-xl border-2 rounded-md"
-                            onChange={(e) => updateQuantity(productData.id, Number(e.target.value))}
+                            onChange={(e) =>
+                                updateQuantity(productData.id, dataObj.size, Number(e.target.value))
+                            }
                         >
                             {Array.from({ length: maxQty }, (_, idx) => (
                                 <option value={idx + 1} key={idx}>
