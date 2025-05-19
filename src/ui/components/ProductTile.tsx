@@ -17,7 +17,13 @@ export default function ProductTile({
     const stock = isBagItem ? dataObj.latestSizeStock : null;
     const maxQty = Math.min(stock ?? 0, Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY));
 
+    const latestQuantity = isBagItem ? Math.min(dataObj.quantity, stock!) : null;
+
     const updateQuantity = useBagStore((state) => state.updateQuantity);
+
+    if (isBagItem && latestQuantity !== dataObj.quantity) {
+        updateQuantity(dataObj.product.id, dataObj.size, latestQuantity!);
+    }
 
     return (
         <div className="flex h-24 w-full sm:w-1/2 min-w-[300px] sm:min-w-[500px] border-2 p-2">

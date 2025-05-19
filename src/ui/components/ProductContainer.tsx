@@ -1,16 +1,18 @@
 "use client";
 
 import { useBagStore } from "@/stores/bagStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sizes } from "../../../generated/prisma";
 import Image from "next/image";
 import { Product } from "@/lib/definitions";
 import GoButton from "./GoButton";
 import { IoBag, IoHeartOutline } from "react-icons/io5";
 import GeneralButton from "./GeneralButton";
+import { getNetStock } from "@/lib/utils";
 
 export default function ProductContainer({ productData }: { productData: Product }) {
     const [size, setSize] = useState<Sizes>();
+    const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
     const bag = useBagStore((state) => state.bag);
     const addToBag = useBagStore((state) => state.addToBag);
 
@@ -19,6 +21,17 @@ export default function ProductContainer({ productData }: { productData: Product
             price / 100
         );
     }
+
+    useEffect(() => {
+        const selectedNetStock = getNetStock(
+            productData,
+            size as keyof typeof productData.stock,
+            bag
+        );
+
+        setIsButtonDisabled(selectedNetStock === 0);
+    }, [size, bag]);
+
     return (
         <section
             id="product-container"
@@ -52,18 +65,11 @@ export default function ProductContainer({ productData }: { productData: Product
                         Please select a size
                     </option>
                     {Object.keys(productData.stock).map((productSize, idx) => {
-                        const backendStock =
-                            productData.stock[productSize as keyof typeof productData.stock];
-
-                        const existing = bag.find(
-                            (bagItem) =>
-                                bagItem.product.id === productData.id &&
-                                bagItem.size === productSize
+                        const netStock = getNetStock(
+                            productData,
+                            productSize as keyof typeof productData.stock,
+                            bag
                         );
-
-                        const bagQuantity = existing?.quantity ?? 0;
-
-                        const netStock = backendStock! - bagQuantity;
 
                         return (
                             <option
@@ -79,8 +85,11 @@ export default function ProductContainer({ productData }: { productData: Product
                 </select>
                 <GoButton
                     onClick={() =>
+                        !isButtonDisabled &&
                         addToBag({ product: productData, size: size as Sizes, quantity: 1 })
                     }
+                    predicate={!(size === undefined || isButtonDisabled)}
+                    disabled={size === undefined || isButtonDisabled}
                 >
                     Add to Bag <IoBag />
                 </GoButton>

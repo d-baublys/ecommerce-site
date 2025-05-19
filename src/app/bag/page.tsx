@@ -9,10 +9,11 @@ import { Product } from "@/lib/definitions";
 
 export default function Page() {
     const [latestData, setLatestData] = useState<Product[]>();
+
     const bag = useBagStore((state) => state.bag);
     const removeFromBag = useBagStore((state) => state.removeFromBag);
-
     const emptyBag = bag.length === 0;
+    const noStock = useBagStore((state) => state.getTotalBagCount()) === 0;
 
     const bagProductIds = bag.map((bagItem) => bagItem.product.id);
 
@@ -77,10 +78,12 @@ export default function Page() {
                         handleDelete={() => removeFromBag(mergedItem.product!.id, mergedItem.size)}
                     />
                 ))}
-                {!emptyBag ? (
-                    <GoButton onClick={handleCheckout}>Proceed to Checkout</GoButton>
+                {!emptyBag && !noStock ? (
+                    <GoButton onClick={handleCheckout} predicate={!emptyBag && !noStock}>
+                        Proceed to Checkout
+                    </GoButton>
                 ) : (
-                    "Your bag is empty!"
+                    emptyBag && "Your bag is empty!"
                 )}
             </div>
         </div>

@@ -8,11 +8,7 @@ import { IoBagOutline, IoHeartOutline, IoPersonOutline, IoSearchOutline } from "
 
 export default function NavBar() {
     const [isScrollingUp, setIsScrollingUp] = useState(false);
-
-    let itemCount = 0;
-    const bag = useBagStore((state) => state.bag);
-
-    bag.forEach((bagItem) => (itemCount += bagItem.quantity));
+    const itemCount = useBagStore((state) => state.getTotalBagCount());
 
     useEffect(() => {
         let lastScroll = window.scrollY;

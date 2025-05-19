@@ -7,9 +7,10 @@ type BagStore = {
     removeFromBag: (id: string, size: Sizes) => void;
     clearBag: () => void;
     updateQuantity: (id: string, size: Sizes, quantity: number) => void;
+    getTotalBagCount: () => number;
 };
 
-export const useBagStore = create<BagStore>((set) => {
+export const useBagStore = create<BagStore>((set, get) => {
     return {
         bag: [],
         addToBag: (newItem) => {
@@ -62,6 +63,9 @@ export const useBagStore = create<BagStore>((set) => {
                     ),
                 };
             });
+        },
+        getTotalBagCount: () => {
+            return get().bag.reduce((total, item) => total + item.quantity, 0);
         },
     };
 });
