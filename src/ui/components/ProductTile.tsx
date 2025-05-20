@@ -1,4 +1,4 @@
-import { BagItem, Product } from "@/lib/definitions";
+import { BagItem, MergedBagItem, Product } from "@/lib/definitions";
 import Link from "next/link";
 import { IoClose } from "react-icons/io5";
 import Image from "next/image";
@@ -8,7 +8,7 @@ export default function ProductTile({
     dataObj,
     handleDelete,
 }: {
-    dataObj: Product | (BagItem & { latestSizeStock: number });
+    dataObj: Product | MergedBagItem;
     handleDelete: () => void;
 }) {
     const isBagItem = "quantity" in dataObj;

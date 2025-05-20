@@ -16,3 +16,11 @@ export type BagItem = {
     size: Sizes;
     quantity: number;
 };
+
+export type MergedBagItem = BagItem & { latestSizeStock: number };
+
+export type ItemMetadata = {
+    productId: string;
+    size: Sizes;
+    quantity: number;
+};

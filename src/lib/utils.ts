@@ -36,6 +36,36 @@ export async function fetchData(where?: Prisma.ProductWhereInput): Promise<Produ
     return products;
 }
 
+export async function updateData(productId: string, size: Sizes, quantity: number): Promise<void> {
+    const product = await prisma.product.findUnique({
+        where: { id: productId },
+        select: { stock: true },
+    });
+
+    if (!product || !product.stock) {
+        throw new Error("Product not found or has no stock.");
+    }
+
+    const currentStock = product.stock as Record<Sizes, number>;
+    const currentSizeStock = currentStock[size] ?? 0;
+
+    if (quantity > currentSizeStock) {
+        throw new Error(`Quantity exceeds stock for size ${size}`);
+    }
+
+    const updatedStock = {
+        ...currentStock,
+        [size]: currentSizeStock - quantity,
+    };
+
+    await prisma.product.update({
+        where: { id: productId },
+        data: {
+            stock: updatedStock,
+        },
+    });
+}
+
 export function getNetStock(productData: Product, productSize: Sizes, bag: BagItem[]) {
     const backendStock = productData.stock[productSize as keyof typeof productData.stock];
 

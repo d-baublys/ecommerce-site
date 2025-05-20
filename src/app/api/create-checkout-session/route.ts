@@ -19,6 +19,15 @@ export async function POST(req: Request) {
                 },
                 quantity: bagItem.quantity,
             })),
+            metadata: {
+                items: JSON.stringify(
+                    bagItems.map((bagItem: BagItem) => ({
+                        productId: bagItem.product.id,
+                        size: bagItem.size,
+                        quantity: bagItem.quantity,
+                    }))
+                ),
+            },
             success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/bag`,
         });

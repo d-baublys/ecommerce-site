@@ -5,7 +5,7 @@ import ProductTile from "@/ui/components/ProductTile";
 import { useBagStore } from "@/stores/bagStore";
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
-import { Product } from "@/lib/definitions";
+import { MergedBagItem, Product } from "@/lib/definitions";
 
 export default function Page() {
     const [latestData, setLatestData] = useState<Product[]>();
@@ -40,7 +40,7 @@ export default function Page() {
     if (!latestData) return;
 
     const latestDataMap = new Map(latestData.map((item) => [item.id, item.stock]));
-    const mergedItems = bag.map((item) => {
+    const mergedItems: MergedBagItem[] = bag.map((item) => {
         const latestSizeStock = latestDataMap.get(item.product.id)?.[item.size] ?? 0;
 
         return { ...item, latestSizeStock };
