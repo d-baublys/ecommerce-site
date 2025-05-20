@@ -1,8 +1,11 @@
+"use client";
+
 import { BagItem, MergedBagItem, Product } from "@/lib/definitions";
 import Link from "next/link";
 import { IoClose } from "react-icons/io5";
 import Image from "next/image";
 import { useBagStore } from "@/stores/bagStore";
+import { useEffect } from "react";
 
 export default function ProductTile({
     dataObj,
@@ -21,9 +24,11 @@ export default function ProductTile({
 
     const updateQuantity = useBagStore((state) => state.updateQuantity);
 
-    if (isBagItem && latestQuantity !== dataObj.quantity) {
-        updateQuantity(dataObj.product.id, dataObj.size, latestQuantity!);
-    }
+    useEffect(() => {
+        if (isBagItem && latestQuantity !== dataObj.quantity) {
+            updateQuantity(dataObj.product.id, dataObj.size, latestQuantity!);
+        }
+    }, [isBagItem, latestQuantity, dataObj, updateQuantity]);
 
     return (
         <div className="flex h-24 w-full sm:w-1/2 min-w-[300px] sm:min-w-[500px] border-2 p-2">

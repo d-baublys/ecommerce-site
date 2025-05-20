@@ -1,18 +1,11 @@
 "use client";
 
 import ProductTile from "@/ui/components/ProductTile";
-import { productList } from "@/lib/data";
-import { BagItem, Product } from "@/lib/definitions";
-import { useState } from "react";
+import { useWishlistStore } from "@/stores/wishlistStore";
 
 export default function Page() {
-    const [wishlist, setWishlist] = useState([productList[2], productList[1]]); // temporary for prototype
-
-    const emptyWishlist = wishlist.length === 0;
-
-    const handleDelete = (deletedProduct: Product | BagItem) => {
-        setWishlist(wishlist.filter((product) => product !== deletedProduct));
-    };
+    const wishlist = useWishlistStore.getState().wishlist;
+    const handleDelete = useWishlistStore.getState().removeFromWishlist;
 
     return (
         <div className="flex flex-col justify-center items-center grow w-full">
@@ -25,11 +18,11 @@ export default function Page() {
                         <ProductTile
                             key={idx}
                             dataObj={product}
-                            handleDelete={() => handleDelete(product)}
+                            handleDelete={() => handleDelete(product.id)}
                         />
                     );
                 })}
-                {emptyWishlist && "Your wishlist is empty!"}
+                {wishlist.length && "Your wishlist is empty!"}
             </div>
         </div>
     );

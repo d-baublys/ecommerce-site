@@ -1,5 +1,7 @@
 import { BagItem, Sizes } from "@/lib/definitions";
+import { STORAGE_KEYS } from "@/lib/storageKeys";
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 type BagStore = {
     bag: BagItem[];
@@ -10,62 +12,67 @@ type BagStore = {
     getTotalBagCount: () => number;
 };
 
-export const useBagStore = create<BagStore>((set, get) => {
-    return {
-        bag: [],
-        addToBag: (newItem) => {
-            return set((state) => {
+export const useBagStore = create<BagStore>()(
+    persist(
+        (set, get) => ({
+            bag: [],
+            addToBag: (newItem) => {
+                const currentBag = get().bag;
+                let updatedBag = currentBag;
                 const { product, size, quantity } = newItem;
 
-                const existing = state.bag.find(
+                const existing = currentBag.find(
                     (bagItem) => bagItem.product.id === product.id && bagItem.size === size
                 );
 
                 if (existing) {
                     if (
-                        existing.quantity >=
-                            Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY) ||
-                        existing.quantity >= product.stock[size]!
-                    )
-                        return state;
-
-                    return {
-                        bag: state.bag.map((existingItem) => {
-                            return existingItem.product.id === product.id &&
-                                existingItem.size === size
+                        !(
+                            existing.quantity >=
+                                Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY) ||
+                            existing.quantity >= product.stock[size]!
+                        )
+                    ) {
+                        updatedBag = currentBag.map((existingItem) =>
+                            existingItem.product.id === product.id && existingItem.size === size
                                 ? {
                                       ...existing,
                                       quantity: existingItem.quantity + quantity,
                                   }
-                                : existingItem;
-                        }),
-                    };
+                                : existingItem
+                        );
+                    }
+                } else {
+                    updatedBag = [...currentBag, newItem];
                 }
 
-                return { bag: [...state.bag, newItem] };
-            });
-        },
-        removeFromBag: (id, size) => {
-            return set((state) => {
-                return {
-                    bag: state.bag.filter(
-                        (item) => !(item.product.id === id && item.size === size)
-                    ),
-                };
-            });
-        },
-        clearBag: () => set({ bag: [] }),
-        updateQuantity: (id, size, quantity) => {
-            return set((state) => {
-                return {
-                    bag: state.bag.map((item) =>
-                        item.product.id === id && item.size === size ? { ...item, quantity } : item
-                    ),
-                };
-            });
-        },
-        getTotalBagCount: () => {
-            return get().bag.reduce((total, item) => total + item.quantity, 0);
-        },
-    };
-});
+                set({ bag: updatedBag });
+            },
+            removeFromBag: (id, size) => {
+                const currentBag = get().bag;
+                let updatedBag = currentBag;
+                updatedBag = currentBag.filter(
+                    (item) => !(item.product.id === id && item.size === size)
+                );
+
+                set({ bag: updatedBag });
+            },
+            clearBag: () => {
+                set({ bag: [] });
+            },
+            updateQuantity: (id, size, quantity) => {
+                const currentBag = get().bag;
+                let updatedBag = currentBag;
+                updatedBag = currentBag.map((item) =>
+                    item.product.id === id && item.size === size ? { ...item, quantity } : item
+                );
+
+                set({ bag: updatedBag });
+            },
+            getTotalBagCount: () => {
+                return get().bag.reduce((total, item) => total + item.quantity, 0);
+            },
+        }),
+        { name: STORAGE_KEYS.BAG }
+    )
+);

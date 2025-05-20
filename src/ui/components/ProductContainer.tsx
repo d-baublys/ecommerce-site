@@ -9,12 +9,14 @@ import GoButton from "./GoButton";
 import { IoBag, IoHeartOutline } from "react-icons/io5";
 import GeneralButton from "./GeneralButton";
 import { getNetStock } from "@/lib/utils";
+import { useWishlistStore } from "@/stores/wishlistStore";
 
 export default function ProductContainer({ productData }: { productData: Product }) {
     const [size, setSize] = useState<Sizes>();
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
     const bag = useBagStore((state) => state.bag);
     const addToBag = useBagStore((state) => state.addToBag);
+    const addToWishlist = useWishlistStore.getState().addToWishlist;
 
     function getLocalFormatting(price: number) {
         return Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
@@ -93,7 +95,7 @@ export default function ProductContainer({ productData }: { productData: Product
                 >
                     Add to Bag <IoBag />
                 </GoButton>
-                <GeneralButton>
+                <GeneralButton onClick={() => addToWishlist(productData)}>
                     Add to Wishlist <IoHeartOutline className="stroked-path" />
                 </GeneralButton>
             </div>
