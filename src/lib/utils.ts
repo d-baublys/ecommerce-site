@@ -1,5 +1,5 @@
-import { Prisma } from "../../generated/prisma";
-import { BagItem, Product, Sizes } from "./definitions";
+import { OrderStatus, Prisma } from "../../generated/prisma";
+import { BagItem, ItemMetadata, Product, Sizes } from "./definitions";
 import { prisma } from "./prisma";
 
 export function debounce(func: () => void, delay: number) {
@@ -15,16 +15,6 @@ export function debounce(func: () => void, delay: number) {
 export async function fetchData(where?: Prisma.ProductWhereInput): Promise<Product[]> {
     const rawProducts = await prisma.product.findMany({
         where,
-        select: {
-            id: true,
-            name: true,
-            gender: true,
-            price: true,
-            slug: true,
-            src: true,
-            alt: true,
-            stock: true,
-        },
         orderBy: { name: "asc" },
     });
 
@@ -64,6 +54,41 @@ export async function updateData(productId: string, size: Sizes, quantity: numbe
             stock: updatedStock,
         },
     });
+}
+
+export async function createOrder(orderItems: ItemMetadata[], sessionId: string) {
+    const orderTotal = orderItems.reduce((total, currentItem) => total + currentItem.price, 0);
+
+    await prisma.order.create({
+        data: {
+            total: orderTotal,
+            items: {
+                create: orderItems.map((item) => ({
+                    productId: item.productId,
+                    name: item.name,
+                    price: item.price,
+                    size: item.size,
+                    quantity: item.quantity,
+                })),
+            },
+            sessionId,
+        },
+    });
+}
+
+export async function updateOrder(orderId: number, status: OrderStatus) {
+    await prisma.order.update({
+        where: { id: orderId },
+        data: { status },
+    });
+}
+
+export async function getOrder(id: number) {
+    const order = prisma.order.findUnique({
+        where: { id },
+    });
+
+    return order;
 }
 
 export function getNetStock(productData: Product, productSize: Sizes, bag: BagItem[]) {

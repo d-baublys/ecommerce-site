@@ -21,6 +21,10 @@ export type MergedBagItem = BagItem & { latestSizeStock: number };
 
 export type ItemMetadata = {
     productId: string;
+    name: string;
+    price: number;
     size: Sizes;
     quantity: number;
 };
+
+export type OrderStatus = "paid" | "refunded";

@@ -28,13 +28,50 @@ enum Gender {
     womens
 }
 
+enum OrderStatus {
+    paid
+    refunded
+}
+
 model Product {
-    id     String @id @default(uuid())
-    name   String
-    gender Gender
-    price  Int
-    slug   String @unique
-    src    String
-    alt    String
-    stock  Json
+    id        String      @id @default(uuid())
+    name      String
+    gender    Gender
+    price     Int
+    slug      String      @unique
+    src       String
+    alt       String
+    stock     Json
+    orderItem OrderItem[] @ignore
+}
+
+model OrderItem {
+    id        String  @id @default(uuid())
+    productId String
+    product   Product @relation(fields: [productId], references: [id])
+    name      String
+    price     Int
+    size      Sizes
+    quantity  Int
+    orderId   Int
+    order     Order   @relation(fields: [orderId], references: [id])
+}
+
+model Order {
+    id        Int         @id @default(autoincrement())
+    total     Int
+    items     OrderItem[]
+    status    OrderStatus @default(paid)
+    userId    Int?
+    user      User?       @relation(fields: [userId], references: [id])
+    createdAt DateTime    @default(now())
+    sessionId String
+}
+
+model User {
+    id        Int      @id @default(autoincrement())
+    name      String
+    email     String   @unique
+    orders    Order[]
+    createdAt DateTime @default(now())
 }

@@ -23,6 +23,8 @@ export async function POST(req: Request) {
                 items: JSON.stringify(
                     bagItems.map((bagItem: BagItem) => ({
                         productId: bagItem.product.id,
+                        name: bagItem.product.name,
+                        price: bagItem.product.price,
                         size: bagItem.size,
                         quantity: bagItem.quantity,
                     }))
