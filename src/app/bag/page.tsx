@@ -6,14 +6,15 @@ import { useBagStore } from "@/stores/bagStore";
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
 import { MergedBagItem, Product } from "@/lib/definitions";
+import SubHeader from "@/ui/components/SubHeader";
 
 export default function Page() {
     const [latestData, setLatestData] = useState<Product[]>();
 
     const bag = useBagStore((state) => state.bag);
     const removeFromBag = useBagStore((state) => state.removeFromBag);
-    const emptyBag = bag.length === 0;
-    const noStock = useBagStore((state) => state.getTotalBagCount()) === 0;
+    const emptyBag = !bag.length;
+    const noStock = !useBagStore((state) => state.getTotalBagCount());
 
     const bagProductIds = bag.map((bagItem) => bagItem.product.id);
 
@@ -67,15 +68,14 @@ export default function Page() {
 
     return (
         <div className="flex flex-col justify-center items-center grow w-full">
-            <div className="flex justify-center items-center w-full p-2 bg-background-lighter text-contrasted font-semibold md:text-xl">
-                My Bag
-            </div>
+            <SubHeader subheaderText="My Bag" />
             <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-4">
                 {mergedItems.map((mergedItem, idx) => (
                     <ProductTile
                         key={idx}
                         dataObj={mergedItem}
                         handleDelete={() => removeFromBag(mergedItem.product!.id, mergedItem.size)}
+                        productLink={`products/${mergedItem.product.slug}`}
                     />
                 ))}
                 {!emptyBag && !noStock ? (

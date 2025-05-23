@@ -10,9 +10,11 @@ import { useEffect } from "react";
 export default function ProductTile({
     dataObj,
     handleDelete,
+    productLink,
 }: {
     dataObj: Product | MergedBagItem;
-    handleDelete: () => void;
+    handleDelete?: () => void;
+    productLink: string;
 }) {
     const isBagItem = "quantity" in dataObj;
     const productData = isBagItem ? dataObj.product : dataObj;
@@ -32,7 +34,7 @@ export default function ProductTile({
 
     return (
         <div className="flex h-24 w-full sm:w-1/2 min-w-[300px] sm:min-w-[500px] border-2 p-2">
-            <Link className="w-full" href={`products/${productData.slug}`}>
+            <Link className="w-full" href={productLink}>
                 <div className="flex h-full gap-2 sm:gap-8">
                     <div className="wishlist-img-wrapper relative h-full aspect-square">
                         <Image
@@ -54,7 +56,9 @@ export default function ProductTile({
                 </div>
             </Link>
             <div className="flex flex-col justify-between items-end h-full w-24 text-2xl">
-                <IoClose onClick={handleDelete} className="translate-x-1 cursor-pointer" />
+                {handleDelete && (
+                    <IoClose onClick={handleDelete} className="translate-x-1 cursor-pointer" />
+                )}
                 {isBagItem &&
                     (stock ? (
                         <select

@@ -18,17 +18,14 @@ export const useWishlistStore = create<WishlistStore>()(
                 const currentWishlist = get().wishlist;
                 let updatedWishlist = currentWishlist;
 
-                const existing = currentWishlist.find((product) => product.id === newItem.id);
-
-                if (!existing) {
-                    updatedWishlist = [...currentWishlist, newItem];
-                }
+                updatedWishlist = [...currentWishlist, newItem];
 
                 set({ wishlist: updatedWishlist });
             },
             removeFromWishlist: (id) => {
                 const currentWishlist = get().wishlist;
                 let updatedWishlist = currentWishlist;
+
                 updatedWishlist = currentWishlist.filter((product) => !(product.id === id));
 
                 set({ wishlist: updatedWishlist });

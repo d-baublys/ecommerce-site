@@ -2,27 +2,26 @@
 
 import ProductTile from "@/ui/components/ProductTile";
 import { useWishlistStore } from "@/stores/wishlistStore";
+import SubHeader from "@/ui/components/SubHeader";
 
 export default function Page() {
-    const wishlist = useWishlistStore.getState().wishlist;
-    const handleDelete = useWishlistStore.getState().removeFromWishlist;
+    const wishlist = useWishlistStore((state) => state.wishlist);
+    const removeFromWishlist = useWishlistStore((state) => state.removeFromWishlist);
+    const emptyWishlist = !wishlist.length;
 
     return (
         <div className="flex flex-col justify-center items-center grow w-full">
-            <div className="flex justify-center items-center w-full p-2 bg-background-lighter text-contrasted font-semibold md:text-xl">
-                My Wishlist
-            </div>
+            <SubHeader subheaderText="My Wishlist" />
             <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-4">
-                {wishlist.map((product, idx) => {
-                    return (
-                        <ProductTile
-                            key={idx}
-                            dataObj={product}
-                            handleDelete={() => handleDelete(product.id)}
-                        />
-                    );
-                })}
-                {wishlist.length && "Your wishlist is empty!"}
+                {wishlist.map((product, idx) => (
+                    <ProductTile
+                        key={idx}
+                        dataObj={product}
+                        handleDelete={() => removeFromWishlist(product.id)}
+                        productLink={`products/${product.slug}`}
+                    />
+                ))}
+                {emptyWishlist && "Your wishlist is empty!"}
             </div>
         </div>
     );

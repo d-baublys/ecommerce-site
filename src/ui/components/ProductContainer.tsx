@@ -16,7 +16,10 @@ export default function ProductContainer({ productData }: { productData: Product
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
     const bag = useBagStore((state) => state.bag);
     const addToBag = useBagStore((state) => state.addToBag);
-    const addToWishlist = useWishlistStore.getState().addToWishlist;
+    const wishlist = useWishlistStore((state) => state.wishlist);
+    const addToWishlist = useWishlistStore((state) => state.addToWishlist);
+    const removeFromWishlist = useWishlistStore((state) => state.removeFromWishlist);
+    const inWishlist = wishlist.find((wishlistItem) => wishlistItem.id === productData.id);
 
     function getLocalFormatting(price: number) {
         return Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
@@ -31,7 +34,7 @@ export default function ProductContainer({ productData }: { productData: Product
             bag
         );
 
-        setIsButtonDisabled(selectedNetStock === 0);
+        setIsButtonDisabled(!selectedNetStock);
     }, [size, bag]);
 
     return (
@@ -95,8 +98,15 @@ export default function ProductContainer({ productData }: { productData: Product
                 >
                     Add to Bag <IoBag />
                 </GoButton>
-                <GeneralButton onClick={() => addToWishlist(productData)}>
-                    Add to Wishlist <IoHeartOutline className="stroked-path" />
+                <GeneralButton
+                    onClick={() =>
+                        !inWishlist
+                            ? addToWishlist(productData)
+                            : removeFromWishlist(productData.id)
+                    }
+                >
+                    {!inWishlist ? "Add to Wishlist" : "Remove from Wishlist"}{" "}
+                    <IoHeartOutline className="stroked-path" />
                 </GeneralButton>
             </div>
         </section>
