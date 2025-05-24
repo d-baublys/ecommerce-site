@@ -2,16 +2,16 @@
 
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect, useState } from "react";
-import { Sizes } from "../../../generated/prisma";
+import { Sizes } from "@/lib/definitions";
 import Image from "next/image";
 import { Product } from "@/lib/definitions";
-import GoButton from "./GoButton";
+import GoButton from "@/ui/components/GoButton";
 import { IoBag, IoHeartOutline } from "react-icons/io5";
-import GeneralButton from "./GeneralButton";
+import GeneralButton from "@/ui/components/GeneralButton";
 import { getNetStock } from "@/lib/utils";
 import { useWishlistStore } from "@/stores/wishlistStore";
 
-export default function ProductContainer({ productData }: { productData: Product }) {
+export default function ProductPageClient({ productData }: { productData: Product }) {
     const [size, setSize] = useState<Sizes>();
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
     const bag = useBagStore((state) => state.bag);

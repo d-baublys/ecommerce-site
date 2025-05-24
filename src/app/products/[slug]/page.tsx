@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { fetchData } from "@/lib/utils";
-import ProductContainer from "@/ui/components/ProductContainer";
+import ProductPageClient from "./ProductPageClient";
 import { Product } from "@/lib/definitions";
 
 export default async function Page({ params }: { params: { slug: string } }) {
@@ -12,5 +12,5 @@ export default async function Page({ params }: { params: { slug: string } }) {
         notFound();
     }
 
-    return <ProductContainer productData={productData} />;
+    return <ProductPageClient productData={productData} />;
 }

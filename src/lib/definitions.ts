@@ -1,4 +1,6 @@
-export type Sizes = "xs" | "s" | "m" | "l" | "xl" | "xxl";
+export const VALID_SIZES = ["xs", "s", "m", "l", "xl", "xxl"] as const;
+
+export type Sizes = (typeof VALID_SIZES)[number];
 
 export type Product = {
     id: string;
@@ -28,3 +30,5 @@ export type ItemMetadata = {
 };
 
 export type OrderStatus = "paid" | "refunded";
+
+export type InventoryMode = "display" | "edit" | "add";

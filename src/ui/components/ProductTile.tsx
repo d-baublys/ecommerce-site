@@ -14,7 +14,7 @@ export default function ProductTile({
 }: {
     dataObj: Product | MergedBagItem;
     handleDelete?: () => void;
-    productLink: string;
+    productLink?: string;
 }) {
     const isBagItem = "quantity" in dataObj;
     const productData = isBagItem ? dataObj.product : dataObj;
@@ -26,6 +26,40 @@ export default function ProductTile({
 
     const updateQuantity = useBagStore((state) => state.updateQuantity);
 
+    const renderLinkedArea = () => {
+        const linkedArea = (
+            <div className="flex h-full gap-2 sm:gap-8">
+                <div className="wishlist-img-wrapper relative h-full aspect-square">
+                    <Image
+                        className="object-cover"
+                        src={productData.src}
+                        alt={productData.alt}
+                        sizes="auto"
+                        fill
+                    ></Image>
+                </div>
+                <div className="flex flex-col justify-between">
+                    <div className="font-semibold">{productData.name.toUpperCase()}</div>
+                    {isBagItem && (
+                        <div className="text-component-color">
+                            Size - {(dataObj as BagItem).size.toUpperCase()}
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+
+        if (productLink) {
+            return (
+                <Link className="w-full" href={productLink}>
+                    {linkedArea}
+                </Link>
+            );
+        }
+
+        return linkedArea;
+    };
+
     useEffect(() => {
         if (isBagItem && latestQuantity !== dataObj.quantity) {
             updateQuantity(dataObj.product.id, dataObj.size, latestQuantity!);
@@ -34,27 +68,7 @@ export default function ProductTile({
 
     return (
         <div className="flex h-24 w-full sm:w-1/2 min-w-[300px] sm:min-w-[500px] border-2 p-2">
-            <Link className="w-full" href={productLink}>
-                <div className="flex h-full gap-2 sm:gap-8">
-                    <div className="wishlist-img-wrapper relative h-full aspect-square">
-                        <Image
-                            className="object-cover"
-                            src={productData.src}
-                            alt={productData.alt}
-                            sizes="auto"
-                            fill
-                        ></Image>
-                    </div>
-                    <div className="flex flex-col justify-between">
-                        <div className="font-semibold">{productData.name.toUpperCase()}</div>
-                        {isBagItem && (
-                            <div className="text-component-color">
-                                Size - {(dataObj as BagItem).size.toUpperCase()}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </Link>
+            {renderLinkedArea()}
             <div className="flex flex-col justify-between items-end h-full w-24 text-2xl">
                 {handleDelete && (
                     <IoClose onClick={handleDelete} className="translate-x-1 cursor-pointer" />

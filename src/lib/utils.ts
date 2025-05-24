@@ -1,5 +1,5 @@
 import { OrderStatus, Prisma } from "../../generated/prisma";
-import { BagItem, ItemMetadata, Product, Sizes } from "./definitions";
+import { BagItem, ItemMetadata, Product, Sizes, VALID_SIZES } from "./definitions";
 import { prisma } from "./prisma";
 
 export function debounce(func: () => void, delay: number) {
@@ -101,4 +101,16 @@ export function getNetStock(productData: Product, productSize: Sizes, bag: BagIt
     const bagQuantity = existing?.quantity ?? 0;
 
     return backendStock! - bagQuantity;
+}
+
+export function isValidSize(value: string): value is Sizes {
+    return VALID_SIZES.includes(value as Sizes);
+}
+
+export function isUnique(value: string, stockObj: Product["stock"]) {
+    return !Object.entries(stockObj).find(([size]) => size === value);
+}
+
+export function isValidStock(value: number) {
+    return value >= 0;
 }
