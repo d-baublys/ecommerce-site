@@ -1,5 +1,5 @@
 import stripe from "@/lib/stripe";
-import { createOrder, updateData } from "@/lib/utils";
+import { createOrder, updateSingleProduct } from "@/lib/utils";
 import { ItemMetadata } from "@/lib/definitions";
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
         }
 
         for (const item of items) {
-            await updateData(item.productId, item.size, item.quantity);
+            await updateSingleProduct(item.productId, item.size, item.quantity);
         }
 
         await createOrder(items, session.id);

@@ -1,5 +1,6 @@
 "use client";
 
+import stockUpdate from "@/app/actions/stockUpdate";
 import { InventoryMode, Product, Sizes } from "@/lib/definitions";
 import { isUnique, isValidSize } from "@/lib/utils";
 import GeneralButton from "@/ui/components/GeneralButton";
@@ -17,7 +18,7 @@ export default function ProductInventoryClient({ productData }: { productData: P
     const [newSize, setNewSize] = useState<Sizes | undefined>();
     const [newStock, setNewStock] = useState<number | undefined>();
 
-    const handleAdd = () => {
+    const handleAdd = async () => {
         if (
             newSize !== undefined &&
             newStock !== undefined &&
@@ -25,23 +26,39 @@ export default function ProductInventoryClient({ productData }: { productData: P
             isUnique(newSize, provisionalStockObj)
         ) {
             const updatedStockObj = { ...provisionalStockObj, [newSize]: newStock };
-            setProvisionalStockObj!(updatedStockObj);
-            setSavedStockObj(updatedStockObj);
+            const result = await stockUpdate(productData.id, updatedStockObj);
+
+            if (result.success) {
+                setProvisionalStockObj!(updatedStockObj);
+                setSavedStockObj(updatedStockObj);
+                setNewSize(undefined);
+                setNewStock(undefined);
+                setMode("display");
+                setError(undefined);
+            } else {
+                setProvisionalStockObj(savedStockObj);
+                setError("Error updating database");
+            }
+        } else if (!isValidSize(newSize as Sizes) || !newStock) {
+            setError("Invalid size or stock value");
+        } else {
+            setError("Duplicate size value");
+        }
+    };
+
+    const handleSave = async () => {
+        const result = await stockUpdate(productData.id, provisionalStockObj);
+
+        if (result.success) {
+            setSavedStockObj(provisionalStockObj);
             setNewSize(undefined);
             setNewStock(undefined);
             setMode("display");
             setError(undefined);
         } else {
-            setError("Invalid or duplicate size value");
+            setProvisionalStockObj(savedStockObj);
+            setError("Error updating database");
         }
-    };
-
-    const handleSave = () => {
-        setSavedStockObj(provisionalStockObj);
-        setNewSize(undefined);
-        setNewStock(undefined);
-        setMode("display");
-        setError(undefined);
     };
 
     const handleCancel = () => {

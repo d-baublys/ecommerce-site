@@ -26,7 +26,11 @@ export async function fetchData(where?: Prisma.ProductWhereInput): Promise<Produ
     return products;
 }
 
-export async function updateData(productId: string, size: Sizes, quantity: number): Promise<void> {
+export async function updateSingleProduct(
+    productId: string,
+    size: Sizes,
+    quantity: number
+): Promise<void> {
     const product = await prisma.product.findUnique({
         where: { id: productId },
         select: { stock: true },
@@ -80,6 +84,13 @@ export async function updateOrder(orderId: number, status: OrderStatus) {
     await prisma.order.update({
         where: { id: orderId },
         data: { status },
+    });
+}
+
+export async function updateProductStock(productId: string, stockObj: Product["stock"]) {
+    await prisma.product.update({
+        where: { id: productId },
+        data: { stock: stockObj },
     });
 }
 
