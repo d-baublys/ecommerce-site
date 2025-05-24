@@ -4,18 +4,16 @@ import { InventoryMode, Product, Sizes } from "@/lib/definitions";
 import { isUnique, isValidSize } from "@/lib/utils";
 import GeneralButton from "@/ui/components/GeneralButton";
 import InventoryInput from "@/ui/components/InventoryInput";
+import StockRowDelete from "@/ui/components/StockRowDelete";
 import { useState } from "react";
 
 export default function ProductInventoryClient({ productData }: { productData: Product }) {
     const [mode, setMode] = useState<InventoryMode>("display");
-    const [savedStockObj, setSavedStockObj] = useState<Partial<Record<Sizes, number>>>(
-        productData.stock
-    );
-    const [provisionalStockObj, setProvisionalStockObj] = useState<Partial<Record<Sizes, number>>>(
+    const [savedStockObj, setSavedStockObj] = useState<Product["stock"]>(productData.stock);
+    const [provisionalStockObj, setProvisionalStockObj] = useState<Product["stock"]>(
         productData.stock
     );
     const [error, setError] = useState<string | undefined>();
-
     const [newSize, setNewSize] = useState<Sizes | undefined>();
     const [newStock, setNewStock] = useState<number | undefined>();
 
@@ -26,11 +24,9 @@ export default function ProductInventoryClient({ productData }: { productData: P
             isValidSize(newSize) &&
             isUnique(newSize, provisionalStockObj)
         ) {
-            setProvisionalStockObj!((prev) => ({
-                ...prev,
-                [newSize]: newStock,
-            }));
-            setSavedStockObj(provisionalStockObj);
+            const updatedStockObj = { ...provisionalStockObj, [newSize]: newStock };
+            setProvisionalStockObj!(updatedStockObj);
+            setSavedStockObj(updatedStockObj);
             setNewSize(undefined);
             setNewStock(undefined);
             setMode("display");
@@ -100,6 +96,14 @@ export default function ProductInventoryClient({ productData }: { productData: P
                                     setProvisionalStockObj={setProvisionalStockObj}
                                     setNewStock={setNewStock}
                                 />
+                            </td>
+                            <td className="min-w-4 w-8">
+                                {mode === "edit" && (
+                                    <StockRowDelete
+                                        setProvisionalStockObj={setProvisionalStockObj}
+                                        size={size as Sizes}
+                                    />
+                                )}
                             </td>
                         </tr>
                     ))}
