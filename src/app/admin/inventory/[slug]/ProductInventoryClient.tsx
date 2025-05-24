@@ -1,7 +1,7 @@
 "use client";
 
 import stockUpdate from "@/app/actions/stockUpdate";
-import { InventoryMode, Product, Sizes } from "@/lib/definitions";
+import { InventoryMode, Product, Sizes, VALID_SIZES } from "@/lib/definitions";
 import { isUnique, isValidSize } from "@/lib/utils";
 import GeneralButton from "@/ui/components/GeneralButton";
 import InventoryInput from "@/ui/components/InventoryInput";
@@ -29,7 +29,7 @@ export default function ProductInventoryClient({ productData }: { productData: P
             const result = await stockUpdate(productData.id, updatedStockObj);
 
             if (result.success) {
-                setProvisionalStockObj!(updatedStockObj);
+                setProvisionalStockObj(updatedStockObj);
                 setSavedStockObj(updatedStockObj);
                 setNewSize(undefined);
                 setNewStock(undefined);
@@ -95,21 +95,21 @@ export default function ProductInventoryClient({ productData }: { productData: P
                     </tr>
                 </thead>
                 <tbody>
-                    {Object.entries(provisionalStockObj).map(([size, stock], idx) => (
-                        <tr key={idx}>
+                    {VALID_SIZES.filter((size) => size in provisionalStockObj).map((stockSize) => (
+                        <tr key={stockSize}>
                             <td className="border-2">
                                 <InventoryInput
                                     type="text"
                                     mode={mode}
-                                    value={size.toUpperCase()}
+                                    value={stockSize.toUpperCase()}
                                 />
                             </td>
                             <td className="border-2">
                                 <InventoryInput
                                     type="number"
                                     mode={mode}
-                                    value={stock}
-                                    pair={size}
+                                    value={provisionalStockObj[stockSize]}
+                                    pair={stockSize}
                                     setProvisionalStockObj={setProvisionalStockObj}
                                     setNewStock={setNewStock}
                                 />
@@ -118,7 +118,7 @@ export default function ProductInventoryClient({ productData }: { productData: P
                                 {mode === "edit" && (
                                     <StockRowDelete
                                         setProvisionalStockObj={setProvisionalStockObj}
-                                        size={size as Sizes}
+                                        size={stockSize as Sizes}
                                     />
                                 )}
                             </td>

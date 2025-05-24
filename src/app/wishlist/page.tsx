@@ -13,9 +13,9 @@ export default function Page() {
         <div className="flex flex-col justify-center items-center grow w-full">
             <SubHeader subheaderText="My Wishlist" />
             <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-4">
-                {wishlist.map((product, idx) => (
+                {wishlist.map((product) => (
                     <ProductTile
-                        key={idx}
+                        key={product.id}
                         dataObj={product}
                         handleDelete={() => removeFromWishlist(product.id)}
                         productLink={`products/${product.slug}`}

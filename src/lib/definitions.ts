@@ -1,11 +1,15 @@
 export const VALID_SIZES = ["xs", "s", "m", "l", "xl", "xxl"] as const;
 
+export const VALID_CATEGORIES = ["mens", "womens"] as const;
+
 export type Sizes = (typeof VALID_SIZES)[number];
+
+export type Categories = (typeof VALID_CATEGORIES)[number];
 
 export type Product = {
     id: string;
     name: string;
-    gender: "mens" | "womens";
+    gender: Categories;
     price: number;
     slug: string;
     src: string;

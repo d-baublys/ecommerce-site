@@ -70,9 +70,9 @@ export default function Page() {
         <div className="flex flex-col justify-center items-center grow w-full">
             <SubHeader subheaderText="My Bag" />
             <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-4">
-                {mergedItems.map((mergedItem, idx) => (
+                {mergedItems.map((mergedItem) => (
                     <ProductTile
-                        key={idx}
+                        key={`${mergedItem.product.id}-${mergedItem.size}`}
                         dataObj={mergedItem}
                         handleDelete={() => removeFromBag(mergedItem.product!.id, mergedItem.size)}
                         productLink={`products/${mergedItem.product.slug}`}

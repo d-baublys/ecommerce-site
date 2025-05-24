@@ -2,7 +2,7 @@
 
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect, useState } from "react";
-import { Sizes } from "@/lib/definitions";
+import { Sizes, VALID_SIZES } from "@/lib/definitions";
 import Image from "next/image";
 import { Product } from "@/lib/definitions";
 import GoButton from "@/ui/components/GoButton";
@@ -69,7 +69,7 @@ export default function ProductPageClient({ productData }: { productData: Produc
                     <option value="default" hidden>
                         Please select a size
                     </option>
-                    {Object.keys(productData.stock).map((productSize, idx) => {
+                    {VALID_SIZES.filter((size) => size in productData.stock).map((productSize) => {
                         const netStock = getNetStock(
                             productData,
                             productSize as keyof typeof productData.stock,
@@ -78,7 +78,7 @@ export default function ProductPageClient({ productData }: { productData: Produc
 
                         return (
                             <option
-                                key={idx}
+                                key={productSize}
                                 value={productSize}
                                 className={`${!netStock && "text-component-color"}`}
                                 disabled={!netStock}
