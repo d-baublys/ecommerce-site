@@ -5,16 +5,19 @@ import { useState } from "react";
 import ProductTile from "@/ui/components/ProductTile";
 import GeneralButton from "@/ui/components/GeneralButton";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-export default function AdminInventoryClient({ productData }: { productData: Product[] }) {
+export default function AdminProductsClient({ productData }: { productData: Product[] }) {
+    const pathname = usePathname();
     const [filter, setFilter] = useState<Categories | undefined>();
-
     const querySet = productData.filter((item) => item.gender === filter);
 
     return (
         <div className="flex flex-col grow justify-center items-center min-w-[300px] sm:min-w-[500px] gap-8">
             <div className="flex justify-center">
-                <GeneralButton>+ Add Product</GeneralButton>
+                <Link href={`${pathname}/add-product`}>
+                    <GeneralButton>+ Add Product</GeneralButton>
+                </Link>
             </div>
             <div className="flex flex-row justify-between items-center w-full">
                 <div>Filter Existing</div>
@@ -34,7 +37,7 @@ export default function AdminInventoryClient({ productData }: { productData: Pro
             {querySet && (
                 <div className="flex flex-col gap-4">
                     {querySet.map((item: Product) => (
-                        <Link key={item.id} href={`inventory/${item.slug}`}>
+                        <Link key={item.id} href={`${pathname}/${item.slug}`}>
                             <ProductTile dataObj={item} />
                         </Link>
                     ))}

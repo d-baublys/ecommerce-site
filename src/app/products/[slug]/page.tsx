@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { fetchData } from "@/lib/utils";
+import { fetchData } from "@/lib/actions";
 import ProductPageClient from "./ProductPageClient";
 import { Product } from "@/lib/definitions";
 

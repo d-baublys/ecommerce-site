@@ -1,20 +1,27 @@
 "use client";
 
-import stockUpdate from "@/app/actions/stockUpdate";
-import { InventoryMode, Product, Sizes, VALID_SIZES } from "@/lib/definitions";
+import { Product, Sizes, StockTableMode, VALID_SIZES } from "@/lib/definitions";
 import { isUnique, isValidSize } from "@/lib/utils";
 import GeneralButton from "@/ui/components/GeneralButton";
-import InventoryInput from "@/ui/components/InventoryInput";
+import StockTableInput from "@/ui/components/StockTableInput";
 import StockRowDelete from "@/ui/components/StockRowDelete";
 import { useState } from "react";
 
-export default function ProductInventoryClient({ productData }: { productData: Product }) {
-    const [mode, setMode] = useState<InventoryMode>("display");
-    const [savedStockObj, setSavedStockObj] = useState<Product["stock"]>(productData.stock);
+export default function ProductStockTable({
+    productData,
+    setStock: setSavedStockObj,
+    tableMode,
+    setTableMode,
+}: {
+    productData: Product;
+    setStock: React.Dispatch<React.SetStateAction<Product["stock"]>>;
+    tableMode: StockTableMode;
+    setTableMode: React.Dispatch<React.SetStateAction<StockTableMode>>;
+}) {
     const [provisionalStockObj, setProvisionalStockObj] = useState<Product["stock"]>(
         productData.stock
     );
-    const [error, setError] = useState<string | undefined>();
+    const [message, setMessage] = useState<string | undefined>();
     const [newSize, setNewSize] = useState<Sizes | undefined>();
     const [newStock, setNewStock] = useState<number | undefined>();
 
@@ -26,67 +33,56 @@ export default function ProductInventoryClient({ productData }: { productData: P
             isUnique(newSize, provisionalStockObj)
         ) {
             const updatedStockObj = { ...provisionalStockObj, [newSize]: newStock };
-            const result = await stockUpdate(productData.id, updatedStockObj);
 
-            if (result.success) {
-                setProvisionalStockObj(updatedStockObj);
-                setSavedStockObj(updatedStockObj);
-                setNewSize(undefined);
-                setNewStock(undefined);
-                setMode("display");
-                setError(undefined);
-            } else {
-                setProvisionalStockObj(savedStockObj);
-                setError("Error updating database");
-            }
+            setProvisionalStockObj(updatedStockObj);
+            setSavedStockObj(updatedStockObj);
+            setNewSize(undefined);
+            setNewStock(undefined);
+            setTableMode("display");
+            setMessage(undefined);
         } else if (!isValidSize(newSize as Sizes) || !newStock) {
-            setError("Invalid size or stock value");
+            setMessage("Invalid size or stock value");
         } else {
-            setError("Duplicate size value");
+            setMessage("Duplicate size value");
         }
     };
 
     const handleSave = async () => {
-        const result = await stockUpdate(productData.id, provisionalStockObj);
-
-        if (result.success) {
-            setSavedStockObj(provisionalStockObj);
-            setNewSize(undefined);
-            setNewStock(undefined);
-            setMode("display");
-            setError(undefined);
-        } else {
-            setProvisionalStockObj(savedStockObj);
-            setError("Error updating database");
-        }
+        setSavedStockObj(provisionalStockObj);
+        setNewSize(undefined);
+        setNewStock(undefined);
+        setTableMode("display");
+        setMessage(undefined);
     };
 
     const handleCancel = () => {
-        setProvisionalStockObj(savedStockObj);
+        setProvisionalStockObj(productData.stock);
         setNewSize(undefined);
         setNewStock(undefined);
-        setMode("display");
-        setError(undefined);
+        setTableMode("display");
+        setMessage(undefined);
     };
 
     return (
         <div className="flex flex-col border-2 p-2">
             <div className="flex justify-between h-12">
-                {mode === "display" && (
-                    <GeneralButton onClick={() => setMode("edit")}>Edit</GeneralButton>
+                {tableMode === "display" && Object.keys(provisionalStockObj).length > 0 && (
+                    <GeneralButton onClick={() => setTableMode("edit")}>Edit</GeneralButton>
                 )}
-                {mode === "edit" && (
+                {tableMode === "edit" && (
                     <GeneralButton onClick={() => handleSave()}>Save</GeneralButton>
                 )}
-                {mode === "add" && <GeneralButton onClick={() => handleAdd()}>Add</GeneralButton>}
-                {mode === "display" && (
-                    <GeneralButton onClick={() => setMode("add")}>+ Add Size</GeneralButton>
+                {tableMode === "add" && (
+                    <GeneralButton onClick={() => handleAdd()}>Add</GeneralButton>
                 )}
-                {(mode === "edit" || mode === "add") && (
+                {tableMode === "display" && (
+                    <GeneralButton onClick={() => setTableMode("add")}>+ Add Size</GeneralButton>
+                )}
+                {(tableMode === "edit" || tableMode === "add") && (
                     <GeneralButton onClick={() => handleCancel()}>Cancel</GeneralButton>
                 )}
             </div>
-            {error}
+            {message}
             <table className="text-center border-2 mt-2">
                 <thead>
                     <tr className="p-2">
@@ -98,16 +94,16 @@ export default function ProductInventoryClient({ productData }: { productData: P
                     {VALID_SIZES.filter((size) => size in provisionalStockObj).map((stockSize) => (
                         <tr key={stockSize}>
                             <td className="border-2">
-                                <InventoryInput
+                                <StockTableInput
                                     type="text"
-                                    mode={mode}
+                                    mode={tableMode}
                                     value={stockSize.toUpperCase()}
                                 />
                             </td>
                             <td className="border-2">
-                                <InventoryInput
+                                <StockTableInput
                                     type="number"
-                                    mode={mode}
+                                    mode={tableMode}
                                     value={provisionalStockObj[stockSize]}
                                     pair={stockSize}
                                     setProvisionalStockObj={setProvisionalStockObj}
@@ -115,7 +111,7 @@ export default function ProductInventoryClient({ productData }: { productData: P
                                 />
                             </td>
                             <td className="min-w-4 w-8">
-                                {mode === "edit" && (
+                                {tableMode === "edit" && (
                                     <StockRowDelete
                                         setProvisionalStockObj={setProvisionalStockObj}
                                         size={stockSize as Sizes}
@@ -124,20 +120,20 @@ export default function ProductInventoryClient({ productData }: { productData: P
                             </td>
                         </tr>
                     ))}
-                    {mode === "add" && (
+                    {tableMode === "add" && (
                         <tr>
                             <td className="border-2">
-                                <InventoryInput
+                                <StockTableInput
                                     type="text"
-                                    mode={mode}
+                                    mode={tableMode}
                                     isNew
                                     setNewSize={setNewSize}
                                 />
                             </td>
                             <td className="border-2">
-                                <InventoryInput
+                                <StockTableInput
                                     type="number"
-                                    mode={mode}
+                                    mode={tableMode}
                                     setProvisionalStockObj={setProvisionalStockObj}
                                     isNew
                                     setNewStock={setNewStock}

@@ -1,8 +1,8 @@
-import { InventoryMode, Product, Sizes } from "@/lib/definitions";
+import { Product, Sizes, StockTableMode } from "@/lib/definitions";
 import { isValidStock } from "@/lib/utils";
 import React from "react";
 
-export default function InventoryInput({
+export default function StockTableInput({
     type,
     mode,
     value,
@@ -13,7 +13,7 @@ export default function InventoryInput({
     isNew,
 }: {
     type: "text" | "number";
-    mode: InventoryMode;
+    mode: StockTableMode;
     value?: string | number;
     pair?: string | number;
     setProvisionalStockObj?: React.Dispatch<React.SetStateAction<Product["stock"]>>;

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Carousel from "@/ui/components/Carousel";
-import { fetchData } from "@/lib/utils";
+import { fetchData } from "@/lib/actions";
+import Link from "next/link";
 
 export default async function Home() {
     const productList = await fetchData();
@@ -24,9 +25,9 @@ export default async function Home() {
                 ></Image>
                 <div className="flex flex-col main-tagline absolute w-full top-1/2 px-(--gutter) md:px-(--gutter-md) text-4xl font-semibold text-contrasted">
                     Summer 2025 styles here and now.
-                    <a className="mt-8 text-2xl underline" href="">
+                    <Link href={"/"} className="mt-8 text-2xl underline">
                         {"Shop >>>"}
-                    </a>
+                    </Link>
                 </div>
             </div>
             <div className="featured-outer flex flex-col w-full min-h-[500px] bg-white">

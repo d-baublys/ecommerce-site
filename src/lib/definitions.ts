@@ -35,4 +35,6 @@ export type ItemMetadata = {
 
 export type OrderStatus = "paid" | "refunded";
 
-export type InventoryMode = "display" | "edit" | "add";
+export type ProductFormMode = "add" | "edit";
+
+export type StockTableMode = ProductFormMode | "display";

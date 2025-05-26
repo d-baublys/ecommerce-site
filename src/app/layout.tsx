@@ -3,6 +3,7 @@ import "@/ui/styles/globals.css";
 import NavBar from "@/ui/components/NavBar";
 import Footer from "@/ui/components/Footer";
 import { lexendExa } from "@/ui/fonts";
+import ConfirmModal from "@/ui/components/ConfirmModal";
 
 export const metadata: Metadata = {
     title: "D-Wear",
@@ -24,6 +25,7 @@ export default function RootLayout({
                     </main>
                     <Footer />
                 </div>
+                <ConfirmModal />
             </body>
         </html>
     );
