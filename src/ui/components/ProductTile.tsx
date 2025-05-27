@@ -28,7 +28,7 @@ export default function ProductTile({
 
     const renderLinkedArea = () => {
         const linkedArea = (
-            <div className="flex h-full gap-2 sm:gap-8">
+            <div className="flex h-full grow gap-2 sm:gap-8">
                 <div className="wishlist-img-wrapper relative h-full aspect-square">
                     <Image
                         className="object-cover"

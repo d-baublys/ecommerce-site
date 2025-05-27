@@ -1,14 +1,8 @@
-import { fetchData } from "@/lib/actions";
+import { getProductData } from "@/lib/actions";
 import AdminProductsClient from "./AdminProductsClient";
-import SubHeader from "@/ui/components/SubHeader";
 
 export default async function AdminProductsPage() {
-    const allProducts = await fetchData();
+    const allProducts = await getProductData();
 
-    return (
-        <div className="flex flex-col justify-center items-center grow w-full">
-            <SubHeader subheaderText="Administration" />
-            <AdminProductsClient productData={allProducts} />
-        </div>
-    );
+    return <AdminProductsClient productData={allProducts} />;
 }

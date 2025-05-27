@@ -66,7 +66,7 @@ export default function ProductStockTable({
     return (
         <div className="flex flex-col border-2 p-2">
             <div className="flex justify-between h-12">
-                {tableMode === "display" && Object.keys(provisionalStockObj).length > 0 && (
+                {tableMode === "display" && Object.keys(provisionalStockObj)?.length && (
                     <GeneralButton onClick={() => setTableMode("edit")}>Edit</GeneralButton>
                 )}
                 {tableMode === "edit" && (

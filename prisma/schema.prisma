@@ -34,15 +34,22 @@ enum OrderStatus {
 }
 
 model Product {
-    id        String      @id @default(uuid())
-    name      String
-    gender    Gender
-    price     Int
-    slug      String      @unique
-    src       String
-    alt       String
-    stock     Json
-    orderItem OrderItem[] @ignore
+    id              String            @id @default(uuid())
+    name            String
+    gender          Gender
+    price           Int
+    slug            String            @unique
+    src             String
+    alt             String
+    stock           Json
+    orderItem       OrderItem[]       @ignore
+    FeaturedProduct FeaturedProduct[]
+}
+
+model FeaturedProduct {
+    id        String  @id @default(uuid())
+    productId String
+    product   Product @relation(fields: [productId], references: [id])
 }
 
 model OrderItem {

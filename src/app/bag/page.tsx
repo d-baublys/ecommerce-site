@@ -7,6 +7,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
 import { MergedBagItem, Product } from "@/lib/definitions";
 import SubHeader from "@/ui/components/SubHeader";
+import { getProductData } from "@/lib/actions";
 
 export default function Page() {
     const [latestData, setLatestData] = useState<Product[]>();
@@ -19,23 +20,16 @@ export default function Page() {
     const bagProductIds = bag.map((bagItem) => bagItem.product.id);
 
     useEffect(() => {
-        const fetchData = async () => {
-            const res = await fetch("/api/products", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    where: { id: { in: bagProductIds } },
-                    select: { id: true, stock: true },
-                }),
-            });
+        const getData = async () => {
+            const data = await getProductData(
+                { id: { in: bagProductIds } },
+                { id: true, stock: true }
+            );
 
-            const data = await res.json();
             setLatestData(data);
         };
 
-        fetchData();
+        getData();
     }, []);
 
     if (!latestData) return;

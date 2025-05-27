@@ -8,11 +8,7 @@ import ProductLink from "./ProductLink";
 import GeneralButton from "./GeneralButton";
 import { Product } from "@/lib/definitions";
 
-export default function Carousel({
-    featuredList,
-}: {
-    featuredList: { product: Product; alt: string }[];
-}) {
+export default function Carousel({ featuredList }: { featuredList: Product[] }) {
     const [activeFeatured, setActiveFeatured] = useState(0);
     const activeFeaturedRef = useRef(0);
     const [isScrolling, setIsScrolling] = useState(false);
@@ -72,22 +68,22 @@ export default function Carousel({
                     id="carousel-slider"
                     className="flex overflow-x-hidden gap-(--carousel-img-gap) px-(--carousel-img-w) h-full z-30"
                 >
-                    {featuredList.map((featuredItem, idx) => (
+                    {featuredList.map((featuredProd, idx) => (
                         <div
-                            key={featuredItem.product.id}
+                            key={featuredProd.id}
                             id={`featured-${idx + 1}`}
                             className="relative py-2 min-w-[var(--carousel-img-w)]"
                         >
                             <div className="featured-wrapper relative h-full snap-center drop-shadow-(--tile-shadow) z-0">
                                 <Image
-                                    src={featuredItem.product.src}
-                                    alt={featuredItem.alt}
+                                    src={featuredProd.src}
+                                    alt={featuredProd.alt}
                                     fill
                                     sizes="auto"
                                     className="object-cover rounded-2xl"
                                 />
                             </div>
-                            <ProductLink slug={featuredItem.product.slug}>
+                            <ProductLink slug={featuredProd.slug}>
                                 <GeneralButton className="absolute left-[50%] bottom-1/6 translate-x-[-50%] !border-none z-50">
                                     Shop
                                 </GeneralButton>

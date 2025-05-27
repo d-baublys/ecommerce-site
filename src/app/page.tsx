@@ -1,18 +1,21 @@
 import Image from "next/image";
 import Carousel from "@/ui/components/Carousel";
-import { fetchData } from "@/lib/actions";
+import { getFeaturedProducts, getProductData } from "@/lib/actions";
 import Link from "next/link";
 
 export default async function Home() {
-    const productList = await fetchData();
+    let featuredList = await getFeaturedProducts();
 
-    const featuredList = [
-        { product: productList[0], alt: "Featured t-shirt 1" },
-        { product: productList[1], alt: "Featured t-shirt 2" },
-        { product: productList[2], alt: "Featured t-shirt 3" },
-        { product: productList[3], alt: "Featured t-shirt 4" },
-        { product: productList[4], alt: "Featured t-shirt 5" },
-    ];
+    if (!featuredList.length) {
+        const productList = await getProductData();
+        featuredList = [
+            productList[0],
+            productList[1],
+            productList[2],
+            productList[3],
+            productList[4],
+        ];
+    }
 
     return (
         <>

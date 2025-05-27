@@ -14,13 +14,13 @@ export default function AdminProductsClient({ productData }: { productData: Prod
 
     return (
         <div className="flex flex-col grow justify-center items-center min-w-[300px] sm:min-w-[500px] gap-8">
+            <div className="text-xl font-semibold">Products</div>
             <div className="flex justify-center">
                 <Link href={`${pathname}/add-product`}>
                     <GeneralButton>+ Add Product</GeneralButton>
                 </Link>
             </div>
-            <div className="flex flex-row justify-between items-center w-full">
-                <div>Filter Existing</div>
+            <div className="flex flex-row justify-evenly items-center w-full">
                 {VALID_CATEGORIES.map((category) => (
                     <GeneralButton
                         key={category}
@@ -34,7 +34,7 @@ export default function AdminProductsClient({ productData }: { productData: Prod
                     </GeneralButton>
                 ))}
             </div>
-            {querySet && (
+            {filter ? (
                 <div className="flex flex-col gap-4">
                     {querySet.map((item: Product) => (
                         <Link key={item.id} href={`${pathname}/${item.slug}`}>
@@ -42,6 +42,8 @@ export default function AdminProductsClient({ productData }: { productData: Prod
                         </Link>
                     ))}
                 </div>
+            ) : (
+                "Please select a filter"
             )}
         </div>
     );

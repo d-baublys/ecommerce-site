@@ -1,10 +1,10 @@
-import { fetchData } from "@/lib/actions";
+import { getProductData } from "@/lib/actions";
 import ProductAddEditForm from "@/ui/components/ProductAddEditForm";
 import ProductTile from "@/ui/components/ProductTile";
 
 export default async function ProductViewEditPage({ params }: { params: { slug: string } }) {
     const { slug } = await params;
-    const allData = await fetchData();
+    const allData = await getProductData();
     const productData = allData.find((product) => product.slug === slug);
 
     return (

@@ -62,7 +62,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
             imagePath &&
             altText &&
             stock &&
-            Object.keys(stock).length > 0 &&
+            Object.keys(stock)?.length &&
             tableMode === "display"
         ) {
             dataObj = {

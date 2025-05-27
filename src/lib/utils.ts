@@ -1,8 +1,8 @@
 import { BagItem, Product, Sizes, VALID_CATEGORIES, VALID_SIZES } from "./definitions";
 
-export function debounce(func: () => void, delay: number) {
+export function debounce<T extends (...args: any[]) => void>(func: T, delay: number) {
     let timer: ReturnType<typeof setTimeout>;
-    return function (...args: Parameters<typeof func>) {
+    return function (...args: Parameters<T>) {
         clearTimeout(timer);
         timer = setTimeout(() => {
             func(...args);
@@ -74,4 +74,9 @@ export function createEmptyProduct(): Product {
 export function containsClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: string) {
     const element = document.getElementById(id);
     return element ? element.contains(e.target as Node) : false;
+}
+
+export function areProductListsEqual(listA: Product[], listB: Product[]) {
+    if (listA.length !== listB.length) return false;
+    return listA.every((productA, idx) => productA.id === listB[idx].id);
 }
