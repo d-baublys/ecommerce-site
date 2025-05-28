@@ -70,7 +70,7 @@ export default function SearchBar({
                     placeholder="Search products..."
                 ></input>
                 <div className="px-3 text-[1.75rem]">
-                    <IoCloseCircle onClick={() => clearAll()} />
+                    <IoCloseCircle onClick={() => clearAll()} className="cursor-pointer" />
                 </div>
             </div>
             {query && (

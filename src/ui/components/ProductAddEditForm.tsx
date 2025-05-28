@@ -119,6 +119,21 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
         setMessage("");
     }, [tableMode]);
 
+    const handleUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        e.returnValue = "";
+    };
+
+    useEffect(() => {
+        if (productChanged) {
+            window.addEventListener("beforeunload", handleUnload);
+        } else {
+            window.removeEventListener("beforeunload", handleUnload);
+        }
+
+        return () => window.removeEventListener("beforeunload", handleUnload);
+    }, [productChanged]);
+
     return (
         <form className="flex flex-col w-full p-4 gap-8 border-2 rounded-lg">
             <FormInput
