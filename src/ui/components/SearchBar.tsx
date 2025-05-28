@@ -3,18 +3,23 @@
 import { getProductData } from "@/lib/actions";
 import { Product } from "@/lib/definitions";
 import { debounce } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { IoCloseCircle, IoSearch } from "react-icons/io5";
 
 export default function SearchBar({
     handleResultClick,
+    isGlobalSearch,
 }: {
     handleResultClick: (product: Product) => void;
+    isGlobalSearch?: boolean;
 }) {
     const [productList, setProductList] = useState<Product[]>([]);
     const [query, setQuery] = useState<string>("");
     const [results, setResults] = useState<Product[]>([]);
     const [isResultLoading, setIsResultLoading] = useState<boolean>(false);
+
+    const router = useRouter();
 
     useEffect(() => {
         const getData = async () => {
@@ -47,6 +52,12 @@ export default function SearchBar({
         }
     };
 
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<SVGElement>) => {
+        e.preventDefault();
+        if (!query.trim() || !isGlobalSearch) return;
+        router.push(`/search?q=${encodeURIComponent(query)}`);
+    };
+
     const clearAll = () => {
         setQuery("");
         setResults([]);
@@ -58,10 +69,19 @@ export default function SearchBar({
     };
 
     return (
-        <div className="relative flex flex-col w-full">
+        <form
+            role="search"
+            className="relative flex flex-col w-full"
+            onSubmit={(e) => handleSubmit(e)}
+        >
             <div className="flex items-center w-full h-10 bg-background-lightest rounded-full">
-                <div className="px-3 text-xl">
-                    <IoSearch />
+                <div className="flex justify-center items-center w-12 h-full text-xl">
+                    {isGlobalSearch && (
+                        <IoSearch
+                            className={query ? "cursor-pointer" : ""}
+                            onClick={(e) => handleSubmit(e)}
+                        />
+                    )}
                 </div>
                 <input
                     className="w-[90%] h-full outline-none"
@@ -69,12 +89,12 @@ export default function SearchBar({
                     onChange={(e) => handleSearch(e)}
                     placeholder="Search products..."
                 ></input>
-                <div className="px-3 text-[1.75rem]">
+                <div className="flex justify-center items-center w-12 text-[1.75rem]">
                     <IoCloseCircle onClick={() => clearAll()} className="cursor-pointer" />
                 </div>
             </div>
             {query && (
-                <div className="absolute top-full left-[2%] w-[96%] min-h-[100px] px-4 py-2 border-t-[1px] border-background-lighter bg-background-lightest z-100">
+                <div className="mx-4 min-h-[100px] px-4 py-2 border-t-[1px] border-background-lighter bg-background-lightest z-100">
                     <ul>
                         {results?.length > 0 &&
                             results.map((product) => (
@@ -92,6 +112,6 @@ export default function SearchBar({
                     </ul>
                 </div>
             )}
-        </div>
+        </form>
     );
 }

@@ -48,7 +48,9 @@ export default function ManageFeaturedPage() {
     return (
         <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-8">
             <span className="font-semibold text-xl">Featured Products</span>
-            <SearchBar handleResultClick={handleResultClick} />
+            <div className="w-3/4 h-10">
+                <SearchBar handleResultClick={handleResultClick} />
+            </div>
             {provisionalFeaturedList?.length ? (
                 <>
                     {provisionalFeaturedList.map((featuredProd) => (

@@ -6,6 +6,7 @@ import { Product } from "@/lib/definitions";
 import { useSearchStore } from "@/stores/searchStore";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import DarkBackdrop from "./DarkBackdrop";
+import { IoClose } from "react-icons/io5";
 
 export default function SearchOverlay() {
     const { isSearchOpen, setIsSearchOpen, isSearchLoaded, setIsSearchLoaded } = useSearchStore(
@@ -45,11 +46,19 @@ export default function SearchOverlay() {
                 }`}
             >
                 <div
-                    className={`flex flex-col justify-center items-center w-2/3 min-h-full [transition:all_0.4s_ease-out] ${
+                    className={`flex flex-col items-center w-2/3 pb-4 [transition:all_0.4s_ease-out] ${
                         isSearchLoaded ? "opacity-100 translate-0" : "opacity-0 translate-y-6"
                     }`}
                 >
-                    <SearchBar handleResultClick={handleResultClick} />
+                    <div className="flex justify-center items-start mt-[13rem]">
+                        <SearchBar handleResultClick={handleResultClick} isGlobalSearch />
+                        <div className="flex items-center px-1 h-10">
+                            <IoClose
+                                className="text-2xl cursor-pointer"
+                                onClick={() => closeOverlay()}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </>
