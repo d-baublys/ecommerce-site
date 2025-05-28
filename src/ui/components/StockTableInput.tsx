@@ -5,18 +5,18 @@ import React from "react";
 export default function StockTableInput({
     type,
     mode,
+    pairKey,
     value,
-    pair,
-    setProvisionalStockObj,
+    stockObjSetter,
     setNewSize,
     setNewStock,
     isNew,
 }: {
     type: "text" | "number";
     mode: StockTableMode;
+    pairKey?: string | number;
     value?: string | number;
-    pair?: string | number;
-    setProvisionalStockObj?: React.Dispatch<React.SetStateAction<Product["stock"]>>;
+    stockObjSetter?: React.Dispatch<React.SetStateAction<Product["stock"]>>;
     setNewSize?: React.Dispatch<React.SetStateAction<Sizes | undefined>>;
     setNewStock?: React.Dispatch<React.SetStateAction<number | undefined>>;
     isNew?: boolean;
@@ -26,12 +26,13 @@ export default function StockTableInput({
     function handleChange(e: React.FormEvent<HTMLInputElement>) {
         const newValue = e.currentTarget.value;
 
-        if (type === "text") {
-            setNewSize!(newValue.toLowerCase() as Sizes);
-        } else if (type === "number" && isValidStock(Number(newValue))) {
-            setNewStock!(Number(newValue));
-            if (pair) {
-                setProvisionalStockObj!((prev) => ({ ...prev, [pair as Sizes]: Number(newValue) }));
+        if (type === "text" && setNewSize) {
+            setNewSize(newValue.toLowerCase() as Sizes);
+        } else if (type === "number" && setNewStock && isValidStock(Number(newValue))) {
+            if (pairKey && stockObjSetter) {
+                stockObjSetter((prev) => ({ ...prev, [pairKey as Sizes]: Number(newValue) }));
+            } else {
+                setNewStock(Number(newValue));
             }
         }
     }

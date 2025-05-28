@@ -5,37 +5,41 @@ import { isUnique, isValidSize } from "@/lib/utils";
 import GeneralButton from "@/ui/components/GeneralButton";
 import StockTableInput from "@/ui/components/StockTableInput";
 import StockRowDelete from "@/ui/components/StockRowDelete";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ProductStockTable({
-    productData,
-    setStock: setSavedStockObj,
+    savedDataObj,
+    provisionalDataObj,
+    setProvisionalDataObj,
     tableMode,
     setTableMode,
 }: {
-    productData: Product;
-    setStock: React.Dispatch<React.SetStateAction<Product["stock"]>>;
+    savedDataObj: Product;
+    provisionalDataObj: Product;
+    setProvisionalDataObj: React.Dispatch<React.SetStateAction<Product>>;
     tableMode: StockTableMode;
     setTableMode: React.Dispatch<React.SetStateAction<StockTableMode>>;
 }) {
-    const [provisionalStockObj, setProvisionalStockObj] = useState<Product["stock"]>(
-        productData.stock
-    );
+    const [localStockObj, setLocalStockObj] = useState<Product["stock"]>(savedDataObj.stock);
+
     const [message, setMessage] = useState<string | undefined>();
     const [newSize, setNewSize] = useState<Sizes | undefined>();
     const [newStock, setNewStock] = useState<number | undefined>();
+
+    useEffect(() => {
+        setLocalStockObj(provisionalDataObj.stock);
+    }, [provisionalDataObj]);
 
     const handleAdd = async () => {
         if (
             newSize !== undefined &&
             newStock !== undefined &&
             isValidSize(newSize) &&
-            isUnique(newSize, provisionalStockObj)
+            isUnique(newSize, localStockObj)
         ) {
-            const updatedStockObj = { ...provisionalStockObj, [newSize]: newStock };
+            const updatedStockObj = { ...localStockObj, [newSize]: newStock };
 
-            setProvisionalStockObj(updatedStockObj);
-            setSavedStockObj(updatedStockObj);
+            setProvisionalDataObj((prev) => ({ ...prev, stock: updatedStockObj }));
             setNewSize(undefined);
             setNewStock(undefined);
             setTableMode("display");
@@ -47,8 +51,8 @@ export default function ProductStockTable({
         }
     };
 
-    const handleSave = async () => {
-        setSavedStockObj(provisionalStockObj);
+    const handleApply = async () => {
+        setProvisionalDataObj((prev) => ({ ...prev, stock: localStockObj }));
         setNewSize(undefined);
         setNewStock(undefined);
         setTableMode("display");
@@ -56,7 +60,7 @@ export default function ProductStockTable({
     };
 
     const handleCancel = () => {
-        setProvisionalStockObj(productData.stock);
+        setLocalStockObj(savedDataObj.stock);
         setNewSize(undefined);
         setNewStock(undefined);
         setTableMode("display");
@@ -66,11 +70,11 @@ export default function ProductStockTable({
     return (
         <div className="flex flex-col border-2 p-2">
             <div className="flex justify-between h-12">
-                {tableMode === "display" && Object.keys(provisionalStockObj)?.length && (
+                {tableMode === "display" && Object.keys(localStockObj)?.length > 0 && (
                     <GeneralButton onClick={() => setTableMode("edit")}>Edit</GeneralButton>
                 )}
                 {tableMode === "edit" && (
-                    <GeneralButton onClick={() => handleSave()}>Save</GeneralButton>
+                    <GeneralButton onClick={() => handleApply()}>Apply</GeneralButton>
                 )}
                 {tableMode === "add" && (
                     <GeneralButton onClick={() => handleAdd()}>Add</GeneralButton>
@@ -91,7 +95,7 @@ export default function ProductStockTable({
                     </tr>
                 </thead>
                 <tbody>
-                    {VALID_SIZES.filter((size) => size in provisionalStockObj).map((stockSize) => (
+                    {VALID_SIZES.filter((size) => size in localStockObj).map((stockSize) => (
                         <tr key={stockSize}>
                             <td className="border-2">
                                 <StockTableInput
@@ -104,16 +108,16 @@ export default function ProductStockTable({
                                 <StockTableInput
                                     type="number"
                                     mode={tableMode}
-                                    value={provisionalStockObj[stockSize]}
-                                    pair={stockSize}
-                                    setProvisionalStockObj={setProvisionalStockObj}
+                                    pairKey={stockSize}
+                                    value={localStockObj[stockSize]}
+                                    stockObjSetter={setLocalStockObj}
                                     setNewStock={setNewStock}
                                 />
                             </td>
                             <td className="min-w-4 w-8">
                                 {tableMode === "edit" && (
                                     <StockRowDelete
-                                        setProvisionalStockObj={setProvisionalStockObj}
+                                        stockObjSetter={setLocalStockObj}
                                         size={stockSize as Sizes}
                                     />
                                 )}
@@ -134,7 +138,7 @@ export default function ProductStockTable({
                                 <StockTableInput
                                     type="number"
                                     mode={tableMode}
-                                    setProvisionalStockObj={setProvisionalStockObj}
+                                    stockObjSetter={setLocalStockObj}
                                     isNew
                                     setNewStock={setNewStock}
                                 />

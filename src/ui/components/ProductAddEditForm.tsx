@@ -3,35 +3,32 @@
 import { Categories, Product, StockTableMode, VALID_CATEGORIES } from "@/lib/definitions";
 import FormInput from "./FormInput";
 import GeneralButton from "./GeneralButton";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     capitalize,
     convertValidPrice,
     createEmptyProduct,
     formatImagePath,
+    areProductsEqual,
     isValidPrice,
     slugify,
     stringifyConvertPrice,
 } from "@/lib/utils";
 import { IoFolder } from "react-icons/io5";
 import ProductStockTable from "./ProductStockTable";
-import { useRouter } from "next/navigation";
 import { useModalStore } from "@/stores/modalStore";
 import { productAdd, productDelete, productUpdate } from "@/lib/actions";
+import { useRouter } from "next/navigation";
 
 export default function ProductAddEditForm({ productData }: { productData?: Product }) {
-    let dataObj = productData ? productData : createEmptyProduct();
+    const dataObj = productData ? productData : createEmptyProduct();
+    const [savedDataObj, setSavedDataObj] = useState<Product>(dataObj);
+    const [provisionalDataObj, setProvisionalDataObj] = useState<Product>(dataObj);
+
     const mode = productData ? "edit" : "add";
-
-    const [name, setName] = useState<string>(dataObj.name || "");
-    const [category, setCategory] = useState<Categories>(dataObj.gender || VALID_CATEGORIES[0]);
-    const [price, setPrice] = useState<string>(stringifyConvertPrice(dataObj.price) || "0");
-    const [imagePath, setImagePath] = useState<string>(dataObj.src || "");
-    const [altText, setAltText] = useState<string>(dataObj.alt || "");
-    const [stock, setStock] = useState<Product["stock"]>(dataObj.stock || {});
-
     const [tableMode, setTableMode] = useState<StockTableMode>("display");
-    const [fileName, setFileName] = useState<string | null>(dataObj.src.slice(1));
+
+    const [price, setPrice] = useState<string>(stringifyConvertPrice(dataObj.price));
     const [message, setMessage] = useState<string | null>();
     const openModal = useModalStore((state) => state.openModal);
 
@@ -39,46 +36,53 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
     const handleBrowse = () => {
         fileBrowseRef.current?.click();
     };
+    let fileName: string | null = provisionalDataObj.src.slice(1);
 
     const router = useRouter();
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
 
+        fileName = null;
+        let path = "";
+
         if (file) {
-            setFileName(file.name);
-            setImagePath(formatImagePath(file.name));
-        } else {
-            setFileName(null);
-            setImagePath("");
+            fileName = file.name;
+            path = formatImagePath(file.name);
+        }
+        setProvisionalDataObj((prev) => ({ ...prev, src: path }));
+    };
+
+    const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const input = e.target.value;
+        setPrice(input);
+
+        if (isValidPrice(input)) {
+            setProvisionalDataObj((prev) => ({
+                ...prev,
+                price: convertValidPrice(input),
+            }));
         }
     };
 
     const handleSubmit = async () => {
         if (
-            name &&
-            category &&
-            isValidPrice(price) &&
-            imagePath &&
-            altText &&
-            stock &&
-            Object.keys(stock)?.length &&
+            provisionalDataObj.name &&
+            provisionalDataObj.gender &&
+            provisionalDataObj.price &&
+            provisionalDataObj.src &&
+            provisionalDataObj.alt &&
+            Object.keys(provisionalDataObj.stock)?.length &&
             tableMode === "display"
         ) {
-            dataObj = {
-                ...dataObj,
-                name,
-                gender: category,
-                price: convertValidPrice(price),
-                slug: slugify(name),
-                src: imagePath,
-                alt: altText,
-                stock,
+            const dbObj = {
+                ...provisionalDataObj,
+                slug: slugify(provisionalDataObj.name),
             };
-            const dbAction =
-                mode === "add" ? await productAdd(dataObj) : await productUpdate(dataObj);
+            const dbAction = mode === "add" ? await productAdd(dbObj) : await productUpdate(dbObj);
 
             if (dbAction.success) {
+                setSavedDataObj(provisionalDataObj);
                 setMessage(
                     mode === "add" ? "Product added successfully" : "Changes saved succesfully"
                 );
@@ -93,29 +97,48 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
     };
 
     const handleCancel = () => {
-        router.back();
+        setProvisionalDataObj(savedDataObj);
     };
 
     const handleDelete = async (id: string) => {
         const deleteConfirm = await openModal();
 
         if (deleteConfirm) {
-            productDelete(id);
+            try {
+                await productDelete(id);
+                router.push(`./`);
+            } catch {
+                setMessage("Error deleting product");
+            }
         }
     };
+
+    const productChanged = !areProductsEqual(savedDataObj, provisionalDataObj);
+
+    useEffect(() => {
+        setMessage("");
+    }, [tableMode]);
 
     return (
         <form className="flex flex-col w-full p-4 gap-8 border-2 rounded-lg">
             <FormInput
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                    setProvisionalDataObj((prev) => ({ ...prev, name: e.target.value }));
+                }}
                 legend="Product Name"
-                value={name}
+                value={provisionalDataObj.name}
             />
             <fieldset>
                 <legend className="mb-2">Category</legend>
                 <select
-                    onChange={(e) => setCategory(e.target.value as Categories)}
+                    onChange={(e) => {
+                        setProvisionalDataObj((prev) => ({
+                            ...prev,
+                            gender: e.target.value as Categories,
+                        }));
+                    }}
                     className="p-1.5 border-2 rounded-lg"
+                    value={provisionalDataObj.gender}
                 >
                     {VALID_CATEGORIES.map((category, idx) => (
                         <option key={idx} value={category}>
@@ -126,7 +149,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
             </fieldset>
             <FormInput
                 type="number"
-                onChange={(e) => setPrice(e.target.value)}
+                onChange={(e) => handlePriceChange(e)}
                 legend="Unit Price"
                 value={price}
             />
@@ -147,30 +170,37 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                 </div>
             </fieldset>
             <FormInput
-                onChange={(e) => setAltText(e.target.value)}
+                onChange={(e) =>
+                    setProvisionalDataObj((prev) => ({ ...prev, alt: e.target.value }))
+                }
                 legend="Image Description"
-                value={altText}
+                value={provisionalDataObj.alt}
             />
             <ProductStockTable
-                productData={dataObj}
-                setStock={setStock}
+                savedDataObj={savedDataObj}
+                provisionalDataObj={provisionalDataObj}
+                setProvisionalDataObj={setProvisionalDataObj}
                 tableMode={tableMode}
                 setTableMode={setTableMode}
             />
             <div className="h-8">{message}</div>
-            <div className="flex justify-between gap-8">
-                <GeneralButton className="w-full" onClick={handleSubmit}>
-                    {mode === "add" ? "Add" : "Save"}
-                </GeneralButton>
-                <GeneralButton className="w-full" onClick={handleCancel}>
-                    Cancel
-                </GeneralButton>
+            <div className="flex justify-between h-8 gap-8">
+                {productChanged && (
+                    <GeneralButton className="w-full" onClick={handleSubmit}>
+                        {mode === "add" ? "Add" : "Save"}
+                    </GeneralButton>
+                )}
+                {productChanged && (
+                    <GeneralButton className="w-full" onClick={handleCancel}>
+                        Cancel
+                    </GeneralButton>
+                )}
             </div>
             {mode === "edit" && (
                 <div className="flex justify-center w-full pt-4 border-t-black border-t-2">
                     <GeneralButton
                         className="bg-danger-color text-contrasted border-danger-color"
-                        onClick={() => handleDelete(dataObj.id)}
+                        onClick={() => handleDelete(provisionalDataObj.id)}
                     >
                         Delete
                     </GeneralButton>

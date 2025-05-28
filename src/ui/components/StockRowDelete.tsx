@@ -2,16 +2,17 @@ import { Product, Sizes } from "@/lib/definitions";
 import { IoTrash } from "react-icons/io5";
 
 export default function StockRowDelete({
-    setProvisionalStockObj,
+    stockObjSetter,
     size,
 }: {
-    setProvisionalStockObj?: React.Dispatch<React.SetStateAction<Product["stock"]>>;
+    stockObjSetter: React.Dispatch<React.SetStateAction<Product["stock"]>>;
     size: Sizes;
 }) {
     const handleDelete = () => {
-        setProvisionalStockObj!((prev) => {
+        stockObjSetter((prev) => {
             const newObj = { ...prev };
             delete newObj[size];
+
             return newObj;
         });
     };

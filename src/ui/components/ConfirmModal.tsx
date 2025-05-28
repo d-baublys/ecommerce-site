@@ -2,9 +2,20 @@
 
 import { useModalStore } from "@/stores/modalStore";
 import GeneralButton from "./GeneralButton";
+import { useEffect } from "react";
 
 export default function ConfirmModal() {
     const { isOpen, resolve, closeModal } = useModalStore((state) => state);
+
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.removeAttribute("style");
+        }
+
+        return () => document.body.removeAttribute("style");
+    }, [isOpen]);
 
     const handleConfirm = () => {
         resolve?.(true);
@@ -22,13 +33,13 @@ export default function ConfirmModal() {
         <>
             <div
                 id="modal-backdrop"
-                className="fixed top-0 left-0 w-full min-h-screen bg-black opacity-75 "
+                className="fixed top-0 left-0 w-full min-h-screen bg-black opacity-75 z-[100]"
             ></div>
             ;
             <div
                 id="modal-container"
                 onClick={handleCancel}
-                className="fixed top-0 left-0 flex flex-col w-full justify-center items-center min-h-screen"
+                className="fixed top-0 left-0 flex flex-col w-full justify-center items-center min-h-screen z-[200]"
             >
                 <div
                     id="modal"

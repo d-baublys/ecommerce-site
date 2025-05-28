@@ -47,7 +47,7 @@ export function convertValidPrice(price: string) {
 }
 
 export function stringifyConvertPrice(price: number) {
-    return (price / 100).toString();
+    return (price / 100).toFixed(2).toString();
 }
 
 export function slugify(name: string) {
@@ -79,4 +79,24 @@ export function containsClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>, i
 export function areProductListsEqual(listA: Product[], listB: Product[]) {
     if (listA.length !== listB.length) return false;
     return listA.every((productA, idx) => productA.id === listB[idx].id);
+}
+
+function areStocksEqual(stockA: Product["stock"], stockB: Product["stock"]) {
+    const keysA = Object.keys(stockA) as Sizes[];
+    const keysB = Object.keys(stockB) as Sizes[];
+
+    if (keysA.length !== keysB.length) return false;
+    return keysA.every((key) => stockA[key] === stockB[key]);
+}
+
+export function areProductsEqual(productA: Product, productB: Product) {
+    for (const key of Object.keys(productA) as (keyof Product)[]) {
+        if (key === "stock") continue;
+
+        if (productA[key] !== productB[key]) {
+            return false;
+        }
+    }
+
+    return areStocksEqual(productA.stock, productB.stock);
 }
