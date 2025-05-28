@@ -4,6 +4,7 @@ import NavBar from "@/ui/components/NavBar";
 import Footer from "@/ui/components/Footer";
 import { lexendExa } from "@/ui/fonts";
 import ConfirmModal from "@/ui/components/ConfirmModal";
+import SearchOverlay from "@/ui/components/SearchOverlay";
 
 export const metadata: Metadata = {
     title: "D-Wear",
@@ -26,6 +27,7 @@ export default function RootLayout({
                     <Footer />
                 </div>
                 <ConfirmModal />
+                <SearchOverlay />
             </body>
         </html>
     );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useBagStore } from "@/stores/bagStore";
+import { useSearchStore } from "@/stores/searchStore";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -9,6 +10,7 @@ import { IoBagOutline, IoHeartOutline, IoPersonOutline, IoSearchOutline } from "
 export default function NavBar() {
     const [isScrollingUp, setIsScrollingUp] = useState(false);
     const itemCount = useBagStore((state) => state.getTotalBagCount());
+    const { isSearchOpen, setIsSearchOpen, setIsSearchLoaded } = useSearchStore((state) => state);
 
     useEffect(() => {
         let lastScroll = window.scrollY;
@@ -22,6 +24,16 @@ export default function NavBar() {
 
         return () => window.removeEventListener("scroll", scrollUpSticky);
     }, []);
+
+    const handleSearchClick = () => {
+        if (!isSearchOpen) {
+            setIsSearchOpen(true);
+            setTimeout(() => setIsSearchLoaded(true), 0);
+        } else {
+            setIsSearchLoaded(false);
+            setTimeout(() => setIsSearchOpen(false), 200);
+        }
+    };
 
     return (
         <nav
@@ -41,8 +53,11 @@ export default function NavBar() {
                     </Link>
                 </div>
                 <div className="flex gap-6 lg:col-start-3 lg:justify-end">
-                    <div>
-                        <IoSearchOutline className="hover:scale-125 transition" />
+                    <div className="cursor-pointer">
+                        <IoSearchOutline
+                            onClick={handleSearchClick}
+                            className="hover:scale-125 transition"
+                        />
                     </div>
                     <Link href={"/wishlist"}>
                         <div>

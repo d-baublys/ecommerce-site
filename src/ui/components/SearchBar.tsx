@@ -4,14 +4,12 @@ import { getProductData } from "@/lib/actions";
 import { Product } from "@/lib/definitions";
 import { debounce } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { IoSearch } from "react-icons/io5";
+import { IoCloseCircle, IoSearch } from "react-icons/io5";
 
 export default function SearchBar({
-    parentArray,
-    setter,
+    handleResultClick,
 }: {
-    parentArray?: Product[];
-    setter?: React.Dispatch<React.SetStateAction<Product[]>>;
+    handleResultClick: (product: Product) => void;
 }) {
     const [productList, setProductList] = useState<Product[]>([]);
     const [query, setQuery] = useState<string>("");
@@ -49,16 +47,18 @@ export default function SearchBar({
         }
     };
 
-    const handleResultClick = (product: Product) => {
-        const isNew = !parentArray?.find((existingProd) => existingProd.id === product.id);
-
-        if (setter && isNew) setter((prev) => (prev ? [...prev, product] : [product]));
+    const clearAll = () => {
         setQuery("");
         setResults([]);
     };
 
+    const handleClick = (product: Product) => {
+        handleResultClick(product);
+        clearAll();
+    };
+
     return (
-        <div className="relative w-full">
+        <div className="relative flex flex-col w-full">
             <div className="flex items-center w-full h-10 bg-background-lightest rounded-full">
                 <div className="px-3 text-xl">
                     <IoSearch />
@@ -69,6 +69,9 @@ export default function SearchBar({
                     onChange={(e) => handleSearch(e)}
                     placeholder="Search products..."
                 ></input>
+                <div className="px-3 text-[1.75rem]">
+                    <IoCloseCircle onClick={() => clearAll()} />
+                </div>
             </div>
             {query && (
                 <div className="absolute top-full left-[2%] w-[96%] min-h-[100px] px-4 py-2 border-t-[1px] border-background-lighter bg-background-lightest z-100">
@@ -78,7 +81,7 @@ export default function SearchBar({
                                 <li
                                     key={product.id}
                                     className="py-1 cursor-pointer bg-background-lightest hover:brightness-90 active:brightness-90"
-                                    onClick={() => handleResultClick(product)}
+                                    onClick={() => handleClick(product)}
                                 >
                                     {product.name}
                                 </li>

@@ -1,25 +1,25 @@
 import { create } from "zustand";
 
 type ModalStore = {
-    isOpen: boolean;
+    isModalOpen: boolean;
     resolve: ((value: boolean) => void) | null;
     openModal: () => Promise<boolean>;
     closeModal: () => void;
 };
 
 export const useModalStore = create<ModalStore>((set) => ({
-    isOpen: false,
+    isModalOpen: false,
     resolve: null,
     openModal: () =>
         new Promise<boolean>((resolveFn) => {
             set({
-                isOpen: true,
+                isModalOpen: true,
                 resolve: resolveFn,
             });
         }),
     closeModal: () => {
         set({
-            isOpen: false,
+            isModalOpen: false,
             resolve: null,
         });
     },

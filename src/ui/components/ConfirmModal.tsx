@@ -2,20 +2,13 @@
 
 import { useModalStore } from "@/stores/modalStore";
 import GeneralButton from "./GeneralButton";
-import { useEffect } from "react";
+import useBodyScrollLock from "@/hooks/useBodyScrollLock";
+import DarkBackdrop from "./DarkBackdrop";
 
 export default function ConfirmModal() {
-    const { isOpen, resolve, closeModal } = useModalStore((state) => state);
+    const { isModalOpen, resolve, closeModal } = useModalStore((state) => state);
 
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.removeAttribute("style");
-        }
-
-        return () => document.body.removeAttribute("style");
-    }, [isOpen]);
+    useBodyScrollLock(isModalOpen);
 
     const handleConfirm = () => {
         resolve?.(true);
@@ -27,15 +20,11 @@ export default function ConfirmModal() {
         closeModal();
     };
 
-    if (!isOpen) return null;
+    if (!isModalOpen) return null;
 
     return (
         <>
-            <div
-                id="modal-backdrop"
-                className="fixed top-0 left-0 w-full min-h-screen bg-black opacity-75 z-[100]"
-            ></div>
-            ;
+            <DarkBackdrop zIndex={100} />
             <div
                 id="modal-container"
                 onClick={handleCancel}

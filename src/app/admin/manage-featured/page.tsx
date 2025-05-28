@@ -23,6 +23,14 @@ export default function ManageFeaturedPage() {
         getList();
     }, []);
 
+    const handleResultClick = (product: Product) => {
+        const isNew = !provisionalFeaturedList?.find(
+            (existingProd) => existingProd.id === product.id
+        );
+
+        if (isNew) setProvisionalFeaturedList((prev) => (prev ? [...prev, product] : [product]));
+    };
+
     const handleSave = async () => {
         if (provisionalFeaturedList?.length <= 5) {
             await clearFeaturedProducts();
@@ -40,7 +48,7 @@ export default function ManageFeaturedPage() {
     return (
         <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-8">
             <span className="font-semibold text-xl">Featured Products</span>
-            <SearchBar setter={setProvisionalFeaturedList} parentArray={provisionalFeaturedList} />
+            <SearchBar handleResultClick={handleResultClick} />
             {provisionalFeaturedList?.length ? (
                 <>
                     {provisionalFeaturedList.map((featuredProd) => (
