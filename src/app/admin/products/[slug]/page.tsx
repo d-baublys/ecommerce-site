@@ -1,6 +1,6 @@
 import { getProductData } from "@/lib/actions";
 import ProductAddEditForm from "@/ui/components/ProductAddEditForm";
-import ProductTile from "@/ui/components/ProductTile";
+import BagTile from "@/ui/components/BagTile";
 
 export default async function ProductViewEditPage({ params }: { params: { slug: string } }) {
     const { slug } = await params;
@@ -9,7 +9,7 @@ export default async function ProductViewEditPage({ params }: { params: { slug: 
 
     return (
         <div className="flex flex-col gap-8">
-            <ProductTile dataObj={productData!} />
+            <BagTile dataObj={productData!} />
             <ProductAddEditForm productData={productData} />
         </div>
     );

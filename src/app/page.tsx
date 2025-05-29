@@ -24,6 +24,7 @@ export default async function Home() {
                     className="object-cover brightness-50"
                     src="/tshirts.jpg"
                     alt="Branded t-shirts"
+                    sizes="auto"
                     fill
                 ></Image>
                 <div className="flex flex-col main-tagline absolute w-full top-1/2 px-(--gutter) md:px-(--gutter-md) text-4xl font-semibold text-contrasted">

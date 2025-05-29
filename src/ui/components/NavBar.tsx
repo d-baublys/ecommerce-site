@@ -49,6 +49,7 @@ export default function NavBar() {
                             alt="DB-Wear logomark"
                             width={120}
                             height={120}
+                            style={{ width: 120, height: 120 }}
                         />
                     </Link>
                 </div>

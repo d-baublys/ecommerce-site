@@ -4,7 +4,7 @@ import { clearFeaturedProducts, createFeaturedProducts, getFeaturedProducts } fr
 import { Product } from "@/lib/definitions";
 import { areProductListsEqual } from "@/lib/utils";
 import GeneralButton from "@/ui/components/GeneralButton";
-import ProductTile from "@/ui/components/ProductTile";
+import BagTile from "@/ui/components/BagTile";
 import SearchBar from "@/ui/components/SearchBar";
 import { useEffect, useState } from "react";
 
@@ -54,7 +54,7 @@ export default function ManageFeaturedPage() {
             {provisionalFeaturedList?.length ? (
                 <>
                     {provisionalFeaturedList.map((featuredProd) => (
-                        <ProductTile
+                        <BagTile
                             key={featuredProd.id}
                             dataObj={featuredProd}
                             handleDelete={() =>

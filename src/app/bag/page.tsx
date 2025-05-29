@@ -1,7 +1,7 @@
 "use client";
 
 import GoButton from "@/ui/components/GoButton";
-import ProductTile from "@/ui/components/ProductTile";
+import BagTile from "@/ui/components/BagTile";
 import { useBagStore } from "@/stores/bagStore";
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
@@ -65,7 +65,7 @@ export default function Page() {
             <SubHeader subheaderText="My Bag" />
             <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-4">
                 {mergedItems.map((mergedItem) => (
-                    <ProductTile
+                    <BagTile
                         key={`${mergedItem.product.id}-${mergedItem.size}`}
                         dataObj={mergedItem}
                         handleDelete={() => removeFromBag(mergedItem.product!.id, mergedItem.size)}

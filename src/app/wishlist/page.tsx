@@ -1,6 +1,6 @@
 "use client";
 
-import ProductTile from "@/ui/components/ProductTile";
+import BagTile from "@/ui/components/BagTile";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import SubHeader from "@/ui/components/SubHeader";
 
@@ -14,7 +14,7 @@ export default function Page() {
             <SubHeader subheaderText="My Wishlist" />
             <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-4">
                 {wishlist.map((product) => (
-                    <ProductTile
+                    <BagTile
                         key={product.id}
                         dataObj={product}
                         handleDelete={() => removeFromWishlist(product.id)}

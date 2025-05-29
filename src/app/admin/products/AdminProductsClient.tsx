@@ -2,7 +2,7 @@
 
 import { Categories, Product, VALID_CATEGORIES } from "@/lib/definitions";
 import { useState } from "react";
-import ProductTile from "@/ui/components/ProductTile";
+import BagTile from "@/ui/components/BagTile";
 import GeneralButton from "@/ui/components/GeneralButton";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -38,7 +38,7 @@ export default function AdminProductsClient({ productData }: { productData: Prod
                 <div className="flex flex-col gap-4">
                     {querySet.map((item: Product) => (
                         <Link key={item.id} href={`${pathname}/${item.slug}`}>
-                            <ProductTile dataObj={item} />
+                            <BagTile dataObj={item} />
                         </Link>
                     ))}
                 </div>
