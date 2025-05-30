@@ -4,7 +4,11 @@ import BagTile from "@/ui/components/BagTile";
 
 export default async function ProductViewEditPage({ params }: { params: { slug: string } }) {
     const { slug } = await params;
-    const allData = await getProductData();
+    const productsFetch = await getProductData();
+    const allData = productsFetch.data;
+
+    if (!allData) throw new Error("No products to display");
+
     const productData = allData.find((product) => product.slug === slug);
 
     return (

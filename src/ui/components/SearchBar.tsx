@@ -23,8 +23,11 @@ export default function SearchBar({
 
     useEffect(() => {
         const getData = async () => {
-            const data = await getProductData();
-            setProductList(data);
+            const productFetch = await getProductData();
+
+            if (!productFetch.data) throw new Error("Error fetching data for results");
+
+            setProductList(productFetch.data);
         };
 
         getData();
@@ -33,7 +36,7 @@ export default function SearchBar({
     const debouncedResults = debounce((currQuery) => {
         setResults(
             productList!.filter((product) =>
-                product.name.toLowerCase().includes(currQuery.toLowerCase())
+                product.name.toLowerCase().includes((currQuery as string).toLowerCase())
             )
         );
         setIsResultLoading(false);

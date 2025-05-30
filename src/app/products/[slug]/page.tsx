@@ -1,16 +1,16 @@
 import { notFound } from "next/navigation";
 import { getProductData } from "@/lib/actions";
 import ProductPageClient from "./ProductPageClient";
-import { Product } from "@/lib/definitions";
 
 export default async function Page({ params }: { params: { slug: string } }) {
     const { slug } = params;
-    const productList: Product[] = await getProductData({ slug: slug });
-    const [productData] = productList;
+    const productFetch = await getProductData({ slug: slug });
 
-    if (!productData) {
+    if (!productFetch.data) {
         notFound();
     }
+
+    const [productData] = productFetch.data;
 
     return <ProductPageClient productData={productData} />;
 }

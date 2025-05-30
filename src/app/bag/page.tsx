@@ -21,10 +21,10 @@ export default function Page() {
 
     useEffect(() => {
         const getData = async () => {
-            const data = await getProductData(
-                { id: { in: bagProductIds } },
-                { id: true, stock: true }
-            );
+            const productData = await getProductData({ id: { in: bagProductIds } });
+            const data = productData.data;
+
+            if (!data) throw new Error("Error fetching latest product data");
 
             setLatestData(data);
         };

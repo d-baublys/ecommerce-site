@@ -4,17 +4,19 @@ import { getFeaturedProducts, getProductData } from "@/lib/actions";
 import Link from "next/link";
 
 export default async function Home() {
-    let featuredList = await getFeaturedProducts();
+    const featuredFetch = await getFeaturedProducts();
+    let featuredList = featuredFetch.data;
 
-    if (!featuredList.length) {
-        const productList = await getProductData();
-        featuredList = [
-            productList[0],
-            productList[1],
-            productList[2],
-            productList[3],
-            productList[4],
-        ];
+    if (!featuredFetch.success) {
+        const fallbackFetch = await getProductData();
+
+        if (fallbackFetch.success && fallbackFetch.data) {
+            const fallbackData = fallbackFetch.data;
+
+            featuredList = fallbackData.slice(0, 5);
+        } else {
+            throw new Error("No featured or fallback products to display");
+        }
     }
 
     return (
@@ -38,7 +40,7 @@ export default async function Home() {
                 <div className="p-(--gutter) xl:p-(--gutter-md) font-semibold md:text-xl">
                     Featured
                 </div>
-                <Carousel featuredList={featuredList} />
+                {featuredList && <Carousel featuredList={featuredList} />}
             </div>
         </>
     );

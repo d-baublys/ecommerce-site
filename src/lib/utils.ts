@@ -1,6 +1,7 @@
-import { BagItem, Product, Sizes, VALID_CATEGORIES, VALID_SIZES } from "./definitions";
+import { Stock } from "../../generated/prisma";
+import { BagItem, Product, PRODUCT_BASE_FIELDS, ProductBase, Sizes, VALID_CATEGORIES, VALID_SIZES } from "./definitions";
 
-export function debounce<T extends (...args: any[]) => void>(func: T, delay: number) {
+export function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number) {
     let timer: ReturnType<typeof setTimeout>;
     return function (...args: Parameters<T>) {
         clearTimeout(timer);
@@ -99,4 +100,28 @@ export function areProductsEqual(productA: Product, productB: Product) {
     }
 
     return areStocksEqual(productA.stock, productB.stock);
+}
+
+export function mapStockForDb(productData: Product) {
+    return Object.entries(productData.stock).map(([size, quantity]) => ({
+        productId: productData.id,
+        size: size as Sizes,
+        quantity,
+    }));
+}
+
+export function buildStockObj(stock: Stock[]) {
+    return stock.reduce((acc, stockItem) => {
+        acc[stockItem.size] = stockItem.quantity;
+        return acc;
+    }, {} as Record<Sizes, number>);
+}
+
+export function extractProductFields(product: Product): ProductBase {
+    const fields = {} as ProductBase;
+    const keys = Object.keys(PRODUCT_BASE_FIELDS);
+    for (const key of keys) {
+        fields[key] = product[key as keyof ProductBase];
+    }
+    return fields;
 }

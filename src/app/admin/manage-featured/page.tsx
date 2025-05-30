@@ -14,10 +14,13 @@ export default function ManageFeaturedPage() {
 
     useEffect(() => {
         const getList = async () => {
-            const list = await getFeaturedProducts();
+            const listFetch = await getFeaturedProducts();
+            const list = listFetch.data;
             if (list) {
                 setSavedFeaturedList(list);
                 setProvisionalFeaturedList(list);
+            } else {
+                throw new Error("No featured products to display")
             }
         };
         getList();

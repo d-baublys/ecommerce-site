@@ -41,9 +41,17 @@ model Product {
     slug            String            @unique
     src             String
     alt             String
-    stock           Json
+    stock           Stock[]
+    featuredProduct FeaturedProduct[]
     orderItem       OrderItem[]       @ignore
-    FeaturedProduct FeaturedProduct[]
+}
+
+model Stock {
+    id        String  @id @default(uuid())
+    size      Sizes
+    quantity  Int
+    productId String
+    product   Product @relation(fields: [productId], references: [id])
 }
 
 model FeaturedProduct {

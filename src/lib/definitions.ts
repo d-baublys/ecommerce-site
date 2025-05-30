@@ -1,3 +1,13 @@
+export const PRODUCT_BASE_FIELDS = {
+    id: null as unknown as string,
+    name: null as unknown as string,
+    gender: null as unknown as Categories,
+    price: null as unknown as number,
+    slug: null as unknown as string,
+    src: null as unknown as string,
+    alt: null as unknown as string,
+};
+
 export const VALID_SIZES = ["xs", "s", "m", "l", "xl", "xxl"] as const;
 
 export const VALID_CATEGORIES = ["mens", "womens"] as const;
@@ -6,14 +16,11 @@ export type Sizes = (typeof VALID_SIZES)[number];
 
 export type Categories = (typeof VALID_CATEGORIES)[number];
 
-export type Product = {
-    id: string;
-    name: string;
-    gender: Categories;
-    price: number;
-    slug: string;
-    src: string;
-    alt: string;
+export type ProductBase = {
+    [K in keyof typeof PRODUCT_BASE_FIELDS]: (typeof PRODUCT_BASE_FIELDS)[K];
+};
+
+export type Product = ProductBase & {
     stock: Partial<Record<Sizes, number>>;
 };
 

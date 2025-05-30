@@ -36,7 +36,10 @@ export async function POST(req: NextRequest) {
         }
 
         for (const item of items) {
-            await updateStockOnPurchase(item.productId, item.size, item.quantity);
+            const result = await updateStockOnPurchase(item.productId, item.size, item.quantity);
+            if (!result.success) {
+                return new Response("Error updating stock", { status: 400 });
+            }
         }
 
         await createOrder(items, session.id);

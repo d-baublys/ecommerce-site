@@ -66,6 +66,8 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
     };
 
     const handleSubmit = async () => {
+        setMessage("");
+
         if (
             provisionalDataObj.name &&
             provisionalDataObj.gender &&
@@ -97,6 +99,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
     };
 
     const handleCancel = () => {
+        setMessage("");
         setProvisionalDataObj(savedDataObj);
     };
 

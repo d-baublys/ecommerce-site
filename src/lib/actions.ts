@@ -3,103 +3,106 @@
 import { Prisma } from "../../generated/prisma";
 import { ItemMetadata, OrderStatus, Product, Sizes } from "./definitions";
 import { prisma } from "./prisma";
+import { buildStockObj, extractProductFields, mapStockForDb } from "./utils";
 
 export async function productAdd(productData: Product) {
     try {
         await prisma.product.create({
-            data: {
-                name: productData.name,
-                gender: productData.gender,
-                price: productData.price,
-                slug: productData.slug,
-                src: productData.src,
-                alt: productData.alt,
-                stock: productData.stock,
-            },
+            data: extractProductFields(productData),
         });
+        await prisma.stock.createMany({
+            data: mapStockForDb(productData),
+        });
+
         return { success: true };
-    } catch {
+    } catch (error) {
+        console.error("Error adding product: ", error);
         return { success: false };
     }
 }
 
-export async function getProductData(
-    where?: Prisma.ProductWhereInput,
-    select?: Prisma.ProductSelect
-): Promise<Product[]> {
-    const rawProducts = await prisma.product.findMany({
-        where,
-        select,
-        orderBy: { name: "asc" },
-    });
+export async function getProductData(where?: Prisma.ProductWhereInput) {
+    try {
+        const rawProducts = await prisma.product.findMany({
+            where,
+            include: { stock: true },
+            orderBy: { name: "asc" },
+        });
 
-    const products: Product[] = rawProducts.map((product) => ({
-        ...product,
-        stock: product.stock as Product["stock"],
-    }));
+        const products: Product[] = rawProducts.map((product) => ({
+            ...product,
+            stock: buildStockObj(product.stock),
+        }));
 
-    return products;
+        return { data: products, success: true };
+    } catch (error) {
+        console.error("Error fetching product data: ", error);
+        return { success: false };
+    }
 }
 
 export async function productUpdate(productData: Product) {
     try {
-        await prisma.product.update({
-            where: { id: productData.id },
-            data: {
-                name: productData.name,
-                gender: productData.gender,
-                price: productData.price,
-                slug: productData.slug,
-                src: productData.src,
-                alt: productData.alt,
-                stock: productData.stock,
-            },
-        });
+        await prisma.$transaction([
+            prisma.stock.deleteMany({
+                where: { productId: productData.id },
+            }),
+            prisma.stock.createMany({
+                data: mapStockForDb(productData),
+            }),
+            prisma.product.update({
+                where: { id: productData.id },
+                data: extractProductFields(productData),
+            }),
+        ]);
+
         return { success: true };
-    } catch {
+    } catch (error) {
+        console.error("Error updating product data: ", error);
         return { success: false };
     }
 }
 
-export async function updateStockOnPurchase(
-    productId: string,
-    size: Sizes,
-    quantity: number
-): Promise<void> {
-    const product = await prisma.product.findUnique({
-        where: { id: productId },
-        select: { stock: true },
+export async function updateStockOnPurchase(productId: string, size: Sizes, quantity: number) {
+    const stockItem = await prisma.stock.findFirst({
+        where: { productId, size },
+        select: { id: true, quantity: true },
     });
 
-    if (!product || !product.stock) {
+    if (!stockItem || !stockItem.quantity) {
         throw new Error("Product not found or has no stock.");
     }
 
-    const currentStock = product.stock as Product["stock"];
-    const currentSizeStock = currentStock[size] ?? 0;
+    const currentStock = stockItem.quantity;
 
-    if (quantity > currentSizeStock) {
+    if (quantity > currentStock) {
         throw new Error(`Quantity exceeds stock for size ${size}`);
     }
 
-    const updatedStock = {
-        ...currentStock,
-        [size]: currentSizeStock - quantity,
-    };
+    const updatedStock = currentStock - quantity;
 
-    await prisma.product.update({
-        where: { id: productId },
-        data: {
-            stock: updatedStock,
-        },
-    });
+    try {
+        await prisma.stock.update({
+            where: { id: stockItem.id },
+            data: { quantity: updatedStock },
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating stock data: ", error);
+        return { success: false };
+    }
 }
 
 export async function productDelete(id: string) {
     try {
-        await prisma.product.delete({
-            where: { id },
-        });
+        await prisma.$transaction([
+            prisma.stock.deleteMany({
+                where: { productId: id },
+            }),
+            prisma.product.delete({
+                where: { id },
+            }),
+        ]);
         return { success: true };
     } catch {
         return { success: false };
@@ -109,62 +112,100 @@ export async function productDelete(id: string) {
 export async function createOrder(orderItems: ItemMetadata[], sessionId: string) {
     const orderTotal = orderItems.reduce((total, currentItem) => total + currentItem.price, 0);
 
-    await prisma.order.create({
-        data: {
-            total: orderTotal,
-            items: {
-                create: orderItems.map((item) => ({
-                    productId: item.productId,
-                    name: item.name,
-                    price: item.price,
-                    size: item.size,
-                    quantity: item.quantity,
-                })),
+    try {
+        await prisma.order.create({
+            data: {
+                total: orderTotal,
+                items: {
+                    create: orderItems.map((item) => ({
+                        productId: item.productId,
+                        name: item.name,
+                        price: item.price,
+                        size: item.size,
+                        quantity: item.quantity,
+                    })),
+                },
+                sessionId,
             },
-            sessionId,
-        },
-    });
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error creating order: ", error);
+        return { success: false };
+    }
 }
 
 export async function getOrder(id: number) {
-    const order = prisma.order.findUnique({
-        where: { id },
-    });
+    try {
+        const order = await prisma.order.findUnique({
+            where: { id },
+        });
 
-    return order;
+        return { data: order, success: true };
+    } catch (error) {
+        console.error("Error fetching order data: ", error);
+        return { success: false };
+    }
 }
 
 export async function updateOrder(orderId: number, status: OrderStatus) {
-    await prisma.order.update({
-        where: { id: orderId },
-        data: { status },
-    });
+    try {
+        await prisma.order.update({
+            where: { id: orderId },
+            data: { status },
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating order: ", error);
+        return { success: false };
+    }
 }
 
 export async function createFeaturedProducts(dataObj: Product[]) {
-    await prisma.featuredProduct.createMany({
-        data: dataObj.map((product) => ({
-            productId: product.id,
-        })),
-        skipDuplicates: true,
-    });
+    try {
+        await prisma.featuredProduct.createMany({
+            data: dataObj.map((product) => ({
+                productId: product.id,
+            })),
+            skipDuplicates: true,
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error creating featured products: ", error);
+        return { success: false };
+    }
 }
 
 export async function getFeaturedProducts() {
-    const rawProducts = await prisma.featuredProduct.findMany({
-        include: {
-            product: true,
-        },
-    });
+    try {
+        const rawProducts = await prisma.featuredProduct.findMany({
+            include: {
+                product: {
+                    include: {
+                        stock: true,
+                    },
+                },
+            },
+        });
 
-    const products: Product[] = rawProducts.map((item) => ({
-        ...item.product,
-        stock: item.product.stock as Product["stock"],
-    }));
+        const products: Product[] = rawProducts.map((item) => ({
+            ...item.product,
+            stock: buildStockObj(item.product.stock),
+        }));
 
-    return products;
+        return { data: products, success: true };
+    } catch (error) {
+        console.error("Error fetching featured products: ", error);
+        return { success: false };
+    }
 }
 
 export async function clearFeaturedProducts() {
-    await prisma.featuredProduct.deleteMany();
+    try {
+        await prisma.featuredProduct.deleteMany();
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting featured products: ", error);
+        return { success: false };
+    }
 }
