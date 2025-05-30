@@ -45,3 +45,15 @@ export type OrderStatus = "paid" | "refunded";
 export type ProductFormMode = "add" | "edit";
 
 export type StockTableMode = ProductFormMode | "display";
+
+export const priceFiltersOptions = {
+    a: { min: 0, max: 5000 },
+    b: { min: 5000, max: 10000 },
+    c: { min: 10000, max: 15000 },
+    d: { min: 15000, max: 20000 },
+    e: { min: 20000, max: Infinity },
+} as const;
+
+export type PriceFilterKey = keyof typeof priceFiltersOptions;
+
+export type PriceRange = (typeof priceFiltersOptions)[PriceFilterKey];

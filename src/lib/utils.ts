@@ -1,5 +1,17 @@
-import { Stock } from "../../generated/prisma";
-import { BagItem, Product, PRODUCT_BASE_FIELDS, ProductBase, Sizes, VALID_CATEGORIES, VALID_SIZES } from "./definitions";
+import { Prisma, Stock } from "../../generated/prisma";
+import { getProductData } from "./actions";
+import {
+    BagItem,
+    Categories,
+    PriceFilterKey,
+    priceFiltersOptions,
+    Product,
+    PRODUCT_BASE_FIELDS,
+    ProductBase,
+    Sizes,
+    VALID_CATEGORIES,
+    VALID_SIZES,
+} from "./definitions";
 
 export function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number) {
     let timer: ReturnType<typeof setTimeout>;
@@ -124,4 +136,43 @@ export function extractProductFields(product: Product): ProductBase {
         fields[key] = product[key as keyof ProductBase];
     }
     return fields;
+}
+
+export async function fetchFilteredProducts({
+    category,
+    sizeFilters = [],
+    priceFilters = [],
+}: {
+    category: Categories;
+    sizeFilters?: Sizes[];
+    priceFilters?: string[];
+}) {
+    const filterQuery: Prisma.ProductWhereInput = {
+        gender: category as Categories,
+        stock: {
+            some: {
+                quantity: { gt: 0 },
+            },
+        },
+    };
+
+    if (sizeFilters.length > 0 && filterQuery.stock) {
+        filterQuery.stock.some = {
+            ...filterQuery.stock.some,
+            size: { in: sizeFilters },
+        };
+    }
+
+    if (priceFilters.length > 0) {
+        filterQuery.OR = priceFilters.map((key) => {
+            const { min, max } = priceFiltersOptions[key as PriceFilterKey];
+            return { price: { gte: min, lt: max } };
+        });
+    }
+
+    const productsFetch = await getProductData(filterQuery);
+
+    if (!productsFetch.data) throw new Error("No products to display");
+
+    return productsFetch.data;
 }

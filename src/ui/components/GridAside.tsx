@@ -1,27 +1,24 @@
 "use client";
 
-import { Categories, Product, VALID_SIZES } from "@/lib/definitions";
+import { PriceFilterKey, priceFiltersOptions, Product, VALID_SIZES } from "@/lib/definitions";
 import AccordionSection from "./AccordionSection";
 import GeneralButton from "./GeneralButton";
 import { Sizes } from "@/lib/definitions";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 export default function GridAside({
-    products,
-    category,
+    allCategoryProducts,
+    sizeFilters,
+    setSizeFilters,
+    priceFilters,
+    setPriceFilters,
 }: {
-    products: Product[];
-    category: Categories;
+    allCategoryProducts: Product[];
+    sizeFilters: Sizes[];
+    setSizeFilters: React.Dispatch<React.SetStateAction<Sizes[]>>;
+    priceFilters: string[];
+    setPriceFilters: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
-    const [sizeFilters, setSizeFilters] = useState<Sizes[]>([]);
-
-    const priceFilters = [
-        { min: 0, max: 50 },
-        { min: 50, max: 100 },
-        { min: 100, max: 150 },
-        { min: 150, max: 200 },
-    ];
-
     const handleSizePress = (size: Sizes) => {
         setSizeFilters((prev) =>
             sizeFilters.includes(size)
@@ -37,14 +34,14 @@ export default function GridAside({
             sizesObj[size as Sizes] = 0;
         });
 
-        products.forEach((product) => {
-            Object.entries(product.stock).forEach(
-                ([size, count]) => (sizesObj[size as Sizes] += count)
+        allCategoryProducts.forEach((product) => {
+            Object.keys(product.stock).forEach(
+                (size) => product.stock[size as Sizes] && sizesObj[size as Sizes]++
             );
         });
 
         return sizesObj;
-    }, [products]);
+    }, [allCategoryProducts]);
 
     const populateSizes = () => {
         return Object.entries(sizesObj).map(([size, count]) => {
@@ -64,10 +61,59 @@ export default function GridAside({
         });
     };
 
+    const handlePricePress = (key: PriceFilterKey) => {
+        setPriceFilters((prev) =>
+            priceFilters.includes(key) ? prev.filter((prevKey) => prevKey !== key) : [...prev, key]
+        );
+    };
+
+    const pricesObj = useMemo(() => {
+        const pricesObj: Record<string, number> = {} as Record<string, number>;
+
+        Object.keys(priceFiltersOptions).forEach((key) => {
+            pricesObj[key] = 0;
+        });
+
+        allCategoryProducts.forEach((product) => {
+            Object.entries(priceFiltersOptions).forEach(([key, range]) => {
+                if (range.min <= product.price && product.price < range.max) {
+                    pricesObj[key]++;
+                }
+            });
+        });
+        return pricesObj;
+    }, [allCategoryProducts]);
+
+    const populatePrices = () => {
+        return Object.entries(pricesObj).map(([key, count]) => {
+            if (!count) return null;
+
+            return (
+                <GeneralButton
+                    key={key}
+                    onClick={() => handlePricePress(key as PriceFilterKey)}
+                    className={`!py-2 !px-3 h-min ${
+                        priceFilters.includes(key) ? "" : "!border-contrasted "
+                    }`}
+                >
+                    {createPriceLabel(key as PriceFilterKey, count)}
+                </GeneralButton>
+            );
+        });
+    };
+
+    const createPriceLabel = (key: PriceFilterKey, count: number) => {
+        return isFinite(priceFiltersOptions[key].max)
+            ? `£${priceFiltersOptions[key].min / 100}-£${
+                  priceFiltersOptions[key].max / 100 - 1
+              } (${count})`
+            : `Over £${priceFiltersOptions[key].min / 100} (${count})`;
+    };
+
     return (
         <div>
             <AccordionSection text="Size">{populateSizes()}</AccordionSection>
-            <AccordionSection text="Price">{"Something else"}</AccordionSection>
+            <AccordionSection text="Price">{populatePrices()}</AccordionSection>
         </div>
     );
 }

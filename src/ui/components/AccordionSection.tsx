@@ -21,7 +21,7 @@ export default function AccordionSection({
                 <div className="w-full py-4 ">{text}</div>
                 <div>{isOpen ? <IoChevronUp /> : <IoChevronDown />}</div>
             </div>
-            <div className={`flex flex-wrap gap-4 h-min shrink-0 overflow-hidden [transition:all_0.4s_ease] ${isOpen ? "max-h-64" : "max-h-0"}`}>{children}</div>
+            <div className={`flex flex-wrap gap-4 h-min shrink-0 overflow-hidden [transition:all_0.4s_ease] ${isOpen ? "max-h-72" : "max-h-0"}`}>{children}</div>
         </div>
     );
 }
