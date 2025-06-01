@@ -21,10 +21,10 @@ export default function AdminProductsClient({ productData }: { productData: Prod
                 </Link>
             </div>
             <div className="flex flex-row justify-evenly items-center w-full">
-                {VALID_CATEGORIES.map((category) => (
+                {Object.keys(VALID_CATEGORIES).map((category) => (
                     <GeneralButton
                         key={category}
-                        onClick={() => setFilter(category)}
+                        onClick={() => setFilter(category as Categories)}
                         className={`capitalize ${
                             filter === category &&
                             "!bg-component-color !border-component-color !text-contrasted"

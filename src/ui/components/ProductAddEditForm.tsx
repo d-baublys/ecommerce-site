@@ -158,7 +158,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                     className="p-1.5 border-2 rounded-lg"
                     value={provisionalDataObj.gender}
                 >
-                    {VALID_CATEGORIES.map((category, idx) => (
+                    {Object.keys(VALID_CATEGORIES).map((category, idx) => (
                         <option key={idx} value={category}>
                             {capitalize(category)}
                         </option>

@@ -1,5 +1,6 @@
 "use client";
 
+import { VALID_CATEGORIES } from "@/lib/definitions";
 import { useBagStore } from "@/stores/bagStore";
 import { useSearchStore } from "@/stores/searchStore";
 import Image from "next/image";
@@ -41,19 +42,28 @@ export default function NavBar() {
                 isScrollingUp ? "top-0" : "top-[calc(var(--nav-height)*-1)]"
             } [transition:top_0.5s_ease]`}
         >
-            <div className="flex lg:grid lg:grid-cols-3 justify-between items-center w-full mx-(--gutter) lg:mx-(--gutter-md)">
-                <div className="flex shrink-0 lg:col-start-2 lg:justify-center mr-(--gutter)">
+            <div className="flex justify-between items-center w-full mx-(--gutter) lg:mx-(--gutter-md)">
+                <div className="flex shrink-0 mr-(--gutter) order-1 lg:order-2">
                     <Link href={"/"}>
-                        <Image
-                            src="/dbwearopt.svg"
-                            alt="DB-Wear logomark"
-                            width={120}
-                            height={120}
-                            style={{ width: 120, height: 120 }}
-                        />
+                        <div className="relative">
+                            <Image
+                                src="/dbwearopt.svg"
+                                alt="DB-Wear logomark"
+                                width={0}
+                                height={0}
+                                style={{ width: 120, height: "100%" }}
+                            />
+                        </div>
                     </Link>
                 </div>
-                <div className="flex gap-6 lg:col-start-3 lg:justify-end">
+                <div className="flex gap-4 lg:gap-8 order-2 lg:order-1">
+                    {Object.entries(VALID_CATEGORIES).map(([category, displayName]) => (
+                        <Link key={category} href={`/category/${category}`}>
+                            <button className="cursor-pointer">{displayName}</button>
+                        </Link>
+                    ))}
+                </div>
+                <div className="flex gap-6 order-3">
                     <div className="cursor-pointer">
                         <IoSearchOutline
                             onClick={handleSearchClick}

@@ -7,5 +7,5 @@ export default function ProductLink({
     children: React.ReactNode;
     slug: string;
 }) {
-    return <Link href={`/products/${slug}`}>{children}</Link>;
+    return <Link href={`/products/${slug}`} className="h-min">{children}</Link>;
 }

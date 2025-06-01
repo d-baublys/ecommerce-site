@@ -75,7 +75,7 @@ export function createEmptyProduct(): Product {
     return {
         id: "",
         name: "",
-        gender: VALID_CATEGORIES[0],
+        gender: Object.keys(VALID_CATEGORIES)[0] as keyof typeof VALID_CATEGORIES,
         price: 0,
         slug: "",
         src: "",
@@ -130,12 +130,10 @@ export function buildStockObj(stock: Stock[]) {
 }
 
 export function extractProductFields(product: Product): ProductBase {
-    const fields = {} as ProductBase;
-    const keys = Object.keys(PRODUCT_BASE_FIELDS);
-    for (const key of keys) {
-        fields[key] = product[key as keyof ProductBase];
-    }
-    return fields;
+    const keys = Object.keys(PRODUCT_BASE_FIELDS) as (keyof ProductBase)[];
+    const result = Object.fromEntries(keys.map((key) => [key, product[key]])) as ProductBase;
+
+    return result;
 }
 
 export async function fetchFilteredProducts({
