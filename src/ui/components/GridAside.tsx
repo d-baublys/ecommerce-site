@@ -1,6 +1,6 @@
 "use client";
 
-import { PriceFilterKey, priceFiltersOptions, Product, VALID_SIZES } from "@/lib/definitions";
+import { PriceFilterKey, PRICE_FILTER_OPTIONS, Product, VALID_SIZES } from "@/lib/definitions";
 import AccordionSection from "./AccordionSection";
 import GeneralButton from "./GeneralButton";
 import { Sizes } from "@/lib/definitions";
@@ -51,8 +51,8 @@ export default function GridAside({
                 <GeneralButton
                     key={size}
                     onClick={() => handleSizePress(size as Sizes)}
-                    className={`!py-2 !px-3 h-min ${
-                        sizeFilters.includes(size as Sizes) ? "" : "!border-contrasted "
+                    className={`!py-1 !px-2 h-min !bg-background-lightest ${
+                        sizeFilters.includes(size as Sizes) ? "" : "!border-background-lightest "
                     }`}
                 >
                     {size.toUpperCase()} ({count})
@@ -70,12 +70,12 @@ export default function GridAside({
     const pricesObj = useMemo(() => {
         const pricesObj: Record<string, number> = {} as Record<string, number>;
 
-        Object.keys(priceFiltersOptions).forEach((key) => {
+        Object.keys(PRICE_FILTER_OPTIONS).forEach((key) => {
             pricesObj[key] = 0;
         });
 
         allCategoryProducts.forEach((product) => {
-            Object.entries(priceFiltersOptions).forEach(([key, range]) => {
+            Object.entries(PRICE_FILTER_OPTIONS).forEach(([key, range]) => {
                 if (range.min <= product.price && product.price < range.max) {
                     pricesObj[key]++;
                 }
@@ -92,8 +92,8 @@ export default function GridAside({
                 <GeneralButton
                     key={key}
                     onClick={() => handlePricePress(key as PriceFilterKey)}
-                    className={`!py-2 !px-3 h-min ${
-                        priceFilters.includes(key) ? "" : "!border-contrasted "
+                    className={`!py-1 !px-2 h-min !bg-background-lightest ${
+                        priceFilters.includes(key) ? "" : "!border-background-lightest "
                     }`}
                 >
                     {createPriceLabel(key as PriceFilterKey, count)}
@@ -103,15 +103,15 @@ export default function GridAside({
     };
 
     const createPriceLabel = (key: PriceFilterKey, count: number) => {
-        return isFinite(priceFiltersOptions[key].max)
-            ? `£${priceFiltersOptions[key].min / 100}-£${
-                  priceFiltersOptions[key].max / 100 - 1
+        return isFinite(PRICE_FILTER_OPTIONS[key].max)
+            ? `£${PRICE_FILTER_OPTIONS[key].min / 100}-£${
+                  PRICE_FILTER_OPTIONS[key].max / 100 - 1
               } (${count})`
-            : `Over £${priceFiltersOptions[key].min / 100} (${count})`;
+            : `Over £${PRICE_FILTER_OPTIONS[key].min / 100} (${count})`;
     };
 
     return (
-        <div>
+        <div className="divide-y border-y">
             <AccordionSection text="Size">{populateSizes()}</AccordionSection>
             <AccordionSection text="Price">{populatePrices()}</AccordionSection>
         </div>

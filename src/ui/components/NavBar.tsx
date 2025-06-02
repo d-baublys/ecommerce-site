@@ -1,6 +1,5 @@
 "use client";
 
-import { VALID_CATEGORIES } from "@/lib/definitions";
 import { useBagStore } from "@/stores/bagStore";
 import { useSearchStore } from "@/stores/searchStore";
 import Image from "next/image";
@@ -57,11 +56,9 @@ export default function NavBar() {
                     </Link>
                 </div>
                 <div className="flex gap-4 lg:gap-8 order-2 lg:order-1">
-                    {Object.entries(VALID_CATEGORIES).map(([category, displayName]) => (
-                        <Link key={category} href={`/category/${category}`}>
-                            <button className="cursor-pointer">{displayName}</button>
-                        </Link>
-                    ))}
+                    <Link href={`/category/all`}>
+                        <button className="cursor-pointer">Shop</button>
+                    </Link>
                 </div>
                 <div className="flex gap-6 order-3">
                     <div className="cursor-pointer">

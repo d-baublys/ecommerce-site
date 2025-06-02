@@ -1,3 +1,5 @@
+import { Prisma } from "../../generated/prisma";
+
 export const PRODUCT_BASE_FIELDS = {
     id: "",
     name: "",
@@ -6,6 +8,7 @@ export const PRODUCT_BASE_FIELDS = {
     slug: "",
     src: "",
     alt: "",
+    dateAdded: "",
 };
 
 export const VALID_SIZES = ["xs", "s", "m", "l", "xl", "xxl"] as const;
@@ -44,14 +47,20 @@ export type ProductFormMode = "add" | "edit";
 
 export type StockTableMode = ProductFormMode | "display";
 
-export const priceFiltersOptions = {
+export const PRICE_FILTER_OPTIONS = {
     a: { min: 0, max: 5000 },
     b: { min: 5000, max: 10000 },
     c: { min: 10000, max: 15000 },
     d: { min: 15000, max: 20000 },
     e: { min: 20000, max: Infinity },
-} as const;
+};
 
-export type PriceFilterKey = keyof typeof priceFiltersOptions;
+export type PriceFilterKey = keyof typeof PRICE_FILTER_OPTIONS;
 
-export type PriceRange = (typeof priceFiltersOptions)[PriceFilterKey];
+export const SORT_OPTIONS = {
+    a: { sort: { price: "asc" as Prisma.SortOrder }, displayName: "Price (Low to High)" },
+    b: { sort: { price: "desc" as Prisma.SortOrder }, displayName: "Price (High to Low)" },
+    c: { sort: { dateAdded: "desc" as Prisma.SortOrder }, displayName: "Newest" },
+};
+
+export type ProductSortKey = keyof typeof SORT_OPTIONS;

@@ -31,7 +31,7 @@ export default async function Home() {
                 ></Image>
                 <div className="flex flex-col main-tagline absolute w-full top-1/2 px-(--gutter) md:px-(--gutter-md) text-4xl font-semibold text-contrasted">
                     Summer 2025 styles here and now.
-                    <Link href={"/"} className="mt-8 text-2xl underline">
+                    <Link href={"/category/all"} className="mt-8 text-2xl underline">
                         {"Shop >>>"}
                     </Link>
                 </div>

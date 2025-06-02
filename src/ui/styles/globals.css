@@ -43,3 +43,9 @@ body {
         stroke-width: 50px;
     }
 }
+
+.extra-stroked {
+    path {
+        stroke-width: 75px;
+    }
+}

@@ -4,13 +4,15 @@ import {
     BagItem,
     Categories,
     PriceFilterKey,
-    priceFiltersOptions,
+    PRICE_FILTER_OPTIONS,
     Product,
     PRODUCT_BASE_FIELDS,
     ProductBase,
     Sizes,
     VALID_CATEGORIES,
     VALID_SIZES,
+    ProductSortKey,
+    SORT_OPTIONS,
 } from "./definitions";
 
 export function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number) {
@@ -80,6 +82,7 @@ export function createEmptyProduct(): Product {
         slug: "",
         src: "",
         alt: "",
+        dateAdded: processDateForClient(),
         stock: {},
     };
 }
@@ -126,33 +129,43 @@ export function buildStockObj(stock: Stock[]) {
     return stock.reduce((acc, stockItem) => {
         acc[stockItem.size] = stockItem.quantity;
         return acc;
-    }, {} as Record<Sizes, number>);
+    }, {} as Product["stock"]);
 }
 
-export function extractProductFields(product: Product): ProductBase {
+export function extractProductFields(product: Product) {
     const keys = Object.keys(PRODUCT_BASE_FIELDS) as (keyof ProductBase)[];
-    const result = Object.fromEntries(keys.map((key) => [key, product[key]])) as ProductBase;
+    const resultInitial = Object.fromEntries(keys.map((key) => [key, product[key]])) as ProductBase;
+    const result = { ...resultInitial, dateAdded: new Date(resultInitial.dateAdded) };
 
     return result;
+}
+
+export function processDateForClient(date?: Date) {
+    return (date ? date : new Date()).toISOString().split("T")[0];
 }
 
 export async function fetchFilteredProducts({
     category,
     sizeFilters = [],
     priceFilters = [],
+    productSort,
 }: {
-    category: Categories;
+    category: Categories | "all";
     sizeFilters?: Sizes[];
     priceFilters?: string[];
+    productSort?: ProductSortKey;
 }) {
     const filterQuery: Prisma.ProductWhereInput = {
-        gender: category as Categories,
         stock: {
             some: {
                 quantity: { gt: 0 },
             },
         },
     };
+
+    if (category !== "all") {
+        filterQuery.gender = category as Categories;
+    }
 
     if (sizeFilters.length > 0 && filterQuery.stock) {
         filterQuery.stock.some = {
@@ -163,12 +176,14 @@ export async function fetchFilteredProducts({
 
     if (priceFilters.length > 0) {
         filterQuery.OR = priceFilters.map((key) => {
-            const { min, max } = priceFiltersOptions[key as PriceFilterKey];
+            const { min, max } = PRICE_FILTER_OPTIONS[key as PriceFilterKey];
             return { price: { gte: min, lt: max } };
         });
     }
 
-    const productsFetch = await getProductData(filterQuery);
+    const orderBy = productSort && SORT_OPTIONS[productSort].sort;
+
+    const productsFetch = await getProductData(filterQuery, orderBy);
 
     if (!productsFetch.data) throw new Error("No products to display");
 

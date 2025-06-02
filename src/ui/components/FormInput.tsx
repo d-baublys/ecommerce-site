@@ -4,7 +4,7 @@ export default function FormInput({
     onChange,
     value,
 }: {
-    type?: string;
+    type?: React.HTMLInputTypeAttribute;
     legend: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     value?: string | number;

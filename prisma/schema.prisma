@@ -41,6 +41,7 @@ model Product {
     slug            String            @unique
     src             String
     alt             String
+    dateAdded       DateTime          @default(now())
     stock           Stock[]
     featuredProduct FeaturedProduct[]
     orderItem       OrderItem[]       @ignore

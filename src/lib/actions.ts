@@ -3,7 +3,7 @@
 import { Prisma } from "../../generated/prisma";
 import { ItemMetadata, OrderStatus, Product, Sizes } from "./definitions";
 import { prisma } from "./prisma";
-import { buildStockObj, extractProductFields, mapStockForDb } from "./utils";
+import { buildStockObj, extractProductFields, mapStockForDb, processDateForClient } from "./utils";
 
 export async function productAdd(productData: Product) {
     try {
@@ -21,16 +21,20 @@ export async function productAdd(productData: Product) {
     }
 }
 
-export async function getProductData(where?: Prisma.ProductWhereInput) {
+export async function getProductData(
+    where?: Prisma.ProductWhereInput,
+    orderBy?: Prisma.ProductOrderByWithRelationInput
+) {
     try {
         const rawProducts = await prisma.product.findMany({
             where,
             include: { stock: true },
-            orderBy: { name: "asc" },
+            orderBy: orderBy ? orderBy : { name: "asc" },
         });
 
         const products: Product[] = rawProducts.map((product) => ({
             ...product,
+            dateAdded: processDateForClient(product.dateAdded),
             stock: buildStockObj(product.stock),
         }));
 
@@ -190,6 +194,7 @@ export async function getFeaturedProducts() {
 
         const products: Product[] = rawProducts.map((item) => ({
             ...item.product,
+            dateAdded: item.product.dateAdded.toString(),
             stock: buildStockObj(item.product.stock),
         }));
 

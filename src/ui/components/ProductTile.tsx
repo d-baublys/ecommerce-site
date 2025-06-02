@@ -6,7 +6,7 @@ import ProductLink from "./ProductLink";
 export default function ProductTile({ product }: { product: Product }) {
     return (
         <ProductLink slug={product.slug}>
-            <div className="flex flex-col justify-evenly min-h-[200px] h-min bg-green-500 gap-4">
+            <div className="flex flex-col justify-evenly min-h-[200px] h-min gap-4 text-sm">
                 <div className="relative w-full aspect-[4/5]">
                     <Image
                         src={product.src}

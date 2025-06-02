@@ -5,7 +5,6 @@ import FormInput from "./FormInput";
 import GeneralButton from "./GeneralButton";
 import { useEffect, useRef, useState } from "react";
 import {
-    capitalize,
     convertValidPrice,
     createEmptyProduct,
     formatImagePath,
@@ -74,6 +73,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
             provisionalDataObj.price &&
             provisionalDataObj.src &&
             provisionalDataObj.alt &&
+            provisionalDataObj.dateAdded &&
             Object.keys(provisionalDataObj.stock)?.length &&
             tableMode === "display"
         ) {
@@ -160,7 +160,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                 >
                     {Object.keys(VALID_CATEGORIES).map((category, idx) => (
                         <option key={idx} value={category}>
-                            {capitalize(category)}
+                            {VALID_CATEGORIES[category as Categories]}
                         </option>
                     ))}
                 </select>
@@ -193,6 +193,14 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                 }
                 legend="Image Description"
                 value={provisionalDataObj.alt}
+            />
+            <FormInput
+                type="date"
+                onChange={(e) =>
+                    setProvisionalDataObj((prev) => ({ ...prev, dateAdded: e.target.value }))
+                }
+                legend="Date Added"
+                value={provisionalDataObj.dateAdded}
             />
             <ProductStockTable
                 savedDataObj={savedDataObj}
