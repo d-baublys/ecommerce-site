@@ -69,15 +69,19 @@ export default function BagTile({
     return (
         <div className="flex h-24 w-full sm:w-1/2 min-w-[300px] sm:min-w-[500px] border-2 p-2">
             {renderLinkedArea()}
-            <div className="flex flex-col justify-between items-end h-full w-24 text-2xl">
+            <div className="flex flex-col justify-between items-end h-full w-24">
                 {handleDelete && (
-                    <IoClose onClick={handleDelete} className="translate-x-1 cursor-pointer" />
+                    <IoClose
+                        onClick={handleDelete}
+                        className="translate-x-1 cursor-pointer"
+                        size={24}
+                    />
                 )}
                 {isBagItem &&
                     (stock ? (
                         <select
                             value={dataObj.quantity}
-                            className="h-10 w-10 pl-1 text-xl border-2 rounded-md"
+                            className="h-10 w-10 pl-1 border-2 rounded-md"
                             onChange={(e) =>
                                 updateQuantity(productData.id, dataObj.size, Number(e.target.value))
                             }
@@ -89,7 +93,7 @@ export default function BagTile({
                             ))}
                         </select>
                     ) : (
-                        <div className="flex justify-center w-full text-base text-end text-component-color">
+                        <div className="flex justify-center w-full text-end text-component-color">
                             Out of stock
                         </div>
                     ))}

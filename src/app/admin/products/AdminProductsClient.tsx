@@ -14,7 +14,9 @@ export default function AdminProductsClient({ productData }: { productData: Prod
 
     return (
         <div className="flex flex-col grow justify-center items-center min-w-[300px] sm:min-w-[500px] gap-8">
-            <div className="text-xl font-semibold">Products</div>
+            <div className="text-sz-subheading lg:text-sz-subheading-lg font-semibold">
+                Products
+            </div>
             <div className="flex justify-center">
                 <Link href={`${pathname}/add-product`}>
                     <GeneralButton>+ Add Product</GeneralButton>

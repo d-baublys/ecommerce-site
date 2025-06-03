@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${lexendExa.variable} antialiased`}>
+            <body className={`${lexendExa.variable} antialiased text-sz-base lg:text-sz-base-lg`}>
                 <div className="flex flex-col justify-center items-center min-h-screen">
                     <NavBar />
                     <main className="relative flex flex-col grow w-full justify-center items-center bg-contrasted z-0">

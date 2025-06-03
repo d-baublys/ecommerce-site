@@ -108,14 +108,14 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                         className="cursor-pointer mr-[calc(var(--carousel-img-gap)/2)] translate-x-[50%]"
                         onClick={navBack}
                     >
-                        <IoChevronBackSharp className="text-4xl text-component-color" />
+                        <IoChevronBackSharp className="text-component-color" size={36} />
                     </button>
                     <button
                         id="carousel-nav-forward"
                         className="cursor-pointer ml-[calc(var(--carousel-img-gap)/2)] translate-x-[-50%]"
                         onClick={navForward}
                     >
-                        <IoChevronForwardSharp className="text-4xl text-component-color" />
+                        <IoChevronForwardSharp className="text-component-color" size={36} />
                     </button>
                 </div>
             </div>

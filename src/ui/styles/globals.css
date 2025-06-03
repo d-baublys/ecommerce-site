@@ -30,6 +30,15 @@
     --color-go-color: var(--go-color);
     --color-danger-color: var(--danger-color);
     --height-nav-height: var(--nav-height);
+    --text-sz-heading: 1.75rem;
+    --text-sz-heading-lg: 2.25rem;
+    --text-sz-subheading: 1rem;
+    --text-sz-subheading-lg: 1.5rem;
+    --text-sz-base: 0.875rem;
+    --text-sz-base-lg: 1rem;
+    --text-sz-label-button: 0.75rem;
+    --text-sz-label-button-lg: 0.875rem;
+    --text-sz-smallest: 0.75rem;
 }
 
 body {

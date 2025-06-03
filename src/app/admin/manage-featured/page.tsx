@@ -20,7 +20,7 @@ export default function ManageFeaturedPage() {
                 setSavedFeaturedList(list);
                 setProvisionalFeaturedList(list);
             } else {
-                throw new Error("No featured products to display")
+                throw new Error("No featured products to display");
             }
         };
         getList();
@@ -50,7 +50,9 @@ export default function ManageFeaturedPage() {
 
     return (
         <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-8">
-            <span className="font-semibold text-xl">Featured Products</span>
+            <span className="font-semibold text-sz-subheading lg:text-sz-subheading-lg">
+                Featured Products
+            </span>
             <div className="w-3/4 h-10">
                 <SearchBar handleResultClick={handleResultClick} />
             </div>

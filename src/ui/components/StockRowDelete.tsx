@@ -20,9 +20,9 @@ export default function StockRowDelete({
     return (
         <div
             onClick={() => handleDelete()}
-            className="flex justify-center items-center text-lg cursor-pointer"
+            className="flex justify-center items-center cursor-pointer"
         >
-            <IoTrash />
+            <IoTrash size={20} />
         </div>
     );
 }

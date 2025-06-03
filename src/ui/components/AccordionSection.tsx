@@ -22,7 +22,7 @@ export default function AccordionSection({
                 <div>{isOpen ? <IoChevronUp /> : <IoChevronDown />}</div>
             </div>
             <div
-                className={`flex flex-wrap gap-4 h-min shrink-0 text-sm overflow-hidden [transition:all_0.4s_ease] ${
+                className={`flex flex-wrap gap-4 h-min shrink-0 overflow-hidden [transition:all_0.4s_ease] ${
                     isOpen ? "max-h-64" : "max-h-0"
                 }`}
             >

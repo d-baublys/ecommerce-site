@@ -51,7 +51,7 @@ export default function GridAside({
                 <GeneralButton
                     key={size}
                     onClick={() => handleSizePress(size as Sizes)}
-                    className={`!py-1 !px-2 h-min !bg-background-lightest ${
+                    className={`!py-1 !px-2 h-min !bg-background-lightest !text-sz-label-button lg:!text-sz-label-button-lg ${
                         sizeFilters.includes(size as Sizes) ? "" : "!border-background-lightest "
                     }`}
                 >
@@ -92,7 +92,7 @@ export default function GridAside({
                 <GeneralButton
                     key={key}
                     onClick={() => handlePricePress(key as PriceFilterKey)}
-                    className={`!py-1 !px-2 h-min !bg-background-lightest ${
+                    className={`!py-1 !px-2 h-min !bg-background-lightest !text-sz-label-button lg:!text-sz-label-button-lg ${
                         priceFilters.includes(key) ? "" : "!border-background-lightest "
                     }`}
                 >

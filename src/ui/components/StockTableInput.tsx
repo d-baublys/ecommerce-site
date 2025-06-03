@@ -42,7 +42,7 @@ export default function StockTableInput({
             type={type}
             disabled={!editable}
             min={0}
-            className={`min-w-8 w-16 bg-contrasted border-2 rounded-sm my-2 text-lg font-semibold text-center ${
+            className={`min-w-8 w-16 bg-contrasted border-2 rounded-sm my-2 font-semibold text-center ${
                 !editable && "border-contrasted"
             }`}
             value={value}

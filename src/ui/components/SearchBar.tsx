@@ -78,11 +78,12 @@ export default function SearchBar({
             onSubmit={(e) => handleSubmit(e)}
         >
             <div className="flex items-center w-full h-10 bg-background-lightest rounded-full">
-                <div className="flex justify-center items-center w-12 h-full text-xl">
+                <div className="flex justify-center items-center w-12 h-full">
                     {isGlobalSearch && (
                         <IoSearch
                             className={query ? "cursor-pointer" : ""}
                             onClick={(e) => handleSubmit(e)}
+                            size={20}
                         />
                     )}
                 </div>

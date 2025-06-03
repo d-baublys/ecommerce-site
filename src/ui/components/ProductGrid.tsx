@@ -70,7 +70,7 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                     </div>
                 </aside>
                 <div className="flex flex-col w-full ml-8">
-                    <div className="flex justify-between w-full pb-4 text-sm font-semibold">
+                    <div className="flex justify-between w-full pb-4 font-semibold">
                         <div>{filteredProducts.length} Items</div>
                         <div className="flex items-center gap-1">
                             <label

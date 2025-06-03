@@ -54,8 +54,9 @@ export default function SearchOverlay() {
                         <SearchBar handleResultClick={handleResultClick} isGlobalSearch />
                         <div className="flex items-center px-1 h-10">
                             <IoClose
-                                className="text-2xl cursor-pointer"
+                                className="cursor-pointer"
                                 onClick={() => closeOverlay()}
+                                size={24}
                             />
                         </div>
                     </div>

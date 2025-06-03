@@ -29,15 +29,18 @@ export default async function Home() {
                     sizes="auto"
                     fill
                 ></Image>
-                <div className="flex flex-col main-tagline absolute w-full top-1/2 px-(--gutter) md:px-(--gutter-md) text-4xl font-semibold text-contrasted">
+                <div className="flex flex-col main-tagline absolute w-full top-1/2 px-(--gutter) md:px-(--gutter-md) text-sz-heading lg:text-sz-heading-lg font-semibold text-contrasted">
                     Summer 2025 styles here and now.
-                    <Link href={"/category/all"} className="mt-8 text-2xl underline">
+                    <Link
+                        href={"/category/all"}
+                        className="mt-8 text-sz-subheading lg:text-sz-subheading-lg underline"
+                    >
                         {"Shop >>>"}
                     </Link>
                 </div>
             </div>
             <div className="featured-outer flex flex-col w-full min-h-[500px] bg-white">
-                <div className="p-(--gutter) xl:p-(--gutter-md) font-semibold md:text-xl">
+                <div className="p-(--gutter) xl:p-(--gutter-md) font-semibold text-sz-subheading lg:text-sz-subheading-lg">
                     Featured
                 </div>
                 {featuredList && <Carousel featuredList={featuredList} />}

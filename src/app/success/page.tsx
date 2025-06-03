@@ -19,9 +19,11 @@ export default async function Page({ searchParams }: { searchParams: { session_i
             <SuccessBagClearClient />
             <div className="flex flex-col justify-center items-center gap-8">
                 <div className="flex flex-col justify-between w-full sm:w-1/2 min-w-[300px] sm:min-w-[500px] border-2 p-2 gap-4">
-                    <div className="flex items-center gap-3 text-2xl">
-                        <IoCheckmarkCircle className="shrink-0 text-3xl text-go-color" />
-                        Thank you for your purchase!
+                    <div className="flex items-center gap-3">
+                        <IoCheckmarkCircle className="shrink-0 text-go-color" size={30} />
+                        <div className="text-sz-subheading lg:text-sz-subheading-lg">
+                            Thank you for your purchase!
+                        </div>
                     </div>
                     <div>
                         You will receive an order confirmation by email shortly. If not, please
