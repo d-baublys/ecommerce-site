@@ -58,15 +58,17 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                 </div>
             )}
             <div className="flex flex-row grow">
-                <div id="filter-aside" className="[flex:1_0_200px]">
-                    <GridAside
-                        allCategoryProducts={allCategoryProducts}
-                        sizeFilters={sizeFilters}
-                        setSizeFilters={setSizeFilters}
-                        priceFilters={priceFilters}
-                        setPriceFilters={setPriceFilters}
-                    />
-                </div>
+                <aside id="filter-aside" className="[flex:1_0_200px]">
+                    <div className="sticky top-0">
+                        <GridAside
+                            allCategoryProducts={allCategoryProducts}
+                            sizeFilters={sizeFilters}
+                            setSizeFilters={setSizeFilters}
+                            priceFilters={priceFilters}
+                            setPriceFilters={setPriceFilters}
+                        />
+                    </div>
+                </aside>
                 <div className="flex flex-col w-full ml-8">
                     <div className="flex justify-between w-full pb-4 text-sm font-semibold">
                         <div>{filteredProducts.length} Items</div>

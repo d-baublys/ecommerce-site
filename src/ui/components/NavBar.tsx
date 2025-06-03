@@ -41,39 +41,43 @@ export default function NavBar() {
                 isScrollingUp ? "top-0" : "top-[calc(var(--nav-height)*-1)]"
             } [transition:top_0.5s_ease]`}
         >
-            <div className="flex justify-between items-center w-full mx-(--gutter) lg:mx-(--gutter-md)">
-                <div className="flex shrink-0 mr-(--gutter) order-1 lg:order-2">
-                    <Link href={"/"}>
-                        <div className="relative">
-                            <Image
-                                src="/dbwearopt.svg"
-                                alt="DB-Wear logomark"
-                                width={0}
-                                height={0}
-                                style={{ width: 120, height: "100%" }}
-                            />
-                        </div>
+            <div className="flex justify-evenly items-center w-full min-h-full">
+                <div className="flex justify-start md:justify-center w-full md:w-auto px-(--gutter) md:px-0 order-1 md:order-2">
+                    <Link href={"/"} className="relative">
+                        <Image
+                            src="/dbwearopt.svg"
+                            alt="DB-Wear logomark"
+                            width={0}
+                            height={0}
+                            className="min-w-[120px] h-full"
+                        />
                     </Link>
                 </div>
-                <div className="flex gap-4 lg:gap-8 order-2 lg:order-1">
+                <div className="flex w-full justify-center order-2 md:order-1 px-(--gutter) lg:px-(--gutter-md)">
                     <Link href={`/category/all`}>
                         <button className="cursor-pointer">Shop</button>
                     </Link>
                 </div>
-                <div className="flex gap-6 order-3">
-                    <div className="cursor-pointer">
+                <div className="flex w-full justify-end gap-2 md:gap-4 order-3 px-(--gutter) lg:px-(--gutter-md)">
+                    <button
+                        className="cursor-pointer p-2 [border-radius:50%]"
+                        title="Search"
+                        aria-label="Search"
+                    >
                         <IoSearchOutline
                             onClick={handleSearchClick}
                             className="hover:scale-125 transition"
                         />
-                    </div>
-                    <Link href={"/wishlist"}>
-                        <div>
-                            <IoHeartOutline className="hover:scale-125 transition" />
-                        </div>
+                    </button>
+                    <Link href={"/wishlist"} className="p-2 [border-radius:50%]">
+                        <IoHeartOutline
+                            className="hover:scale-125 transition"
+                            title="Wishlist"
+                            aria-label="Wishlist"
+                        />
                     </Link>
-                    <Link href={"/bag"}>
-                        <div className="relative">
+                    <Link href={"/bag"} className="p-2 [border-radius:50%]">
+                        <div className="relative" title="Bag" aria-label="Bag">
                             <IoBagOutline className="hover:scale-125 transition" />
                             {itemCount > 0 && (
                                 <div className="bag-item-count flex justify-center items-center absolute top-[-67%] w-4 aspect-square right-[-67%] [border-radius:50%] bg-red-500 text-contrasted text-[0.67rem]">
@@ -82,9 +86,13 @@ export default function NavBar() {
                             )}
                         </div>
                     </Link>
-                    <div>
-                        <IoPersonOutline className="hover:scale-125 transition" />
-                    </div>
+                    <button className="p-2 [border-radius:50%]">
+                        <IoPersonOutline
+                            className="hover:scale-125 transition"
+                            title="Account"
+                            aria-label="Account"
+                        />
+                    </button>
                 </div>
             </div>
         </nav>
