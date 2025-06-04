@@ -54,9 +54,7 @@ export default function NavBar() {
                     </Link>
                 </div>
                 <div className="flex w-full justify-center order-2 md:order-1 px-(--gutter) lg:px-(--gutter-md)">
-                    <Link href={`/category/all`}>
-                        <button className="cursor-pointer">Shop</button>
-                    </Link>
+                    <Link href={`/category/all`}>Shop</Link>
                 </div>
                 <div className="flex w-full justify-end gap-2 md:gap-4 order-3 px-(--gutter) lg:px-(--gutter-md)">
                     <button
@@ -76,15 +74,18 @@ export default function NavBar() {
                             aria-label="Wishlist"
                         />
                     </Link>
-                    <Link href={"/bag"} className="p-2 [border-radius:50%]">
-                        <div className="relative" title="Bag" aria-label="Bag">
-                            <IoBagOutline className="hover:scale-125 transition" />
-                            {itemCount > 0 && (
-                                <div className="bag-item-count flex justify-center items-center absolute top-[-67%] w-4 aspect-square right-[-67%] [border-radius:50%] bg-red-500 text-contrasted text-[0.67rem]">
-                                    {Math.min(itemCount, 99)}
-                                </div>
-                            )}
-                        </div>
+                    <Link
+                        href={"/bag"}
+                        className="relative p-2 [border-radius:50%]"
+                        title="Bag"
+                        aria-label="Bag"
+                    >
+                        <IoBagOutline className="hover:scale-125 transition" />
+                        {itemCount > 0 && (
+                            <div className="bag-item-count flex justify-center items-center absolute top-[-10%] w-4 aspect-square right-[-10%] [border-radius:50%] bg-red-500 text-contrasted text-[0.67rem]">
+                                {Math.min(itemCount, 99)}
+                            </div>
+                        )}
                     </Link>
                     <button className="p-2 [border-radius:50%]">
                         <IoPersonOutline

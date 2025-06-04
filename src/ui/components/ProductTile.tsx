@@ -16,8 +16,11 @@ export default function ProductTile({ product }: { product: Product }) {
                         className="object-cover"
                     />
                 </div>
-                <div>{product.name}</div>
-                <div className="font-semibold">£{stringifyConvertPrice(product.price)}</div>
+                <p>{product.name}</p>
+                <div className="font-semibold">
+                    <span>£</span>
+                    <span>{stringifyConvertPrice(product.price)}</span>
+                </div>
             </div>
         </ProductLink>
     );

@@ -184,7 +184,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                         <IoFolder />
                         <span>Browse</span>
                     </GeneralButton>
-                    <span>{fileName}</span>
+                    <p>{fileName}</p>
                 </div>
             </fieldset>
             <FormInput
@@ -209,7 +209,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                 tableMode={tableMode}
                 setTableMode={setTableMode}
             />
-            <div className="h-8">{message}</div>
+            <p className="h-8">{message}</p>
             <div className="flex justify-between h-8 gap-8">
                 {productChanged && (
                     <GeneralButton className="w-full" onClick={handleSubmit}>

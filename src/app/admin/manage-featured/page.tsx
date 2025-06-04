@@ -50,28 +50,29 @@ export default function ManageFeaturedPage() {
 
     return (
         <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-8">
-            <span className="font-semibold text-sz-subheading lg:text-sz-subheading-lg">
+            <h2 className="font-semibold text-sz-subheading lg:text-sz-subheading-lg">
                 Featured Products
-            </span>
+            </h2>
             <div className="w-3/4 h-10">
                 <SearchBar handleResultClick={handleResultClick} />
             </div>
             {provisionalFeaturedList?.length ? (
-                <>
+                <ul>
                     {provisionalFeaturedList.map((featuredProd) => (
-                        <BagTile
-                            key={featuredProd.id}
-                            dataObj={featuredProd}
-                            handleDelete={() =>
-                                setProvisionalFeaturedList((prev) =>
-                                    prev?.filter((currProd) => currProd.id !== featuredProd.id)
-                                )
-                            }
-                        />
+                        <li key={featuredProd.id}>
+                            <BagTile
+                                dataObj={featuredProd}
+                                handleDelete={() =>
+                                    setProvisionalFeaturedList((prev) =>
+                                        prev?.filter((currProd) => currProd.id !== featuredProd.id)
+                                    )
+                                }
+                            />
+                        </li>
                     ))}
-                </>
+                </ul>
             ) : (
-                "No featured items selected"
+                <p>{"Featured item list is empty"}</p>
             )}
             <div className="flex gap-8 h-8">
                 {isListChanged && <GeneralButton onClick={handleSave}>Save</GeneralButton>}

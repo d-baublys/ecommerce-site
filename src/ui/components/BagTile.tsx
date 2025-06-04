@@ -94,7 +94,7 @@ export default function BagTile({
                         </select>
                     ) : (
                         <div className="flex justify-center w-full text-end text-component-color">
-                            Out of stock
+                            <p>Out of stock</p>
                         </div>
                     ))}
             </div>

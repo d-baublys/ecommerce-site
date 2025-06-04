@@ -49,13 +49,15 @@ export default function ProductGrid({ category }: { category: Categories | "all"
     return (
         <div className="flex flex-col px-(--gutter) py-8 lg:px-(--gutter-md) w-screen grow">
             {category === "all" && (
-                <div className="flex w-full border-b-2 gap-8 mb-8 py-2">
+                <ul className="flex w-full border-b-2 gap-8 mb-8 py-2">
                     {Object.entries(VALID_CATEGORIES).map(([key, displayName]) => (
-                        <Link key={key} href={`/category/${key}`}>
-                            <div>{displayName}</div>
-                        </Link>
+                        <li key={key}>
+                            <Link href={`/category/${key}`}>
+                                <div>{displayName}</div>
+                            </Link>
+                        </li>
                     ))}
-                </div>
+                </ul>
             )}
             <div className="flex flex-row grow">
                 <aside id="filter-aside" className="[flex:1_0_200px]">
@@ -71,7 +73,9 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                 </aside>
                 <div className="flex flex-col w-full ml-8">
                     <div className="flex justify-between w-full pb-4 font-semibold">
-                        <div>{filteredProducts.length} Items</div>
+                        <div>
+                            <span>{filteredProducts.length}</span> <span>Items</span>
+                        </div>
                         <div className="flex items-center gap-1">
                             <label
                                 htmlFor="sort-select"
@@ -84,7 +88,7 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                             <select
                                 id="sort-select"
                                 className={`pr-6 font-normal appearance-none cursor-pointer ${
-                                    productSort ? "" : "max-w-[100px]"
+                                    productSort ? "" : "max-w-[100px] lg:max-w-[115px]"
                                 }`}
                                 onChange={(e) => setProductSort(e.target.value as ProductSortKey)}
                                 defaultValue="default"
@@ -103,14 +107,17 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                         {filteredProducts.length > 0 ? (
                             <div className="grid grid-cols-12 w-full gap-x-4 gap-y-8">
                                 {filteredProducts.map((product) => (
-                                    <div key={product.id} className="col-span-6 xl:col-span-4 2xl:col-span-3">
+                                    <div
+                                        key={product.id}
+                                        className="col-span-6 xl:col-span-4 2xl:col-span-3"
+                                    >
                                         <ProductTile product={product} />
                                     </div>
                                 ))}
                             </div>
                         ) : (
                             <div className="flex justify-center items-center w-full p-4 gap-4">
-                                No products matching your filter
+                                <p>No products matching your filter</p>
                             </div>
                         )}
                     </div>

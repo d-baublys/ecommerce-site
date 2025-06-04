@@ -86,7 +86,7 @@ export default function ProductStockTable({
                     <GeneralButton onClick={() => handleCancel()}>Cancel</GeneralButton>
                 )}
             </div>
-            {message}
+            <p>{message}</p>
             <table className="text-center border-2 mt-2">
                 <thead>
                     <tr className="p-2">

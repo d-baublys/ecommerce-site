@@ -3,9 +3,9 @@ import ListButton from "@/ui/components/ListButton";
 export default function AdminPage() {
     return (
         <div className="flex flex-col grow justify-center items-center min-w-[300px] sm:min-w-[500px] gap-8">
-            <span className="font-semibold text-sz-subheading lg:text-sz-subheading-lg">
+            <h2 className="font-semibold text-sz-subheading lg:text-sz-subheading-lg">
                 Admin Actions
-            </span>
+            </h2>
             <ul>
                 <li>
                     <ListButton text="View and manage products" link="/products" relativeLink />

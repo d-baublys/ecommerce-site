@@ -37,9 +37,9 @@ export default function Footer() {
                     Sitemap
                 </Link>
             </div>
-            <span className="text-sz-label-button lg:text-sz-label-button-lg">
+            <p className="text-sz-label-button lg:text-sz-label-button-lg">
                 ©2025 by DB-Wear
-            </span>
+            </p>
         </footer>
     );
 }

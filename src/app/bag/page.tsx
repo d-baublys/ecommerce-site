@@ -64,20 +64,27 @@ export default function Page() {
         <div className="flex flex-col justify-center items-center grow w-full">
             <SubHeader subheaderText="My Bag" />
             <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-4">
-                {mergedItems.map((mergedItem) => (
-                    <BagTile
-                        key={`${mergedItem.product.id}-${mergedItem.size}`}
-                        dataObj={mergedItem}
-                        handleDelete={() => removeFromBag(mergedItem.product!.id, mergedItem.size)}
-                        productLink={`products/${mergedItem.product.slug}`}
-                    />
-                ))}
+                {!emptyBag && (
+                    <ul>
+                        {mergedItems.map((mergedItem) => (
+                            <li key={`${mergedItem.product.id}-${mergedItem.size}`}>
+                                <BagTile
+                                    dataObj={mergedItem}
+                                    handleDelete={() =>
+                                        removeFromBag(mergedItem.product!.id, mergedItem.size)
+                                    }
+                                    productLink={`products/${mergedItem.product.slug}`}
+                                />
+                            </li>
+                        ))}
+                    </ul>
+                )}
                 {!emptyBag && !noStock ? (
                     <GoButton onClick={handleCheckout} predicate={!emptyBag && !noStock}>
                         Proceed to Checkout
                     </GoButton>
                 ) : (
-                    emptyBag && "Your bag is empty!"
+                    emptyBag && <p>{"Your bag is empty!"}</p>
                 )}
             </div>
         </div>

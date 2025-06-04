@@ -35,9 +35,9 @@ export default function ConfirmModal() {
                     onClick={(e) => e.stopPropagation()}
                     className="flex flex-col w-[500px] h-[250px] bg-contrasted justify-evenly p-8 rounded-2xl drop-shadow-2xl"
                 >
-                    <span className="text-center">
+                    <p className="text-center">
                         Are you sure you want to delete this product? This action cannot be undone.
-                    </span>
+                    </p>
                     <div className="flex justify-evenly items-center w-full gap-4">
                         <GeneralButton onClick={handleConfirm}>Confirm</GeneralButton>
                         <GeneralButton onClick={handleCancel}>Cancel</GeneralButton>

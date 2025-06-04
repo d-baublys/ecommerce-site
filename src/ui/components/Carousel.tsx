@@ -64,12 +64,12 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                 id="slider-container"
                 className="relative max-w-(--carousel-width) h-4/5 overflow-hidden"
             >
-                <div
+                <ul
                     id="carousel-slider"
                     className="flex overflow-x-hidden gap-(--carousel-img-gap) px-(--carousel-img-w) h-full z-30"
                 >
                     {featuredList.map((featuredProd, idx) => (
-                        <div
+                        <li
                             key={featuredProd.id}
                             id={`featured-${idx + 1}`}
                             className="relative py-2 min-w-[var(--carousel-img-w)]"
@@ -88,9 +88,9 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                                     Shop
                                 </GeneralButton>
                             </ProductLink>
-                        </div>
+                        </li>
                     ))}
-                </div>
+                </ul>
                 <div
                     id="gradient-overlay-left"
                     className="carousel-gradient-overlay absolute top-0 left-0 w-[calc((100%-var(--carousel-img-w))/2))] h-full bg-[linear-gradient(to_right,_white_0%,_transparent_100%)] pointer-events-none z-40"
@@ -123,22 +123,23 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                 id="dot-container-spacer"
                 className="flex justify-center items-center w-full h-1/5"
             >
-                <div
+                <ul
                     id="carousel-dot-container"
                     className="absolute flex items-center gap-[10px] bottom-[calc(50px)] left-[50%] translate-x-[-50%] translate-y-[50%]"
                 >
                     {featuredList.map((_, idx) => (
-                        <button
-                            onClick={() => {
-                                setActiveFeatured(idx);
-                            }}
-                            key={idx}
-                            className={`carousel-dot w-auto h-3 aspect-square rounded-full ${
-                                activeFeatured === idx && "bg-component-color"
-                            } border-2 border-component-color transition`}
-                        ></button>
+                        <li key={idx} className="flex">
+                            <button
+                                onClick={() => {
+                                    setActiveFeatured(idx);
+                                }}
+                                className={`carousel-dot w-auto h-3 aspect-square rounded-full ${
+                                    activeFeatured === idx && "bg-component-color"
+                                } border-2 border-component-color transition`}
+                            ></button>
+                        </li>
                     ))}
-                </div>
+                </ul>
             </div>
         </div>
     );

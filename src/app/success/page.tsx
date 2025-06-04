@@ -21,13 +21,15 @@ export default async function Page({ searchParams }: { searchParams: { session_i
                 <div className="flex flex-col justify-between w-full sm:w-1/2 min-w-[300px] sm:min-w-[500px] border-2 p-2 gap-4">
                     <div className="flex items-center gap-3">
                         <IoCheckmarkCircle className="shrink-0 text-go-color" size={30} />
-                        <div className="text-sz-subheading lg:text-sz-subheading-lg">
+                        <span className="text-sz-subheading lg:text-sz-subheading-lg">
                             Thank you for your purchase!
-                        </div>
+                        </span>
                     </div>
                     <div>
-                        You will receive an order confirmation by email shortly. If not, please
-                        check your spam folder.
+                        <p>
+                            You will receive an order confirmation by email shortly. If not, please
+                            check your spam folder.
+                        </p>
                     </div>
                 </div>
                 <Link href={"/"}>

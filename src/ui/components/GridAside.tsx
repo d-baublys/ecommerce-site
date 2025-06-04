@@ -43,23 +43,27 @@ export default function GridAside({
         return sizesObj;
     }, [allCategoryProducts]);
 
-    const populateSizes = () => {
-        return Object.entries(sizesObj).map(([size, count]) => {
-            if (!count) return null;
-
-            return (
-                <GeneralButton
-                    key={size}
-                    onClick={() => handleSizePress(size as Sizes)}
-                    className={`!py-1 !px-2 h-min !bg-background-lightest !text-sz-label-button lg:!text-sz-label-button-lg ${
-                        sizeFilters.includes(size as Sizes) ? "" : "!border-background-lightest "
-                    }`}
-                >
-                    {size.toUpperCase()} ({count})
-                </GeneralButton>
-            );
-        });
-    };
+    const populateSizes = () => (
+        <ul>
+            {Object.entries(sizesObj).map(
+                ([size, count]) =>
+                    count > 0 && (
+                        <li key={size}>
+                            <GeneralButton
+                                onClick={() => handleSizePress(size as Sizes)}
+                                className={`!py-1 !px-2 h-min !bg-background-lightest !text-sz-label-button lg:!text-sz-label-button-lg ${
+                                    sizeFilters.includes(size as Sizes)
+                                        ? ""
+                                        : "!border-background-lightest "
+                                }`}
+                            >
+                                {size.toUpperCase()} ({count})
+                            </GeneralButton>
+                        </li>
+                    )
+            )}
+        </ul>
+    );
 
     const handlePricePress = (key: PriceFilterKey) => {
         setPriceFilters((prev) =>
@@ -84,23 +88,25 @@ export default function GridAside({
         return pricesObj;
     }, [allCategoryProducts]);
 
-    const populatePrices = () => {
-        return Object.entries(pricesObj).map(([key, count]) => {
-            if (!count) return null;
-
-            return (
-                <GeneralButton
-                    key={key}
-                    onClick={() => handlePricePress(key as PriceFilterKey)}
-                    className={`!py-1 !px-2 h-min !bg-background-lightest !text-sz-label-button lg:!text-sz-label-button-lg ${
-                        priceFilters.includes(key) ? "" : "!border-background-lightest "
-                    }`}
-                >
-                    {createPriceLabel(key as PriceFilterKey, count)}
-                </GeneralButton>
-            );
-        });
-    };
+    const populatePrices = () => (
+        <ul>
+            {Object.entries(pricesObj).map(
+                ([key, count]) =>
+                    count > 0 && (
+                        <li key={key}>
+                            <GeneralButton
+                                onClick={() => handlePricePress(key as PriceFilterKey)}
+                                className={`!py-1 !px-2 h-min !bg-background-lightest !text-sz-label-button lg:!text-sz-label-button-lg ${
+                                    priceFilters.includes(key) ? "" : "!border-background-lightest "
+                                }`}
+                            >
+                                {createPriceLabel(key as PriceFilterKey, count)}
+                            </GeneralButton>
+                        </li>
+                    )
+            )}
+        </ul>
+    );
 
     const createPriceLabel = (key: PriceFilterKey, count: number) => {
         return isFinite(PRICE_FILTER_OPTIONS[key].max)
