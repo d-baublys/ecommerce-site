@@ -9,6 +9,7 @@ import { IoBagOutline, IoHeartOutline, IoPersonOutline, IoSearchOutline } from "
 
 export default function NavBar() {
     const [isScrollingUp, setIsScrollingUp] = useState(false);
+    const [hasMounted, setHasMounted] = useState<boolean>(false);
     const itemCount = useBagStore((state) => state.getTotalBagCount());
     const { isSearchOpen, setIsSearchOpen, setIsSearchLoaded } = useSearchStore((state) => state);
 
@@ -21,6 +22,8 @@ export default function NavBar() {
             lastScroll = currentScroll;
         }
         window.addEventListener("scroll", scrollUpSticky);
+
+        setHasMounted(true);
 
         return () => window.removeEventListener("scroll", scrollUpSticky);
     }, []);
@@ -81,7 +84,7 @@ export default function NavBar() {
                         aria-label="Bag"
                     >
                         <IoBagOutline className="hover:scale-125 transition" />
-                        {itemCount > 0 && (
+                        {hasMounted && itemCount > 0 && (
                             <div className="bag-item-count flex justify-center items-center absolute top-[-10%] w-4 aspect-square right-[-10%] [border-radius:50%] bg-red-500 text-contrasted text-[0.67rem]">
                                 {Math.min(itemCount, 99)}
                             </div>

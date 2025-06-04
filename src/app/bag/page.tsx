@@ -11,6 +11,7 @@ import { getProductData } from "@/lib/actions";
 
 export default function Page() {
     const [latestData, setLatestData] = useState<Product[]>();
+    const [error, setError] = useState<Error | null>(null);
 
     const bag = useBagStore((state) => state.bag);
     const removeFromBag = useBagStore((state) => state.removeFromBag);
@@ -21,18 +22,20 @@ export default function Page() {
 
     useEffect(() => {
         const getData = async () => {
-            const productData = await getProductData({ id: { in: bagProductIds } });
-            const data = productData.data;
-
-            if (!data) throw new Error("Error fetching latest product data");
-
-            setLatestData(data);
+            try {
+                const dataFetch = await getProductData({ id: { in: bagProductIds } });
+                setLatestData(dataFetch.data);
+            } catch {
+                setError(new Error("Error fetching product data. Please try again later."));
+            }
         };
 
         getData();
     }, []);
 
-    if (!latestData) return;
+    if (error) throw error;
+
+    if (!latestData) return null;
 
     const latestDataMap = new Map(latestData.map((item) => [item.id, item.stock]));
     const mergedItems: MergedBagItem[] = bag.map((item) => {
@@ -56,7 +59,7 @@ export default function Page() {
             await stripePromise;
             window.location.href = data.url;
         } else {
-            alert("Error starting checkout");
+            setError(new Error("Error starting checkout. Please try again later."));
         }
     };
 
@@ -71,7 +74,7 @@ export default function Page() {
                                 <BagTile
                                     dataObj={mergedItem}
                                     handleDelete={() =>
-                                        removeFromBag(mergedItem.product!.id, mergedItem.size)
+                                        removeFromBag(mergedItem.product.id, mergedItem.size)
                                     }
                                     productLink={`products/${mergedItem.product.slug}`}
                                 />

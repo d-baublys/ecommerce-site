@@ -7,8 +7,6 @@ export default async function ProductViewEditPage({ params }: { params: { slug: 
     const productsFetch = await getProductData();
     const allData = productsFetch.data;
 
-    if (!allData) throw new Error("No products to display");
-
     const productData = allData.find((product) => product.slug === slug);
 
     return (

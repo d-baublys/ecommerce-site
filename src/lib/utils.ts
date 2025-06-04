@@ -185,7 +185,5 @@ export async function fetchFilteredProducts({
 
     const productsFetch = await getProductData(filterQuery, orderBy);
 
-    if (!productsFetch.data) throw new Error("No products to display");
-
     return productsFetch.data;
 }

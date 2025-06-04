@@ -64,3 +64,5 @@ export const SORT_OPTIONS = {
 };
 
 export type ProductSortKey = keyof typeof SORT_OPTIONS;
+
+export const FEATURED_COUNT = 5;

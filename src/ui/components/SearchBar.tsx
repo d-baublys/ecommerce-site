@@ -14,7 +14,7 @@ export default function SearchBar({
     handleResultClick: (product: Product) => void;
     isGlobalSearch?: boolean;
 }) {
-    const [productList, setProductList] = useState<Product[]>([]);
+    const [productList, setProductList] = useState<Product[]>();
     const [query, setQuery] = useState<string>("");
     const [results, setResults] = useState<Product[]>([]);
     const [isResultLoading, setIsResultLoading] = useState<boolean>(false);
@@ -25,13 +25,15 @@ export default function SearchBar({
         const getData = async () => {
             const productFetch = await getProductData();
 
-            if (!productFetch.data) throw new Error("Error fetching data for results");
-
             setProductList(productFetch.data);
         };
 
         getData();
     }, []);
+
+    if (productList === undefined) {
+        return <p className="flex items-center h-full">Error fetching product data. Please try again later.</p>;
+    }
 
     const debouncedResults = debounce((currQuery) => {
         setResults(
@@ -90,6 +92,7 @@ export default function SearchBar({
                 <input
                     className="w-[90%] h-full outline-none"
                     value={query}
+                    disabled={productList === undefined}
                     onChange={(e) => handleSearch(e)}
                     placeholder="Search products..."
                 ></input>

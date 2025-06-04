@@ -6,7 +6,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
     const { slug } = params;
     const productFetch = await getProductData({ slug: slug });
 
-    if (!productFetch.data) {
+    if (!productFetch.data.length) {
         notFound();
     }
 

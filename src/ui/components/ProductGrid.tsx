@@ -16,35 +16,49 @@ import Link from "next/link";
 import { IoChevronDown } from "react-icons/io5";
 
 export default function ProductGrid({ category }: { category: Categories | "all" }) {
-    const [allCategoryProducts, setAllCategoryProducts] = useState<Product[]>([]);
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+    const [allCategoryProducts, setAllCategoryProducts] = useState<Product[]>();
+    const [filteredProducts, setFilteredProducts] = useState<Product[]>();
     const [sizeFilters, setSizeFilters] = useState<Sizes[]>([]);
     const [priceFilters, setPriceFilters] = useState<string[]>([]);
     const [productSort, setProductSort] = useState<ProductSortKey>();
+    const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
         const fetchInitial = async () => {
-            const products = await fetchFilteredProducts({ category });
+            try {
+                const products = await fetchFilteredProducts({ category });
 
-            setAllCategoryProducts(products);
+                setAllCategoryProducts(products);
+            } catch {
+                setError(new Error("Error fetching product data. Please try again later."));
+            }
         };
+
         fetchInitial();
     }, []);
 
     useEffect(() => {
         const fetchFiltered = async () => {
-            const products = await fetchFilteredProducts({
-                category,
-                sizeFilters,
-                priceFilters,
-                productSort,
-            });
+            try {
+                const products = await fetchFilteredProducts({
+                    category,
+                    sizeFilters,
+                    priceFilters,
+                    productSort,
+                });
 
-            setFilteredProducts(products);
+                setFilteredProducts(products);
+            } catch {
+                setError(new Error("Error fetching product data. Please try again later."));
+            }
         };
 
         fetchFiltered();
     }, [category, sizeFilters, priceFilters, productSort]);
+
+    if (error) throw error;
+
+    if (!(allCategoryProducts && filteredProducts)) return null;
 
     return (
         <div className="flex flex-col px-(--gutter) py-8 lg:px-(--gutter-md) w-screen grow">

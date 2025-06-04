@@ -38,10 +38,10 @@ export async function getProductData(
             stock: buildStockObj(product.stock),
         }));
 
-        return { data: products, success: true };
+        return { data: products };
     } catch (error) {
         console.error("Error fetching product data: ", error);
-        return { success: false };
+        throw new Error("Error fetching product data. Please try again later.");
     }
 }
 
@@ -145,10 +145,10 @@ export async function getOrder(id: number) {
             where: { id },
         });
 
-        return { data: order, success: true };
+        return { data: order };
     } catch (error) {
         console.error("Error fetching order data: ", error);
-        return { success: false };
+        throw new Error("Error fetching order data. Please try again later.");
     }
 }
 
@@ -198,10 +198,10 @@ export async function getFeaturedProducts() {
             stock: buildStockObj(item.product.stock),
         }));
 
-        return { data: products, success: true };
+        return { data: products };
     } catch (error) {
         console.error("Error fetching featured products: ", error);
-        return { success: false };
+        throw new Error("Error fetching featured products. Please try again later.");
     }
 }
 

@@ -2,21 +2,22 @@ import Image from "next/image";
 import Carousel from "@/ui/components/Carousel";
 import { getFeaturedProducts, getProductData } from "@/lib/actions";
 import Link from "next/link";
+import { FEATURED_COUNT } from "@/lib/definitions";
 
 export default async function Home() {
     const featuredFetch = await getFeaturedProducts();
     let featuredList = featuredFetch.data;
 
-    if (!featuredFetch.success) {
+    if (!featuredList.length) {
         const fallbackFetch = await getProductData();
 
-        if (fallbackFetch.success && fallbackFetch.data) {
-            const fallbackData = fallbackFetch.data;
+        const fallbackData = fallbackFetch.data;
 
-            featuredList = fallbackData.slice(0, 5);
-        } else {
-            throw new Error("No featured or fallback products to display");
+        if (!fallbackData.length) {
+            return <p>No featured or fallback products to display</p>;
         }
+
+        featuredList = fallbackData.slice(0, FEATURED_COUNT);
     }
 
     return (
