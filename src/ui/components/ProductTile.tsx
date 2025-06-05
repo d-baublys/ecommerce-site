@@ -1,7 +1,7 @@
 "use client";
 
-import { Product, Sizes } from "@/lib/definitions";
-import { stringifyConvertPrice } from "@/lib/utils";
+import { Product, Sizes, VALID_SIZES } from "@/lib/definitions";
+import { getNetStock, stringifyConvertPrice } from "@/lib/utils";
 import Image from "next/image";
 import ProductLink from "./ProductLink";
 import { useWishlistStore } from "@/stores/wishlistStore";
@@ -14,13 +14,18 @@ export default function ProductTile({ product }: { product: Product }) {
     const { wishlist, addToWishlist, removeFromWishlist } = useWishlistStore((state) => state);
     const inWishlist = wishlist.find((item) => item.id === product.id);
 
-    const addToBag = useBagStore((state) => state.addToBag);
+    const { bag, addToBag } = useBagStore((state) => state);
 
     const [isHovered, setIsHovered] = useState<boolean>(false);
     const [isQuickAddActive, setIsQuickAddActive] = useState<boolean>(false);
+    const [isImgLoaded, setIsImgLoaded] = useState<boolean>(false);
 
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const tileRef = useRef<HTMLDivElement>(null);
+
+    const availableSizes = VALID_SIZES.filter(
+        (size) => size in product.stock && getNetStock(product, size, bag) > 0
+    );
 
     const isolateInteraction = (e: React.TouchEvent | React.MouseEvent) => {
         e.preventDefault();
@@ -85,13 +90,23 @@ export default function ProductTile({ product }: { product: Product }) {
                 onTouchCancel={handleTouchEnd}
             >
                 <div className="relative w-full aspect-[4/5]">
-                    <Image
-                        src={product.src}
-                        alt={product.alt}
-                        fill
-                        sizes="auto"
-                        className="object-cover"
-                    />
+                    <div
+                        className={`relative w-full h-full transition duration-500 ${
+                            isImgLoaded ? "opacity-100" : "opacity-0"
+                        }`}
+                    >
+                        <Image
+                            src={product.src}
+                            alt={product.alt}
+                            fill
+                            sizes="auto"
+                            className="object-cover"
+                            onLoad={() => setIsImgLoaded(true)}
+                        />
+                    </div>
+                    {!isImgLoaded && (
+                        <div className="absolute w-full h-full inset-0 bg-gray-200 overflow-hidden before:content-[''] before:absolute before:inset-0 before:translate-x-[-100%] before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:[animation:skeletonSweep_1s_infinite]"></div>
+                    )}
                     {isHovered && (
                         <div>
                             <div
@@ -107,28 +122,35 @@ export default function ProductTile({ product }: { product: Product }) {
                                 </div>
                             </div>
                             <div className="absolute bottom-0 left-0 w-full p-4">
-                                {!isQuickAddActive ? (
+                                {!isQuickAddActive && availableSizes.length > 0 ? (
                                     <GeneralButton className="w-full" onClick={handleQuickAddClick}>
                                         Quick Add
                                     </GeneralButton>
-                                ) : (
-                                    <ul className="flex flex-wrap justify-center gap-4 p-2 bg-background-lighter rounded-full">
-                                        {Object.entries(product.stock).map(
-                                            ([size, count]) =>
-                                                count > 0 && (
-                                                    <li key={size}>
-                                                        <button
-                                                            className="flex justify-center items-center w-10 aspect-square bg-white text-sz-base lg:text-sz-base-lg [border-radius:50%] cursor-pointer"
-                                                            onClick={(e) =>
-                                                                handleSizeClick(e, size as Sizes)
-                                                            }
-                                                        >
-                                                            {size.toUpperCase()}
-                                                        </button>
-                                                    </li>
-                                                )
-                                        )}
+                                ) : availableSizes.length > 0 ? (
+                                    <ul
+                                        className="flex flex-wrap justify-center gap-4 p-2 bg-background-lightest rounded-full cursor-auto"
+                                        onClick={isolateInteraction}
+                                    >
+                                        {availableSizes.map((size) => (
+                                            <li key={size}>
+                                                <button
+                                                    className="flex justify-center items-center h-12 aspect-square bg-white text-sz-base lg:text-sz-base-lg [border-radius:50%] cursor-pointer"
+                                                    onClick={(e) =>
+                                                        handleSizeClick(e, size as Sizes)
+                                                    }
+                                                >
+                                                    {size.toUpperCase()}
+                                                </button>
+                                            </li>
+                                        ))}
                                     </ul>
+                                ) : (
+                                    <div
+                                        className="flex justify-center items-center px-6 py-2 bg-background-lightest border-white rounded-full cursor-auto"
+                                        onClick={isolateInteraction}
+                                    >
+                                        <p>Out of stock</p>
+                                    </div>
                                 )}
                             </div>
                         </div>

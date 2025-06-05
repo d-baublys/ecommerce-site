@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { fetchFilteredProducts } from "@/lib/utils";
 import Link from "next/link";
 import { IoChevronDown } from "react-icons/io5";
+import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 
 export default function ProductGrid({ category }: { category: Categories | "all" }) {
     const [allCategoryProducts, setAllCategoryProducts] = useState<Product[]>();
@@ -22,13 +23,16 @@ export default function ProductGrid({ category }: { category: Categories | "all"
     const [priceFilters, setPriceFilters] = useState<string[]>([]);
     const [productSort, setProductSort] = useState<ProductSortKey>();
     const [error, setError] = useState<Error | null>(null);
+    const [isQueryLoading, setIsQueryLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchInitial = async () => {
             try {
+                setIsQueryLoading(true);
                 const products = await fetchFilteredProducts({ category });
 
                 setAllCategoryProducts(products);
+                setIsQueryLoading(false);
             } catch {
                 setError(new Error("Error fetching product data. Please try again later."));
             }
@@ -40,6 +44,7 @@ export default function ProductGrid({ category }: { category: Categories | "all"
     useEffect(() => {
         const fetchFiltered = async () => {
             try {
+                setIsQueryLoading(true);
                 const products = await fetchFilteredProducts({
                     category,
                     sizeFilters,
@@ -47,7 +52,15 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                     productSort,
                 });
 
-                setFilteredProducts(products);
+                if (filteredProducts === undefined) {
+                    setFilteredProducts(products);
+                    setIsQueryLoading(false);
+                } else {
+                    setTimeout(() => {
+                        setFilteredProducts(products);
+                        setIsQueryLoading(false);
+                    }, 400);
+                }
             } catch {
                 setError(new Error("Error fetching product data. Please try again later."));
             }
@@ -55,6 +68,8 @@ export default function ProductGrid({ category }: { category: Categories | "all"
 
         fetchFiltered();
     }, [category, sizeFilters, priceFilters, productSort]);
+
+    useBodyScrollLock(isQueryLoading);
 
     if (error) throw error;
 
@@ -137,6 +152,18 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                     </div>
                 </div>
             </div>
+            {isQueryLoading && (
+                <div className="fixed inset-0 flex justify-center items-center min-h-screen w-full">
+                    <div className="flex justify-center items-center h-20 gap-[10px] p-4 bg-white rounded-2xl drop-shadow-(--button-shadow)">
+                        {Array.from({ length: 5 }).map((_, idx) => (
+                            <div
+                                key={idx}
+                                className={`loading-circle w-auto h-3 aspect-square rounded-full border-2 border-component-color [animation:loadingSequence_1s_infinite]`}
+                            ></div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

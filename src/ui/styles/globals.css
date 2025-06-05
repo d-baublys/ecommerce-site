@@ -58,3 +58,47 @@ body {
         stroke-width: 75px;
     }
 }
+
+@keyframes skeletonSweep {
+    100% {
+        translate: 100%;
+    }
+}
+
+@keyframes loadingSequence {
+    0% {
+        background-color: var(--component-color);
+    }
+
+    25% {
+        background-color: transparent;
+    }
+
+    75% {
+        background-color: transparent;
+    }
+
+    100% {
+        background-color: var(--component-color);
+    }
+}
+
+.loading-circle:nth-child(1) {
+    animation-delay: -0.4s;
+}
+
+.loading-circle:nth-child(2) {
+    animation-delay: -0.3s;
+}
+
+.loading-circle:nth-child(3) {
+    animation-delay: -0.2s;
+}
+
+.loading-circle:nth-child(4) {
+    animation-delay: -0.1s;
+}
+
+.loading-circle:nth-child(5) {
+    animation-delay: 0s;
+}
