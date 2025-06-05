@@ -177,7 +177,7 @@ export async function fetchFilteredProducts({
     if (priceFilters.length > 0) {
         filterQuery.OR = priceFilters.map((key) => {
             const { min, max } = PRICE_FILTER_OPTIONS[key as PriceFilterKey];
-            return { price: { gte: min, lt: max } };
+            return isFinite(max) ? { price: { gte: min, lt: max } } : { price: { gte: min } };
         });
     }
 

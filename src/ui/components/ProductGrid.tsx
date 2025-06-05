@@ -74,7 +74,7 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                 </ul>
             )}
             <div className="flex flex-row grow">
-                <aside id="filter-aside" className="[flex:1_0_200px]">
+                <aside id="filter-aside" className="[flex:1_0_250px]">
                     <div className="sticky top-0">
                         <GridAside
                             allCategoryProducts={allCategoryProducts}

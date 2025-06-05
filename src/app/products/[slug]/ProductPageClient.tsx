@@ -6,7 +6,7 @@ import { Sizes, VALID_SIZES } from "@/lib/definitions";
 import Image from "next/image";
 import { Product } from "@/lib/definitions";
 import GoButton from "@/ui/components/GoButton";
-import { IoBag, IoHeartOutline } from "react-icons/io5";
+import { IoBag, IoHeart, IoHeartOutline } from "react-icons/io5";
 import GeneralButton from "@/ui/components/GeneralButton";
 import { getNetStock } from "@/lib/utils";
 import { useWishlistStore } from "@/stores/wishlistStore";
@@ -105,8 +105,8 @@ export default function ProductPageClient({ productData }: { productData: Produc
                             : removeFromWishlist(productData.id)
                     }
                 >
-                    {!inWishlist ? "Add to Wishlist" : "Remove from Wishlist"}{" "}
-                    <IoHeartOutline className="stroked-path" />
+                    <span>{!inWishlist ? "Add to Wishlist" : "Remove from Wishlist"}</span>
+                    {inWishlist ? <IoHeart /> : <IoHeartOutline className="stroked-path" />}
                 </GeneralButton>
             </div>
         </section>

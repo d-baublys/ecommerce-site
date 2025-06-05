@@ -53,6 +53,7 @@ export default function NavBar() {
                             width={0}
                             height={0}
                             className="min-w-[120px] h-full"
+                            priority={true}
                         />
                     </Link>
                 </div>

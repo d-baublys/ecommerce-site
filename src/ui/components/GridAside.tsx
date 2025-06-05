@@ -43,27 +43,28 @@ export default function GridAside({
         return sizesObj;
     }, [allCategoryProducts]);
 
-    const populateSizes = () => (
-        <ul>
-            {Object.entries(sizesObj).map(
-                ([size, count]) =>
-                    count > 0 && (
-                        <li key={size}>
-                            <GeneralButton
-                                onClick={() => handleSizePress(size as Sizes)}
-                                className={`!py-1 !px-2 h-min !bg-background-lightest !text-sz-label-button lg:!text-sz-label-button-lg ${
-                                    sizeFilters.includes(size as Sizes)
-                                        ? ""
-                                        : "!border-background-lightest "
-                                }`}
-                            >
-                                {size.toUpperCase()} ({count})
-                            </GeneralButton>
-                        </li>
-                    )
-            )}
-        </ul>
-    );
+    const populateSizes = () =>
+        Object.entries(sizesObj).length > 0 && (
+            <ul className="flex flex-wrap py-4 gap-4">
+                {Object.entries(sizesObj).map(
+                    ([size, count]) =>
+                        count > 0 && (
+                            <li key={size}>
+                                <GeneralButton
+                                    onClick={() => handleSizePress(size as Sizes)}
+                                    className={`!py-1 !px-2 h-min !bg-background-lightest !text-sz-label-button lg:!text-sz-label-button-lg ${
+                                        sizeFilters.includes(size as Sizes)
+                                            ? ""
+                                            : "!border-background-lightest "
+                                    }`}
+                                >
+                                    {size.toUpperCase()} ({count})
+                                </GeneralButton>
+                            </li>
+                        )
+                )}
+            </ul>
+        );
 
     const handlePricePress = (key: PriceFilterKey) => {
         setPriceFilters((prev) =>
@@ -88,25 +89,28 @@ export default function GridAside({
         return pricesObj;
     }, [allCategoryProducts]);
 
-    const populatePrices = () => (
-        <ul>
-            {Object.entries(pricesObj).map(
-                ([key, count]) =>
-                    count > 0 && (
-                        <li key={key}>
-                            <GeneralButton
-                                onClick={() => handlePricePress(key as PriceFilterKey)}
-                                className={`!py-1 !px-2 h-min !bg-background-lightest !text-sz-label-button lg:!text-sz-label-button-lg ${
-                                    priceFilters.includes(key) ? "" : "!border-background-lightest "
-                                }`}
-                            >
-                                {createPriceLabel(key as PriceFilterKey, count)}
-                            </GeneralButton>
-                        </li>
-                    )
-            )}
-        </ul>
-    );
+    const populatePrices = () =>
+        Object.entries(pricesObj).length > 0 && (
+            <ul className="flex flex-wrap py-4 gap-4">
+                {Object.entries(pricesObj).map(
+                    ([key, count]) =>
+                        count > 0 && (
+                            <li key={key}>
+                                <GeneralButton
+                                    onClick={() => handlePricePress(key as PriceFilterKey)}
+                                    className={`!py-1 !px-2 h-min !bg-background-lightest !text-sz-label-button lg:!text-sz-label-button-lg ${
+                                        priceFilters.includes(key)
+                                            ? ""
+                                            : "!border-background-lightest "
+                                    }`}
+                                >
+                                    {createPriceLabel(key as PriceFilterKey, count)}
+                                </GeneralButton>
+                            </li>
+                        )
+                )}
+            </ul>
+        );
 
     const createPriceLabel = (key: PriceFilterKey, count: number) => {
         return isFinite(PRICE_FILTER_OPTIONS[key].max)

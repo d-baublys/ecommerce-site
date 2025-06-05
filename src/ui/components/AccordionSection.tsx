@@ -15,20 +15,18 @@ export default function AccordionSection({
     return (
         <div>
             <div
-                className="flex justify-between items-center cursor-pointer"
+                className="flex justify-between items-center py-4 cursor-pointer"
                 onClick={() => setIsOpen((prev) => !prev)}
             >
-                <div className="w-full py-4 ">{text}</div>
+                <div className="w-full">{text}</div>
                 <div>{isOpen ? <IoChevronUp /> : <IoChevronDown />}</div>
             </div>
             <div
-                className={`flex flex-wrap gap-4 h-min shrink-0 overflow-hidden [transition:all_0.4s_ease] ${
+                className={`flex shrink-0 overflow-hidden [transition:all_0.4s_ease] ${
                     isOpen ? "max-h-64" : "max-h-0"
                 }`}
             >
-                <div className="w-full"></div>
                 {children}
-                <div className="w-full"></div>
             </div>
         </div>
     );
