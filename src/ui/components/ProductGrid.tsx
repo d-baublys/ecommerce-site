@@ -2,6 +2,7 @@
 
 import {
     Categories,
+    PriceFilterKey,
     Product,
     ProductSortKey,
     Sizes,
@@ -10,7 +11,7 @@ import {
 } from "@/lib/definitions";
 import ProductTile from "./ProductTile";
 import GridAside from "./GridAside";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchFilteredProducts } from "@/lib/utils";
 import Link from "next/link";
 import { IoChevronDown } from "react-icons/io5";
@@ -19,11 +20,14 @@ import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 export default function ProductGrid({ category }: { category: Categories | "all" }) {
     const [allCategoryProducts, setAllCategoryProducts] = useState<Product[]>();
     const [filteredProducts, setFilteredProducts] = useState<Product[]>();
+
     const [sizeFilters, setSizeFilters] = useState<Sizes[]>([]);
-    const [priceFilters, setPriceFilters] = useState<string[]>([]);
+    const [priceFilters, setPriceFilters] = useState<PriceFilterKey[]>([]);
     const [productSort, setProductSort] = useState<ProductSortKey>();
+
     const [error, setError] = useState<Error | null>(null);
     const [isQueryLoading, setIsQueryLoading] = useState<boolean>(true);
+    const isFirstLoad = useRef<boolean>(true);
 
     useEffect(() => {
         const fetchInitial = async () => {
@@ -52,7 +56,8 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                     productSort,
                 });
 
-                if (filteredProducts === undefined) {
+                if (isFirstLoad.current) {
+                    isFirstLoad.current = false;
                     setFilteredProducts(products);
                     setIsQueryLoading(false);
                 } else {
@@ -69,11 +74,26 @@ export default function ProductGrid({ category }: { category: Categories | "all"
         fetchFiltered();
     }, [category, sizeFilters, priceFilters, productSort]);
 
+    const loadingIndicator = () => {
+        return (
+            <div className="fixed inset-0 flex justify-center items-center min-h-screen w-full">
+                <div className="flex justify-center items-center h-20 gap-[10px] p-4 bg-white rounded-2xl drop-shadow-(--button-shadow)">
+                    {Array.from({ length: 5 }).map((_, idx) => (
+                        <div
+                            key={idx}
+                            className={`loading-circle w-auto h-3 aspect-square rounded-full border-2 border-component-color [animation:loadingSequence_1s_infinite]`}
+                        ></div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
     useBodyScrollLock(isQueryLoading);
 
     if (error) throw error;
 
-    if (!(allCategoryProducts && filteredProducts)) return null;
+    if (!(allCategoryProducts && filteredProducts)) return loadingIndicator();
 
     return (
         <div className="flex flex-col px-(--gutter) py-8 lg:px-(--gutter-md) w-screen grow">
@@ -90,7 +110,7 @@ export default function ProductGrid({ category }: { category: Categories | "all"
             )}
             <div className="flex flex-row grow">
                 <aside id="filter-aside" className="[flex:1_0_250px]">
-                    <div className="sticky top-0">
+                    <div className="sticky top-(--nav-height)">
                         <GridAside
                             allCategoryProducts={allCategoryProducts}
                             sizeFilters={sizeFilters}
@@ -152,18 +172,7 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                     </div>
                 </div>
             </div>
-            {isQueryLoading && (
-                <div className="fixed inset-0 flex justify-center items-center min-h-screen w-full">
-                    <div className="flex justify-center items-center h-20 gap-[10px] p-4 bg-white rounded-2xl drop-shadow-(--button-shadow)">
-                        {Array.from({ length: 5 }).map((_, idx) => (
-                            <div
-                                key={idx}
-                                className={`loading-circle w-auto h-3 aspect-square rounded-full border-2 border-component-color [animation:loadingSequence_1s_infinite]`}
-                            ></div>
-                        ))}
-                    </div>
-                </div>
-            )}
+            {isQueryLoading && loadingIndicator()}
         </div>
     );
 }
