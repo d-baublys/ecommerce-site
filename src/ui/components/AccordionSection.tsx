@@ -13,7 +13,7 @@ export default function AccordionSection({
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
     return (
-        <div>
+        <>
             <div
                 className="flex justify-between items-center py-4 cursor-pointer"
                 onClick={() => setIsOpen((prev) => !prev)}
@@ -28,6 +28,6 @@ export default function AccordionSection({
             >
                 {children}
             </div>
-        </div>
+        </>
     );
 }

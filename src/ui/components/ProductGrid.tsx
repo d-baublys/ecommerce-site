@@ -16,6 +16,8 @@ import { fetchFilteredProducts } from "@/lib/utils";
 import Link from "next/link";
 import { IoChevronDown } from "react-icons/io5";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
+import GeneralButton from "./GeneralButton";
+import CloseButton from "./CloseButton";
 
 export default function ProductGrid({ category }: { category: Categories | "all" }) {
     const [allCategoryProducts, setAllCategoryProducts] = useState<Product[]>();
@@ -27,6 +29,7 @@ export default function ProductGrid({ category }: { category: Categories | "all"
 
     const [error, setError] = useState<Error | null>(null);
     const [isQueryLoading, setIsQueryLoading] = useState<boolean>(true);
+    const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
     const isFirstLoad = useRef<boolean>(true);
 
     useEffect(() => {
@@ -109,7 +112,7 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                 </ul>
             )}
             <div className="flex flex-row grow">
-                <aside id="filter-aside" className="[flex:1_0_250px]">
+                <aside id="filter-aside" className="hidden lg:flex [flex:1_0_250px] mr-8">
                     <div className="sticky top-(--nav-height)">
                         <GridAside
                             allCategoryProducts={allCategoryProducts}
@@ -120,7 +123,7 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                         />
                     </div>
                 </aside>
-                <div className="flex flex-col w-full ml-8">
+                <div className="flex flex-col w-full">
                     <div className="flex justify-between w-full pb-4 font-semibold">
                         <div>
                             <span>{filteredProducts.length}</span> <span>Items</span>
@@ -173,6 +176,40 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                 </div>
             </div>
             {isQueryLoading && loadingIndicator()}
+            {!isFilterOpen && (
+                <div className="fixed bottom-[5%] left-1/2 translate-x-[-50%] lg:hidden">
+                    <GeneralButton
+                        className="!bg-black !text-white !border-black [filter:drop-shadow(0_0_2px_rgba(255,255,255,0.5))]"
+                        onClick={() => setIsFilterOpen(true)}
+                    >
+                        Filter
+                    </GeneralButton>
+                </div>
+            )}
+            <div
+                className={`fixed left-0 w-screen h-full lg:hidden bg-white [transition:all_0.3s_ease-in-out] overflow-auto z-50 ${
+                    isFilterOpen ? "top-0" : "top-[-250%]"
+                }`}
+            >
+                {isFilterOpen && (
+                    <>
+                        <div className="relative inset-0 mx-4 my-(--nav-height)">
+                            <div className="flex justify-center pt-[5rem] h-min">
+                                <GridAside
+                                    allCategoryProducts={allCategoryProducts}
+                                    sizeFilters={sizeFilters}
+                                    setSizeFilters={setSizeFilters}
+                                    priceFilters={priceFilters}
+                                    setPriceFilters={setPriceFilters}
+                                />
+                            </div>
+                        </div>
+                        <div className="fixed top-20 right-4 p-1 bg-background-lightest rounded-full z-[100] ">
+                            <CloseButton onClick={() => setIsFilterOpen(false)} />
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
     );
 }

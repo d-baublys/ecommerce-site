@@ -6,7 +6,7 @@ import { Product } from "@/lib/definitions";
 import { useSearchStore } from "@/stores/searchStore";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import DarkBackdrop from "./DarkBackdrop";
-import { IoClose } from "react-icons/io5";
+import CloseButton from "./CloseButton";
 
 export default function SearchOverlay() {
     const { isSearchOpen, setIsSearchOpen, isSearchLoaded, setIsSearchLoaded } = useSearchStore(
@@ -52,13 +52,7 @@ export default function SearchOverlay() {
                 >
                     <div className="flex justify-center items-start mt-[13rem]">
                         <SearchBar handleResultClick={handleResultClick} isGlobalSearch />
-                        <div className="flex items-center px-1 h-10">
-                            <IoClose
-                                className="cursor-pointer"
-                                onClick={() => closeOverlay()}
-                                size={24}
-                            />
-                        </div>
+                        <CloseButton onClick={() => closeOverlay()} />
                     </div>
                 </div>
             </div>
