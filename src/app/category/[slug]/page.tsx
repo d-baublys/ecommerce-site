@@ -1,5 +1,5 @@
 import { Categories, VALID_CATEGORIES } from "@/lib/definitions";
-import ProductGrid from "@/ui/components/ProductGrid";
+import CategoryGridPage from "@/ui/components/CategoryGridPage";
 import { notFound } from "next/navigation";
 
 export default async function CategoryPage({ params }: { params: { slug: string } }) {
@@ -9,5 +9,5 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         notFound();
     }
 
-    return <ProductGrid category={slug as Categories} />;
+    return <CategoryGridPage category={slug as Categories} />;
 }
