@@ -13,11 +13,13 @@
     --nav-shadow: 0 0px 2px rgba(0, 0, 0, 0.33);
     --tile-shadow: 1px 2px 2px rgba(0, 0, 0, 0.33);
     --button-shadow: 2px 3px 4px rgba(0, 0, 0, 0.25);
+    --gutter-sm: 0.5rem;
     --gutter: 1rem;
     --gutter-md: 4rem;
     --carousel-img-w: min(50vw, 350px);
     --carousel-img-gap: calc(var(--carousel-img-w) / 4);
     --carousel-width: min(100vw, 700px);
+    --searchbar-height: 2.5rem;
 }
 
 @theme inline {
@@ -30,6 +32,7 @@
     --color-go-color: var(--go-color);
     --color-danger-color: var(--danger-color);
     --height-nav-height: var(--nav-height);
+    --height-searchbar-height: var(--searchbar-height);
     --text-sz-heading: 1.75rem;
     --text-sz-heading-lg: 2.25rem;
     --text-sz-subheading: 1rem;

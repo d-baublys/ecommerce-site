@@ -187,3 +187,7 @@ export async function fetchFilteredProducts({
 
     return productsFetch.data;
 }
+
+export function pluralise(word: string, count: number) {
+    return count === 1 ? word : word + "s";
+}

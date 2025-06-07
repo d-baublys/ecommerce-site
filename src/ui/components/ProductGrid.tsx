@@ -12,12 +12,12 @@ import {
 import ProductTile from "./ProductTile";
 import GridAside from "./GridAside";
 import { useEffect, useRef, useState } from "react";
-import { fetchFilteredProducts } from "@/lib/utils";
+import { fetchFilteredProducts, pluralise } from "@/lib/utils";
 import Link from "next/link";
 import { IoChevronDown } from "react-icons/io5";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import GeneralButton from "./GeneralButton";
-import CloseButton from "./CloseButton";
+import SlideDownMenu from "./SlideDownMenu";
 
 export default function ProductGrid({ category }: { category: Categories | "all" }) {
     const [allCategoryProducts, setAllCategoryProducts] = useState<Product[]>();
@@ -99,7 +99,7 @@ export default function ProductGrid({ category }: { category: Categories | "all"
     if (!(allCategoryProducts && filteredProducts)) return loadingIndicator();
 
     return (
-        <div className="flex flex-col px-(--gutter) py-8 lg:px-(--gutter-md) w-screen grow">
+        <div className="flex flex-col px-(--gutter-sm) sm:px-(--gutter) py-8 lg:px-(--gutter-md) w-screen grow">
             {category === "all" && (
                 <ul className="flex w-full border-b-2 gap-8 mb-8 py-2">
                     {Object.entries(VALID_CATEGORIES).map(([key, displayName]) => (
@@ -125,21 +125,24 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                 </aside>
                 <div className="flex flex-col w-full">
                     <div className="flex justify-between w-full pb-4 font-semibold">
-                        <div>
-                            <span>{filteredProducts.length}</span> <span>Items</span>
-                        </div>
                         <div className="flex items-center gap-1">
+                            <span>{filteredProducts.length}</span>
+                            <span>{pluralise("Item", filteredProducts.length)}</span>
+                        </div>
+                        <div className="flex items-center gap-1 translate-x-4">
                             <label
                                 htmlFor="sort-select"
-                                className={`pr-2 pointer-events-none ${
-                                    productSort ? "" : "translate-x-[120%]"
+                                className={`pr-2 whitespace-nowrap pointer-events-none ${
+                                    productSort
+                                        ? "translate-x-[10%] md:translate-0"
+                                        : "translate-x-[120%]"
                                 }`}
                             >
                                 Sort By
                             </label>
                             <select
                                 id="sort-select"
-                                className={`pr-6 font-normal appearance-none cursor-pointer ${
+                                className={`pr-5 font-normal appearance-none cursor-pointer ${
                                     productSort ? "" : "max-w-[100px] lg:max-w-[115px]"
                                 }`}
                                 onChange={(e) => setProductSort(e.target.value as ProductSortKey)}
@@ -152,7 +155,10 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                                     </option>
                                 ))}
                             </select>
-                            <IoChevronDown className="relative translate-x-[-150%] extra-stroked pointer-events-none" />
+                            <IoChevronDown
+                                className="relative translate-x-[-150%] extra-stroked pointer-events-none"
+                                size={14}
+                            />
                         </div>
                     </div>
                     <div className="flex grow">
@@ -186,30 +192,15 @@ export default function ProductGrid({ category }: { category: Categories | "all"
                     </GeneralButton>
                 </div>
             )}
-            <div
-                className={`fixed left-0 w-screen h-full lg:hidden bg-white [transition:all_0.3s_ease-in-out] overflow-auto z-50 ${
-                    isFilterOpen ? "top-0" : "top-[-250%]"
-                }`}
-            >
-                {isFilterOpen && (
-                    <>
-                        <div className="relative inset-0 mx-4 my-(--nav-height)">
-                            <div className="flex justify-center pt-[5rem] h-min">
-                                <GridAside
-                                    allCategoryProducts={allCategoryProducts}
-                                    sizeFilters={sizeFilters}
-                                    setSizeFilters={setSizeFilters}
-                                    priceFilters={priceFilters}
-                                    setPriceFilters={setPriceFilters}
-                                />
-                            </div>
-                        </div>
-                        <div className="fixed top-20 right-4 p-1 bg-background-lightest rounded-full z-[100] ">
-                            <CloseButton onClick={() => setIsFilterOpen(false)} />
-                        </div>
-                    </>
-                )}
-            </div>
+            <SlideDownMenu predicate={isFilterOpen} predicateSetter={setIsFilterOpen}>
+                <GridAside
+                    allCategoryProducts={allCategoryProducts}
+                    sizeFilters={sizeFilters}
+                    setSizeFilters={setSizeFilters}
+                    priceFilters={priceFilters}
+                    setPriceFilters={setPriceFilters}
+                />
+            </SlideDownMenu>
         </div>
     );
 }

@@ -79,7 +79,7 @@ export default function SearchBar({
             className="relative flex flex-col w-full"
             onSubmit={(e) => handleSubmit(e)}
         >
-            <div className="flex items-center w-full h-10 bg-background-lightest rounded-full">
+            <div className="flex items-center w-full h-searchbar-height bg-background-lightest rounded-full">
                 <div className="flex justify-center items-center w-12 h-full">
                     {isGlobalSearch && (
                         <IoSearch

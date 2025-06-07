@@ -52,7 +52,9 @@ export default function SearchOverlay() {
                 >
                     <div className="flex justify-center items-start mt-[13rem]">
                         <SearchBar handleResultClick={handleResultClick} isGlobalSearch />
-                        <CloseButton onClick={() => closeOverlay()} />
+                        <div className="flex items-center h-searchbar-height pl-0.5">
+                            <CloseButton onClick={() => closeOverlay()} />
+                        </div>
                     </div>
                 </div>
             </div>
