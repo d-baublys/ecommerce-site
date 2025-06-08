@@ -1,6 +1,6 @@
 "use client";
 
-import GeneralButton from "@/ui/components/GeneralButton";
+import RoundedButton from "@/ui/components/RoundedButton";
 
 export default function Error({
     error,
@@ -14,7 +14,7 @@ export default function Error({
             <p>
                 <span>{error ? `${error.message}` : "Something went wrong!"}</span>
             </p>
-            <GeneralButton onClick={() => reset()}>Try Again</GeneralButton>
+            <RoundedButton onClick={() => reset()}>Try Again</RoundedButton>
         </div>
     );
 }

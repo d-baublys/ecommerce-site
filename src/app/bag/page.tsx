@@ -122,9 +122,13 @@ export default function Page() {
                         <p>£{stringifyConvertPrice(orderTotal)}</p>
                     </div>
                 </div>
-                {!emptyBag && !noStock && (
+                {!(emptyBag || noStock) && (
                     <div className="flex pt-4 w-full justify-center">
-                        <GoButton onClick={handleCheckout} predicate={!emptyBag && !noStock}>
+                        <GoButton
+                            onClick={handleCheckout}
+                            predicate={!(emptyBag || noStock)}
+                            disabled={emptyBag || noStock}
+                        >
                             Checkout
                         </GoButton>
                     </div>

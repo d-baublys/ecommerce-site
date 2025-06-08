@@ -1,14 +1,15 @@
+interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    legend: string;
+    ref?: React.RefObject<HTMLInputElement | null>;
+}
+
 export default function FormInput({
     type = "text",
     legend,
-    onChange,
-    value,
-}: {
-    type?: React.HTMLInputTypeAttribute;
-    legend: string;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    value?: string | number;
-}) {
+    ref,
+    className: overrideClasses,
+    ...props
+}: FormInputProps) {
     return (
         <fieldset>
             <legend className="mb-2">{legend}</legend>
@@ -16,9 +17,9 @@ export default function FormInput({
                 type={type}
                 min={0}
                 step={"0.01"}
-                className="w-full p-1 border-2 rounded-lg"
-                onChange={onChange}
-                value={value}
+                className={`w-full p-1 border-2 rounded-lg ${overrideClasses}`}
+                ref={ref}
+                {...props}
             ></input>
         </fieldset>
     );

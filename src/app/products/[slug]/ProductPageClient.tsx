@@ -7,9 +7,9 @@ import Image from "next/image";
 import { Product } from "@/lib/definitions";
 import GoButton from "@/ui/components/GoButton";
 import { IoBag, IoHeart, IoHeartOutline } from "react-icons/io5";
-import GeneralButton from "@/ui/components/GeneralButton";
 import { getNetStock } from "@/lib/utils";
 import { useWishlistStore } from "@/stores/wishlistStore";
+import RoundedButton from "@/ui/components/RoundedButton";
 
 export default function ProductPageClient({ productData }: { productData: Product }) {
     const [size, setSize] = useState<Sizes>();
@@ -57,8 +57,12 @@ export default function ProductPageClient({ productData }: { productData: Produc
                 </div>
             </div>
             <div id="product-aside" className="flex flex-col md:w-1/2 min-h-full m-8 gap-8 ">
-                <div>{productData.name}</div>
-                <div className="font-semibold">{getLocalFormatting(productData.price)}</div>
+                <div>
+                    <p>{productData.name}</p>
+                </div>
+                <div className="font-semibold">
+                    <p>{getLocalFormatting(productData.price)}</p>
+                </div>
                 <select
                     className="p-2 bg-white border-2 rounded-md"
                     value={size}
@@ -90,7 +94,6 @@ export default function ProductPageClient({ productData }: { productData: Produc
                 </select>
                 <GoButton
                     onClick={() =>
-                        !isButtonDisabled &&
                         addToBag({ product: productData, size: size as Sizes, quantity: 1 })
                     }
                     predicate={!(size === undefined || isButtonDisabled)}
@@ -98,7 +101,7 @@ export default function ProductPageClient({ productData }: { productData: Produc
                 >
                     Add to Bag <IoBag />
                 </GoButton>
-                <GeneralButton
+                <RoundedButton
                     onClick={() =>
                         !inWishlist
                             ? addToWishlist(productData)
@@ -107,7 +110,7 @@ export default function ProductPageClient({ productData }: { productData: Produc
                 >
                     <span>{!inWishlist ? "Add to Wishlist" : "Remove from Wishlist"}</span>
                     {inWishlist ? <IoHeart /> : <IoHeartOutline className="stroked-path" />}
-                </GeneralButton>
+                </RoundedButton>
             </div>
         </section>
     );

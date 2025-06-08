@@ -2,7 +2,7 @@
 
 import { Product, Sizes, StockTableMode, VALID_SIZES } from "@/lib/definitions";
 import { isUnique, isValidSize } from "@/lib/utils";
-import GeneralButton from "@/ui/components/GeneralButton";
+import RoundedButton from "@/ui/components/RoundedButton";
 import StockTableInput from "@/ui/components/StockTableInput";
 import StockRowDelete from "@/ui/components/StockRowDelete";
 import { useEffect, useState } from "react";
@@ -22,9 +22,9 @@ export default function ProductStockTable({
 }) {
     const [localStockObj, setLocalStockObj] = useState<Product["stock"]>(savedDataObj.stock);
 
-    const [message, setMessage] = useState<string | undefined>();
-    const [newSize, setNewSize] = useState<Sizes | undefined>();
-    const [newStock, setNewStock] = useState<number | undefined>();
+    const [message, setMessage] = useState<string>();
+    const [newSize, setNewSize] = useState<Sizes>();
+    const [newStock, setNewStock] = useState<number>();
 
     useEffect(() => {
         setLocalStockObj(provisionalDataObj.stock);
@@ -71,19 +71,19 @@ export default function ProductStockTable({
         <div className="flex flex-col border-2 p-2">
             <div className="flex justify-between h-12">
                 {tableMode === "display" && Object.keys(localStockObj)?.length > 0 && (
-                    <GeneralButton onClick={() => setTableMode("edit")}>Edit</GeneralButton>
+                    <RoundedButton onClick={() => setTableMode("edit")}>Edit</RoundedButton>
                 )}
                 {tableMode === "edit" && (
-                    <GeneralButton onClick={() => handleApply()}>Apply</GeneralButton>
+                    <RoundedButton onClick={() => handleApply()}>Apply</RoundedButton>
                 )}
                 {tableMode === "add" && (
-                    <GeneralButton onClick={() => handleAdd()}>Add</GeneralButton>
+                    <RoundedButton onClick={() => handleAdd()}>Add</RoundedButton>
                 )}
                 {tableMode === "display" && (
-                    <GeneralButton onClick={() => setTableMode("add")}>+ Add Size</GeneralButton>
+                    <RoundedButton onClick={() => setTableMode("add")}>+ Add Size</RoundedButton>
                 )}
                 {(tableMode === "edit" || tableMode === "add") && (
-                    <GeneralButton onClick={() => handleCancel()}>Cancel</GeneralButton>
+                    <RoundedButton onClick={() => handleCancel()}>Cancel</RoundedButton>
                 )}
             </div>
             <p>{message}</p>

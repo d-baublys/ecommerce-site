@@ -8,14 +8,14 @@ export default function AdminPage() {
             </h2>
             <ul>
                 <li>
-                    <ListButton text="View and manage products" link="/products" relativeLink />
+                    <ListButton link="/products" relativeLink>
+                        View and manage products
+                    </ListButton>
                 </li>
                 <li>
-                    <ListButton
-                        text="Manage featured products"
-                        link="/manage-featured"
-                        relativeLink
-                    />
+                    <ListButton link="/manage-featured" relativeLink>
+                        Manage featured products
+                    </ListButton>
                 </li>
             </ul>
         </div>

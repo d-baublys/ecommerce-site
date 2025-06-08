@@ -18,7 +18,9 @@ export default function AccordionSection({
                 className="flex justify-between items-center py-4 cursor-pointer"
                 onClick={() => setIsOpen((prev) => !prev)}
             >
-                <div className="w-full">{text}</div>
+                <div className="w-full">
+                    <p>{text}</p>
+                </div>
                 <div>{isOpen ? <IoChevronUp /> : <IoChevronDown />}</div>
             </div>
             <div

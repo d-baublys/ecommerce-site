@@ -7,7 +7,7 @@ import ProductLink from "./ProductLink";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
 import { useEffect, useRef, useState } from "react";
-import GeneralButton from "./GeneralButton";
+import RoundedButton from "./RoundedButton";
 import { useBagStore } from "@/stores/bagStore";
 
 export default function ProductTile({ product }: { product: Product }) {
@@ -123,9 +123,9 @@ export default function ProductTile({ product }: { product: Product }) {
                             </div>
                             <div className="absolute bottom-0 left-0 w-full p-4">
                                 {!isQuickAddActive && availableSizes.length > 0 ? (
-                                    <GeneralButton className="w-full" onClick={handleQuickAddClick}>
+                                    <RoundedButton className="w-full" onClick={handleQuickAddClick}>
                                         Quick Add
-                                    </GeneralButton>
+                                    </RoundedButton>
                                 ) : availableSizes.length > 0 ? (
                                     <ul
                                         className="flex flex-wrap justify-center gap-4 p-2 bg-background-lightest rounded-full cursor-auto"

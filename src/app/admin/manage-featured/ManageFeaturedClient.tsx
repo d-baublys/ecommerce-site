@@ -3,7 +3,7 @@
 import { clearFeaturedProducts, createFeaturedProducts } from "@/lib/actions";
 import { FEATURED_COUNT, Product } from "@/lib/definitions";
 import { areProductListsEqual } from "@/lib/utils";
-import GeneralButton from "@/ui/components/GeneralButton";
+import RoundedButton from "@/ui/components/RoundedButton";
 import SearchBar from "@/ui/components/SearchBar";
 import { useEffect, useState } from "react";
 import DisplayTile from "@/ui/components/DisplayTile";
@@ -76,8 +76,8 @@ export default function ManageFeaturedClient({ productData }: { productData: Pro
                 <p>{"Featured item list is empty"}</p>
             )}
             <div className="flex gap-8 h-8">
-                {isListChanged && <GeneralButton onClick={handleSave}>Save</GeneralButton>}
-                {isListChanged && <GeneralButton onClick={handleCancel}>Cancel</GeneralButton>}
+                {isListChanged && <RoundedButton onClick={handleSave}>Save</RoundedButton>}
+                {isListChanged && <RoundedButton onClick={handleCancel}>Cancel</RoundedButton>}
             </div>
         </div>
     );

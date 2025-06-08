@@ -2,7 +2,7 @@
 
 import { Categories, Product, StockTableMode, VALID_CATEGORIES } from "@/lib/definitions";
 import FormInput from "./FormInput";
-import GeneralButton from "./GeneralButton";
+import RoundedButton from "./RoundedButton";
 import { useEffect, useRef, useState } from "react";
 import {
     convertValidPrice,
@@ -99,6 +99,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
     };
 
     const handleCancel = () => {
+        setPrice(stringifyConvertPrice(savedDataObj.price));
         setMessage("");
         setProvisionalDataObj(savedDataObj);
     };
@@ -171,22 +172,22 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                 legend="Unit Price"
                 value={price}
             />
-            <fieldset>
-                <legend className="mb-2">Image Path</legend>
-                <input
+            <div>
+                <FormInput
                     ref={fileBrowseRef}
                     type="file"
-                    className="hidden"
                     onChange={(e) => handleFileSelect(e)}
-                ></input>
+                    legend="Image Path"
+                    className="hidden"
+                />
                 <div className="flex items-center gap-4">
-                    <GeneralButton onClick={handleBrowse}>
+                    <RoundedButton onClick={handleBrowse}>
                         <IoFolder />
                         <span>Browse</span>
-                    </GeneralButton>
+                    </RoundedButton>
                     <p>{fileName}</p>
                 </div>
-            </fieldset>
+            </div>
             <FormInput
                 onChange={(e) =>
                     setProvisionalDataObj((prev) => ({ ...prev, alt: e.target.value }))
@@ -212,24 +213,24 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
             <p className="h-8">{message}</p>
             <div className="flex justify-between h-8 gap-8">
                 {productChanged && (
-                    <GeneralButton className="w-full" onClick={handleSubmit}>
+                    <RoundedButton className="w-full" onClick={handleSubmit}>
                         {mode === "add" ? "Add" : "Save"}
-                    </GeneralButton>
+                    </RoundedButton>
                 )}
                 {productChanged && (
-                    <GeneralButton className="w-full" onClick={handleCancel}>
+                    <RoundedButton className="w-full" onClick={handleCancel}>
                         Cancel
-                    </GeneralButton>
+                    </RoundedButton>
                 )}
             </div>
             {mode === "edit" && (
                 <div className="flex justify-center w-full pt-4 border-t-black border-t-2">
-                    <GeneralButton
-                        className="bg-danger-color text-contrasted border-danger-color"
+                    <RoundedButton
+                        className="!bg-danger-color !text-contrasted !border-danger-color"
                         onClick={() => handleDelete(provisionalDataObj.id)}
                     >
                         Delete
-                    </GeneralButton>
+                    </RoundedButton>
                 </div>
             )}
         </form>

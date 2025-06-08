@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { IoChevronBackSharp, IoChevronForwardSharp } from "react-icons/io5";
 import { debounce } from "@/lib/utils";
 import ProductLink from "./ProductLink";
-import GeneralButton from "./GeneralButton";
 import { Product } from "@/lib/definitions";
+import RoundedButton from "./RoundedButton";
 
 export default function Carousel({ featuredList }: { featuredList: Product[] }) {
     const [activeFeatured, setActiveFeatured] = useState(0);
@@ -84,9 +84,9 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                                 />
                             </div>
                             <ProductLink slug={featuredProd.slug}>
-                                <GeneralButton className="absolute left-[50%] bottom-1/6 translate-x-[-50%] !border-none z-50">
-                                    Shop
-                                </GeneralButton>
+                                <RoundedButton className="absolute left-[50%] bottom-1/6 translate-x-[-50%] !border-none z-50">
+                                    View
+                                </RoundedButton>
                             </ProductLink>
                         </li>
                     ))}

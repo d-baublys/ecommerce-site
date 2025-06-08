@@ -13,9 +13,9 @@ import { useEffect, useRef, useState } from "react";
 import { fetchFilteredProducts } from "@/lib/utils";
 import { IoChevronDown } from "react-icons/io5";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
-import GeneralButton from "./GeneralButton";
 import SlideDownMenu from "./SlideDownMenu";
 import BaseGridPage from "./BaseGridPage";
+import RoundedButton from "./RoundedButton";
 
 export default function CategoryGridPage({ category }: { category: Categories | "all" }) {
     const [allCategoryProducts, setAllCategoryProducts] = useState<Product[]>();
@@ -152,12 +152,12 @@ export default function CategoryGridPage({ category }: { category: Categories | 
                 {isQueryLoading && loadingIndicator()}
                 {!isFilterOpen && (
                     <div className="fixed bottom-[5%] left-1/2 translate-x-[-50%] lg:hidden">
-                        <GeneralButton
-                            className="!bg-black !text-white !border-black [filter:drop-shadow(0_0_2px_rgba(255,255,255,0.5))]"
+                        <RoundedButton
+                            className="!bg-black !text-contrasted !border-black [filter:drop-shadow(0_0_2px_rgba(255,255,255,0.5))]"
                             onClick={() => setIsFilterOpen(true)}
                         >
                             Filter
-                        </GeneralButton>
+                        </RoundedButton>
                     </div>
                 )}
                 <SlideDownMenu predicate={isFilterOpen} predicateSetter={setIsFilterOpen}>

@@ -1,9 +1,9 @@
-import GeneralButton from "@/ui/components/GeneralButton";
 import stripe from "@/lib/stripe";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { IoCheckmarkCircle } from "react-icons/io5";
 import { SuccessBagClearClient } from "./SuccessBagClearClient";
+import RoundedButton from "@/ui/components/RoundedButton";
 
 export default async function Page({ searchParams }: { searchParams: { session_id?: string } }) {
     const session_id = await searchParams.session_id;
@@ -33,7 +33,7 @@ export default async function Page({ searchParams }: { searchParams: { session_i
                     </div>
                 </div>
                 <Link href={"/"}>
-                    <GeneralButton>Home</GeneralButton>
+                    <RoundedButton>Home</RoundedButton>
                 </Link>
             </div>
         </>

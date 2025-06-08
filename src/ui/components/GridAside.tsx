@@ -117,7 +117,7 @@ export default function GridAside({
                             <FilterButton
                                 objKey={key as T}
                                 filterArr={filterArr}
-                                handleClick={() => handleClick(key as T)}
+                                onClick={() => handleClick(key as T)}
                             >
                                 {labelCreator(key as T, count as number)}
                             </FilterButton>

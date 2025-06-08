@@ -41,7 +41,7 @@ export default function SearchOverlay() {
                 />
             }
             <div
-                className={`absolute top-0 left-0 flex justify-center w-full min-h-screen md:min-h-[400px] bg-contrasted drop-shadow-xl [transition:all_0.2s_ease-out] ${
+                className={`absolute top-0 left-0 flex justify-center w-full min-h-screen md:min-h-[400px] bg-white drop-shadow-xl [transition:all_0.2s_ease-out] ${
                     isSearchLoaded ? "opacity-100" : "opacity-0"
                 }`}
             >

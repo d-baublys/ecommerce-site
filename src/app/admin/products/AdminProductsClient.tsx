@@ -2,10 +2,10 @@
 
 import { Categories, Product, VALID_CATEGORIES } from "@/lib/definitions";
 import { useState } from "react";
-import GeneralButton from "@/ui/components/GeneralButton";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import DisplayTile from "@/ui/components/DisplayTile";
+import RoundedButton from "@/ui/components/RoundedButton";
 
 export default function AdminProductsClient({ productData }: { productData: Product[] }) {
     const pathname = usePathname();
@@ -17,13 +17,13 @@ export default function AdminProductsClient({ productData }: { productData: Prod
             <h2 className="text-sz-subheading lg:text-sz-subheading-lg font-semibold">Products</h2>
             <div className="flex justify-center">
                 <Link href={`${pathname}/add-product`}>
-                    <GeneralButton>+ Add Product</GeneralButton>
+                    <RoundedButton>+ Add Product</RoundedButton>
                 </Link>
             </div>
             <ul className="flex flex-row justify-evenly items-center w-full">
                 {Object.keys(VALID_CATEGORIES).map((category) => (
                     <li key={category}>
-                        <GeneralButton
+                        <RoundedButton
                             onClick={() => setFilter(category as Categories)}
                             className={`capitalize ${
                                 filter === category &&
@@ -31,7 +31,7 @@ export default function AdminProductsClient({ productData }: { productData: Prod
                             }`}
                         >
                             {category}
-                        </GeneralButton>
+                        </RoundedButton>
                     </li>
                 ))}
             </ul>

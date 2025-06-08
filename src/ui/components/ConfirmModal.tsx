@@ -1,9 +1,9 @@
 "use client";
 
 import { useModalStore } from "@/stores/modalStore";
-import GeneralButton from "./GeneralButton";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import DarkBackdrop from "./DarkBackdrop";
+import RoundedButton from "./RoundedButton";
 
 export default function ConfirmModal() {
     const { isModalOpen, resolve, closeModal } = useModalStore((state) => state);
@@ -33,14 +33,14 @@ export default function ConfirmModal() {
                 <div
                     id="modal"
                     onClick={(e) => e.stopPropagation()}
-                    className="flex flex-col w-[500px] h-[250px] bg-contrasted justify-evenly p-8 rounded-2xl drop-shadow-2xl"
+                    className="flex flex-col w-[500px] h-[250px] bg-white justify-evenly p-8 rounded-2xl drop-shadow-2xl"
                 >
                     <p className="text-center">
                         Are you sure you want to delete this product? This action cannot be undone.
                     </p>
                     <div className="flex justify-evenly items-center w-full gap-4">
-                        <GeneralButton onClick={handleConfirm}>Confirm</GeneralButton>
-                        <GeneralButton onClick={handleCancel}>Cancel</GeneralButton>
+                        <RoundedButton onClick={handleConfirm}>Confirm</RoundedButton>
+                        <RoundedButton onClick={handleCancel}>Cancel</RoundedButton>
                     </div>
                 </div>
             </div>
