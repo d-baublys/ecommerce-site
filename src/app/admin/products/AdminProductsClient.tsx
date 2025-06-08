@@ -2,10 +2,10 @@
 
 import { Categories, Product, VALID_CATEGORIES } from "@/lib/definitions";
 import { useState } from "react";
-import BagTile from "@/ui/components/BagTile";
 import GeneralButton from "@/ui/components/GeneralButton";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import DisplayTile from "@/ui/components/DisplayTile";
 
 export default function AdminProductsClient({ productData }: { productData: Product[] }) {
     const pathname = usePathname();
@@ -41,7 +41,7 @@ export default function AdminProductsClient({ productData }: { productData: Prod
                         querySet.map((item: Product) => (
                             <li key={item.id}>
                                 <Link href={`${pathname}/${item.slug}`}>
-                                    <BagTile dataObj={item} />
+                                    <DisplayTile productData={item} />
                                 </Link>
                             </li>
                         ))

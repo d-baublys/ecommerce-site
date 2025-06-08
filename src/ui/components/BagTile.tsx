@@ -1,89 +1,72 @@
 "use client";
 
-import { BagItem, MergedBagItem, Product } from "@/lib/definitions";
+import { MergedBagItem } from "@/lib/definitions";
 import Link from "next/link";
 import { IoClose } from "react-icons/io5";
 import Image from "next/image";
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect } from "react";
+import { stringifyConvertPrice } from "@/lib/utils";
 
 export default function BagTile({
-    dataObj,
+    bagItem,
     handleDelete,
     productLink,
 }: {
-    dataObj: Product | MergedBagItem;
+    bagItem: MergedBagItem;
     handleDelete?: () => void;
-    productLink?: string;
+    productLink: string;
 }) {
-    const isBagItem = "quantity" in dataObj;
-    const productData = isBagItem ? dataObj.product : dataObj;
-
-    const stock = isBagItem ? dataObj.latestSizeStock : null;
-    const maxQty = Math.min(stock ?? 0, Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY));
-
-    const latestQuantity = isBagItem ? Math.min(dataObj.quantity, stock!) : null;
-
+    const productData = bagItem.product;
     const updateQuantity = useBagStore((state) => state.updateQuantity);
 
-    const renderLinkedArea = () => {
-        const linkedArea = (
-            <div className="flex h-full grow gap-2 sm:gap-8">
-                <div className="wishlist-img-wrapper relative h-full aspect-square">
-                    <Image
-                        className="object-cover"
-                        src={productData.src}
-                        alt={productData.alt}
-                        sizes="auto"
-                        fill
-                    ></Image>
-                </div>
-                <div className="flex flex-col justify-between">
-                    <div className="font-semibold">{productData.name.toUpperCase()}</div>
-                    {isBagItem && (
-                        <div className="text-component-color">
-                            Size - {(dataObj as BagItem).size.toUpperCase()}
-                        </div>
-                    )}
-                </div>
-            </div>
-        );
-
-        if (productLink) {
-            return (
-                <Link className="w-full" href={productLink}>
-                    {linkedArea}
-                </Link>
-            );
-        }
-
-        return linkedArea;
-    };
+    const stock = bagItem.latestSizeStock;
+    const maxQty = Math.min(stock ?? 0, Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY));
+    const latestQuantity = Math.min(bagItem.quantity, stock);
 
     useEffect(() => {
-        if (isBagItem && latestQuantity !== dataObj.quantity) {
-            updateQuantity(dataObj.product.id, dataObj.size, latestQuantity!);
+        if (latestQuantity !== bagItem.quantity) {
+            updateQuantity(productData.id, bagItem.size, latestQuantity);
         }
-    }, [isBagItem, latestQuantity, dataObj, updateQuantity]);
+    }, [latestQuantity]);
 
     return (
-        <div className="flex h-24 w-full sm:w-1/2 min-w-[300px] sm:min-w-[500px] border-2 p-2">
-            {renderLinkedArea()}
+        <div className="flex h-40 w-full min-w-[300px] sm:min-w-[500px] p-2">
+            <Link className="w-full" href={productLink}>
+                {
+                    <div className="flex h-full grow gap-2 sm:gap-8">
+                        <div className="wishlist-img-wrapper relative h-full aspect-3/4">
+                            <Image
+                                className="object-cover"
+                                src={productData.src}
+                                alt={productData.alt}
+                                sizes="auto"
+                                fill
+                            ></Image>
+                        </div>
+                        <div className="flex flex-col justify-between">
+                            <div className="text-sz-subheading lg:text-sz-subheading-lg font-semibold">
+                                <p>{productData.name.toUpperCase()}</p>
+                            </div>
+                            <div className="text-component-color">
+                                <p>Size - {bagItem.size.toUpperCase()}</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </Link>
             <div className="flex flex-col justify-between items-end h-full w-24">
-                {handleDelete && (
-                    <IoClose
-                        onClick={handleDelete}
-                        className="translate-x-1 cursor-pointer"
-                        size={24}
-                    />
-                )}
-                {isBagItem &&
-                    (stock ? (
+                <div className="text-sz-subheading lg:text-sz-subheading-lg">
+                    <span>£</span>
+                    <span>{stringifyConvertPrice(productData.price * bagItem.quantity)}</span>
+                </div>
+                <div className="flex items-center gap-2 pr-2">
+                    {stock ? (
                         <select
-                            value={dataObj.quantity}
+                            value={bagItem.quantity}
                             className="h-10 w-10 pl-1 border-2 rounded-md"
                             onChange={(e) =>
-                                updateQuantity(productData.id, dataObj.size, Number(e.target.value))
+                                updateQuantity(productData.id, bagItem.size, Number(e.target.value))
                             }
                         >
                             {Array.from({ length: maxQty }, (_, idx) => (
@@ -96,7 +79,13 @@ export default function BagTile({
                         <div className="flex justify-center w-full text-end text-component-color">
                             <p>Out of stock</p>
                         </div>
-                    ))}
+                    )}
+                    <IoClose
+                        onClick={handleDelete}
+                        className="translate-x-1 cursor-pointer"
+                        size={24}
+                    />
+                </div>
             </div>
         </div>
     );

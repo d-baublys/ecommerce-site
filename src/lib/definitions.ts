@@ -1,7 +1,6 @@
 import { Prisma } from "../../generated/prisma";
 
 export const PRODUCT_BASE_FIELDS = {
-    id: "",
     name: "",
     gender: "" as Categories,
     price: 0,
@@ -18,6 +17,7 @@ export const VALID_CATEGORIES = { mens: "Men's", womens: "Women's" } as const;
 export type ProductBase = typeof PRODUCT_BASE_FIELDS;
 
 export type Product = ProductBase & {
+    id: string;
     stock: Partial<Record<Sizes, number>>;
 };
 

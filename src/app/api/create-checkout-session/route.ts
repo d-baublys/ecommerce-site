@@ -3,22 +3,38 @@ import stripe from "@/lib/stripe";
 import { BagItem } from "@/lib/definitions";
 
 export async function POST(req: Request) {
-    const { bagItems } = await req.json();
+    const { bagItems, shippingCost } = await req.json();
+
+    const lineItems = [
+        ...bagItems.map((bagItem: BagItem) => ({
+            price_data: {
+                currency: "gbp",
+                product_data: {
+                    name: bagItem.product.name,
+                },
+                unit_amount: bagItem.product.price,
+            },
+            quantity: bagItem.quantity,
+        })),
+        ...[
+            {
+                price_data: {
+                    currency: "gbp",
+                    product_data: {
+                        name: "Shipping",
+                    },
+                    unit_amount: shippingCost,
+                },
+                quantity: 1,
+            },
+        ],
+    ];
 
     try {
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             mode: "payment",
-            line_items: bagItems.map((bagItem: BagItem) => ({
-                price_data: {
-                    currency: "gbp",
-                    product_data: {
-                        name: bagItem.product.name,
-                    },
-                    unit_amount: bagItem.product.price,
-                },
-                quantity: bagItem.quantity,
-            })),
+            line_items: lineItems,
             metadata: {
                 items: JSON.stringify(
                     bagItems.map((bagItem: BagItem) => ({

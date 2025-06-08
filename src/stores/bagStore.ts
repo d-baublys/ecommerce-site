@@ -10,6 +10,7 @@ type BagStore = {
     clearBag: () => void;
     updateQuantity: (id: string, size: Sizes, quantity: number) => void;
     getTotalBagCount: () => number;
+    hasHydrated: boolean;
 };
 
 export const useBagStore = create<BagStore>()(
@@ -72,7 +73,13 @@ export const useBagStore = create<BagStore>()(
             getTotalBagCount: () => {
                 return get().bag.reduce((total, item) => total + item.quantity, 0);
             },
+            hasHydrated: false,
         }),
-        { name: STORAGE_KEYS.BAG }
+        {
+            name: STORAGE_KEYS.BAG,
+            onRehydrateStorage: () => (state) => {
+                state!.hasHydrated = true;
+            },
+        }
     )
 );

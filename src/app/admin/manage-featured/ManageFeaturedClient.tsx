@@ -4,9 +4,9 @@ import { clearFeaturedProducts, createFeaturedProducts } from "@/lib/actions";
 import { FEATURED_COUNT, Product } from "@/lib/definitions";
 import { areProductListsEqual } from "@/lib/utils";
 import GeneralButton from "@/ui/components/GeneralButton";
-import BagTile from "@/ui/components/BagTile";
 import SearchBar from "@/ui/components/SearchBar";
 import { useEffect, useState } from "react";
+import DisplayTile from "@/ui/components/DisplayTile";
 
 export default function ManageFeaturedClient({ productData }: { productData: Product[] }) {
     const [savedFeaturedList, setSavedFeaturedList] = useState<Product[]>(productData);
@@ -61,8 +61,8 @@ export default function ManageFeaturedClient({ productData }: { productData: Pro
                 <ul>
                     {provisionalFeaturedList.map((featuredProd) => (
                         <li key={featuredProd.id}>
-                            <BagTile
-                                dataObj={featuredProd}
+                            <DisplayTile
+                                productData={featuredProd}
                                 handleDelete={() =>
                                     setProvisionalFeaturedList((prev) =>
                                         prev?.filter((currProd) => currProd.id !== featuredProd.id)

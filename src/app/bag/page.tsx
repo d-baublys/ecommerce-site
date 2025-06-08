@@ -6,21 +6,28 @@ import { useBagStore } from "@/stores/bagStore";
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
 import { MergedBagItem, Product } from "@/lib/definitions";
-import SubHeader from "@/ui/components/SubHeader";
 import { getProductData } from "@/lib/actions";
+import { stringifyConvertPrice } from "@/lib/utils";
 
 export default function Page() {
     const [latestData, setLatestData] = useState<Product[]>();
     const [error, setError] = useState<Error | null>(null);
 
-    const bag = useBagStore((state) => state.bag);
-    const removeFromBag = useBagStore((state) => state.removeFromBag);
+    const { bag, removeFromBag, hasHydrated } = useBagStore((state) => state);
     const emptyBag = !bag.length;
     const noStock = !useBagStore((state) => state.getTotalBagCount());
-
     const bagProductIds = bag.map((bagItem) => bagItem.product.id);
 
+    const orderSubtotal = bag.reduce(
+        (subTotal, bagItem) => subTotal + bagItem.product.price * bagItem.quantity,
+        0
+    );
+    const shippingCost = !emptyBag && orderSubtotal ? 500 : 0;
+    const orderTotal = orderSubtotal + shippingCost;
+
     useEffect(() => {
+        if (!hasHydrated) return;
+
         const getData = async () => {
             try {
                 const dataFetch = await getProductData({ id: { in: bagProductIds } });
@@ -31,7 +38,7 @@ export default function Page() {
         };
 
         getData();
-    }, []);
+    }, [hasHydrated]);
 
     if (error) throw error;
 
@@ -52,6 +59,7 @@ export default function Page() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 bagItems: bag,
+                shippingCost,
             }),
         });
         const data = await res.json();
@@ -64,15 +72,17 @@ export default function Page() {
     };
 
     return (
-        <div className="flex flex-col justify-center items-center grow w-full">
-            <SubHeader subheaderText="My Bag" />
-            <div className="flex flex-col grow justify-center items-center w-full max-w-[960px] h-full my-4 gap-4">
-                {!emptyBag && (
-                    <ul>
+        <div className="flex flex-col md:flex-row  w-full h-full grow px-(--gutter-sm) sm:px-(--gutter) py-8 lg:px-(--gutter-md)">
+            <div className="flex justify-center w-full">
+                {!emptyBag ? (
+                    <ul className="flex flex-col w-full gap-8">
                         {mergedItems.map((mergedItem) => (
-                            <li key={`${mergedItem.product.id}-${mergedItem.size}`}>
+                            <li
+                                key={`${mergedItem.product.id}-${mergedItem.size}`}
+                                className="w-full"
+                            >
                                 <BagTile
-                                    dataObj={mergedItem}
+                                    bagItem={mergedItem}
                                     handleDelete={() =>
                                         removeFromBag(mergedItem.product.id, mergedItem.size)
                                     }
@@ -81,13 +91,43 @@ export default function Page() {
                             </li>
                         ))}
                     </ul>
-                )}
-                {!emptyBag && !noStock ? (
-                    <GoButton onClick={handleCheckout} predicate={!emptyBag && !noStock}>
-                        Proceed to Checkout
-                    </GoButton>
                 ) : (
-                    emptyBag && <p>{"Your bag is empty!"}</p>
+                    <p>{"Your bag is empty!"}</p>
+                )}
+            </div>
+            <div className="flex flex-col px-8 py-6 w-full h-min mt-2 md:mt-0 md:w-2/5 md:ml-8 justify-evenly bg-background-lightest rounded-sm">
+                <p className="pb-6 font-semibold text-sz-subheading lg:text-sz-subheading-lg whitespace-nowrap">
+                    Order Summary
+                </p>
+                <div>
+                    <div className="flex justify-between py-3">
+                        <p>Subtotal</p>
+                        <p>£{stringifyConvertPrice(orderSubtotal)}</p>
+                    </div>
+                    <div className="flex justify-between py-3 border-b-2">
+                        <p>Shipping</p>
+                        <p>
+                            {shippingCost ? (
+                                <>
+                                    <span>£</span>
+                                    <span>{stringifyConvertPrice(shippingCost)}</span>
+                                </>
+                            ) : (
+                                "-"
+                            )}
+                        </p>
+                    </div>
+                    <div className="flex justify-between py-3 font-semibold">
+                        <p>Total</p>
+                        <p>£{stringifyConvertPrice(orderTotal)}</p>
+                    </div>
+                </div>
+                {!emptyBag && !noStock && (
+                    <div className="flex pt-4 w-full justify-center">
+                        <GoButton onClick={handleCheckout} predicate={!emptyBag && !noStock}>
+                            Checkout
+                        </GoButton>
+                    </div>
                 )}
             </div>
         </div>
