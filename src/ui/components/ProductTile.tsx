@@ -157,10 +157,10 @@ export default function ProductTile({ product }: { product: Product }) {
                     )}
                 </div>
                 <p>{product.name}</p>
-                <div className="font-semibold">
+                <p className="font-semibold">
                     <span>£</span>
                     <span>{stringifyConvertPrice(product.price)}</span>
-                </div>
+                </p>
             </div>
         </ProductLink>
     );

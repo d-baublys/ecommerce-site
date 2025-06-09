@@ -35,10 +35,10 @@ export default function BaseGridPage({
                 {asideContent ?? null}
                 <div className="flex flex-col w-full">
                     <div className="flex justify-between w-full pb-4 font-semibold">
-                        <div className="flex items-center gap-1">
+                        <p className="flex items-center gap-1">
                             <span>{displayedProducts.length}</span>
                             <span>{pluralise("Item", displayedProducts.length)}</span>
-                        </div>
+                        </p>
                         {sortingUnit}
                     </div>
                     <div className="flex grow">

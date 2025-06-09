@@ -11,9 +11,7 @@ export default function Error({
 }) {
     return (
         <div className="flex flex-col items-center text-center gap-8">
-            <p>
-                <span>{error ? `${error.message}` : "Something went wrong!"}</span>
-            </p>
+            <p>{error ? `${error.message}` : "Something went wrong!"}</p>
             <RoundedButton onClick={() => reset()}>Try Again</RoundedButton>
         </div>
     );

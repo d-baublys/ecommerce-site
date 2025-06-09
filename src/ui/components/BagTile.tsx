@@ -56,10 +56,10 @@ export default function BagTile({
                 }
             </Link>
             <div className="flex flex-col justify-between items-end h-full w-24">
-                <div className="text-sz-subheading lg:text-sz-subheading-lg">
+                <p className="text-sz-subheading lg:text-sz-subheading-lg">
                     <span>£</span>
                     <span>{stringifyConvertPrice(productData.price * bagItem.quantity)}</span>
-                </div>
+                </p>
                 <div className="flex items-center gap-2 pr-2">
                     {stock ? (
                         <select
