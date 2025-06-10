@@ -8,14 +8,14 @@ import {
     Sizes,
     SORT_OPTIONS,
 } from "@/lib/definitions";
-import GridAside from "./GridAside";
+import GridAside from "@/ui/components/GridAside";
 import { useEffect, useRef, useState } from "react";
 import { fetchFilteredProducts } from "@/lib/utils";
 import { IoChevronDown } from "react-icons/io5";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
-import SlideDownMenu from "./SlideDownMenu";
-import BaseGridPage from "./BaseGridPage";
-import RoundedButton from "./RoundedButton";
+import SlideDownMenu from "@/ui/components/SlideDownMenu";
+import BaseGridPage from "@/ui/pages/BaseGridPage";
+import RoundedButton from "@/ui/components/RoundedButton";
 
 export default function CategoryGridPage({ category }: { category: Categories | "all" }) {
     const [allCategoryProducts, setAllCategoryProducts] = useState<Product[]>();

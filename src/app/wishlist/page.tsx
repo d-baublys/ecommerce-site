@@ -1,7 +1,7 @@
 "use client";
 
 import { useWishlistStore } from "@/stores/wishlistStore";
-import BaseGridPage from "@/ui/components/BaseGridPage";
+import BaseGridPage from "@/ui/pages/BaseGridPage";
 import MainLayout from "@/ui/layouts/MainLayout";
 
 export default function Page() {
