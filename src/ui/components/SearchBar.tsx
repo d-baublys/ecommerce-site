@@ -18,6 +18,7 @@ export default function SearchBar({
     const [query, setQuery] = useState<string>("");
     const [results, setResults] = useState<Product[]>([]);
     const [isResultLoading, setIsResultLoading] = useState<boolean>(false);
+    const [hasMounted, setHasMounted] = useState<boolean>(false);
 
     const router = useRouter();
 
@@ -26,13 +27,18 @@ export default function SearchBar({
             const productFetch = await getProductData();
 
             setProductList(productFetch.data);
+            setHasMounted(true);
         };
 
         getData();
     }, []);
 
-    if (productList === undefined) {
-        return <p className="flex items-center h-full">Error fetching product data. Please try again later.</p>;
+    if (productList === undefined && hasMounted) {
+        return (
+            <p className="flex items-center h-full">
+                Error fetching product data. Please try again later.
+            </p>
+        );
     }
 
     const debouncedResults = debounce((currQuery) => {

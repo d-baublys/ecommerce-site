@@ -1,6 +1,7 @@
-"use client";
+"use client"; // must for error files
 
 import RoundedButton from "@/ui/components/RoundedButton";
+import BareLayout from "@/ui/layouts/BareLayout";
 
 export default function Error({
     error,
@@ -10,9 +11,9 @@ export default function Error({
     reset: () => void;
 }) {
     return (
-        <div className="flex flex-col items-center text-center gap-8">
+        <BareLayout>
             <p>{error ? `${error.message}` : "Something went wrong!"}</p>
             <RoundedButton onClick={() => reset()}>Try Again</RoundedButton>
-        </div>
+        </BareLayout>
     );
 }

@@ -139,7 +139,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
     }, [productChanged]);
 
     return (
-        <form className="flex flex-col w-full p-4 gap-8 border-2 rounded-lg">
+        <form className="flex flex-col w-full p-4 gap-8 border-2 bg-background-lightest rounded-lg">
             <FormInput
                 onChange={(e) => {
                     setProvisionalDataObj((prev) => ({ ...prev, name: e.target.value }));
@@ -156,7 +156,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                             gender: e.target.value as Categories,
                         }));
                     }}
-                    className="p-1.5 border-2 rounded-lg"
+                    className="p-1.5 border-2 rounded-lg bg-white"
                     value={provisionalDataObj.gender}
                 >
                     {Object.keys(VALID_CATEGORIES).map((category, idx) => (
@@ -210,8 +210,10 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                 tableMode={tableMode}
                 setTableMode={setTableMode}
             />
-            <p className="h-8">{message}</p>
-            <div className="flex justify-between h-8 gap-8">
+            <div className="flex justify-center p-2 h-8">
+                <p className="text-center">{message}</p>
+            </div>
+            <div className="flex justify-between gap-8">
                 {productChanged && (
                     <RoundedButton className="w-full" onClick={handleSubmit}>
                         {mode === "add" ? "Add" : "Save"}

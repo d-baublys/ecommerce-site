@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { IoCheckmarkCircle } from "react-icons/io5";
 import { SuccessBagClearClient } from "./SuccessBagClearClient";
 import RoundedButton from "@/ui/components/RoundedButton";
+import MainWrapper from "@/ui/layouts/MainWrapper";
 
 export default async function Page({ searchParams }: { searchParams: { session_id?: string } }) {
     const session_id = await searchParams.session_id;
@@ -15,9 +16,9 @@ export default async function Page({ searchParams }: { searchParams: { session_i
     if (!session || session.payment_status !== "paid") notFound();
 
     return (
-        <>
+        <MainWrapper>
             <SuccessBagClearClient />
-            <div className="flex flex-col justify-center items-center gap-8">
+            <div className="flex flex-col grow justify-center items-center h-full gap-8">
                 <div className="flex flex-col justify-between w-full sm:w-1/2 min-w-[300px] sm:min-w-[500px] border-2 p-2 gap-4">
                     <div className="flex items-center gap-3">
                         <IoCheckmarkCircle className="shrink-0 text-go-color" size={30} />
@@ -36,6 +37,6 @@ export default async function Page({ searchParams }: { searchParams: { session_i
                     <RoundedButton>Home</RoundedButton>
                 </Link>
             </div>
-        </>
+        </MainWrapper>
     );
 }

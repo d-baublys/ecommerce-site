@@ -19,7 +19,7 @@ export default function BaseGridPage({
     sortingUnit?: React.ReactNode;
 }) {
     return (
-        <div className="flex flex-col px-(--gutter-sm) sm:px-(--gutter) py-8 lg:px-(--gutter-md) w-screen grow">
+        <>
             {category === "all" ? (
                 <ul className="flex w-full border-b-2 gap-8 mb-8 py-2">
                     {Object.entries(VALID_CATEGORIES).map(([key, displayName]) => (
@@ -53,6 +53,6 @@ export default function BaseGridPage({
                 </div>
             </div>
             {fixedOverlays ?? null}
-        </div>
+        </>
     );
 }

@@ -21,7 +21,7 @@ export default async function Home() {
     }
 
     return (
-        <>
+        <div className="flex flex-col w-full">
             <div className="main-product relative grow w-full min-h-[400px]">
                 <Image
                     className="object-cover brightness-50"
@@ -40,12 +40,14 @@ export default async function Home() {
                     </Link>
                 </div>
             </div>
-            <div className="featured-outer flex flex-col w-full min-h-[500px] bg-white">
-                <div className="p-(--gutter) xl:p-(--gutter-md) font-semibold text-sz-subheading lg:text-sz-subheading-lg">
-                    <h2>Featured</h2>
+            {featuredList ? (
+                <div className="featured-outer flex flex-col w-full min-h-[500px] bg-white">
+                    <div className="p-(--gutter) xl:p-(--gutter-md) font-semibold text-sz-subheading lg:text-sz-subheading-lg">
+                        <h2>Featured</h2>
+                    </div>
+                    <Carousel featuredList={featuredList} />
                 </div>
-                {featuredList && <Carousel featuredList={featuredList} />}
-            </div>
-        </>
+            ) : null}
+        </div>
     );
 }

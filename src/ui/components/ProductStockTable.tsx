@@ -86,8 +86,10 @@ export default function ProductStockTable({
                     <RoundedButton onClick={() => handleCancel()}>Cancel</RoundedButton>
                 )}
             </div>
-            <p>{message}</p>
-            <table className="text-center border-2 mt-2">
+            <div className="flex justify-center h-8 p-2">
+                <p className="text-center">{message}</p>
+            </div>
+            <table className="text-center border-2 mt-2 bg-white">
                 <thead>
                     <tr className="p-2">
                         <th className="border-2">Size</th>

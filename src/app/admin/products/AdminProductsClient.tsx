@@ -13,9 +13,8 @@ export default function AdminProductsClient({ productData }: { productData: Prod
     const querySet = productData.filter((item) => item.gender === filter);
 
     return (
-        <div className="flex flex-col grow justify-center items-center min-w-[300px] sm:min-w-[500px] gap-8">
-            <h2 className="text-sz-subheading lg:text-sz-subheading-lg font-semibold">Products</h2>
-            <div className="flex justify-center">
+        <div className="flex flex-col grow w-full justify-center items-center">
+            <div className="flex justify-center mb-8">
                 <Link href={`${pathname}/add-product`}>
                     <RoundedButton>+ Add Product</RoundedButton>
                 </Link>
@@ -35,23 +34,27 @@ export default function AdminProductsClient({ productData }: { productData: Prod
                     </li>
                 ))}
             </ul>
-            {filter ? (
-                <ul className="flex flex-col gap-4">
-                    {querySet.length > 0 ? (
-                        querySet.map((item: Product) => (
-                            <li key={item.id}>
-                                <Link href={`${pathname}/${item.slug}`}>
-                                    <DisplayTile productData={item} />
-                                </Link>
-                            </li>
-                        ))
-                    ) : (
-                        <li>No products to show</li>
-                    )}
-                </ul>
-            ) : (
-                <p>{"Please select a filter"}</p>
-            )}
+            <div className="flex justify-center items-center w-full h-full">
+                {filter ? (
+                    <ul className="flex flex-col w-full h-full">
+                        {querySet.length > 0 ? (
+                            querySet.map((item: Product) => (
+                                <li key={item.id} className="mt-8">
+                                    <Link href={`${pathname}/${item.slug}`}>
+                                        <DisplayTile productData={item} />
+                                    </Link>
+                                </li>
+                            ))
+                        ) : (
+                            <li>No products to show</li>
+                        )}
+                    </ul>
+                ) : (
+                    <div className="pt-8">
+                        <p>{"Please select a filter"}</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

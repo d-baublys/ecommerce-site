@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { MergedBagItem, Product } from "@/lib/definitions";
 import { getProductData } from "@/lib/actions";
 import { stringifyConvertPrice } from "@/lib/utils";
+import MainLayout from "@/ui/layouts/MainLayout";
 
 export default function Page() {
     const [latestData, setLatestData] = useState<Product[]>();
@@ -72,14 +73,14 @@ export default function Page() {
     };
 
     return (
-        <div className="flex flex-col md:flex-row  w-full h-full grow px-(--gutter-sm) sm:px-(--gutter) py-8 lg:px-(--gutter-md)">
-            <div className="flex justify-center w-full">
+        <MainLayout subheaderText="My Bag">
+            <div className="flex flex-col md:flex-row w-full h-full">
                 {!emptyBag ? (
-                    <ul className="flex flex-col w-full gap-8">
+                    <ul className="flex flex-col w-full lg:gap-8">
                         {mergedItems.map((mergedItem) => (
                             <li
                                 key={`${mergedItem.product.id}-${mergedItem.size}`}
-                                className="w-full"
+                                className="w-full mb-8 lg:mb-0"
                             >
                                 <BagTile
                                     bagItem={mergedItem}
@@ -92,48 +93,50 @@ export default function Page() {
                         ))}
                     </ul>
                 ) : (
-                    <p>{"Your bag is empty!"}</p>
+                    <div className="flex justify-center items-center w-full">
+                        <p>{"Your bag is empty!"}</p>
+                    </div>
                 )}
-            </div>
-            <div className="flex flex-col px-8 py-6 w-full h-min mt-2 md:mt-0 md:w-2/5 md:ml-8 justify-evenly bg-background-lightest rounded-sm">
-                <p className="pb-6 font-semibold text-sz-subheading lg:text-sz-subheading-lg whitespace-nowrap">
-                    Order Summary
-                </p>
-                <div>
-                    <div className="flex justify-between py-3">
-                        <p>Subtotal</p>
-                        <p>£{stringifyConvertPrice(orderSubtotal)}</p>
+                <div className="flex flex-col px-8 py-6 w-full h-min md:w-2/5 md:ml-8 justify-evenly bg-background-lightest rounded-sm">
+                    <p className="pb-6 font-semibold text-sz-subheading lg:text-sz-subheading-lg whitespace-nowrap">
+                        Order Summary
+                    </p>
+                    <div>
+                        <div className="flex justify-between py-3">
+                            <p>Subtotal</p>
+                            <p>£{stringifyConvertPrice(orderSubtotal)}</p>
+                        </div>
+                        <div className="flex justify-between py-3 border-b-2">
+                            <p>Shipping</p>
+                            <p>
+                                {shippingCost ? (
+                                    <>
+                                        <span>£</span>
+                                        <span>{stringifyConvertPrice(shippingCost)}</span>
+                                    </>
+                                ) : (
+                                    "-"
+                                )}
+                            </p>
+                        </div>
+                        <div className="flex justify-between py-3 font-semibold">
+                            <p>Total</p>
+                            <p>£{stringifyConvertPrice(orderTotal)}</p>
+                        </div>
                     </div>
-                    <div className="flex justify-between py-3 border-b-2">
-                        <p>Shipping</p>
-                        <p>
-                            {shippingCost ? (
-                                <>
-                                    <span>£</span>
-                                    <span>{stringifyConvertPrice(shippingCost)}</span>
-                                </>
-                            ) : (
-                                "-"
-                            )}
-                        </p>
-                    </div>
-                    <div className="flex justify-between py-3 font-semibold">
-                        <p>Total</p>
-                        <p>£{stringifyConvertPrice(orderTotal)}</p>
-                    </div>
+                    {!(emptyBag || noStock) && (
+                        <div className="flex pt-4 w-full justify-center">
+                            <GoButton
+                                onClick={handleCheckout}
+                                predicate={!(emptyBag || noStock)}
+                                disabled={emptyBag || noStock}
+                            >
+                                Checkout
+                            </GoButton>
+                        </div>
+                    )}
                 </div>
-                {!(emptyBag || noStock) && (
-                    <div className="flex pt-4 w-full justify-center">
-                        <GoButton
-                            onClick={handleCheckout}
-                            predicate={!(emptyBag || noStock)}
-                            disabled={emptyBag || noStock}
-                        >
-                            Checkout
-                        </GoButton>
-                    </div>
-                )}
             </div>
-        </div>
+        </MainLayout>
     );
 }

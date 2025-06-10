@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getProductData } from "@/lib/actions";
 import ProductPageClient from "./ProductPageClient";
+import MainLayout from "@/ui/layouts/MainLayout";
 
 export default async function Page({ params }: { params: { slug: string } }) {
     const { slug } = params;
@@ -12,5 +13,9 @@ export default async function Page({ params }: { params: { slug: string } }) {
 
     const [productData] = productFetch.data;
 
-    return <ProductPageClient productData={productData} />;
+    return (
+        <MainLayout>
+            <ProductPageClient productData={productData} />
+        </MainLayout>
+    );
 }

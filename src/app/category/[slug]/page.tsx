@@ -1,5 +1,6 @@
 import { Categories, VALID_CATEGORIES } from "@/lib/definitions";
 import CategoryGridPage from "@/ui/components/CategoryGridPage";
+import MainLayout from "@/ui/layouts/MainLayout";
 import { notFound } from "next/navigation";
 
 export default async function CategoryPage({ params }: { params: { slug: string } }) {
@@ -9,5 +10,11 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         notFound();
     }
 
-    return <CategoryGridPage category={slug as Categories} />;
+    const subheaderText = slug === "all" ? "All Products" : VALID_CATEGORIES[slug as Categories];
+
+    return (
+        <MainLayout subheaderText={subheaderText}>
+            <CategoryGridPage category={slug as Categories} />
+        </MainLayout>
+    );
 }
