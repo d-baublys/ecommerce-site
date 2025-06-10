@@ -30,6 +30,8 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
     }
 
     function scrollActiveIntoView() {
+        const lastScroll: ScrollToOptions = { top: window.scrollY, left: window.scrollX };
+
         const element = document.getElementById(`featured-${activeFeaturedRef.current + 1}`);
         if (element) {
             element.scrollIntoView({
@@ -41,6 +43,8 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                 setIsScrolling(false);
             }, 200);
         }
+
+        window.scrollTo(lastScroll);
     }
     const debouncedScrollIntoView = debounce(scrollActiveIntoView, 200);
 

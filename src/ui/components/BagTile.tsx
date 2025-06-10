@@ -45,7 +45,7 @@ export default function BagTile({
                             ></Image>
                         </div>
                         <div className="flex flex-col justify-between">
-                            <div className="text-sz-subheading lg:text-sz-subheading-lg font-semibold">
+                            <div className="text-sz-interm lg:text-sz-interm-lg font-semibold">
                                 <p>{productData.name.toUpperCase()}</p>
                             </div>
                             <div className="text-component-color">
@@ -56,7 +56,7 @@ export default function BagTile({
                 }
             </Link>
             <div className="flex flex-col justify-between items-end h-full w-24">
-                <p className="text-sz-subheading lg:text-sz-subheading-lg">
+                <p className="text-sz-interm lg:text-sz-interm-lg">
                     <span>£</span>
                     <span>{stringifyConvertPrice(productData.price * bagItem.quantity)}</span>
                 </p>
