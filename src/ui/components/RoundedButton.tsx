@@ -1,10 +1,10 @@
 export interface RoundedButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    className?: string;
+    overrideClasses?: string;
 }
 
 export default function RoundedButton({
     type = "button",
-    className: overrideClasses,
+    overrideClasses,
     ...props
 }: RoundedButtonProps) {
     return (

@@ -178,7 +178,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                     type="file"
                     onChange={(e) => handleFileSelect(e)}
                     legend="Image Path"
-                    className="hidden"
+                    overrideClasses="hidden"
                 />
                 <div className="flex items-center gap-4">
                     <RoundedButton onClick={handleBrowse}>
@@ -215,12 +215,12 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
             </div>
             <div className="flex justify-between gap-8">
                 {productChanged && (
-                    <RoundedButton className="w-full" onClick={handleSubmit}>
+                    <RoundedButton overrideClasses="w-full" onClick={handleSubmit}>
                         {mode === "add" ? "Add" : "Save"}
                     </RoundedButton>
                 )}
                 {productChanged && (
-                    <RoundedButton className="w-full" onClick={handleCancel}>
+                    <RoundedButton overrideClasses="w-full" onClick={handleCancel}>
                         Cancel
                     </RoundedButton>
                 )}
@@ -228,7 +228,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
             {mode === "edit" && (
                 <div className="flex justify-center w-full pt-4 border-t-black border-t-2">
                     <RoundedButton
-                        className="!bg-danger-color !text-contrasted !border-danger-color"
+                        overrideClasses="!bg-danger-color !text-contrasted !border-danger-color"
                         onClick={() => handleDelete(provisionalDataObj.id)}
                     >
                         Delete

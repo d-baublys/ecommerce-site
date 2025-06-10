@@ -153,7 +153,7 @@ export default function CategoryGridPage({ category }: { category: Categories | 
                 {!isFilterOpen && (
                     <div className="fixed bottom-[5%] left-1/2 translate-x-[-50%] lg:hidden">
                         <RoundedButton
-                            className="!bg-black !text-contrasted !border-black [filter:drop-shadow(0_0_2px_rgba(255,255,255,0.5))]"
+                            overrideClasses="!bg-black !text-contrasted !border-black [filter:drop-shadow(0_0_2px_rgba(255,255,255,0.5))]"
                             onClick={() => setIsFilterOpen(true)}
                         >
                             Filter

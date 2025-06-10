@@ -123,7 +123,7 @@ export default function ProductTile({ product }: { product: Product }) {
                             </div>
                             <div className="absolute bottom-0 left-0 w-full p-4">
                                 {!isQuickAddActive && availableSizes.length > 0 ? (
-                                    <RoundedButton className="w-full" onClick={handleQuickAddClick}>
+                                    <RoundedButton overrideClasses="w-full" onClick={handleQuickAddClick}>
                                         Quick Add
                                     </RoundedButton>
                                 ) : availableSizes.length > 0 ? (

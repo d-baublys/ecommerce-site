@@ -24,7 +24,7 @@ export default function AdminProductsClient({ productData }: { productData: Prod
                     <li key={category}>
                         <RoundedButton
                             onClick={() => setFilter(category as Categories)}
-                            className={`capitalize ${
+                            overrideClasses={`${
                                 filter === category &&
                                 "!bg-component-color !border-component-color !text-contrasted"
                             }`}

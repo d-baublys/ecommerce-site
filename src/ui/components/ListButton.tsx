@@ -6,13 +6,13 @@ import { usePathname } from "next/navigation";
 interface ListButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     link?: string;
     relativeLink?: boolean;
-    className?: string;
+    overrideClasses?: string;
 }
 
 export default function ListButton({
     link,
     relativeLink,
-    className: overrideClasses,
+    overrideClasses,
     ...props
 }: ListButtonProps) {
     const pathname = usePathname();

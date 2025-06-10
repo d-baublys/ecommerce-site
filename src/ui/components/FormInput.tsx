@@ -1,13 +1,14 @@
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     legend: string;
+    overrideClasses?: string;
     ref?: React.RefObject<HTMLInputElement | null>;
 }
 
 export default function FormInput({
     type = "text",
     legend,
+    overrideClasses,
     ref,
-    className: overrideClasses,
     ...props
 }: FormInputProps) {
     return (
