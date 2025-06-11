@@ -54,7 +54,7 @@ export default function NavBar() {
                 } [transition:top_0.5s_ease]`}
             >
                 <div className="flex justify-evenly items-center w-full min-h-full">
-                    <div className="flex justify-start sm:justify-center w-full md:w-auto px-(--gutter) md:px-(--gutter-md) order-1 sm:order-2">
+                    <div className="flex justify-start sm:justify-center w-full sm:w-auto px-(--gutter) sm:px-0 order-1 sm:order-2">
                         <Link href={"/"} className="relative">
                             <Image
                                 src="/dbwearopt.svg"

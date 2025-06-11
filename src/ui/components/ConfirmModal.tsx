@@ -33,7 +33,7 @@ export default function ConfirmModal() {
                 <div
                     id="modal"
                     onClick={(e) => e.stopPropagation()}
-                    className="flex flex-col w-[500px] h-[250px] bg-white justify-evenly p-8 rounded-2xl drop-shadow-2xl"
+                    className="flex flex-col min-w-[360px] max-w-[480px] h-[250px] bg-white justify-evenly p-8 rounded-2xl drop-shadow-2xl"
                 >
                     <p className="text-center">
                         Are you sure you want to delete this product? This action cannot be undone.

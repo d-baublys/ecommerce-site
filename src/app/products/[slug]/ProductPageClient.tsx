@@ -38,80 +38,83 @@ export default function ProductPageClient({ productData }: { productData: Produc
     }, [size, bag]);
 
     return (
-        <section
-            id="product-container"
-            className="flex flex-col md:flex-row grow w-full max-w-[960px]"
-        >
-            <div className="flex justify-center w-full md:w-1/2 md:m-8">
-                <div
-                    id="product-img-wrapper"
-                    className="relative aspect-[2/3] w-full md:w-auto md:h-[500px] snap-center drop-shadow-(--tile-shadow) z-0"
-                >
-                    <Image
-                        src={productData.src}
-                        alt={productData.alt}
-                        fill
-                        sizes="auto"
-                        className="object-cover rounded-md"
-                    />
+        <div className="flex grow justify-center items-center">
+            <div
+                id="product-container"
+                className="flex flex-col md:flex-row grow w-full max-w-[900px]"
+            >
+                <div className="flex justify-center w-full md:w-1/2">
+                    <div
+                        id="product-img-wrapper"
+                        className="relative aspect-[2/3] w-full md:w-auto md:h-[500px] snap-center drop-shadow-(--tile-shadow) z-0"
+                    >
+                        <Image
+                            src={productData.src}
+                            alt={productData.alt}
+                            fill
+                            sizes="auto"
+                            className="object-cover rounded-md"
+                        />
+                    </div>
+                </div>
+                <div id="product-aside" className="flex flex-col md:w-1/2 gap-8 mt-8 md:mt-0 md:ml-4">
+                    <div>
+                        <p>{productData.name}</p>
+                    </div>
+                    <div className="font-semibold">
+                        <p>{getLocalFormatting(productData.price)}</p>
+                    </div>
+                    <select
+                        className="p-2 bg-white border-2 rounded-md"
+                        value={size}
+                        defaultValue={"default"}
+                        required
+                        onChange={(e) => setSize(e.target.value as Sizes)}
+                    >
+                        <option value="default" hidden>
+                            Please select a size
+                        </option>
+                        {VALID_SIZES.filter((size) => size in productData.stock).map(
+                            (productSize) => {
+                                const netStock = getNetStock(
+                                    productData,
+                                    productSize as keyof typeof productData.stock,
+                                    bag
+                                );
+                                return (
+                                    <option
+                                        key={productSize}
+                                        value={productSize}
+                                        className={`${!netStock && "text-component-color"}`}
+                                        disabled={!netStock}
+                                    >
+                                        {productSize.toUpperCase()} {!netStock && " - out of stock"}
+                                    </option>
+                                );
+                            }
+                        )}
+                    </select>
+                    <GoButton
+                        onClick={() =>
+                            addToBag({ product: productData, size: size as Sizes, quantity: 1 })
+                        }
+                        predicate={!(size === undefined || isButtonDisabled)}
+                        disabled={size === undefined || isButtonDisabled}
+                    >
+                        Add to Bag <IoBag />
+                    </GoButton>
+                    <RoundedButton
+                        onClick={() =>
+                            !inWishlist
+                                ? addToWishlist(productData)
+                                : removeFromWishlist(productData.id)
+                        }
+                    >
+                        <span>{!inWishlist ? "Add to Wishlist" : "Remove from Wishlist"}</span>
+                        {inWishlist ? <IoHeart /> : <IoHeartOutline className="stroked-path" />}
+                    </RoundedButton>
                 </div>
             </div>
-            <div id="product-aside" className="flex flex-col md:w-1/2 min-h-full m-8 gap-8 ">
-                <div>
-                    <p>{productData.name}</p>
-                </div>
-                <div className="font-semibold">
-                    <p>{getLocalFormatting(productData.price)}</p>
-                </div>
-                <select
-                    className="p-2 bg-white border-2 rounded-md"
-                    value={size}
-                    defaultValue={"default"}
-                    required
-                    onChange={(e) => setSize(e.target.value as Sizes)}
-                >
-                    <option value="default" hidden>
-                        Please select a size
-                    </option>
-                    {VALID_SIZES.filter((size) => size in productData.stock).map((productSize) => {
-                        const netStock = getNetStock(
-                            productData,
-                            productSize as keyof typeof productData.stock,
-                            bag
-                        );
-
-                        return (
-                            <option
-                                key={productSize}
-                                value={productSize}
-                                className={`${!netStock && "text-component-color"}`}
-                                disabled={!netStock}
-                            >
-                                {productSize.toUpperCase()} {!netStock && " - out of stock"}
-                            </option>
-                        );
-                    })}
-                </select>
-                <GoButton
-                    onClick={() =>
-                        addToBag({ product: productData, size: size as Sizes, quantity: 1 })
-                    }
-                    predicate={!(size === undefined || isButtonDisabled)}
-                    disabled={size === undefined || isButtonDisabled}
-                >
-                    Add to Bag <IoBag />
-                </GoButton>
-                <RoundedButton
-                    onClick={() =>
-                        !inWishlist
-                            ? addToWishlist(productData)
-                            : removeFromWishlist(productData.id)
-                    }
-                >
-                    <span>{!inWishlist ? "Add to Wishlist" : "Remove from Wishlist"}</span>
-                    {inWishlist ? <IoHeart /> : <IoHeartOutline className="stroked-path" />}
-                </RoundedButton>
-            </div>
-        </section>
+        </div>
     );
 }

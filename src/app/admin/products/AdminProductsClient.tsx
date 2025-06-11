@@ -29,14 +29,14 @@ export default function AdminProductsClient({ productData }: { productData: Prod
                                 "!bg-component-color !border-component-color !text-contrasted"
                             }`}
                         >
-                            {category}
+                            {VALID_CATEGORIES[category as Categories]}
                         </RoundedButton>
                     </li>
                 ))}
             </ul>
-            <div className="flex justify-center items-center w-full h-full">
+            <div className="flex justify-center w-full grow">
                 {filter ? (
-                    <ul className="flex flex-col w-full h-full">
+                    <ul className="flex flex-col w-full">
                         {querySet.length > 0 ? (
                             querySet.map((item: Product) => (
                                 <li key={item.id} className="mt-8">
@@ -50,7 +50,7 @@ export default function AdminProductsClient({ productData }: { productData: Prod
                         )}
                     </ul>
                 ) : (
-                    <div className="pt-8">
+                    <div className="mt-8">
                         <p>{"Please select a filter"}</p>
                     </div>
                 )}

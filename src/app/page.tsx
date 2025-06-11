@@ -3,6 +3,7 @@ import Carousel from "@/ui/components/Carousel";
 import { getFeaturedProducts, getProductData } from "@/lib/actions";
 import Link from "next/link";
 import { FEATURED_COUNT } from "@/lib/definitions";
+import BareLayout from "@/ui/layouts/BareLayout";
 
 export default async function Home() {
     const featuredFetch = await getFeaturedProducts();
@@ -14,7 +15,11 @@ export default async function Home() {
         const fallbackData = fallbackFetch.data;
 
         if (!fallbackData.length) {
-            return <p>No featured or fallback products to display</p>;
+            return (
+                <BareLayout>
+                    <p>No featured or fallback products to display</p>
+                </BareLayout>
+            );
         }
 
         featuredList = fallbackData.slice(0, FEATURED_COUNT);

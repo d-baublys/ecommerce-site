@@ -50,14 +50,14 @@ export default function ManageFeaturedClient({ productData }: { productData: Pro
     }, [isListChanged]);
 
     return (
-        <div className="flex flex-col grow justify-center items-center w-full h-full">
-            <div className="w-3/4 h-10">
+        <div className="flex flex-col justify-center items-center w-full h-full">
+            <div className="w-full h-10">
                 <SearchBar handleResultClick={handleResultClick} />
             </div>
             {provisionalFeaturedList.length > 0 ? (
                 <ul className="flex flex-col w-full">
                     {provisionalFeaturedList.map((featuredProd) => (
-                        <li key={featuredProd.id} className="pt-8">
+                        <li key={featuredProd.id} className="mt-8">
                             <DisplayTile
                                 productData={featuredProd}
                                 handleDelete={() =>
@@ -70,12 +70,20 @@ export default function ManageFeaturedClient({ productData }: { productData: Pro
                     ))}
                 </ul>
             ) : (
-                <p>{"Featured item list is empty"}</p>
+                <div className="flex items-center mt-8 h-full">
+                    <p>{"Featured item list is empty"}</p>
+                </div>
             )}
-            <div className="flex gap-8">
-                {isListChanged && <RoundedButton onClick={handleSave}>Save</RoundedButton>}
-                {isListChanged && <RoundedButton onClick={handleCancel}>Cancel</RoundedButton>}
-            </div>
+            {isListChanged ? (
+                <>
+                    <div className="flex grow items-end">
+                        <div className="flex gap-8 mt-8  h-min">
+                            <RoundedButton onClick={handleSave}>Save</RoundedButton>{" "}
+                            <RoundedButton onClick={handleCancel}>Cancel</RoundedButton>
+                        </div>
+                    </div>
+                </>
+            ) : null}
         </div>
     );
 }

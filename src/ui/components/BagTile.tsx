@@ -55,7 +55,7 @@ export default function BagTile({
                     </div>
                 }
             </Link>
-            <div className="flex flex-col justify-between items-end h-full w-24">
+            <div className="flex flex-col justify-between items-end h-full w-24 ml-8">
                 <p className="text-sz-interm lg:text-sz-interm-lg">
                     <span>£</span>
                     <span>{stringifyConvertPrice(productData.price * bagItem.quantity)}</span>
@@ -64,7 +64,7 @@ export default function BagTile({
                     {stock ? (
                         <select
                             value={bagItem.quantity}
-                            className="h-10 w-10 pl-1 border-2 rounded-md"
+                            className="h-10 w-10 pl-1 border-2 rounded-md bg-white"
                             onChange={(e) =>
                                 updateQuantity(productData.id, bagItem.size, Number(e.target.value))
                             }

@@ -33,7 +33,7 @@ export default function BaseGridPage({
             ) : null}
             <div className="flex flex-row grow">
                 {asideContent ?? null}
-                <div className="flex flex-col w-full">
+                <div className="flex flex-col w-full overflow-clip">
                     <div className="flex justify-between w-full pb-4 font-semibold">
                         <p className="flex items-center gap-1">
                             <span>{displayedProducts.length}</span>
@@ -46,7 +46,7 @@ export default function BaseGridPage({
                             <ProductGrid productList={displayedProducts} />
                         ) : (
                             <div className="flex justify-center items-center w-full p-4 gap-4">
-                                <p>{noProductMessage}</p>
+                                <p className="text-center">{noProductMessage}</p>
                             </div>
                         )}
                     </div>

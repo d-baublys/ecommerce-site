@@ -7,7 +7,7 @@ export default function MainWrapper({
 }) {
     return (
         <div
-            className={`flex flex-col grow h-full px-(--gutter-sm) sm:px-(--gutter) py-8 lg:px-(--gutter-md) bg-green-500 ${
+            className={`flex flex-col grow px-(--gutter-sm) sm:px-(--gutter) py-8 lg:px-(--gutter-md) ${
                 overrideClasses ?? ""
             }`}
         >
