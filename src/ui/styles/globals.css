@@ -108,3 +108,14 @@ body {
 .loading-circle:nth-child(5) {
     animation-delay: 0s;
 }
+
+#product-img-wrapper::before {
+    display: var(--image-display, none);
+    position: absolute;
+    content: "";
+    inset: 0;
+    z-index: 1;
+    background-image: var(--zoomed-bg);
+    background-size: 200%;
+    background-position: var(--image-x) var(--image-y);
+}

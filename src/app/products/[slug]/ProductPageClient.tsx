@@ -10,6 +10,7 @@ import { IoBag, IoHeart, IoHeartOutline } from "react-icons/io5";
 import { getNetStock } from "@/lib/utils";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import RoundedButton from "@/ui/components/RoundedButton";
+import ZoomableImage from "@/ui/components/ZoomableImage";
 
 export default function ProductPageClient({ productData }: { productData: Product }) {
     const [size, setSize] = useState<Sizes>();
@@ -44,20 +45,12 @@ export default function ProductPageClient({ productData }: { productData: Produc
                 className="flex flex-col md:flex-row grow w-full max-w-[900px]"
             >
                 <div className="flex justify-center w-full md:w-1/2">
-                    <div
-                        id="product-img-wrapper"
-                        className="relative aspect-[2/3] w-full md:w-auto md:h-[500px] snap-center drop-shadow-(--tile-shadow) z-0"
-                    >
-                        <Image
-                            src={productData.src}
-                            alt={productData.alt}
-                            fill
-                            sizes="auto"
-                            className="object-cover rounded-md"
-                        />
-                    </div>
+                    <ZoomableImage productData={productData} />
                 </div>
-                <div id="product-aside" className="flex flex-col md:w-1/2 gap-8 mt-8 md:mt-0 md:ml-4">
+                <div
+                    id="product-aside"
+                    className="flex flex-col md:w-1/2 gap-8 mt-8 md:mt-0 md:ml-4"
+                >
                     <div>
                         <p>{productData.name}</p>
                     </div>
