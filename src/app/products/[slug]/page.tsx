@@ -14,7 +14,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
     const [productData] = productFetch.data;
 
     return (
-        <MainLayout>
+        <MainLayout lastCrumbText={productData.name}>
             <ProductPageClient productData={productData} />
         </MainLayout>
     );

@@ -39,7 +39,7 @@ export default function ProductPageClient({ productData }: { productData: Produc
     }, [size, bag]);
 
     return (
-        <div className="flex grow justify-center items-center">
+        <div className="flex grow justify-center items-start">
             <div
                 id="product-container"
                 className="flex flex-col md:flex-row grow w-full max-w-[900px]"

@@ -13,7 +13,10 @@ export default async function CategoryPage({ params }: { params: { slug: string 
     const subheaderText = slug === "all" ? "All Products" : VALID_CATEGORIES[slug as Categories];
 
     return (
-        <MainLayout subheaderText={subheaderText}>
+        <MainLayout
+            subheaderText={subheaderText}
+            lastCrumbText={slug === "all" ? "All" : subheaderText}
+        >
             <CategoryGridPage category={slug as Categories} />
         </MainLayout>
     );

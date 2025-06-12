@@ -93,7 +93,7 @@ export default function Page() {
                         ))}
                     </ul>
                 ) : (
-                    <div className="flex justify-center items-center w-full">
+                    <div className="flex justify-center items-center w-full h-full p-8 md:p-0">
                         <p>{"Your bag is empty!"}</p>
                     </div>
                 )}
