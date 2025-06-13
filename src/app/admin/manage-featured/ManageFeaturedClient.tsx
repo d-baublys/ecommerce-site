@@ -50,7 +50,7 @@ export default function ManageFeaturedClient({ productData }: { productData: Pro
     }, [isListChanged]);
 
     return (
-        <div className="flex flex-col justify-center items-center w-full h-full">
+        <div className="flex flex-col justify-start items-center w-full h-full">
             <div className="w-full h-10">
                 <SearchBar handleResultClick={handleResultClick} />
             </div>

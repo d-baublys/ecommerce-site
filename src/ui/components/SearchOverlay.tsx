@@ -31,15 +31,14 @@ export default function SearchOverlay() {
 
     return (
         <>
-            {
-                <DarkBackdrop
-                    zIndex={50}
-                    onClick={() => closeOverlay()}
-                    classes={`[transition:all_0.1s_ease] ${
-                        isSearchLoaded ? "!opacity-75" : "!opacity-0"
-                    }`}
-                />
-            }
+            <DarkBackdrop
+                zIndex={50}
+                onClick={() => closeOverlay()}
+                classes={`[transition:all_0.1s_ease] ${
+                    isSearchLoaded ? "!opacity-75" : "!opacity-0"
+                }`}
+            />
+
             <div
                 className={`absolute top-0 left-0 flex justify-center w-full min-h-screen md:min-h-[400px] bg-white drop-shadow-xl [transition:all_0.2s_ease-out] ${
                     isSearchLoaded ? "opacity-100" : "opacity-0"
@@ -51,7 +50,11 @@ export default function SearchOverlay() {
                     }`}
                 >
                     <div className="flex justify-center items-start w-full mt-[13rem]">
-                        <SearchBar handleResultClick={handleResultClick} isGlobalSearch />
+                        <SearchBar
+                            handleResultClick={handleResultClick}
+                            handleSearchClose={() => closeOverlay()}
+                            isGlobalSearch
+                        />
                         <div className="flex items-center h-searchbar-height pl-0.5">
                             <CloseButton onClick={() => closeOverlay()} />
                         </div>

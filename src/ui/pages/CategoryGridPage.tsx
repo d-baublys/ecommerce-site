@@ -7,6 +7,7 @@ import {
     ProductSortKey,
     Sizes,
     SORT_OPTIONS,
+    VALID_CATEGORIES,
 } from "@/lib/definitions";
 import GridAside from "@/ui/components/GridAside";
 import { useEffect, useRef, useState } from "react";
@@ -16,8 +17,24 @@ import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import SlideDownMenu from "@/ui/components/SlideDownMenu";
 import BaseGridPage from "@/ui/pages/BaseGridPage";
 import RoundedButton from "@/ui/components/RoundedButton";
+import Link from "next/link";
 
-export default function CategoryGridPage({ category }: { category: Categories | "all" }) {
+type pageOptions = {
+    noAside?: boolean;
+    noCategoryTabs?: boolean;
+    noOverlays?: boolean;
+    noSorting?: boolean;
+};
+
+export default function CategoryGridPage({
+    category,
+    options,
+    query,
+}: {
+    category: Categories | "all";
+    options?: pageOptions;
+    query?: string;
+}) {
     const [allCategoryProducts, setAllCategoryProducts] = useState<Product[]>();
     const [filteredProducts, setFilteredProducts] = useState<Product[]>();
 
@@ -34,7 +51,7 @@ export default function CategoryGridPage({ category }: { category: Categories | 
         const fetchInitial = async () => {
             try {
                 setIsQueryLoading(true);
-                const products = await fetchFilteredProducts({ category });
+                const products = await fetchFilteredProducts({ category, query });
 
                 setAllCategoryProducts(products);
                 setIsQueryLoading(false);
@@ -44,7 +61,7 @@ export default function CategoryGridPage({ category }: { category: Categories | 
         };
 
         fetchInitial();
-    }, []);
+    }, [query]);
 
     useEffect(() => {
         const fetchFiltered = async () => {
@@ -55,6 +72,7 @@ export default function CategoryGridPage({ category }: { category: Categories | 
                     sizeFilters,
                     priceFilters,
                     productSort,
+                    query,
                 });
 
                 if (isFirstLoad.current) {
@@ -73,7 +91,21 @@ export default function CategoryGridPage({ category }: { category: Categories | 
         };
 
         fetchFiltered();
-    }, [category, sizeFilters, priceFilters, productSort]);
+    }, [category, sizeFilters, priceFilters, productSort, query]);
+
+    const categoryTabs = () => {
+        return (
+            <ul className="flex w-full border-b-2 gap-8 mb-8 py-2">
+                {Object.entries(VALID_CATEGORIES).map(([key, displayName]) => (
+                    <li key={key}>
+                        <Link href={`/category/${key}`}>
+                            <div>{displayName}</div>
+                        </Link>
+                    </li>
+                ))}
+            </ul>
+        );
+    };
 
     const loadingIndicator = () => {
         return (
@@ -133,7 +165,7 @@ export default function CategoryGridPage({ category }: { category: Categories | 
     const asideContent = () => {
         return (
             <aside id="filter-aside" className="hidden lg:flex [flex:1_0_250px] mr-8">
-                <div className="sticky top-(--nav-height)">
+                <div className="sticky top-(--nav-height) w-full">
                     <GridAside
                         allCategoryProducts={allCategoryProducts}
                         sizeFilters={sizeFilters}
@@ -173,18 +205,22 @@ export default function CategoryGridPage({ category }: { category: Categories | 
         );
     };
 
+    const shouldRenderAside = !options?.noAside && (filteredProducts.length > 0 || !query);
+
     return (
         <BaseGridPage
             displayedProducts={filteredProducts}
             noProductMessage={
                 allCategoryProducts.length > 0
                     ? "No products matching your filter"
+                    : query !== undefined
+                    ? "No products matching your search"
                     : "No products to display"
             }
-            category={category}
-            asideContent={asideContent()}
-            fixedOverlays={fixedOverlays()}
-            sortingUnit={sortingUnit()}
+            categoryTabs={!options?.noCategoryTabs && categoryTabs()}
+            asideContent={shouldRenderAside && asideContent()}
+            fixedOverlays={!options?.noOverlays && fixedOverlays()}
+            sortingUnit={!options?.noSorting && sortingUnit()}
         />
     );
 }

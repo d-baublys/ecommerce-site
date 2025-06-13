@@ -149,11 +149,13 @@ export async function fetchFilteredProducts({
     sizeFilters = [],
     priceFilters = [],
     productSort,
+    query,
 }: {
     category: Categories | "all";
     sizeFilters?: Sizes[];
     priceFilters?: string[];
     productSort?: ProductSortKey;
+    query?: string;
 }) {
     const filterQuery: Prisma.ProductWhereInput = {
         stock: {
@@ -179,6 +181,10 @@ export async function fetchFilteredProducts({
             const { min, max } = PRICE_FILTER_OPTIONS[key as PriceFilterKey];
             return isFinite(max) ? { price: { gte: min, lt: max } } : { price: { gte: min } };
         });
+    }
+
+    if (query) {
+        filterQuery.name = { contains: query };
     }
 
     const orderBy = productSort && SORT_OPTIONS[productSort].sort;

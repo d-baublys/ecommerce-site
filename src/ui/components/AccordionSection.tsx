@@ -15,7 +15,7 @@ export default function AccordionSection({
     return (
         <>
             <div
-                className="flex justify-between items-center py-4 cursor-pointer"
+                className="flex justify-between items-center py-4 border-t-1 cursor-pointer"
                 onClick={() => setIsOpen((prev) => !prev)}
             >
                 <div className="w-full">

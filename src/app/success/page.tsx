@@ -8,7 +8,8 @@ import BareLayout from "@/ui/layouts/BareLayout";
 import { getOrder } from "@/lib/actions";
 
 export default async function Page({ searchParams }: { searchParams: { session_id?: string } }) {
-    const session_id = await searchParams.session_id;
+    const params = await searchParams;
+    const session_id = params.session_id;
 
     if (!session_id) notFound();
 

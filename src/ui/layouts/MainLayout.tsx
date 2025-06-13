@@ -1,16 +1,24 @@
 import MainWrapperWithSubheader from "./MainWrapperWithSubheader";
 
+export interface MainLayoutProps {
+    children: React.ReactNode;
+    subheaderText?: string;
+    lastCrumbText?: string;
+    noCrumbs?: boolean;
+}
+
 export default function MainLayout({
     children,
     subheaderText,
     lastCrumbText,
-}: {
-    children: React.ReactNode;
-    subheaderText?: string;
-    lastCrumbText?: string;
-}) {
+    noCrumbs,
+}: MainLayoutProps) {
     return (
-        <MainWrapperWithSubheader subheaderText={subheaderText} lastCrumbText={lastCrumbText}>
+        <MainWrapperWithSubheader
+            subheaderText={subheaderText}
+            lastCrumbText={lastCrumbText}
+            noCrumbs={noCrumbs}
+        >
             {children}
         </MainWrapperWithSubheader>
     );

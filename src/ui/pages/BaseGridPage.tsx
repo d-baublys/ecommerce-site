@@ -6,31 +6,21 @@ import Link from "next/link";
 export default function BaseGridPage({
     displayedProducts,
     noProductMessage,
-    category,
+    categoryTabs,
     asideContent,
     fixedOverlays,
     sortingUnit,
 }: {
     displayedProducts: Product[];
     noProductMessage: string;
-    category?: Categories | "all";
+    categoryTabs?: React.ReactNode;
     asideContent?: React.ReactNode;
     fixedOverlays?: React.ReactNode;
     sortingUnit?: React.ReactNode;
 }) {
     return (
         <>
-            {category === "all" ? (
-                <ul className="flex w-full border-b-2 gap-8 mb-8 py-2">
-                    {Object.entries(VALID_CATEGORIES).map(([key, displayName]) => (
-                        <li key={key}>
-                            <Link href={`/category/${key}`}>
-                                <div>{displayName}</div>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            ) : null}
+            {categoryTabs ?? null}
             <div className="flex flex-row grow">
                 {asideContent ?? null}
                 <div className="flex flex-col w-full overflow-clip">

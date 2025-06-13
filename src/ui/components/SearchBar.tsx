@@ -2,16 +2,18 @@
 
 import { getProductData } from "@/lib/actions";
 import { Product } from "@/lib/definitions";
-import { debounce } from "@/lib/utils";
+import { debounce, fetchFilteredProducts } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { IoCloseCircle, IoSearch } from "react-icons/io5";
 
 export default function SearchBar({
     handleResultClick,
+    handleSearchClose,
     isGlobalSearch,
 }: {
     handleResultClick: (product: Product) => void;
+    handleSearchClose?: () => void;
     isGlobalSearch?: boolean;
 }) {
     const [productList, setProductList] = useState<Product[]>();
@@ -24,9 +26,9 @@ export default function SearchBar({
 
     useEffect(() => {
         const getData = async () => {
-            const productFetch = await getProductData();
+            const productFetch = await fetchFilteredProducts({ category: "all" });
 
-            setProductList(productFetch.data);
+            setProductList(productFetch);
             setHasMounted(true);
         };
 
@@ -66,7 +68,8 @@ export default function SearchBar({
     const handleSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<SVGElement>) => {
         e.preventDefault();
         if (!query.trim() || !isGlobalSearch) return;
-        router.push(`/search?q=${encodeURIComponent(query)}`);
+        handleSearchClose && handleSearchClose();
+        router.push(`/results?q=${encodeURIComponent(query)}`);
     };
 
     const clearAll = () => {
@@ -77,6 +80,7 @@ export default function SearchBar({
     const handleClick = (product: Product) => {
         handleResultClick(product);
         clearAll();
+        handleSearchClose && handleSearchClose();
     };
 
     return (

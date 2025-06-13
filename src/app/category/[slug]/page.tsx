@@ -1,5 +1,5 @@
 import { Categories, VALID_CATEGORIES } from "@/lib/definitions";
-import CategoryGridPage from "./CategoryGridPage";
+import CategoryGridPage from "@/ui/pages/CategoryGridPage";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { notFound } from "next/navigation";
 
