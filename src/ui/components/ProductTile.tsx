@@ -121,20 +121,23 @@ export default function ProductTile({ product }: { product: Product }) {
                                     )}
                                 </div>
                             </div>
-                            <div className="absolute bottom-0 left-0 w-full p-4">
+                            <div className="absolute bottom-0 left-0 w-full p-2 md:p-3">
                                 {!isQuickAddActive && availableSizes.length > 0 ? (
-                                    <RoundedButton overrideClasses="w-full" onClick={handleQuickAddClick}>
+                                    <RoundedButton
+                                        overrideClasses="w-full"
+                                        onClick={handleQuickAddClick}
+                                    >
                                         Quick Add
                                     </RoundedButton>
                                 ) : availableSizes.length > 0 ? (
                                     <ul
-                                        className="flex flex-wrap justify-center gap-4 p-2 bg-background-lightest rounded-full cursor-auto"
+                                        className="flex flex-wrap justify-center gap-[2%] md:gap-[5%] p-2 bg-background-lightest rounded-full cursor-auto"
                                         onClick={isolateInteraction}
                                     >
                                         {availableSizes.map((size) => (
-                                            <li key={size}>
+                                            <li key={size} className="p-1">
                                                 <button
-                                                    className="flex justify-center items-center h-12 aspect-square bg-white text-sz-base lg:text-sz-base-lg [border-radius:50%] cursor-pointer"
+                                                    className="flex justify-center items-center h-8 md:h-10 aspect-square bg-white text-sz-label-button md:text-sz-label-button-lg [border-radius:50%] cursor-pointer"
                                                     onClick={(e) =>
                                                         handleSizeClick(e, size as Sizes)
                                                     }
