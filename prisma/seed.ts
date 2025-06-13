@@ -1,85 +1,246 @@
-import { prisma } from "@/lib/prisma";
+import { v4 as uuid } from "uuid";
+
+import { PrismaClient } from "../generated/prisma";
+import { processDateForClient, slugify } from "../src/lib/utils";
+
+const prisma = new PrismaClient();
 
 async function main() {
-    await prisma.product.createMany({
-        data: [
-            {
-                name: "T-shirt design 1",
+    const createProductOne = async () => {
+        const name = "T-shirt design 1";
+
+        const createdProduct = await prisma.product.create({
+            data: {
+                name,
                 gender: "womens",
                 price: 2200,
-                slug: "t-shirt-design-1",
+                slug: slugify(name),
                 src: "/tshirt1.jpg",
                 alt: "T-shirt design 1",
-                stock: {
-                    xs: 5,
-                    s: 2,
-                    m: 3,
-                    l: 5,
-                    xl: 5,
-                },
+                dateAdded: new Date(),
             },
-            {
-                name: "T-shirt design 2",
+        });
+
+        await prisma.stock.createMany({
+            data: [
+                {
+                    size: "xs",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "s",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "m",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "l",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "xl",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+            ],
+        });
+    };
+
+    const createProductTwo = async () => {
+        const name = "T-shirt design 2";
+
+        const createdProduct = await prisma.product.create({
+            data: {
+                name,
                 gender: "womens",
-                price: 3000,
-                slug: "t-shirt-design-2",
+                price: 3600,
+                slug: slugify(name),
                 src: "/tshirt2.jpg",
                 alt: "T-shirt design 2",
-                stock: {
-                    xs: 5,
-                    s: 0,
-                    m: 3,
-                    l: 5,
-                    xl: 5,
-                },
+                dateAdded: new Date(),
             },
-            {
-                name: "T-shirt design 3",
+        });
+
+        await prisma.stock.createMany({
+            data: [
+                {
+                    size: "xs",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "s",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "m",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "l",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "xl",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+            ],
+        });
+    };
+
+    const createProductThree = async () => {
+        const name = "T-shirt design 3";
+
+        const createdProduct = await prisma.product.create({
+            data: {
+                name,
                 gender: "mens",
-                price: 2500,
-                slug: "t-shirt-design-3",
+                price: 8200,
+                slug: slugify(name),
                 src: "/tshirt3.jpg",
                 alt: "T-shirt design 3",
-                stock: {
-                    s: 2,
-                    m: 3,
-                    l: 0,
-                    xl: 5,
-                    xxl: 7,
-                },
+                dateAdded: new Date(),
             },
-            {
-                name: "T-shirt design 4",
+        });
+
+        await prisma.stock.createMany({
+            data: [
+                {
+                    size: "s",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "m",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "l",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "xl",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "xxl",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+            ],
+        });
+    };
+    const createProductFour = async () => {
+        const name = "T-shirt design 4";
+
+        const createdProduct = await prisma.product.create({
+            data: {
+                name,
                 gender: "mens",
-                price: 2700,
-                slug: "t-shirt-design-4",
+                price: 11000,
+                slug: slugify(name),
                 src: "/tshirt4.jpg",
                 alt: "T-shirt design 4",
-                stock: {
-                    s: 2,
-                    m: 3,
-                    l: 5,
-                    xl: 5,
-                    xxl: 7,
-                },
+                dateAdded: new Date(),
             },
-            {
-                name: "T-shirt design 5",
+        });
+
+        await prisma.stock.createMany({
+            data: [
+                {
+                    size: "s",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "m",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "l",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "xl",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "xxl",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+            ],
+        });
+    };
+    const createProductFive = async () => {
+        const name = "T-shirt design 5";
+
+        const createdProduct = await prisma.product.create({
+            data: {
+                name,
                 gender: "mens",
-                price: 2300,
-                slug: "t-shirt-design-5",
+                price: 20500,
+                slug: slugify(name),
                 src: "/tshirt5.jpg",
                 alt: "T-shirt design 5",
-                stock: {
-                    s: 2,
-                    m: 3,
-                    l: 5,
-                    xl: 5,
-                    xxl: 7,
-                },
+                dateAdded: new Date(),
             },
-        ],
-    });
+        });
+
+        await prisma.stock.createMany({
+            data: [
+                {
+                    size: "s",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "m",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "l",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "xl",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+                {
+                    size: "xxl",
+                    quantity: Math.floor(Math.random() * 20),
+                    productId: createdProduct.id,
+                },
+            ],
+        });
+    };
+
+    await Promise.all([
+        createProductOne(),
+        createProductTwo(),
+        createProductThree(),
+        createProductFour(),
+        createProductFive(),
+    ]);
 }
 
 main()

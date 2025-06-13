@@ -113,15 +113,31 @@ export async function productDelete(id: string) {
     }
 }
 
-export async function createOrder(orderItems: ItemMetadata[], sessionId: string) {
-    const orderTotal = orderItems.reduce((total, currentItem) => total + currentItem.price, 0);
-
+export async function createOrder({
+    items,
+    subTotal,
+    shippingTotal,
+    total,
+    sessionId,
+    email,
+    userId,
+}: {
+    items: ItemMetadata[];
+    subTotal: number;
+    shippingTotal: number;
+    total: number;
+    sessionId: string;
+    email: string;
+    userId?: number;
+}) {
     try {
-        await prisma.order.create({
+        const dataObj: Prisma.OrderCreateArgs = {
             data: {
-                total: orderTotal,
+                subTotal,
+                shippingTotal,
+                total,
                 items: {
-                    create: orderItems.map((item) => ({
+                    create: items.map((item) => ({
                         productId: item.productId,
                         name: item.name,
                         price: item.price,
@@ -130,8 +146,16 @@ export async function createOrder(orderItems: ItemMetadata[], sessionId: string)
                     })),
                 },
                 sessionId,
+                email,
             },
-        });
+        };
+
+        if (userId) {
+            dataObj.data.userId = userId;
+        }
+
+        await prisma.order.create(dataObj);
+
         return { success: true };
     } catch (error) {
         console.error("Error creating order: ", error);
@@ -139,10 +163,10 @@ export async function createOrder(orderItems: ItemMetadata[], sessionId: string)
     }
 }
 
-export async function getOrder(id: number) {
+export async function getOrder(where?: Prisma.OrderWhereInput) {
     try {
-        const order = await prisma.order.findUnique({
-            where: { id },
+        const order = await prisma.order.findFirst({
+            where: where,
         });
 
         return { data: order };

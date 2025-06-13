@@ -45,6 +45,7 @@ export async function POST(req: Request) {
                         quantity: bagItem.quantity,
                     }))
                 ),
+                shippingCost,
             },
             success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/bag`,

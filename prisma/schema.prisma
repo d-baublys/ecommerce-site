@@ -74,14 +74,17 @@ model OrderItem {
 }
 
 model Order {
-    id        Int         @id @default(autoincrement())
-    total     Int
-    items     OrderItem[]
-    status    OrderStatus @default(paid)
-    userId    Int?
-    user      User?       @relation(fields: [userId], references: [id])
-    createdAt DateTime    @default(now())
-    sessionId String
+    id            Int         @id @default(autoincrement())
+    subTotal      Int
+    shippingTotal Int
+    total         Int
+    items         OrderItem[]
+    status        OrderStatus @default(paid)
+    userId        Int?
+    user          User?       @relation(fields: [userId], references: [id])
+    email         String
+    createdAt     DateTime    @default(now())
+    sessionId     String
 }
 
 model User {

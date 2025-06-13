@@ -5,6 +5,7 @@ import { IoCheckmarkCircle } from "react-icons/io5";
 import { SuccessBagClearClient } from "./SuccessBagClearClient";
 import RoundedButton from "@/ui/components/RoundedButton";
 import BareLayout from "@/ui/layouts/BareLayout";
+import { getOrder } from "@/lib/actions";
 
 export default async function Page({ searchParams }: { searchParams: { session_id?: string } }) {
     const session_id = await searchParams.session_id;
@@ -14,6 +15,9 @@ export default async function Page({ searchParams }: { searchParams: { session_i
     const session = await stripe.checkout.sessions.retrieve(session_id);
 
     if (!session || session.payment_status !== "paid") notFound();
+
+    const savedOrder = await getOrder({ sessionId: session.id });
+    const orderNumber = savedOrder.data?.id;
 
     return (
         <BareLayout>
@@ -25,8 +29,8 @@ export default async function Page({ searchParams }: { searchParams: { session_i
                         <span className="">Thank you for your purchase!</span>
                         <div>
                             <p>
-                                <span>Your order number is </span>
-                                <span>#</span>
+                                <span>Your order number is: </span>
+                                <span className="font-semibold">{orderNumber}</span>
                             </p>
                         </div>
                     </div>
