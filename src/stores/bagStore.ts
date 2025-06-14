@@ -5,7 +5,7 @@ import { persist } from "zustand/middleware";
 
 type BagStore = {
     bag: BagItem[];
-    addToBag: (item: BagItem) => void;
+    addToBag: (item: BagItem) => boolean;
     removeFromBag: (id: string, size: Sizes) => void;
     clearBag: () => void;
     updateQuantity: (id: string, size: Sizes, quantity: number) => void;
@@ -19,6 +19,7 @@ export const useBagStore = create<BagStore>()(
             bag: [],
             addToBag: (newItem) => {
                 const currentBag = get().bag;
+                let permitted = true;
                 let updatedBag = currentBag;
                 const { product, size, quantity } = newItem;
 
@@ -42,12 +43,15 @@ export const useBagStore = create<BagStore>()(
                                   }
                                 : existingItem
                         );
+                    } else {
+                        permitted = false;
                     }
                 } else {
                     updatedBag = [...currentBag, newItem];
                 }
 
                 set({ bag: updatedBag });
+                return permitted;
             },
             removeFromBag: (id, size) => {
                 const currentBag = get().bag;

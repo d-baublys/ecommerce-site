@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Product } from "@/lib/definitions";
 import GoButton from "@/ui/components/GoButton";
 import { IoBag, IoHeart, IoHeartOutline } from "react-icons/io5";
-import { getNetStock } from "@/lib/utils";
+import { checkStock } from "@/lib/utils";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import RoundedButton from "@/ui/components/RoundedButton";
 import ZoomableImage from "@/ui/components/ZoomableImage";
@@ -29,14 +29,14 @@ export default function ProductPageClient({ productData }: { productData: Produc
     }
 
     useEffect(() => {
-        const selectedNetStock = getNetStock(
+        const selectedAvailable = checkStock(
             productData,
             size as keyof typeof productData.stock,
             bag
         );
 
-        setIsButtonDisabled(!selectedNetStock);
-    }, [size, bag]);
+        setIsButtonDisabled(!selectedAvailable);
+    }, [size, bag, productData]);
 
     return (
         <div className="flex grow justify-center items-start">
@@ -69,7 +69,7 @@ export default function ProductPageClient({ productData }: { productData: Produc
                         </option>
                         {VALID_SIZES.filter((size) => size in productData.stock).map(
                             (productSize) => {
-                                const netStock = getNetStock(
+                                const thisSizeAvailable = checkStock(
                                     productData,
                                     productSize as keyof typeof productData.stock,
                                     bag
@@ -78,10 +78,13 @@ export default function ProductPageClient({ productData }: { productData: Produc
                                     <option
                                         key={productSize}
                                         value={productSize}
-                                        className={`${!netStock && "text-component-color"}`}
-                                        disabled={!netStock}
+                                        className={`${
+                                            !thisSizeAvailable && "text-component-color"
+                                        }`}
+                                        disabled={!thisSizeAvailable}
                                     >
-                                        {productSize.toUpperCase()} {!netStock && " - out of stock"}
+                                        {productSize.toUpperCase()}{" "}
+                                        {!thisSizeAvailable && " - out of stock"}
                                     </option>
                                 );
                             }

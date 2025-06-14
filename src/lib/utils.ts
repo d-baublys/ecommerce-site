@@ -25,8 +25,8 @@ export function debounce<T extends (...args: unknown[]) => void>(func: T, delay:
     };
 }
 
-export function getNetStock(productData: Product, productSize: Sizes, bag: BagItem[]) {
-    const backendStock = productData.stock[productSize as keyof typeof productData.stock];
+export function checkStock(productData: Product, productSize: Sizes, bag: BagItem[]) {
+    const stock = productData.stock[productSize as keyof typeof productData.stock] ?? 0;
 
     const existing = bag.find(
         (bagItem) => bagItem.product.id === productData.id && bagItem.size === productSize
@@ -34,7 +34,10 @@ export function getNetStock(productData: Product, productSize: Sizes, bag: BagIt
 
     const bagQuantity = existing?.quantity ?? 0;
 
-    return backendStock! - bagQuantity;
+    return !(
+        bagQuantity >= Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY) ||
+        bagQuantity >= stock
+    );
 }
 
 export function isValidSize(value: string): value is Sizes {
@@ -184,7 +187,7 @@ export async function fetchFilteredProducts({
     }
 
     if (query) {
-        filterQuery.name = { contains: query };
+        filterQuery.name = { contains: query, mode: "insensitive" };
     }
 
     const orderBy = productSort && SORT_OPTIONS[productSort].sort;

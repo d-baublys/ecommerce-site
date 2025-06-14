@@ -18,6 +18,7 @@ import ProductStockTable from "./ProductStockTable";
 import { useModalStore } from "@/stores/modalStore";
 import { productAdd, productDelete, productUpdate } from "@/lib/actions";
 import { useRouter } from "next/navigation";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
 export default function ProductAddEditForm({ productData }: { productData?: Product }) {
     const dataObj = productData ? productData : createEmptyProduct();
@@ -139,102 +140,105 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
     }, [productChanged]);
 
     return (
-        <form className="flex flex-col w-full p-4 gap-8 border-2 bg-background-lightest rounded-lg">
-            <FormInput
-                onChange={(e) => {
-                    setProvisionalDataObj((prev) => ({ ...prev, name: e.target.value }));
-                }}
-                legend="Product Name"
-                value={provisionalDataObj.name}
-            />
-            <fieldset>
-                <legend className="mb-2">Category</legend>
-                <select
-                    onChange={(e) => {
-                        setProvisionalDataObj((prev) => ({
-                            ...prev,
-                            gender: e.target.value as Categories,
-                        }));
-                    }}
-                    className="p-1.5 border-2 rounded-lg bg-white"
-                    value={provisionalDataObj.gender}
-                >
-                    {Object.keys(VALID_CATEGORIES).map((category, idx) => (
-                        <option key={idx} value={category}>
-                            {VALID_CATEGORIES[category as Categories]}
-                        </option>
-                    ))}
-                </select>
-            </fieldset>
-            <FormInput
-                type="number"
-                onChange={(e) => handlePriceChange(e)}
-                legend="Unit Price"
-                value={price}
-            />
-            <div>
+        <>
+            <form className="flex flex-col w-full p-4 gap-8 border-2 bg-background-lightest rounded-lg">
                 <FormInput
-                    ref={fileBrowseRef}
-                    type="file"
-                    onChange={(e) => handleFileSelect(e)}
-                    legend="Image Path"
-                    overrideClasses="hidden"
+                    onChange={(e) => {
+                        setProvisionalDataObj((prev) => ({ ...prev, name: e.target.value }));
+                    }}
+                    legend="Product Name"
+                    value={provisionalDataObj.name}
                 />
-                <div className="flex items-center gap-4">
-                    <RoundedButton onClick={handleBrowse}>
-                        <IoFolder />
-                        <span>Browse</span>
-                    </RoundedButton>
-                    <p>{fileName}</p>
-                </div>
-            </div>
-            <FormInput
-                onChange={(e) =>
-                    setProvisionalDataObj((prev) => ({ ...prev, alt: e.target.value }))
-                }
-                legend="Image Description"
-                value={provisionalDataObj.alt}
-            />
-            <FormInput
-                type="date"
-                onChange={(e) =>
-                    setProvisionalDataObj((prev) => ({ ...prev, dateAdded: e.target.value }))
-                }
-                legend="Date Added"
-                value={provisionalDataObj.dateAdded}
-            />
-            <ProductStockTable
-                savedDataObj={savedDataObj}
-                provisionalDataObj={provisionalDataObj}
-                setProvisionalDataObj={setProvisionalDataObj}
-                tableMode={tableMode}
-                setTableMode={setTableMode}
-            />
-            <div className="flex justify-center p-2 h-8">
-                <p className="text-center">{message}</p>
-            </div>
-            <div className="flex justify-between gap-8">
-                {productChanged && (
-                    <RoundedButton overrideClasses="w-full" onClick={handleSubmit}>
-                        {mode === "add" ? "Add" : "Save"}
-                    </RoundedButton>
-                )}
-                {productChanged && (
-                    <RoundedButton overrideClasses="w-full" onClick={handleCancel}>
-                        Cancel
-                    </RoundedButton>
-                )}
-            </div>
-            {mode === "edit" && (
-                <div className="flex justify-center w-full pt-4 border-t-black border-t-2">
-                    <RoundedButton
-                        overrideClasses="!bg-danger-color !text-contrasted !border-danger-color"
-                        onClick={() => handleDelete(provisionalDataObj.id)}
+                <fieldset>
+                    <legend className="mb-2">Category</legend>
+                    <select
+                        onChange={(e) => {
+                            setProvisionalDataObj((prev) => ({
+                                ...prev,
+                                gender: e.target.value as Categories,
+                            }));
+                        }}
+                        className="p-1.5 border-2 rounded-lg bg-white"
+                        value={provisionalDataObj.gender}
                     >
-                        Delete
-                    </RoundedButton>
+                        {Object.keys(VALID_CATEGORIES).map((category, idx) => (
+                            <option key={idx} value={category}>
+                                {VALID_CATEGORIES[category as Categories]}
+                            </option>
+                        ))}
+                    </select>
+                </fieldset>
+                <FormInput
+                    type="number"
+                    onChange={(e) => handlePriceChange(e)}
+                    legend="Unit Price"
+                    value={price}
+                />
+                <div>
+                    <FormInput
+                        ref={fileBrowseRef}
+                        type="file"
+                        onChange={(e) => handleFileSelect(e)}
+                        legend="Image Path"
+                        overrideClasses="hidden"
+                    />
+                    <div className="flex items-center gap-4">
+                        <RoundedButton onClick={handleBrowse}>
+                            <IoFolder />
+                            <span>Browse</span>
+                        </RoundedButton>
+                        <p>{fileName}</p>
+                    </div>
                 </div>
-            )}
-        </form>
+                <FormInput
+                    onChange={(e) =>
+                        setProvisionalDataObj((prev) => ({ ...prev, alt: e.target.value }))
+                    }
+                    legend="Image Description"
+                    value={provisionalDataObj.alt}
+                />
+                <FormInput
+                    type="date"
+                    onChange={(e) =>
+                        setProvisionalDataObj((prev) => ({ ...prev, dateAdded: e.target.value }))
+                    }
+                    legend="Date Added"
+                    value={provisionalDataObj.dateAdded}
+                />
+                <ProductStockTable
+                    savedDataObj={savedDataObj}
+                    provisionalDataObj={provisionalDataObj}
+                    setProvisionalDataObj={setProvisionalDataObj}
+                    tableMode={tableMode}
+                    setTableMode={setTableMode}
+                />
+                <div className="flex justify-center p-2 h-8">
+                    <p className="text-center">{message}</p>
+                </div>
+                <div className="flex justify-between gap-8">
+                    {productChanged && (
+                        <RoundedButton overrideClasses="w-full" onClick={handleSubmit}>
+                            {mode === "add" ? "Add" : "Save"}
+                        </RoundedButton>
+                    )}
+                    {productChanged && (
+                        <RoundedButton overrideClasses="w-full" onClick={handleCancel}>
+                            Cancel
+                        </RoundedButton>
+                    )}
+                </div>
+                {mode === "edit" && (
+                    <div className="flex justify-center w-full pt-4 border-t-black border-t-2">
+                        <RoundedButton
+                            overrideClasses="!bg-danger-color !text-contrasted !border-danger-color"
+                            onClick={() => handleDelete(provisionalDataObj.id)}
+                        >
+                            Delete
+                        </RoundedButton>
+                    </div>
+                )}
+            </form>
+            <DeleteConfirmModal />
+        </>
     );
 }

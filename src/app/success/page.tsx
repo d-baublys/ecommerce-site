@@ -26,7 +26,7 @@ export default async function Page({ searchParams }: { searchParams: { session_i
             <div className="flex flex-col grow justify-center items-center h-full gap-8">
                 <div className="flex flex-col justify-between w-full gap-4">
                     <div className="flex flex-col justify-center items-center gap-3 text-sz-subheading lg:text-sz-subheading-lg">
-                        <IoCheckmarkCircle className="shrink-0 text-go-color" size={30} />
+                        <IoCheckmarkCircle className="shrink-0 text-go-color" size={36} />
                         <span className="">Thank you for your purchase!</span>
                         <div>
                             <p>

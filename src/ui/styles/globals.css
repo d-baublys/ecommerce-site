@@ -119,3 +119,17 @@ body {
     background-size: 200%;
     background-position: var(--image-x) var(--image-y);
 }
+
+@keyframes popIn {
+    0% {
+        scale: 100%;
+    }
+
+    50% {
+        scale: 110%;
+    }
+
+    100% {
+        scale: 100%;
+    }
+}
