@@ -38,15 +38,14 @@ export default function SearchOverlay() {
     return (
         <>
             <DarkBackdrop
-                zIndex={50}
                 onClick={() => closeOverlay()}
-                classes={`[transition:all_0.1s_ease] ${
+                overrideClasses={`[transition:all_0.1s_ease] ${
                     isSearchLoaded ? "!opacity-75" : "!opacity-0"
                 }`}
             />
 
             <div
-                className={`absolute top-0 left-0 flex justify-center w-full min-h-screen md:min-h-[400px] bg-white drop-shadow-xl [transition:all_0.2s_ease-out] ${
+                className={`absolute top-0 left-0 flex justify-center w-full min-h-screen md:min-h-[400px] bg-white drop-shadow-xl z-[1500] [transition:all_0.2s_ease-out] ${
                     isSearchLoaded ? "opacity-100" : "opacity-0"
                 }`}
             >

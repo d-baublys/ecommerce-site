@@ -49,7 +49,7 @@ export default function NavBar() {
     return (
         <>
             <nav
-                className={`sticky flex justify-center items-center w-full h-nav-height bg-white text-black drop-shadow-(--nav-shadow) z-10 ${
+                className={`sticky flex justify-center items-center w-full h-nav-height bg-white text-black drop-shadow-(--nav-shadow) z-[9999] ${
                     isScrollingUp ? "top-0" : "top-[calc(var(--nav-height)*-1)]"
                 } [transition:top_0.5s_ease]`}
             >

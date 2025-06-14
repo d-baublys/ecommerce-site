@@ -23,7 +23,7 @@ export default function Modal({
 
     return (
         <>
-            <DarkBackdrop zIndex={1000} />
+            <DarkBackdrop />
             <div
                 id="modal-container"
                 onClick={handleClose}
@@ -32,7 +32,9 @@ export default function Modal({
                 <div
                     id="modal"
                     onClick={(e) => e.stopPropagation()}
-                    className={`relative flex min-w-[300px] w-full max-w-[400px] h-[250px] bg-white p-8 rounded-2xl drop-shadow-2xl [animation:popIn_0.3s_ease] ${overrideClasses}`}
+                    className={`relative flex min-w-[300px] w-full max-w-[400px] h-[250px] bg-white p-8 rounded-2xl drop-shadow-2xl [animation:popIn_0.3s_ease] ${
+                        overrideClasses ?? ""
+                    }`}
                 >
                     {hasCloseButton && (
                         <div className="absolute top-0 right-0 p-4">
