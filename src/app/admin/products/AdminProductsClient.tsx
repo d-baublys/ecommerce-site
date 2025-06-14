@@ -3,14 +3,26 @@
 import { Categories, Product, VALID_CATEGORIES } from "@/lib/definitions";
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import DisplayTile from "@/ui/components/DisplayTile";
 import RoundedButton from "@/ui/components/RoundedButton";
+import SearchBar from "@/ui/components/SearchBar";
 
-export default function AdminProductsClient({ productData }: { productData: Product[] }) {
+export default function AdminProductsClient() {
+    const router = useRouter();
     const pathname = usePathname();
-    const [filter, setFilter] = useState<Categories | undefined>();
-    const querySet = productData.filter((item) => item.gender === filter);
+    const [filter, setFilter] = useState<Categories | null>(null);
+    const [unfilteredResults, setUnfilteredResults] = useState<Product[]>([]);
+    const [searchQuery, setSearchQuery] = useState<string | null>(null);
+    const querySet = unfilteredResults.filter((item) => {
+        if (filter) return item.gender === filter;
+        if (searchQuery) return true;
+        return false;
+    });
+
+    const handleResultClick = (product: Product) => {
+        router.push(`/admin/products/${encodeURIComponent(product.slug)}`);
+    };
 
     return (
         <div className="flex flex-col grow w-full justify-center items-center">
@@ -19,11 +31,23 @@ export default function AdminProductsClient({ productData }: { productData: Prod
                     <RoundedButton>+ Add Product</RoundedButton>
                 </Link>
             </div>
+            <div className="w-full h-10 mb-8">
+                <SearchBar
+                    handleResultClick={handleResultClick}
+                    options={{ isGlobalSearch: false, showSuggestions: false }}
+                    parentSetter={setUnfilteredResults}
+                    parentQuerySetter={setSearchQuery}
+                />
+            </div>
             <ul className="flex flex-row justify-evenly items-center w-full">
                 {Object.keys(VALID_CATEGORIES).map((category) => (
                     <li key={category}>
                         <RoundedButton
-                            onClick={() => setFilter(category as Categories)}
+                            onClick={() =>
+                                setFilter((curr) =>
+                                    curr === category ? null : (category as Categories)
+                                )
+                            }
                             overrideClasses={`${
                                 filter === category &&
                                 "!bg-component-color !border-component-color !text-contrasted"
@@ -35,23 +59,23 @@ export default function AdminProductsClient({ productData }: { productData: Prod
                 ))}
             </ul>
             <div className="flex justify-center w-full grow">
-                {filter ? (
+                {(filter || searchQuery) && querySet.length > 0 ? (
                     <ul className="flex flex-col w-full">
-                        {querySet.length > 0 ? (
-                            querySet.map((item: Product) => (
-                                <li key={item.id} className="mt-8">
-                                    <Link href={`${pathname}/${encodeURIComponent(item.slug)}`}>
-                                        <DisplayTile productData={item} />
-                                    </Link>
-                                </li>
-                            ))
-                        ) : (
-                            <li>No products to show</li>
-                        )}
+                        {querySet.map((item: Product) => (
+                            <li key={item.id} className="mt-8">
+                                <Link href={`${pathname}/${encodeURIComponent(item.slug)}`}>
+                                    <DisplayTile productData={item} />
+                                </Link>
+                            </li>
+                        ))}
                     </ul>
                 ) : (
-                    <div className="mt-8">
-                        <p>{"Please select a filter"}</p>
+                    <div className="flex items-center mt-8 h-full">
+                        <p className="text-center">
+                            {filter || searchQuery
+                                ? "No products matching your search"
+                                : "Please select a filter or search by keyword"}
+                        </p>
                     </div>
                 )}
             </div>

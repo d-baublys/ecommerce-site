@@ -1,20 +1,29 @@
 "use client";
 
-import { getProductData } from "@/lib/actions";
 import { Product } from "@/lib/definitions";
 import { debounce, fetchFilteredProducts } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { IoCloseCircle, IoSearch } from "react-icons/io5";
+
+type SearchBarConfig = {
+    isGlobalSearch: boolean;
+    showSuggestions: boolean;
+    placeholderText?: string;
+};
 
 export default function SearchBar({
     handleResultClick,
     handleSearchClose,
-    isGlobalSearch,
+    options,
+    parentSetter,
+    parentQuerySetter,
 }: {
     handleResultClick: (product: Product) => void;
     handleSearchClose?: () => void;
-    isGlobalSearch?: boolean;
+    options: SearchBarConfig;
+    parentSetter?: React.Dispatch<SetStateAction<Product[]>>;
+    parentQuerySetter?: React.Dispatch<SetStateAction<string | null>>;
 }) {
     const [productList, setProductList] = useState<Product[]>();
     const [query, setQuery] = useState<string>("");
@@ -29,6 +38,7 @@ export default function SearchBar({
             const productFetch = await fetchFilteredProducts({ category: "all" });
 
             setProductList(productFetch);
+            if (parentSetter) parentSetter(productFetch);
             setHasMounted(true);
         };
 
@@ -44,11 +54,11 @@ export default function SearchBar({
     }
 
     const debouncedResults = debounce((currQuery) => {
-        setResults(
-            productList!.filter((product) =>
-                product.name.toLowerCase().includes((currQuery as string).toLowerCase())
-            )
+        const results = productList!.filter((product) =>
+            product.name.toLowerCase().includes((currQuery as string).toLowerCase())
         );
+        setResults(results);
+        if (parentSetter) parentSetter(results);
         setIsResultLoading(false);
     }, 100);
 
@@ -56,6 +66,7 @@ export default function SearchBar({
         setResults([]);
         const query = e.currentTarget.value;
         setQuery(query);
+        parentQuerySetter && parentQuerySetter(query);
 
         if (!query.trim()) return;
 
@@ -67,13 +78,14 @@ export default function SearchBar({
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<SVGElement>) => {
         e.preventDefault();
-        if (!query.trim() || !isGlobalSearch) return;
+        if (!query.trim() || !options?.isGlobalSearch) return;
         handleSearchClose && handleSearchClose();
         router.push(`/results?q=${encodeURIComponent(query)}`);
     };
 
     const clearAll = () => {
         setQuery("");
+        parentQuerySetter && parentQuerySetter(null);
         setResults([]);
     };
 
@@ -91,7 +103,7 @@ export default function SearchBar({
         >
             <div className="flex items-center w-full h-searchbar-height bg-background-lightest rounded-full">
                 <div className="flex justify-center items-center w-12 h-full">
-                    {isGlobalSearch && (
+                    {options?.isGlobalSearch && (
                         <IoSearch
                             className={query ? "cursor-pointer" : ""}
                             onClick={(e) => handleSubmit(e)}
@@ -104,13 +116,13 @@ export default function SearchBar({
                     value={query}
                     disabled={productList === undefined}
                     onChange={(e) => handleSearch(e)}
-                    placeholder="Search products..."
+                    placeholder={options?.placeholderText ?? "Search products..."}
                 ></input>
                 <div className="flex justify-center items-center w-12 text-[1.75rem]">
                     <IoCloseCircle onClick={() => clearAll()} className="cursor-pointer" />
                 </div>
             </div>
-            {query && (
+            {query && options?.showSuggestions && (
                 <div className="mx-4 min-h-[100px] px-2 py-2 border-t-[1px] border-background-lighter bg-background-lightest z-100">
                     <ul>
                         {results?.length > 0 &&

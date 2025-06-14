@@ -4,7 +4,7 @@ import ListButton from "@/ui/components/ListButton";
 export default function AdminPage() {
     return (
         <AdminLayout subheaderText="Admin Actions">
-            <ul>
+            <ul className="flex flex-col gap-4">
                 <li>
                     <ListButton link="/products" relativeLink>
                         View and manage products

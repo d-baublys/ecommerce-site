@@ -58,7 +58,7 @@ export default function SearchOverlay() {
                         <SearchBar
                             handleResultClick={handleResultClick}
                             handleSearchClose={() => closeOverlay()}
-                            isGlobalSearch
+                            options={{ isGlobalSearch: true, showSuggestions: true }}
                         />
                         <div className="flex items-center h-searchbar-height pl-0.5">
                             <CloseButton onClick={() => closeOverlay()} />
