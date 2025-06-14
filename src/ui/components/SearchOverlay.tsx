@@ -24,7 +24,7 @@ export default function SearchOverlay() {
 
     const handleResultClick = (product: Product) => {
         closeOverlay();
-        router.push(`/products/${product.slug}`);
+        router.push(`/products/${encodeURIComponent(product.slug)}`);
     };
 
     if (!isSearchOpen && !isSearchLoaded) return null;

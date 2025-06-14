@@ -40,7 +40,7 @@ export default function AdminProductsClient({ productData }: { productData: Prod
                         {querySet.length > 0 ? (
                             querySet.map((item: Product) => (
                                 <li key={item.id} className="mt-8">
-                                    <Link href={`${pathname}/${item.slug}`}>
+                                    <Link href={`${pathname}/${encodeURIComponent(item.slug)}`}>
                                         <DisplayTile productData={item} />
                                     </Link>
                                 </li>

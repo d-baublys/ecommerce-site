@@ -87,7 +87,9 @@ export default function Page() {
                                     handleDelete={() =>
                                         removeFromBag(mergedItem.product.id, mergedItem.size)
                                     }
-                                    productLink={`products/${mergedItem.product.slug}`}
+                                    productLink={`products/${encodeURIComponent(
+                                        mergedItem.product.slug
+                                    )}`}
                                 />
                             </li>
                         ))}

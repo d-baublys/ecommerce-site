@@ -5,7 +5,7 @@ import MainLayout from "@/ui/layouts/MainLayout";
 
 export default async function Page({ params }: { params: { slug: string } }) {
     const { slug } = params;
-    const productFetch = await getProductData({ slug: slug });
+    const productFetch = await getProductData({ slug: decodeURIComponent(slug) });
 
     if (!productFetch.data.length) {
         notFound();

@@ -13,7 +13,6 @@ import GridAside from "@/ui/components/GridAside";
 import { useEffect, useRef, useState } from "react";
 import { fetchFilteredProducts } from "@/lib/utils";
 import { IoChevronDown } from "react-icons/io5";
-import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import SlideDownMenu from "@/ui/components/SlideDownMenu";
 import BaseGridPage from "@/ui/pages/BaseGridPage";
 import RoundedButton from "@/ui/components/RoundedButton";
@@ -156,8 +155,6 @@ export default function CategoryGridPage({
         );
     };
 
-    useBodyScrollLock(isQueryLoading);
-
     if (error) throw error;
 
     if (!(allCategoryProducts && filteredProducts)) return loadingIndicator();
@@ -205,6 +202,7 @@ export default function CategoryGridPage({
         );
     };
 
+    const shouldRenderTabs = !options?.noCategoryTabs && category === "all";
     const shouldRenderAside = !options?.noAside && (filteredProducts.length > 0 || !query);
 
     return (
@@ -217,7 +215,7 @@ export default function CategoryGridPage({
                     ? "No products matching your search"
                     : "No products to display"
             }
-            categoryTabs={!options?.noCategoryTabs && categoryTabs()}
+            categoryTabs={shouldRenderTabs && categoryTabs()}
             asideContent={shouldRenderAside && asideContent()}
             fixedOverlays={!options?.noOverlays && fixedOverlays()}
             sortingUnit={!options?.noSorting && sortingUnit()}
