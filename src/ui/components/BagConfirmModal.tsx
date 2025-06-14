@@ -19,9 +19,7 @@ export default function BagConfirmModal({
             <div className="flex flex-col justify-evenly items-center grow">
                 <div className="flex flex-col items-center gap-4 p-4">
                     <IoCheckmarkCircle className="shrink-0 text-go-color" size={36} />
-                    <p className="text-center text-sz-interm lg:text-sz-interm-lg">
-                        Item added to bag
-                    </p>
+                    <p className="text-center text-sz-interm">Item added to bag</p>
                 </div>
                 <Link href={"/bag"}>
                     <RoundedButton>View Bag</RoundedButton>

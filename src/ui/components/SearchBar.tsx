@@ -100,7 +100,7 @@ export default function SearchBar({
                     )}
                 </div>
                 <input
-                    className="w-[90%] h-full outline-none"
+                    className="w-full h-full outline-none"
                     value={query}
                     disabled={productList === undefined}
                     onChange={(e) => handleSearch(e)}
@@ -111,20 +111,29 @@ export default function SearchBar({
                 </div>
             </div>
             {query && (
-                <div className="mx-4 min-h-[100px] px-4 py-2 border-t-[1px] border-background-lighter bg-background-lightest z-100">
+                <div className="mx-4 min-h-[100px] px-2 py-2 border-t-[1px] border-background-lighter bg-background-lightest z-100">
                     <ul>
                         {results?.length > 0 &&
                             results.map((product) => (
                                 <li
                                     key={product.id}
-                                    className="py-1 cursor-pointer bg-background-lightest hover:brightness-90 active:brightness-90"
+                                    className="flex items-center p-1 cursor-pointer bg-background-lightest hover:brightness-90 active:brightness-90"
                                     onClick={() => handleClick(product)}
                                 >
-                                    {product.name}
+                                    <div className="flex shrink-0 mr-2">
+                                        <IoSearch size={14} />
+                                    </div>
+                                    <span className="whitespace-nowrap overflow-ellipsis overflow-hidden">
+                                        {product.name}
+                                    </span>
                                 </li>
                             ))}
                         {!results?.length && !isResultLoading && (
-                            <li className="py-1">No results found</li>
+                            <li className="p-1">
+                                <span className="whitespace-nowrap overflow-ellipsis overflow-hidden">
+                                    No results found
+                                </span>
+                            </li>
                         )}
                     </ul>
                 </div>

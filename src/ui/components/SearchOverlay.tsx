@@ -1,12 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import SearchBar from "./SearchBar";
 import { Product } from "@/lib/definitions";
 import { useSearchStore } from "@/stores/searchStore";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import DarkBackdrop from "./DarkBackdrop";
 import CloseButton from "./CloseButton";
+import { useEffect } from "react";
 
 export default function SearchOverlay() {
     const { isSearchOpen, setIsSearchOpen, isSearchLoaded, setIsSearchLoaded } = useSearchStore(
@@ -16,6 +17,7 @@ export default function SearchOverlay() {
     useBodyScrollLock(isSearchOpen);
 
     const router = useRouter();
+    const pathname = usePathname();
 
     const closeOverlay = () => {
         setIsSearchLoaded(false);
@@ -26,6 +28,10 @@ export default function SearchOverlay() {
         closeOverlay();
         router.push(`/products/${encodeURIComponent(product.slug)}`);
     };
+
+    useEffect(() => {
+        closeOverlay();
+    }, [pathname]);
 
     if (!isSearchOpen && !isSearchLoaded) return null;
 
