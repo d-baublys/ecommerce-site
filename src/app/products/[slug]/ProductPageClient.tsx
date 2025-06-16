@@ -3,24 +3,18 @@
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect, useState } from "react";
 import { Sizes, VALID_SIZES } from "@/lib/definitions";
-import Image from "next/image";
 import { Product } from "@/lib/definitions";
 import GoButton from "@/ui/components/GoButton";
 import { IoBag, IoHeart, IoHeartOutline } from "react-icons/io5";
 import { checkStock } from "@/lib/utils";
-import { useWishlistStore } from "@/stores/wishlistStore";
-import RoundedButton from "@/ui/components/RoundedButton";
 import ZoomableImage from "@/ui/components/ZoomableImage";
+import WishlistToggleButton from "@/ui/components/WishlistToggleButton";
 
 export default function ProductPageClient({ productData }: { productData: Product }) {
     const [size, setSize] = useState<Sizes | "placeholder">("placeholder");
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
     const bag = useBagStore((state) => state.bag);
     const addToBag = useBagStore((state) => state.addToBag);
-    const wishlist = useWishlistStore((state) => state.wishlist);
-    const addToWishlist = useWishlistStore((state) => state.addToWishlist);
-    const removeFromWishlist = useWishlistStore((state) => state.removeFromWishlist);
-    const inWishlist = wishlist.find((wishlistItem) => wishlistItem.id === productData.id);
 
     function getLocalFormatting(price: number) {
         return Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
@@ -98,16 +92,7 @@ export default function ProductPageClient({ productData }: { productData: Produc
                     >
                         Add to Bag <IoBag />
                     </GoButton>
-                    <RoundedButton
-                        onClick={() =>
-                            !inWishlist
-                                ? addToWishlist(productData)
-                                : removeFromWishlist(productData.id)
-                        }
-                    >
-                        <span>{!inWishlist ? "Add to Wishlist" : "Remove from Wishlist"}</span>
-                        {inWishlist ? <IoHeart /> : <IoHeartOutline className="stroked-path" />}
-                    </RoundedButton>
+                    <WishlistToggleButton product={productData} />
                 </div>
             </div>
         </div>

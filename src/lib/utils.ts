@@ -213,3 +213,7 @@ export function extractFilters<T extends string>(
 export function extractSort(param: string | null) {
     return param && param in SORT_OPTIONS ? (param as ProductSortKey) : "placeholder";
 }
+
+export const isolateInteraction = (e: React.TouchEvent | React.MouseEvent) => {
+    e.preventDefault();
+};

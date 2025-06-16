@@ -32,7 +32,7 @@ export default function Modal({
                 <div
                     id="modal"
                     onClick={(e) => e.stopPropagation()}
-                    className={`relative flex min-w-[300px] w-full max-w-[400px] h-[250px] bg-white p-8 rounded-2xl drop-shadow-2xl [animation:popIn_0.3s_ease] ${
+                    className={`relative flex min-w-[300px] w-full max-w-[400px] h-[250px] bg-white p-8 rounded-2xl drop-shadow-2xl [animation:small-pop-in_0.3s_ease] ${
                         overrideClasses ?? ""
                     }`}
                 >

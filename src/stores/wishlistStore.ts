@@ -28,7 +28,9 @@ export const useWishlistStore = create<WishlistStore>()(
 
                 updatedWishlist = currentWishlist.filter((product) => !(product.id === id));
 
-                set({ wishlist: updatedWishlist });
+                setTimeout(() => {
+                    set({ wishlist: updatedWishlist });
+                }, 300);
             },
             clearWishlist: () => {
                 set({ wishlist: [] });

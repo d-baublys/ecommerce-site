@@ -60,7 +60,9 @@ export const useBagStore = create<BagStore>()(
                     (item) => !(item.product.id === id && item.size === size)
                 );
 
-                set({ bag: updatedBag });
+                setTimeout(() => {
+                    set({ bag: updatedBag });
+                }, 300);
             },
             clearBag: () => {
                 set({ bag: [] });

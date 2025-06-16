@@ -120,13 +120,27 @@ body {
     background-position: var(--image-x) var(--image-y);
 }
 
-@keyframes popIn {
+@keyframes small-pop-in {
     0% {
         scale: 100%;
     }
 
     50% {
         scale: 110%;
+    }
+
+    100% {
+        scale: 100%;
+    }
+}
+
+@keyframes big-pop-in {
+    0% {
+        scale: 100%;
+    }
+
+    50% {
+        scale: 125%;
     }
 
     100% {
@@ -202,4 +216,16 @@ body {
 
 .styled-link:hover::after {
     transform: scaleX(0);
+}
+
+.filled-heart {
+    transform: scaleY(0);
+    transition: all 0.1s ease-in-out;
+    transform-origin: 0% 90%;
+    opacity: 0;
+}
+
+.filled-heart.show-filled {
+    transform: scaleY(1);
+    opacity: 1;
 }

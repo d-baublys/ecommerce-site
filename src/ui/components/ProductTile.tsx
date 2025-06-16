@@ -1,20 +1,16 @@
 "use client";
 
 import { Product, Sizes, VALID_SIZES } from "@/lib/definitions";
-import { checkStock, stringifyConvertPrice } from "@/lib/utils";
+import { checkStock, isolateInteraction, stringifyConvertPrice } from "@/lib/utils";
 import Image from "next/image";
 import ProductLink from "./ProductLink";
-import { useWishlistStore } from "@/stores/wishlistStore";
-import { IoHeart, IoHeartOutline } from "react-icons/io5";
 import { useEffect, useRef, useState } from "react";
 import RoundedButton from "./RoundedButton";
 import { useBagStore } from "@/stores/bagStore";
 import BagConfirmModal from "./BagConfirmModal";
+import WishlistToggleIcon from "./WishlistToggleIcon";
 
 export default function ProductTile({ product }: { product: Product }) {
-    const { wishlist, addToWishlist, removeFromWishlist } = useWishlistStore((state) => state);
-    const inWishlist = wishlist.find((item) => item.id === product.id);
-
     const { bag, addToBag } = useBagStore((state) => state);
 
     const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -29,10 +25,6 @@ export default function ProductTile({ product }: { product: Product }) {
         (size) => size in product.stock && checkStock(product, size, bag)
     );
 
-    const isolateInteraction = (e: React.TouchEvent | React.MouseEvent) => {
-        e.preventDefault();
-    };
-
     const handleTouchStart = () => {
         timerRef.current = setTimeout(() => setIsHovered(true), 300);
     };
@@ -41,16 +33,6 @@ export default function ProductTile({ product }: { product: Product }) {
         if (timerRef.current) {
             clearTimeout(timerRef.current);
             timerRef.current = null;
-        }
-    };
-
-    const handleWishlistClick = (e: React.TouchEvent | React.MouseEvent) => {
-        isolateInteraction(e);
-
-        if (!inWishlist) {
-            addToWishlist(product);
-        } else {
-            removeFromWishlist(product.id);
         }
     };
 
@@ -113,17 +95,11 @@ export default function ProductTile({ product }: { product: Product }) {
                         )}
                         {isHovered && (
                             <div>
-                                <div
-                                    className="absolute top-0 right-0 p-1 m-2 bg-white [border-radius:50%]"
-                                    onClick={handleWishlistClick}
-                                >
-                                    <div className="relative translate-y-[1px]">
-                                        {inWishlist ? (
-                                            <IoHeart size={24} />
-                                        ) : (
-                                            <IoHeartOutline size={24} />
-                                        )}
-                                    </div>
+                                <div className="absolute top-0 right-0 m-2">
+                                    <WishlistToggleIcon
+                                        product={product}
+                                        iconSize={24}
+                                    />
                                 </div>
                                 <div className="absolute bottom-0 left-0 w-full p-2 md:p-3">
                                     {!isQuickAddActive && availableSizes.length > 0 ? (
