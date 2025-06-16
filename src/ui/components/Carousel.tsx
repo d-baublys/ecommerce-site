@@ -88,7 +88,7 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                                 />
                             </div>
                             <ProductLink slug={featuredProd.slug}>
-                                <RoundedButton overrideClasses="absolute left-[50%] bottom-1/6 translate-x-[-50%] !border-none z-50">
+                                <RoundedButton overrideClasses="absolute left-[50%] bottom-1/6 translate-x-[-50%] z-50">
                                     View
                                 </RoundedButton>
                             </ProductLink>

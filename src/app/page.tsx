@@ -39,7 +39,7 @@ export default async function Home() {
                     <h1>Summer 2025 styles here and now.</h1>
                     <Link
                         href={"/category/all"}
-                        className="mt-8 text-sz-subheading lg:text-sz-subheading-lg underline"
+                        className="styled-link w-fit mt-8 text-sz-subheading lg:text-sz-subheading-lg underline"
                     >
                         {"Shop >>>"}
                     </Link>
