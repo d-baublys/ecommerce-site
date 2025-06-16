@@ -13,7 +13,7 @@ import RoundedButton from "@/ui/components/RoundedButton";
 import ZoomableImage from "@/ui/components/ZoomableImage";
 
 export default function ProductPageClient({ productData }: { productData: Product }) {
-    const [size, setSize] = useState<Sizes>();
+    const [size, setSize] = useState<Sizes | "placeholder">("placeholder");
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
     const bag = useBagStore((state) => state.bag);
     const addToBag = useBagStore((state) => state.addToBag);
@@ -60,11 +60,10 @@ export default function ProductPageClient({ productData }: { productData: Produc
                     <select
                         className="p-2 bg-white border-2 rounded-md"
                         value={size}
-                        defaultValue={"default"}
                         required
                         onChange={(e) => setSize(e.target.value as Sizes)}
                     >
-                        <option value="default" hidden>
+                        <option value="placeholder" hidden>
                             Please select a size
                         </option>
                         {VALID_SIZES.filter((size) => size in productData.stock).map(

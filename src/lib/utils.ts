@@ -157,7 +157,7 @@ export async function fetchFilteredProducts({
     category: Categories | "all";
     sizeFilters?: Sizes[];
     priceFilters?: string[];
-    productSort?: ProductSortKey;
+    productSort?: ProductSortKey | "placeholder";
     query?: string;
 }) {
     const filterQuery: Prisma.ProductWhereInput = {
@@ -190,7 +190,8 @@ export async function fetchFilteredProducts({
         filterQuery.name = { contains: query, mode: "insensitive" };
     }
 
-    const orderBy = productSort && SORT_OPTIONS[productSort].sort;
+    const orderBy =
+        productSort && productSort !== "placeholder" ? SORT_OPTIONS[productSort].sort : undefined;
 
     const productsFetch = await getProductData(filterQuery, orderBy);
 
@@ -199,4 +200,16 @@ export async function fetchFilteredProducts({
 
 export function pluralise(word: string, count: number) {
     return count === 1 ? word : word + "s";
+}
+
+export function extractFilters<T extends string>(
+    param: string | null,
+    validValues: readonly T[] | T[]
+) {
+    if (!param) return [];
+    return param.split("|").filter((val): val is T => validValues.includes(val as T));
+}
+
+export function extractSort(param: string | null) {
+    return param && param in SORT_OPTIONS ? (param as ProductSortKey) : "placeholder";
 }

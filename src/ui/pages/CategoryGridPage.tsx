@@ -2,21 +2,25 @@
 
 import {
     Categories,
+    PRICE_FILTER_OPTIONS,
     PriceFilterKey,
     Product,
     ProductSortKey,
     Sizes,
     SORT_OPTIONS,
     VALID_CATEGORIES,
+    VALID_SIZES,
 } from "@/lib/definitions";
 import GridAside from "@/ui/components/GridAside";
 import { useEffect, useRef, useState } from "react";
-import { fetchFilteredProducts } from "@/lib/utils";
+import { extractFilters, extractSort, fetchFilteredProducts } from "@/lib/utils";
 import { IoChevronDown } from "react-icons/io5";
 import SlideDownMenu from "@/ui/components/SlideDownMenu";
 import BaseGridPage from "@/ui/pages/BaseGridPage";
 import RoundedButton from "@/ui/components/RoundedButton";
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 type pageOptions = {
     noAside?: boolean;
@@ -34,12 +38,31 @@ export default function CategoryGridPage({
     options?: pageOptions;
     query?: string;
 }) {
+    const paramsGetter = useSearchParams();
+    const paramsSetter = new URLSearchParams(paramsGetter);
+    const pathname = usePathname();
+    const { replace } = useRouter();
+    const [currSizeFilters, currPriceFilters, currSort] = [
+        paramsGetter.get("s"),
+        paramsGetter.get("p"),
+        paramsGetter.get("sort"),
+    ];
+
     const [allCategoryProducts, setAllCategoryProducts] = useState<Product[]>();
     const [filteredProducts, setFilteredProducts] = useState<Product[]>();
 
-    const [sizeFilters, setSizeFilters] = useState<Sizes[]>([]);
-    const [priceFilters, setPriceFilters] = useState<PriceFilterKey[]>([]);
-    const [productSort, setProductSort] = useState<ProductSortKey>();
+    const [sizeFilters, setSizeFilters] = useState<Sizes[]>(
+        extractFilters<Sizes>(currSizeFilters, VALID_SIZES)
+    );
+    const [priceFilters, setPriceFilters] = useState<PriceFilterKey[]>(
+        extractFilters<PriceFilterKey>(
+            currPriceFilters,
+            Object.keys(PRICE_FILTER_OPTIONS) as PriceFilterKey[]
+        )
+    );
+    const [productSort, setProductSort] = useState<ProductSortKey | "placeholder">(
+        extractSort(currSort)
+    );
 
     const [error, setError] = useState<Error | null>(null);
     const [isQueryLoading, setIsQueryLoading] = useState<boolean>(true);
@@ -92,6 +115,28 @@ export default function CategoryGridPage({
         fetchFiltered();
     }, [category, sizeFilters, priceFilters, productSort, query]);
 
+    useEffect(() => {
+        if (sizeFilters.length) {
+            paramsSetter.set("s", sizeFilters.join("|"));
+        } else {
+            paramsSetter.delete("s");
+        }
+
+        if (priceFilters.length) {
+            paramsSetter.set("p", priceFilters.join("|"));
+        } else {
+            paramsSetter.delete("p");
+        }
+
+        if (productSort && productSort !== "placeholder") {
+            paramsSetter.set("sort", productSort);
+        } else {
+            paramsSetter.delete("sort");
+        }
+
+        replace(`${pathname}?${paramsSetter.toString()}`);
+    }, [sizeFilters, priceFilters, productSort]);
+
     const categoryTabs = () => {
         return (
             <ul className="flex w-full border-b-2 gap-8 mb-8 py-2">
@@ -127,7 +172,9 @@ export default function CategoryGridPage({
                 <label
                     htmlFor="sort-select"
                     className={`pr-2 whitespace-nowrap pointer-events-none ${
-                        productSort ? "translate-x-[10%] md:translate-0" : "translate-x-[120%]"
+                        productSort !== "placeholder"
+                            ? "translate-x-[10%] md:translate-0"
+                            : "translate-x-[120%]"
                     }`}
                 >
                     Sort By
@@ -135,12 +182,12 @@ export default function CategoryGridPage({
                 <select
                     id="sort-select"
                     className={`pr-5 font-normal appearance-none cursor-pointer ${
-                        productSort ? "" : "max-w-[100px] lg:max-w-[115px]"
+                        productSort !== "placeholder" ? "" : "max-w-[100px] lg:max-w-[115px]"
                     }`}
                     onChange={(e) => setProductSort(e.target.value as ProductSortKey)}
-                    defaultValue="default"
+                    value={productSort}
                 >
-                    <option disabled hidden value="default"></option>
+                    <option disabled hidden value="placeholder"></option>
                     {Object.entries(SORT_OPTIONS).map(([key, sortData]) => (
                         <option key={key} value={key}>
                             {sortData.displayName}
