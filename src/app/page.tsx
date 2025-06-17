@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Carousel from "@/ui/components/Carousel";
 import { getFeaturedProducts, getProductData } from "@/lib/actions";
 import Link from "next/link";
 import { FEATURED_COUNT } from "@/lib/definitions";
 import BareLayout from "@/ui/layouts/BareLayout";
+import ProductImage from "@/ui/components/ProductImage";
 
 export default async function Home() {
     const featuredFetch = await getFeaturedProducts();
@@ -28,13 +28,10 @@ export default async function Home() {
     return (
         <div className="flex flex-col w-full">
             <div className="main-product relative grow w-full min-h-[400px]">
-                <Image
-                    className="object-cover brightness-50"
-                    src="/tshirts.jpg"
-                    alt="Branded t-shirts"
-                    sizes="auto"
-                    fill
-                ></Image>
+                <ProductImage
+                    product={{ src: "/tshirts.jpg", alt: "Branded t-shirts" }}
+                    overrideClasses="brightness-50"
+                />
                 <div className="flex flex-col main-tagline absolute w-full top-1/2 px-(--gutter) md:px-(--gutter-md) text-sz-heading lg:text-sz-heading-lg font-semibold text-contrasted">
                     <h1>Summer 2025 styles here and now.</h1>
                     <Link

@@ -3,10 +3,10 @@
 import { MergedBagItem } from "@/lib/definitions";
 import Link from "next/link";
 import { IoClose } from "react-icons/io5";
-import Image from "next/image";
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect } from "react";
 import { stringifyConvertPrice } from "@/lib/utils";
+import ProductImage from "./ProductImage";
 
 export default function BagTile({
     bagItem,
@@ -35,15 +35,7 @@ export default function BagTile({
             <Link className="w-full" href={productLink}>
                 {
                     <div className="flex h-full grow gap-2 sm:gap-8">
-                        <div className="wishlist-img-wrapper relative h-full aspect-3/4">
-                            <Image
-                                className="object-cover"
-                                src={productData.src}
-                                alt={productData.alt}
-                                sizes="auto"
-                                fill
-                            ></Image>
-                        </div>
+                        <ProductImage product={productData} overrideClasses="aspect-3/4" />
                         <div className="flex flex-col justify-between">
                             <div className="text-sz-interm lg:text-sz-interm-lg font-semibold">
                                 <p>{productData.name.toUpperCase()}</p>

@@ -7,6 +7,7 @@ import { debounce } from "@/lib/utils";
 import ProductLink from "./ProductLink";
 import { Product } from "@/lib/definitions";
 import RoundedButton from "./RoundedButton";
+import ProductImage from "./ProductImage";
 
 export default function Carousel({ featuredList }: { featuredList: Product[] }) {
     const [activeFeatured, setActiveFeatured] = useState(0);
@@ -78,15 +79,10 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                             id={`featured-${idx + 1}`}
                             className="relative py-2 min-w-[var(--carousel-img-w)]"
                         >
-                            <div className="featured-wrapper relative h-full snap-center drop-shadow-(--tile-shadow) z-0">
-                                <Image
-                                    src={featuredProd.src}
-                                    alt={featuredProd.alt}
-                                    fill
-                                    sizes="auto"
-                                    className="object-cover rounded-2xl"
-                                />
-                            </div>
+                            <ProductImage
+                                product={featuredProd}
+                                overrideClasses="snap-center rounded-2xl drop-shadow-(--tile-shadow) overflow-hidden"
+                            />
                             <ProductLink slug={featuredProd.slug}>
                                 <RoundedButton overrideClasses="absolute left-[50%] bottom-1/6 translate-x-[-50%] z-50">
                                     View

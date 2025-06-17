@@ -2,20 +2,19 @@
 
 import { Product, Sizes, VALID_SIZES } from "@/lib/definitions";
 import { checkStock, isolateInteraction, stringifyConvertPrice } from "@/lib/utils";
-import Image from "next/image";
 import ProductLink from "./ProductLink";
 import { useEffect, useRef, useState } from "react";
 import RoundedButton from "./RoundedButton";
 import { useBagStore } from "@/stores/bagStore";
 import BagConfirmModal from "./BagConfirmModal";
 import WishlistToggleIcon from "./WishlistToggleIcon";
+import ProductImage from "./ProductImage";
 
 export default function ProductTile({ product }: { product: Product }) {
     const { bag, addToBag } = useBagStore((state) => state);
 
     const [isHovered, setIsHovered] = useState<boolean>(false);
     const [isQuickAddActive, setIsQuickAddActive] = useState<boolean>(false);
-    const [isImgLoaded, setIsImgLoaded] = useState<boolean>(false);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -76,30 +75,11 @@ export default function ProductTile({ product }: { product: Product }) {
                     onTouchCancel={handleTouchEnd}
                 >
                     <div className="relative w-full aspect-[4/5]">
-                        <div
-                            className={`relative w-full h-full transition duration-500 ${
-                                isImgLoaded ? "opacity-100" : "opacity-0"
-                            }`}
-                        >
-                            <Image
-                                src={product.src}
-                                alt={product.alt}
-                                fill
-                                sizes="auto"
-                                className="object-cover"
-                                onLoad={() => setIsImgLoaded(true)}
-                            />
-                        </div>
-                        {!isImgLoaded && (
-                            <div className="absolute w-full h-full inset-0 bg-gray-200 overflow-hidden before:content-[''] before:absolute before:inset-0 before:translate-x-[-100%] before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:[animation:skeletonSweep_1s_infinite]"></div>
-                        )}
+                        <ProductImage product={product} />
                         {isHovered && (
                             <div>
                                 <div className="absolute top-0 right-0 m-2">
-                                    <WishlistToggleIcon
-                                        product={product}
-                                        iconSize={24}
-                                    />
+                                    <WishlistToggleIcon product={product} iconSize={24} />
                                 </div>
                                 <div className="absolute bottom-0 left-0 w-full p-2 md:p-3">
                                     {!isQuickAddActive && availableSizes.length > 0 ? (

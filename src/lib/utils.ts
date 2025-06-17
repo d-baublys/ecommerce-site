@@ -217,3 +217,11 @@ export function extractSort(param: string | null) {
 export const isolateInteraction = (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
 };
+
+export const getSkeletonSweep = (loadedPredicate: boolean) => {
+    return `${
+        !loadedPredicate
+            ? "before:content-[''] before:absolute before:inset-0 before:translate-x-[-100%] before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:[animation:skeletonSweep_1s_infinite]"
+            : ""
+    }`;
+};

@@ -4,6 +4,7 @@ import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import { Product } from "@/lib/definitions";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import ProductImage from "./ProductImage";
 
 export default function ZoomableImage({ productData }: { productData: Product }) {
     const [isScrollLocked, setIsScrollLocked] = useState<boolean>(false);
@@ -114,7 +115,7 @@ export default function ZoomableImage({ productData }: { productData: Product })
     return (
         <div
             id="product-img-wrapper"
-            className="relative aspect-[2/3] w-full md:w-auto md:h-[500px] snap-center  rounded-md overflow-hidden drop-shadow-(--tile-shadow) z-0"
+            className="relative w-full md:w-auto md:h-[500px] rounded-md overflow-hidden drop-shadow-(--tile-shadow) z-0"
             style={{ "--zoomed-bg": `url(${productData.src})` } as React.CSSProperties}
             onMouseEnter={handleMouseEnter}
             onMouseMove={(e) => moveZoomedImage({ e })}
@@ -124,13 +125,7 @@ export default function ZoomableImage({ productData }: { productData: Product })
             onTouchEnd={handleTouchEnd}
             onTouchCancel={handleMouseLeave}
         >
-            <Image
-                src={productData.src}
-                alt={productData.alt}
-                fill
-                sizes="auto"
-                className="object-cover"
-            />
+            <ProductImage product={productData} overrideClasses="aspect-[2/3]" />
         </div>
     );
 }
