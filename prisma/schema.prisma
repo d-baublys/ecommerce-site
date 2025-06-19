@@ -33,6 +33,11 @@ enum OrderStatus {
     refunded
 }
 
+enum UserRoles {
+    admin
+    user
+}
+
 model Product {
     id              String            @id @default(uuid())
     name            String
@@ -53,6 +58,8 @@ model Stock {
     quantity  Int
     productId String
     product   Product @relation(fields: [productId], references: [id])
+
+    @@unique([productId, size])
 }
 
 model FeaturedProduct {
@@ -88,9 +95,11 @@ model Order {
 }
 
 model User {
-    id        Int      @id @default(autoincrement())
-    name      String
-    email     String   @unique
+    id        Int       @id @default(autoincrement())
+    username  String    @unique
+    password  String
+    email     String    @unique
+    role      UserRoles
     orders    Order[]
-    createdAt DateTime @default(now())
+    createdAt DateTime  @default(now())
 }
