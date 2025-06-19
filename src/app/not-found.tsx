@@ -5,7 +5,7 @@ import BareLayout from "@/ui/layouts/BareLayout";
 export default function NotFound() {
     return (
         <BareLayout>
-            <p>{"Oops! Looks like the page you're looking for doesn't exist."}</p>
+            <p>{"Oops! It seems the page you're looking for doesn't exist."}</p>
             <Link href={"/"}>
                 <RoundedButton>Home</RoundedButton>
             </Link>

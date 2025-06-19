@@ -236,7 +236,11 @@ export default function CategoryGridPage({
                         </RoundedButton>
                     </div>
                 )}
-                <SlideDownMenu predicate={isFilterOpen} predicateSetter={setIsFilterOpen}>
+                <SlideDownMenu
+                    predicate={isFilterOpen}
+                    predicateSetter={setIsFilterOpen}
+                    overrideClasses="lg:hidden"
+                >
                     <GridAside
                         allCategoryProducts={allCategoryProducts}
                         sizeFilters={sizeFilters}

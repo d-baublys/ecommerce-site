@@ -238,3 +238,32 @@ export async function clearFeaturedProducts() {
         return { success: false };
     }
 }
+
+export async function getUser(email: string) {
+    try {
+        const result = await prisma.user.findFirst({
+            where: { email },
+        });
+        return result ? { user: result.name, password: result.password } : null;
+    } catch (error) {
+        console.error("Error fetching user data: ", error);
+        throw new Error("Error fetching user data. Please try again later.");
+    }
+}
+
+// !!!TO-DO!!!
+// export async function authenticate(formData: FormData, prevState?: string) {
+//     try {
+//         await signInServer("credentials", formData);
+//     } catch (error) {
+//         if (error instanceof AuthError) {
+//             switch (error.type) {
+//                 case "CredentialsSignin":
+//                     return "Invalid credentials";
+//                 default:
+//                     return "Something went wrong";
+//             }
+//         }
+//         throw error;
+//     }
+// }
