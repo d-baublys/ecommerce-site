@@ -2,6 +2,7 @@ import { getProductData } from "@/lib/actions";
 import DisplayTile from "@/ui/components/DisplayTile";
 import ProductAddEditForm from "@/ui/components/ProductAddEditForm";
 import AdminLayout from "@/ui/layouts/AdminLayout";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export default async function ProductViewEditPage({ params }: { params: { slug: string } }) {
@@ -17,7 +18,9 @@ export default async function ProductViewEditPage({ params }: { params: { slug: 
     return (
         <AdminLayout subheaderText="Edit Product" lastCrumbText={productData.name}>
             <div className="flex flex-col w-full gap-8">
-                <DisplayTile productData={productData} />
+                <Link href={`/products/${encodeURIComponent(productData.slug)}`}>
+                    <DisplayTile productData={productData} />
+                </Link>
                 <ProductAddEditForm productData={productData} />
             </div>
         </AdminLayout>

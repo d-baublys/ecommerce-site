@@ -197,7 +197,7 @@ export default function NavBarClient() {
                             }`}
                             onClick={() => {
                                 isAdmin && setIsAccountOpen(true);
-                                setIsMenuOpen(false);
+                                isAdmin && setIsMenuOpen(false);
                             }}
                         >
                             <IoPersonOutline

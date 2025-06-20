@@ -141,7 +141,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
 
     return (
         <>
-            <form className="flex flex-col w-full p-4 gap-8 border-2 bg-background-lightest rounded-lg">
+            <form className="flex flex-col w-full p-4 gap-8 bg-background-lightest rounded-lg">
                 <FormInput
                     onChange={(e) => {
                         setProvisionalDataObj((prev) => ({ ...prev, name: e.target.value }));
@@ -150,7 +150,9 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                     value={provisionalDataObj.name}
                 />
                 <fieldset>
-                    <legend className="mb-2">Category</legend>
+                    <legend className="mb-2 text-sz-label-button lg:text-sz-label-button-lg">
+                        Category
+                    </legend>
                     <select
                         onChange={(e) => {
                             setProvisionalDataObj((prev) => ({
@@ -158,7 +160,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                                 gender: e.target.value as Categories,
                             }));
                         }}
-                        className="p-1.5 border-2 rounded-lg bg-white"
+                        className="p-1.5 rounded-lg bg-white"
                         value={provisionalDataObj.gender}
                     >
                         {Object.keys(VALID_CATEGORIES).map((category, idx) => (
@@ -228,7 +230,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                     )}
                 </div>
                 {mode === "edit" && (
-                    <div className="flex justify-center w-full pt-4 border-t-black border-t-2">
+                    <div className="flex justify-center w-full pt-4 border-t">
                         <RoundedButton
                             overrideClasses="!bg-danger-color !text-contrasted !border-danger-color"
                             onClick={() => handleDelete(provisionalDataObj.id)}

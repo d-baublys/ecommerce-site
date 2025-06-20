@@ -26,6 +26,8 @@ export default function ProductStockTable({
     const [newSize, setNewSize] = useState<Sizes>();
     const [newStock, setNewStock] = useState<number>();
 
+    const tableArr = VALID_SIZES.filter((size) => size in localStockObj);
+
     useEffect(() => {
         setLocalStockObj(provisionalDataObj.stock);
     }, [provisionalDataObj]);
@@ -68,8 +70,8 @@ export default function ProductStockTable({
     };
 
     return (
-        <div className="flex flex-col border-2 p-2">
-            <div className="flex justify-between h-12">
+        <div className="flex flex-col py-4 bg-background-lighter rounded-md ">
+            <div className="flex justify-between h-12 px-8">
                 {tableMode === "display" && Object.keys(localStockObj)?.length > 0 && (
                     <RoundedButton onClick={() => setTableMode("edit")}>Edit</RoundedButton>
                 )}
@@ -87,26 +89,43 @@ export default function ProductStockTable({
                 )}
             </div>
             <div className="flex justify-center h-8 p-2">
-                <p className="text-center">{message}</p>
+                <p className="text-center text-white">{message}</p>
             </div>
-            <table className="text-center border-2 mt-2 bg-white">
+            <table className="text-center ml-8 border-separate border-spacing-0 mt-2">
                 <thead>
                     <tr className="p-2">
-                        <th className="border-2">Size</th>
-                        <th className="border-2">Stock</th>
+                        <th className="w-1/2 bg-background-lightest border-2 border-r-1 py-2 rounded-tl-md">
+                            Size
+                        </th>
+                        <th className="w-1/2 bg-background-lightest border-2 border-l-2 py-2 rounded-tr-md">
+                            Stock
+                        </th>
+                        <th className="min-w-8"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {VALID_SIZES.filter((size) => size in localStockObj).map((stockSize) => (
+                    {tableArr.map((stockSize, idx) => (
                         <tr key={stockSize}>
-                            <td className="border-2">
+                            <td
+                                className={`border border-l-2 bg-white ${
+                                    idx === tableArr.length - 1 && !(tableMode === "add")
+                                        ? "rounded-bl-lg border-b-2"
+                                        : ""
+                                } `}
+                            >
                                 <StockTableInput
                                     type="text"
                                     mode={tableMode}
                                     value={stockSize.toUpperCase()}
                                 />
                             </td>
-                            <td className="border-2">
+                            <td
+                                className={`border border-r-2 bg-white ${
+                                    idx === tableArr.length - 1 && !(tableMode === "add")
+                                        ? "rounded-br-lg border-b-2"
+                                        : ""
+                                } `}
+                            >
                                 <StockTableInput
                                     type="number"
                                     mode={tableMode}
@@ -116,7 +135,7 @@ export default function ProductStockTable({
                                     setNewStock={setNewStock}
                                 />
                             </td>
-                            <td className="min-w-4 w-8">
+                            <td>
                                 {tableMode === "edit" && (
                                     <StockRowDelete
                                         stockObjSetter={setLocalStockObj}
@@ -128,7 +147,7 @@ export default function ProductStockTable({
                     ))}
                     {tableMode === "add" && (
                         <tr>
-                            <td className="border-2">
+                            <td className="border border-l-2 border-b-2 rounded-bl-lg bg-white">
                                 <StockTableInput
                                     type="text"
                                     mode={tableMode}
@@ -136,7 +155,7 @@ export default function ProductStockTable({
                                     setNewSize={setNewSize}
                                 />
                             </td>
-                            <td className="border-2">
+                            <td className="border border-r-2 border-b-2 rounded-br-lg bg-white">
                                 <StockTableInput
                                     type="number"
                                     mode={tableMode}

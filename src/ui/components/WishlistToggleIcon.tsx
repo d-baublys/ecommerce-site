@@ -25,7 +25,7 @@ export default function WishlistToggleIcon({
             onClick={toggleWishlist}
         >
             <div
-                className={`relative flex justify-center items-center translate-y-[1px] aspect-square h-[24px] text-black ${
+                className={`relative flex justify-center items-center translate-y-[1px] aspect-square text-black ${
                     isAnimated ? "[animation:big-pop-in_0.3s_ease_0.1s]" : ""
                 }`}
             >

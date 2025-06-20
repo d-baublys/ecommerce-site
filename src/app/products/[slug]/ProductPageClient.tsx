@@ -90,7 +90,8 @@ export default function ProductPageClient({ productData }: { productData: Produc
                         predicate={!(size === undefined || isButtonDisabled)}
                         disabled={size === undefined || isButtonDisabled}
                     >
-                        Add to Bag <IoBag />
+                        <span>Add to Bag</span>
+                        <IoBag />
                     </GoButton>
                     <WishlistToggleButton product={productData} />
                 </div>

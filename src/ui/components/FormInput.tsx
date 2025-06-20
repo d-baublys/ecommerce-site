@@ -13,12 +13,14 @@ export default function FormInput({
 }: FormInputProps) {
     return (
         <fieldset>
-            <legend className="mb-2">{legend}</legend>
+            <legend className="mb-2 text-sz-label-button lg:text-sz-label-button-lg">
+                {legend}
+            </legend>
             <input
                 type={type}
                 min={0}
                 step={"0.01"}
-                className={`w-full p-1 border-2 bg-white rounded-lg ${overrideClasses}`}
+                className={`w-full p-1 bg-white rounded-lg ${overrideClasses}`}
                 ref={ref}
                 {...props}
             ></input>

@@ -25,6 +25,7 @@ export default function LogInInput({
                 {labelText}
             </span>
             <input
+                type={type}
                 className={`w-full border-b-2 p-1 outline-none ${
                     showRed ? " border-red-500" : "focus:border-blue-700"
                 } ${overrideClasses}`}
