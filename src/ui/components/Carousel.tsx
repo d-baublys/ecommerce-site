@@ -63,15 +63,12 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
     return (
         <div
             id="carousel-master"
-            className="flex flex-col justify-center items-center grow w-full h-[500px] min-h-[500px]"
+            className="flex flex-col items-center grow w-full h-[500px] min-h-[500px]"
         >
-            <div
-                id="slider-container"
-                className="relative max-w-(--carousel-width) h-4/5 overflow-hidden"
-            >
+            <div id="slider-container" className="relative max-w-(--carousel-width) h-4/5">
                 <ul
                     id="carousel-slider"
-                    className="flex overflow-x-hidden gap-(--carousel-img-gap) px-(--carousel-img-w) h-full z-30"
+                    className="flex overflow-hidden gap-(--carousel-img-gap) px-(--carousel-img-w) h-full z-30"
                 >
                     {featuredList.map((featuredProd, idx) => (
                         <li
@@ -123,10 +120,7 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                 id="dot-container-spacer"
                 className="flex justify-center items-center w-full h-1/5"
             >
-                <ul
-                    id="carousel-dot-container"
-                    className="absolute flex items-center gap-[10px] bottom-[calc(50px)] left-[50%] translate-x-[-50%] translate-y-[50%]"
-                >
+                <ul id="carousel-dot-container" className="flex items-center gap-3 -translate-y-1">
                     {featuredList.map((_, idx) => (
                         <li key={idx} className="flex">
                             <button

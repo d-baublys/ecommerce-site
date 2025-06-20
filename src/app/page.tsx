@@ -32,7 +32,7 @@ export default async function Home() {
                     product={{ src: "/tshirts.jpg", alt: "Branded t-shirts" }}
                     overrideClasses="brightness-50"
                 />
-                <div className="flex flex-col main-tagline absolute w-full top-1/2 px-(--gutter) md:px-(--gutter-md) text-sz-heading lg:text-sz-heading-lg font-semibold text-contrasted">
+                <div className="flex flex-col main-tagline absolute w-full bottom-0 p-(--gutter) md:p-(--gutter-md) text-sz-heading lg:text-sz-heading-lg font-semibold text-contrasted">
                     <h1>Summer 2025 styles here and now.</h1>
                     <Link
                         href={"/category/all"}
