@@ -62,7 +62,7 @@ export default function RoundedButton({
             type={type}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            className={`rounded-btn relative flex justify-center items-center px-6 py-2 bg-white rounded-full border-[1px] border-component-color gap-2 cursor-pointer hover:scale-[103%] transition active:drop-shadow-(--button-shadow) ${
+            className={`rounded-btn relative flex justify-center items-center px-6 py-2 bg-white rounded-full border border-component-color gap-2 text-sz-label-button lg:text-sz-label-button-lg cursor-pointer hover:scale-[103%] transition active:drop-shadow-(--button-shadow) ${
                 overrideClasses ?? ""
             }`}
             {...props}

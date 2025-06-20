@@ -123,7 +123,7 @@ export default function SearchBar({
                 </div>
             </div>
             {query && options?.showSuggestions && (
-                <div className="mx-4 min-h-[100px] px-2 py-2 border-t-[1px] border-background-lighter bg-background-lightest z-100">
+                <div className="mx-4 min-h-[100px] px-2 py-2 border-t border-background-lighter bg-background-lightest z-100">
                     <ul>
                         {results?.length > 0 &&
                             results.map((product) => (
