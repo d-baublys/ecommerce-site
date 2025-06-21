@@ -1,8 +1,8 @@
 "use client";
 
 import { Product } from "@/lib/definitions";
-import RoundedButton from "./RoundedButton";
-import WishlistToggleIcon from "./WishlistToggleIcon";
+import RoundedButton from "@/ui/components/buttons/RoundedButton";
+import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
 import { useWishlistToggle } from "@/hooks/useWishlistToggle";
 
 export default function WishlistToggleButton({ product }: { product: Product }) {

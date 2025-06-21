@@ -1,5 +1,5 @@
 import MainWrapperWithSubheader from "@/ui/layouts/MainWrapperWithSubheader";
-import { MainLayoutProps } from "./MainLayout";
+import { MainLayoutProps } from "@/ui/layouts/MainLayout";
 
 export default function AdminLayout({
     children,

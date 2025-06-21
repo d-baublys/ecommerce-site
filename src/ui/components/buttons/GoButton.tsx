@@ -1,4 +1,4 @@
-import RoundedButton, { RoundedButtonProps } from "./RoundedButton";
+import RoundedButton, { RoundedButtonProps } from "@/ui/components/buttons/RoundedButton";
 
 interface GoButtonProps extends RoundedButtonProps {
     predicate: boolean;

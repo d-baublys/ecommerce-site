@@ -3,7 +3,7 @@ import "@/ui/styles/globals.css";
 import NavBar from "@/ui/components/NavBar";
 import Footer from "@/ui/components/Footer";
 import { lexendExa } from "@/ui/fonts";
-import SearchOverlay from "@/ui/components/SearchOverlay";
+import SearchOverlay from "@/ui/components/overlays/SearchOverlay";
 
 export const metadata: Metadata = {
     title: "DB-Wear",

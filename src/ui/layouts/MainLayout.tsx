@@ -1,4 +1,4 @@
-import MainWrapperWithSubheader from "./MainWrapperWithSubheader";
+import MainWrapperWithSubheader from "@/ui/layouts/MainWrapperWithSubheader";
 
 export interface MainLayoutProps {
     children: React.ReactNode;

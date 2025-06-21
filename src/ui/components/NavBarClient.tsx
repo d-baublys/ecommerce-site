@@ -14,7 +14,7 @@ import {
     IoSearchOutline,
 } from "react-icons/io5";
 import { signOut, useSession } from "next-auth/react";
-import SlideDownColumnsMenu from "./SlideDownColumnsMenu";
+import SlideDownColumnsMenu from "./overlays/SlideDownColumnsMenu";
 
 export default function NavBarClient() {
     const [isScrollingUp, setIsScrollingUp] = useState(false);

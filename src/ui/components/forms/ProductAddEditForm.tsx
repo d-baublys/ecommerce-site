@@ -1,8 +1,8 @@
 "use client";
 
 import { Categories, Product, StockTableMode, VALID_CATEGORIES } from "@/lib/definitions";
-import FormInput from "./FormInput";
-import RoundedButton from "./RoundedButton";
+import FormInput from "@/ui/components/forms/FormInput";
+import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import { useEffect, useRef, useState } from "react";
 import {
     convertValidPrice,
@@ -18,7 +18,7 @@ import ProductStockTable from "./ProductStockTable";
 import { useModalStore } from "@/stores/modalStore";
 import { productAdd, productDelete, productUpdate } from "@/lib/actions";
 import { useRouter } from "next/navigation";
-import DeleteConfirmModal from "./DeleteConfirmModal";
+import DeleteConfirmModal from "../overlays/DeleteConfirmModal";
 
 export default function ProductAddEditForm({ productData }: { productData?: Product }) {
     const dataObj = productData ? productData : createEmptyProduct();

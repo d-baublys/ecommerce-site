@@ -4,11 +4,11 @@ import { useBagStore } from "@/stores/bagStore";
 import { useEffect, useState } from "react";
 import { Sizes, VALID_SIZES } from "@/lib/definitions";
 import { Product } from "@/lib/definitions";
-import GoButton from "@/ui/components/GoButton";
+import GoButton from "@/ui/components/buttons/GoButton";
 import { IoBag, IoHeart, IoHeartOutline } from "react-icons/io5";
 import { checkStock } from "@/lib/utils";
 import ZoomableImage from "@/ui/components/ZoomableImage";
-import WishlistToggleButton from "@/ui/components/WishlistToggleButton";
+import WishlistToggleButton from "@/ui/components/buttons/WishlistToggleButton";
 
 export default function ProductPageClient({ productData }: { productData: Product }) {
     const [size, setSize] = useState<Sizes | "placeholder">("placeholder");

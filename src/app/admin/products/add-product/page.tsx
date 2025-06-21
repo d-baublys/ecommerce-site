@@ -1,5 +1,5 @@
 import AdminLayout from "@/ui/layouts/AdminLayout";
-import ProductAddEditForm from "@/ui/components/ProductAddEditForm";
+import ProductAddEditForm from "@/ui/components/forms/ProductAddEditForm";
 
 export default function AddProductPage() {
     return (

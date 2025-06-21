@@ -2,9 +2,8 @@
 
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import { Product } from "@/lib/definitions";
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import ProductImage from "./ProductImage";
+import ProductImage from "@/ui/components/ProductImage";
 
 export default function ZoomableImage({ productData }: { productData: Product }) {
     const [isScrollLocked, setIsScrollLocked] = useState<boolean>(false);

@@ -1,13 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { IoChevronBackSharp, IoChevronForwardSharp } from "react-icons/io5";
 import { debounce } from "@/lib/utils";
-import ProductLink from "./ProductLink";
+import ProductLink from "@/ui/components/ProductLink";
 import { Product } from "@/lib/definitions";
-import RoundedButton from "./RoundedButton";
-import ProductImage from "./ProductImage";
+import RoundedButton from "@/ui/components/buttons/RoundedButton";
+import ProductImage from "@/ui/components/ProductImage";
 
 export default function Carousel({ featuredList }: { featuredList: Product[] }) {
     const [activeFeatured, setActiveFeatured] = useState(0);

@@ -1,4 +1,4 @@
-import CloseButton from "./CloseButton";
+import CloseButton from "@/ui/components/buttons/CloseButton";
 
 export interface MenuProps {
     children: React.ReactNode;

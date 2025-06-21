@@ -1,6 +1,6 @@
-import Breadcrumbs from "../components/Breadcrumbs";
-import { MainLayoutProps } from "./MainLayout";
-import MainWrapper from "./MainWrapper";
+import Breadcrumbs from "@/ui/components/Breadcrumbs";
+import { MainLayoutProps } from "@/ui/layouts/MainLayout";
+import MainWrapper from "@/ui/layouts/MainWrapper";
 
 export default function MainWrapperWithSubheader({
     children,

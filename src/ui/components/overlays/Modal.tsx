@@ -1,8 +1,8 @@
 "use client";
 
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
-import DarkBackdrop from "./DarkBackdrop";
-import CloseButton from "./CloseButton";
+import DarkBackdrop from "@/ui/components/overlays/DarkBackdrop";
+import CloseButton from "@/ui/components/buttons/CloseButton";
 
 export interface ModalProps {
     children: React.ReactNode;

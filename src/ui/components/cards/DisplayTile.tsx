@@ -2,8 +2,7 @@
 
 import { Product } from "@/lib/definitions";
 import { IoClose } from "react-icons/io5";
-import Image from "next/image";
-import ProductImage from "./ProductImage";
+import ProductImage from "@/ui/components/ProductImage";
 
 export default function DisplayTile({
     productData,
@@ -15,7 +14,7 @@ export default function DisplayTile({
     return (
         <div className="flex h-28 w-full border-2 p-2 bg-white">
             <div className="flex h-full grow gap-2 sm:gap-8">
-                <ProductImage product={productData} overrideClasses="aspect-square"/>
+                <ProductImage product={productData} overrideClasses="aspect-square" />
                 <div className="flex flex-col justify-between">
                     <div className="font-semibold">{productData.name.toUpperCase()}</div>
                 </div>

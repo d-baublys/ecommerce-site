@@ -1,5 +1,5 @@
 import { Product } from "@/lib/definitions";
-import ProductTile from "./ProductTile";
+import ProductTile from "@/ui/components/cards/ProductTile";
 
 export default function ProductGrid({ productList }: { productList: Product[] }) {
     return (

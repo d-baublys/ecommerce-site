@@ -1,12 +1,12 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import SearchBar from "./SearchBar";
+import SearchBar from "@/ui/components/SearchBar";
 import { Product } from "@/lib/definitions";
 import { useSearchStore } from "@/stores/searchStore";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
-import DarkBackdrop from "./DarkBackdrop";
-import CloseButton from "./CloseButton";
+import DarkBackdrop from "@/ui/components/overlays/DarkBackdrop";
+import CloseButton from "@/ui/components/buttons/CloseButton";
 import { useEffect } from "react";
 
 export default function SearchOverlay() {

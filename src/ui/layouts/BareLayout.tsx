@@ -1,4 +1,4 @@
-import MainWrapper from "./MainWrapper";
+import MainWrapper from "@/ui/layouts/MainWrapper";
 
 export default function BareLayout({ children }: { children: React.ReactNode }) {
     return (

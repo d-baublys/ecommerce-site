@@ -1,8 +1,8 @@
 "use client";
 
 import { useModalStore } from "@/stores/modalStore";
-import RoundedButton from "./RoundedButton";
-import Modal from "./Modal";
+import RoundedButton from "@/ui/components/buttons/RoundedButton";
+import Modal from "@/ui/components/overlays/Modal";
 
 export default function DeleteConfirmModal() {
     const { isModalOpen, resolve, closeModal } = useModalStore((state) => state);

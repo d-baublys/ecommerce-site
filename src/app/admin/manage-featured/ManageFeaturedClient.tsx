@@ -3,10 +3,10 @@
 import { clearFeaturedProducts, createFeaturedProducts } from "@/lib/actions";
 import { FEATURED_COUNT, Product } from "@/lib/definitions";
 import { areProductListsEqual } from "@/lib/utils";
-import RoundedButton from "@/ui/components/RoundedButton";
+import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import SearchBar from "@/ui/components/SearchBar";
 import { useEffect, useState } from "react";
-import DisplayTile from "@/ui/components/DisplayTile";
+import DisplayTile from "@/ui/components/cards/DisplayTile";
 
 export default function ManageFeaturedClient({ productData }: { productData: Product[] }) {
     const [savedFeaturedList, setSavedFeaturedList] = useState<Product[]>(productData);

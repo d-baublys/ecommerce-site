@@ -2,9 +2,9 @@
 
 import { Product, Sizes, StockTableMode, VALID_SIZES } from "@/lib/definitions";
 import { isUnique, isValidSize } from "@/lib/utils";
-import RoundedButton from "@/ui/components/RoundedButton";
-import StockTableInput from "@/ui/components/StockTableInput";
-import StockRowDelete from "@/ui/components/StockRowDelete";
+import RoundedButton from "@/ui/components/buttons/RoundedButton";
+import StockTableInput from "@/ui/components/forms/StockTableInput";
+import StockRowDelete from "@/ui/components/buttons/StockRowDelete";
 import { useEffect, useState } from "react";
 
 export default function ProductStockTable({

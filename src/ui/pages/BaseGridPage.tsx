@@ -1,7 +1,6 @@
-import { Categories, Product, VALID_CATEGORIES } from "@/lib/definitions";
+import { Product } from "@/lib/definitions";
 import { pluralise } from "@/lib/utils";
-import ProductGrid from "@/ui/components/ProductGrid";
-import Link from "next/link";
+import ProductGrid from "@/ui/components/product-grid/ProductGrid";
 
 export default function BaseGridPage({
     displayedProducts,

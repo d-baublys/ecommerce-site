@@ -4,7 +4,7 @@ import { PriceFilterKey, PRICE_FILTER_OPTIONS, Product, VALID_SIZES } from "@/li
 import AccordionSection from "./AccordionSection";
 import { Sizes } from "@/lib/definitions";
 import React, { useMemo } from "react";
-import FilterButton from "./FilterButton";
+import FilterButton from "@/ui/components/buttons/FilterButton";
 
 export default function GridAside({
     allCategoryProducts,

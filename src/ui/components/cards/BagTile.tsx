@@ -6,7 +6,7 @@ import { IoClose } from "react-icons/io5";
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect } from "react";
 import { stringifyConvertPrice } from "@/lib/utils";
-import ProductImage from "./ProductImage";
+import ProductImage from "@/ui/components/ProductImage";
 
 export default function BagTile({
     bagItem,

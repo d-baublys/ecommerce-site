@@ -1,6 +1,6 @@
 "use client"; // must for error files
 
-import RoundedButton from "@/ui/components/RoundedButton";
+import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import BareLayout from "@/ui/layouts/BareLayout";
 
 export default function Error({

@@ -1,4 +1,4 @@
-import RoundedButton from "@/ui/components/RoundedButton";
+import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import Link from "next/link";
 import BareLayout from "@/ui/layouts/BareLayout";
 

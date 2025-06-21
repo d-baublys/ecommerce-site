@@ -2,13 +2,13 @@
 
 import { Product, Sizes, VALID_SIZES } from "@/lib/definitions";
 import { checkStock, isolateInteraction, stringifyConvertPrice } from "@/lib/utils";
-import ProductLink from "./ProductLink";
+import ProductLink from "@/ui/components/ProductLink";
 import { useEffect, useRef, useState } from "react";
-import RoundedButton from "./RoundedButton";
+import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import { useBagStore } from "@/stores/bagStore";
-import BagConfirmModal from "./BagConfirmModal";
-import WishlistToggleIcon from "./WishlistToggleIcon";
-import ProductImage from "./ProductImage";
+import BagConfirmModal from "@/ui/components/overlays/BagConfirmModal";
+import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
+import ProductImage from "@/ui/components/ProductImage";
 
 export default function ProductTile({ product }: { product: Product }) {
     const { bag, addToBag } = useBagStore((state) => state);

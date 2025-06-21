@@ -1,4 +1,4 @@
-import SlideDownMenu, { MenuProps } from "./SlideDownMenu";
+import SlideDownMenu, { MenuProps } from "@/ui/components/overlays/SlideDownMenu";
 
 type GridMenuProps = Omit<MenuProps, "children"> & {
     leftContent?: React.ReactNode;

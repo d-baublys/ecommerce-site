@@ -1,6 +1,6 @@
 import { getProductData } from "@/lib/actions";
-import DisplayTile from "@/ui/components/DisplayTile";
-import ProductAddEditForm from "@/ui/components/ProductAddEditForm";
+import DisplayTile from "@/ui/components/cards/DisplayTile";
+import ProductAddEditForm from "@/ui/components/forms/ProductAddEditForm";
 import AdminLayout from "@/ui/layouts/AdminLayout";
 import Link from "next/link";
 import { notFound } from "next/navigation";

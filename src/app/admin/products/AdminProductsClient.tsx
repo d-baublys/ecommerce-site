@@ -4,8 +4,8 @@ import { Categories, Product, VALID_CATEGORIES } from "@/lib/definitions";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import DisplayTile from "@/ui/components/DisplayTile";
-import RoundedButton from "@/ui/components/RoundedButton";
+import DisplayTile from "@/ui/components/cards/DisplayTile";
+import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import SearchBar from "@/ui/components/SearchBar";
 
 export default function AdminProductsClient() {

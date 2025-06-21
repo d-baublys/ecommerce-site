@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { IoCheckmarkCircle } from "react-icons/io5";
 import { SuccessBagClearClient } from "./SuccessBagClearClient";
-import RoundedButton from "@/ui/components/RoundedButton";
+import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import BareLayout from "@/ui/layouts/BareLayout";
 import { getOrder } from "@/lib/actions";
 

@@ -1,8 +1,8 @@
 "use client";
 
-import GoButton from "@/ui/components/GoButton";
+import GoButton from "@/ui/components/buttons/GoButton";
 import LogInInput from "@/ui/components/LogInInput";
-import RoundedButton from "@/ui/components/RoundedButton";
+import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import AdminLayout from "@/ui/layouts/AdminLayout";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";

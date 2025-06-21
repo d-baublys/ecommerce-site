@@ -1,6 +1,6 @@
 import { IoCheckmarkCircle } from "react-icons/io5";
-import Modal, { ModalProps } from "./Modal";
-import RoundedButton from "./RoundedButton";
+import Modal, { ModalProps } from "@/ui/components/overlays/Modal";
+import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import Link from "next/link";
 
 export default function BagConfirmModal({
