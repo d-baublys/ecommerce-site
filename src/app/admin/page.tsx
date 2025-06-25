@@ -1,5 +1,5 @@
 import AdminLayout from "@/ui/layouts/AdminLayout";
-import ListButton from "@/ui/components/ListButton";
+import ListButton from "@/ui/components/buttons/ListButton";
 
 export default function AdminPage() {
     return (

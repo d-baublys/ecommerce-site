@@ -23,6 +23,7 @@ export default function WishlistToggleIcon({
                 isAnimated ? "[animation:small-pop-in_0.3s_ease]" : ""
             }`}
             onClick={toggleWishlist}
+            aria-label="Add or remove from wishlist"
         >
             <div
                 className={`relative flex justify-center items-center translate-y-[1px] aspect-square text-black ${
@@ -30,12 +31,13 @@ export default function WishlistToggleIcon({
                 }`}
             >
                 <IoHeart
+                    data-testid="filled-heart"
                     size={iconSize}
                     className={`absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] filled-heart ${
                         showFilled ? "show-filled" : ""
                     }`}
                 />
-                <IoHeartOutline size={iconSize} />
+                <IoHeartOutline data-testid="outline-heart" size={iconSize} />
             </div>
         </div>
     );
