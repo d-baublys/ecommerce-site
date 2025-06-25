@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ProductTile from "@/ui/components/cards/ProductTile";
 import { Product } from "@/lib/definitions";
 import { createTestProduct } from "@/lib/test-utils";
@@ -85,8 +85,16 @@ describe("ProductTile", () => {
     });
 
     it("has no accessiblity violations", async () => {
-        const { container } = render(<ProductTile product={mockStockedProduct} />);
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
+        let container: HTMLElement;
+
+        act(() => {
+            const result = render(<ProductTile product={mockStockedProduct} />);
+            container = result.container;
+        });
+
+        await waitFor(async () => {
+            const results = await axe(container);
+            expect(results).toHaveNoViolations();
+        });
     });
 });

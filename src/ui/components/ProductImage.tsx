@@ -32,6 +32,7 @@ export default function ProductImage({
             </div>
             {!isImgLoaded && (
                 <div
+                    data-testid="image-skeleton"
                     className={`absolute inset-0 bg-gray-200 overflow-hidden z-10 ${getSkeletonSweep(
                         isImgLoaded
                     )}`}
