@@ -225,3 +225,7 @@ export const getSkeletonSweep = (loadedPredicate: boolean) => {
             : ""
     }`;
 };
+
+export function escapeRegExp(string: string): string {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
