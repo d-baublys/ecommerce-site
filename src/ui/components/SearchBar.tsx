@@ -1,7 +1,8 @@
 "use client";
 
 import { Product } from "@/lib/definitions";
-import { debounce, fetchFilteredProducts } from "@/lib/utils";
+import { fetchFilteredProducts } from "@/lib/fetching-utils";
+import { debounce } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { SetStateAction, useEffect, useState } from "react";
 import { IoCloseCircle, IoSearch } from "react-icons/io5";

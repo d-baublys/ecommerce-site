@@ -1,10 +1,6 @@
-import { Prisma, Stock } from "../../generated/prisma";
-import { getProductData } from "./actions";
+import { Stock } from "../../generated/prisma";
 import {
     BagItem,
-    Categories,
-    PriceFilterKey,
-    PRICE_FILTER_OPTIONS,
     Product,
     PRODUCT_BASE_FIELDS,
     ProductBase,
@@ -147,57 +143,6 @@ export function processDateForClient(date?: Date) {
     return (date ? date : new Date()).toISOString().split("T")[0];
 }
 
-export async function fetchFilteredProducts({
-    category,
-    sizeFilters = [],
-    priceFilters = [],
-    productSort,
-    query,
-}: {
-    category: Categories | "all";
-    sizeFilters?: Sizes[];
-    priceFilters?: string[];
-    productSort?: ProductSortKey | "placeholder";
-    query?: string;
-}) {
-    const filterQuery: Prisma.ProductWhereInput = {
-        stock: {
-            some: {
-                quantity: { gt: 0 },
-            },
-        },
-    };
-
-    if (category !== "all") {
-        filterQuery.gender = category as Categories;
-    }
-
-    if (sizeFilters.length > 0 && filterQuery.stock) {
-        filterQuery.stock.some = {
-            ...filterQuery.stock.some,
-            size: { in: sizeFilters },
-        };
-    }
-
-    if (priceFilters.length > 0) {
-        filterQuery.OR = priceFilters.map((key) => {
-            const { min, max } = PRICE_FILTER_OPTIONS[key as PriceFilterKey];
-            return isFinite(max) ? { price: { gte: min, lt: max } } : { price: { gte: min } };
-        });
-    }
-
-    if (query) {
-        filterQuery.name = { contains: query, mode: "insensitive" };
-    }
-
-    const orderBy =
-        productSort && productSort !== "placeholder" ? SORT_OPTIONS[productSort].sort : undefined;
-
-    const productsFetch = await getProductData(filterQuery, orderBy);
-
-    return productsFetch.data;
-}
-
 export function pluralise(word: string, count: number) {
     return count === 1 ? word : word + "s";
 }
@@ -218,12 +163,8 @@ export const isolateInteraction = (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
 };
 
-export const getSkeletonSweep = (loadedPredicate: boolean) => {
-    return `${
-        !loadedPredicate
-            ? "before:content-[''] before:absolute before:inset-0 before:translate-x-[-100%] before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:[animation:skeletonSweep_1s_infinite]"
-            : ""
-    }`;
+export const getSkeletonSweep = () => {
+    return "before:content-[''] before:absolute before:inset-0 before:translate-x-[-100%] before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:[animation:skeletonSweep_1s_infinite]";
 };
 
 export function escapeRegExp(string: string): string {

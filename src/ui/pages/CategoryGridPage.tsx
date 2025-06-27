@@ -13,7 +13,7 @@ import {
 } from "@/lib/definitions";
 import GridAside from "@/ui/components/product-grid/GridAside";
 import { useEffect, useRef, useState } from "react";
-import { extractFilters, extractSort, fetchFilteredProducts } from "@/lib/utils";
+import { extractFilters, extractSort } from "@/lib/utils";
 import { IoChevronDown } from "react-icons/io5";
 import SlideDownMenu from "@/ui/components/overlays/SlideDownMenu";
 import BaseGridPage from "@/ui/pages/BaseGridPage";
@@ -21,6 +21,7 @@ import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { fetchFilteredProducts } from "@/lib/fetching-utils";
 
 type pageOptions = {
     noAside?: boolean;
