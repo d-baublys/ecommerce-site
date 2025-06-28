@@ -28,7 +28,7 @@ export default function BaseGridPage({
                             <span>{displayedProducts.length}</span>
                             <span>{pluralise("Item", displayedProducts.length)}</span>
                         </p>
-                        {sortingUnit}
+                        {sortingUnit ?? null}
                     </div>
                     <div className="flex grow">
                         {displayedProducts.length > 0 ? (

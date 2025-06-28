@@ -1,4 +1,11 @@
-import { Product, VALID_CATEGORIES } from "./definitions";
+import React from "react";
+import {
+    PRICE_FILTER_OPTIONS,
+    PriceFilterKey,
+    Product,
+    Sizes,
+    VALID_CATEGORIES,
+} from "./definitions";
 import { processDateForClient, slugify } from "./utils";
 
 export function createTestProduct(overrides: Partial<Product> = {}): Product {
@@ -68,3 +75,47 @@ export function createTestProductList() {
         },
     ];
 }
+
+class ErrorBoundary extends React.Component<
+    { children: React.ReactNode },
+    { hasError: Error | null }
+> {
+    constructor(props: { children: React.ReactNode }) {
+        super(props);
+        this.state = { hasError: null };
+    }
+
+    static getDerivedStateFromError() {
+        return { hasError: true };
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div data-testid="error-container">
+                    <p>Error caught by boundary</p>
+                </div>
+            );
+        }
+
+        return this.props.children;
+    }
+}
+
+export function wrapWithErrorBoundary(children: React.ReactNode) {
+    return <ErrorBoundary>{children}</ErrorBoundary>;
+}
+
+export const matchSizeLabel = (size: Sizes, count: number) => {
+    return new RegExp(`${size.toUpperCase()}\\s\\(${count}\\)`);
+};
+
+export const matchPriceRangeLabel = (filterKey: PriceFilterKey, count: number) => {
+    const pattern = isFinite(PRICE_FILTER_OPTIONS[filterKey].max)
+        ? `[£$€]?${PRICE_FILTER_OPTIONS[filterKey].min / 100}-[£$€]?${
+              PRICE_FILTER_OPTIONS[filterKey].max / 100 - 1
+          }\\s\\(${count}\\)`
+        : `Over\\s[£$€]?${PRICE_FILTER_OPTIONS[filterKey].min / 100}\\s\\(${count}\\)`;
+
+    return new RegExp(pattern);
+};

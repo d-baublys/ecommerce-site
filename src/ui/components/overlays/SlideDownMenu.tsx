@@ -1,6 +1,6 @@
 import CloseButton from "@/ui/components/buttons/CloseButton";
 
-export interface MenuProps {
+export interface MenuProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
     predicate: boolean;
     predicateSetter: React.Dispatch<React.SetStateAction<boolean>>;
@@ -12,12 +12,14 @@ export default function SlideDownMenu({
     predicate,
     predicateSetter,
     overrideClasses,
+    ...props
 }: MenuProps) {
     return (
         <div
             className={`fixed left-0 w-screen h-full bg-white [transition:all_0.3s_ease-in-out] overflow-auto z-50 ${
                 overrideClasses ?? ""
             } ${predicate ? "top-0" : "top-[-250%]"}`}
+            {...props}
         >
             {predicate && (
                 <>

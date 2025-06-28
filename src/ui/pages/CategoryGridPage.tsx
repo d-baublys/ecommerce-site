@@ -140,7 +140,7 @@ export default function CategoryGridPage({
 
     const categoryTabs = () => {
         return (
-            <ul className="flex w-full border-b-2 gap-8 mb-8 py-2">
+            <ul aria-label="Category tabs" className="flex w-full border-b-2 gap-8 mb-8 py-2">
                 {Object.entries(VALID_CATEGORIES).map(([key, displayName]) => (
                     <li key={key}>
                         <Link href={`/category/${key}`}>
@@ -154,7 +154,10 @@ export default function CategoryGridPage({
 
     const loadingIndicator = () => {
         return (
-            <div className="fixed inset-0 flex justify-center items-center min-h-screen w-full">
+            <div
+                aria-label="Loading indicator"
+                className="fixed inset-0 flex justify-center items-center min-h-screen w-full"
+            >
                 <div className="flex justify-center items-center h-20 gap-[10px] p-4 bg-white rounded-2xl drop-shadow-(--button-shadow)">
                     {Array.from({ length: 5 }).map((_, idx) => (
                         <div
@@ -207,9 +210,17 @@ export default function CategoryGridPage({
 
     if (!(allCategoryProducts && filteredProducts)) return loadingIndicator();
 
+    const shouldRenderTabs = !options?.noCategoryTabs && category === "all";
+    const shouldRenderAside = !options?.noAside && (filteredProducts.length > 0 || !query);
+    const shouldRenderFilterBtn = !isFilterOpen && shouldRenderAside;
+
     const asideContent = () => {
         return (
-            <aside id="filter-aside" className="hidden lg:flex [flex:1_0_250px] mr-8">
+            <aside
+                id="filter-aside"
+                aria-label="Filtering aside"
+                className="hidden lg:flex [flex:1_0_250px] mr-8"
+            >
                 <div className="sticky top-(--nav-height) w-full">
                     <GridAside
                         allCategoryProducts={allCategoryProducts}
@@ -225,9 +236,9 @@ export default function CategoryGridPage({
 
     const fixedOverlays = () => {
         return (
-            <>
+            <div data-testid="fixed-overlays">
                 {isQueryLoading && loadingIndicator()}
-                {!isFilterOpen && (
+                {shouldRenderFilterBtn && (
                     <div className="fixed bottom-[5%] left-1/2 translate-x-[-50%] lg:hidden">
                         <RoundedButton
                             overrideClasses="!bg-black !text-contrasted !border-black [filter:drop-shadow(0_0_2px_rgba(255,255,255,0.5))]"
@@ -238,6 +249,7 @@ export default function CategoryGridPage({
                     </div>
                 )}
                 <SlideDownMenu
+                    aria-label="Filter menu"
                     predicate={isFilterOpen}
                     predicateSetter={setIsFilterOpen}
                     overrideClasses="lg:hidden"
@@ -250,12 +262,9 @@ export default function CategoryGridPage({
                         setPriceFilters={setPriceFilters}
                     />
                 </SlideDownMenu>
-            </>
+            </div>
         );
     };
-
-    const shouldRenderTabs = !options?.noCategoryTabs && category === "all";
-    const shouldRenderAside = !options?.noAside && (filteredProducts.length > 0 || !query);
 
     return (
         <BaseGridPage

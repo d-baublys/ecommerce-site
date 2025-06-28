@@ -1,5 +1,5 @@
-import { PRICE_FILTER_OPTIONS, PriceFilterKey, Product, Sizes } from "@/lib/definitions";
-import { createTestProductList } from "@/lib/test-utils";
+import { PriceFilterKey, Product, Sizes } from "@/lib/definitions";
+import { createTestProductList, matchPriceRangeLabel, matchSizeLabel } from "@/lib/test-utils";
 import GridAside from "@/ui/components/product-grid/GridAside";
 import { fireEvent, render, screen } from "@testing-library/react";
 
@@ -19,20 +19,6 @@ describe("GridAside", () => {
                 setPriceFilters={jest.fn()}
             />
         );
-    };
-
-    const matchSizeLabel = (size: Sizes, count: number) => {
-        return new RegExp(`${size.toUpperCase()}\\s\\(${count}\\)`);
-    };
-
-    const matchPriceRangeLabel = (filterKey: PriceFilterKey, count: number) => {
-        const pattern = isFinite(PRICE_FILTER_OPTIONS[filterKey].max)
-            ? `[£$€]?${PRICE_FILTER_OPTIONS[filterKey].min / 100}-[£$€]?${
-                  PRICE_FILTER_OPTIONS[filterKey].max / 100 - 1
-              }\\s\\(${count}\\)`
-            : `Over\\s[£$€]?${PRICE_FILTER_OPTIONS[filterKey].min / 100}\\s\\(${count}\\)`;
-
-        return new RegExp(pattern);
     };
 
     it("shows correct number of size filters", () => {
