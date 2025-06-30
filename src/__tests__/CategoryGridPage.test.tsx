@@ -29,30 +29,29 @@ jest.mock("next/navigation", () => ({
 
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 
+const mockProductList = createTestProductList();
+const filteredMockList: Product[] = mockProductList.filter((product) =>
+    Object.values(product.stock).some((stockCount) => stockCount > 0)
+); // parent would not pass list containing fully unstocked products
+
+const testComponent = <CategoryGridPage category="all" />;
+const testComponentWithQuery = <CategoryGridPage category="all" query="testing-test" />;
+
+const renderPage = () => render(testComponent);
+const renderPageWithQuery = () => render(testComponentWithQuery);
+
+const mockBothQuerysetsEmpty = () => {
+    (fetchFilteredProducts as jest.Mock).mockResolvedValue([]);
+};
+const mockBothQuerysetsFull = () => {
+    (fetchFilteredProducts as jest.Mock).mockResolvedValue(filteredMockList);
+};
+const mockFilterQuerysetEmpty = () => {
+    (fetchFilteredProducts as jest.Mock).mockResolvedValueOnce(filteredMockList); // for allCategoryProducts
+    (fetchFilteredProducts as jest.Mock).mockResolvedValueOnce([]); // for filteredProducts
+};
+
 describe("CategoryGridPage", () => {
-    const mockProductList = createTestProductList();
-    const filteredMockList: Product[] = mockProductList.filter((product) =>
-        Object.values(product.stock).some((stockCount) => stockCount > 0)
-    ); // parent would not pass list containing fully unstocked products
-    const testComponent = <CategoryGridPage category="all" />;
-    const testComponentWithQuery = <CategoryGridPage category="all" query="testing-test" />;
-
-    const renderPage = () => render(testComponent);
-    const renderPageWithQuery = () => render(testComponentWithQuery);
-
-    const mockBothQuerysetsEmpty = () => {
-        (fetchFilteredProducts as jest.Mock).mockResolvedValue([]);
-    };
-
-    const mockBothQuerysetsFull = () => {
-        (fetchFilteredProducts as jest.Mock).mockResolvedValue(filteredMockList);
-    };
-
-    const mockFilterQuerysetEmpty = () => {
-        (fetchFilteredProducts as jest.Mock).mockResolvedValueOnce(filteredMockList); // for allCategoryProducts
-        (fetchFilteredProducts as jest.Mock).mockResolvedValueOnce([]); // for filteredProducts
-    };
-
     it("displays loading indicator while fetching", async () => {
         (fetchFilteredProducts as jest.Mock).mockImplementation(() => new Promise(() => {})); // never-resolving promise
         renderPage();

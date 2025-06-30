@@ -3,24 +3,27 @@ import { createTestProductList, matchPriceRangeLabel, matchSizeLabel } from "@/l
 import GridAside from "@/ui/components/product-grid/GridAside";
 import { fireEvent, render, screen } from "@testing-library/react";
 
+const mockProductList: Product[] = createTestProductList();
+const filteredMockList: Product[] = mockProductList.filter((product) =>
+    Object.values(product.stock).some((stockCount) => stockCount > 0)
+); // parent would not pass list containing fully unstocked products
+
+const mockSizeFiltersSetter = jest.fn();
+const mockPriceFiltersSetter = jest.fn();
+
+const renderGridAside = () => {
+    render(
+        <GridAside
+            allCategoryProducts={filteredMockList}
+            sizeFilters={[]}
+            setSizeFilters={mockSizeFiltersSetter}
+            priceFilters={[]}
+            setPriceFilters={mockPriceFiltersSetter}
+        />
+    );
+};
+
 describe("GridAside", () => {
-    const mockProductList: Product[] = createTestProductList();
-    const filteredMockList: Product[] = mockProductList.filter((product) =>
-        Object.values(product.stock).some((stockCount) => stockCount > 0)
-    ); // parent would not pass list containing fully unstocked products
-
-    const renderGridAside = () => {
-        render(
-            <GridAside
-                allCategoryProducts={filteredMockList}
-                sizeFilters={[]}
-                setSizeFilters={jest.fn()}
-                priceFilters={[]}
-                setPriceFilters={jest.fn()}
-            />
-        );
-    };
-
     it("shows correct number of size filters", () => {
         renderGridAside();
 
@@ -96,33 +99,6 @@ describe("GridAside", () => {
     });
 
     it("toggles a size filter on when clicked", () => {
-        const mockSizeFiltersSetter = jest.fn();
-        const initialSizeFilters: Sizes[] = [];
-
-        render(
-            <GridAside
-                allCategoryProducts={filteredMockList}
-                sizeFilters={initialSizeFilters}
-                setSizeFilters={mockSizeFiltersSetter}
-                priceFilters={[]}
-                setPriceFilters={jest.fn()}
-            />
-        );
-
-        fireEvent.click(
-            screen.getByRole("button", {
-                name: matchSizeLabel("s", 3),
-            })
-        );
-
-        const updateFunc = mockSizeFiltersSetter.mock.calls[0][0];
-        const updateResult = updateFunc(initialSizeFilters);
-
-        expect(updateResult).toEqual(["s"]);
-    });
-
-    it("toggles an active size filter off when clicked", () => {
-        const mockSizeFiltersSetter = jest.fn();
         const initialSizeFilters: Sizes[] = [];
 
         const { rerender } = render(
@@ -131,7 +107,7 @@ describe("GridAside", () => {
                 sizeFilters={initialSizeFilters}
                 setSizeFilters={mockSizeFiltersSetter}
                 priceFilters={[]}
-                setPriceFilters={jest.fn()}
+                setPriceFilters={mockPriceFiltersSetter}
             />
         );
 
@@ -139,64 +115,112 @@ describe("GridAside", () => {
             name: matchSizeLabel("s", 3),
         });
 
+        expect(sizeButton).not.toHaveClass("border-black");
+
         fireEvent.click(sizeButton);
 
-        const toggleOnFunc = mockSizeFiltersSetter.mock.calls[0][0];
-        const toggleOnResult = toggleOnFunc(initialSizeFilters);
+        const updateFunc = mockSizeFiltersSetter.mock.calls[0][0];
+        const updateResult = updateFunc(initialSizeFilters);
+
+        expect(updateResult).toEqual(["s"]);
 
         rerender(
             <GridAside
                 allCategoryProducts={filteredMockList}
-                sizeFilters={toggleOnResult}
+                sizeFilters={updateResult}
                 setSizeFilters={mockSizeFiltersSetter}
                 priceFilters={[]}
-                setPriceFilters={jest.fn()}
-            />
-        );
-
-        fireEvent.click(sizeButton);
-
-        const toggleOffFunc = mockSizeFiltersSetter.mock.calls[1][0];
-        const toggleOffResult = toggleOffFunc(["s"]);
-
-        expect(toggleOffResult).toEqual([]);
-    });
-
-    it("toggles a price filter on when clicked", () => {
-        const mockPriceFiltersSetter = jest.fn();
-        const initialPriceFilters: PriceFilterKey[] = [];
-
-        render(
-            <GridAside
-                allCategoryProducts={filteredMockList}
-                sizeFilters={[]}
-                setSizeFilters={jest.fn()}
-                priceFilters={initialPriceFilters}
                 setPriceFilters={mockPriceFiltersSetter}
             />
         );
 
-        fireEvent.click(
-            screen.getByRole("button", {
-                name: matchPriceRangeLabel("b", 2),
-            })
-        );
-
-        const updateFunc = mockPriceFiltersSetter.mock.calls[0][0];
-        const updateResult = updateFunc(initialPriceFilters);
-
-        expect(updateResult).toEqual(["b"]);
+        expect(sizeButton).toHaveClass("border-black");
     });
 
-    it("toggles an active price filter off when clicked", () => {
-        const mockPriceFiltersSetter = jest.fn();
+    it("toggles an active size filter off when clicked", () => {
+        const initialSizeFilters: Sizes[] = ["s"];
+
+        const { rerender } = render(
+            <GridAside
+                allCategoryProducts={filteredMockList}
+                sizeFilters={initialSizeFilters}
+                setSizeFilters={mockSizeFiltersSetter}
+                priceFilters={[]}
+                setPriceFilters={mockPriceFiltersSetter}
+            />
+        );
+
+        const sizeButton = screen.getByRole("button", {
+            name: matchSizeLabel("s", 3),
+        });
+
+        expect(sizeButton).toHaveClass("border-black");
+
+        fireEvent.click(sizeButton);
+
+        const toggleOffFunc = mockSizeFiltersSetter.mock.calls[0][0];
+        const toggleOffResult = toggleOffFunc(initialSizeFilters);
+
+        rerender(
+            <GridAside
+                allCategoryProducts={filteredMockList}
+                sizeFilters={toggleOffResult}
+                setSizeFilters={mockSizeFiltersSetter}
+                priceFilters={[]}
+                setPriceFilters={mockPriceFiltersSetter}
+            />
+        );
+
+        expect(toggleOffResult).toEqual([]);
+        expect(sizeButton).not.toHaveClass("border-black");
+    });
+
+    it("toggles a price filter on when clicked", () => {
         const initialPriceFilters: PriceFilterKey[] = [];
 
         const { rerender } = render(
             <GridAside
                 allCategoryProducts={filteredMockList}
                 sizeFilters={[]}
-                setSizeFilters={jest.fn()}
+                setSizeFilters={mockSizeFiltersSetter}
+                priceFilters={initialPriceFilters}
+                setPriceFilters={mockPriceFiltersSetter}
+            />
+        );
+
+        const priceRangeBtn = screen.getByRole("button", {
+            name: matchPriceRangeLabel("b", 2),
+        });
+
+        expect(priceRangeBtn).not.toHaveClass("border-black");
+
+        fireEvent.click(priceRangeBtn);
+
+        const updateFunc = mockPriceFiltersSetter.mock.calls[0][0];
+        const updateResult = updateFunc(initialPriceFilters);
+
+        rerender(
+            <GridAside
+                allCategoryProducts={filteredMockList}
+                sizeFilters={[]}
+                setSizeFilters={mockSizeFiltersSetter}
+                priceFilters={updateResult}
+                setPriceFilters={mockPriceFiltersSetter}
+            />
+        );
+
+        expect(updateResult).toEqual(["b"]);
+        expect(priceRangeBtn).toHaveClass("border-black");
+    });
+
+    it("toggles an active price filter off when clicked", () => {
+        const initialPriceFilters: PriceFilterKey[] = ["b"];
+
+        const { rerender } = render(
+            <GridAside
+                allCategoryProducts={filteredMockList}
+                sizeFilters={[]}
+                setSizeFilters={mockSizeFiltersSetter}
                 priceFilters={initialPriceFilters}
                 setPriceFilters={mockPriceFiltersSetter}
             />
@@ -206,26 +230,24 @@ describe("GridAside", () => {
             name: matchPriceRangeLabel("b", 2),
         });
 
+        expect(sizeButton).toHaveClass("border-black");
+
         fireEvent.click(sizeButton);
 
-        const toggleOnFunc = mockPriceFiltersSetter.mock.calls[0][0];
-        const toggleOnResult = toggleOnFunc(initialPriceFilters);
+        const toggleOffFunc = mockPriceFiltersSetter.mock.calls[0][0];
+        const toggleOffResult = toggleOffFunc(initialPriceFilters);
 
         rerender(
             <GridAside
                 allCategoryProducts={filteredMockList}
                 sizeFilters={[]}
-                setSizeFilters={jest.fn()}
-                priceFilters={toggleOnResult}
+                setSizeFilters={mockSizeFiltersSetter}
+                priceFilters={toggleOffResult}
                 setPriceFilters={mockPriceFiltersSetter}
             />
         );
 
-        fireEvent.click(sizeButton);
-
-        const toggleOffFunc = mockPriceFiltersSetter.mock.calls[1][0];
-        const toggleOffResult = toggleOffFunc(["b"]);
-
         expect(toggleOffResult).toEqual([]);
+        expect(sizeButton).not.toHaveClass("border-black");
     });
 });

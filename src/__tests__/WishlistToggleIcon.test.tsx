@@ -13,16 +13,9 @@ import { useWishlistToggle } from "@/hooks/useWishlistToggle";
 const mockToggleWishlist = jest.fn();
 const mockProduct: Product = createTestProduct();
 
-const renderIcon = () => {
-    const icon = render(<WishlistToggleIcon product={mockProduct} iconSize={24} />);
-    return icon;
-};
+const renderIcon = () => render(<WishlistToggleIcon product={mockProduct} iconSize={24} />);
 
 describe("WishlistToggleIcon", () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
-
     it("shows only outline heart by default", () => {
         (useWishlistToggle as jest.Mock).mockReturnValue({
             inWishlist: false,

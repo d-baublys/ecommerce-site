@@ -5,16 +5,16 @@ type GridMenuProps = Omit<MenuProps, "children"> & {
     rightContent?: React.ReactNode;
 };
 
-export default function SlideDownColumnsMenu(props: GridMenuProps) {
+export default function SlideDownColumnsMenu({
+    leftContent,
+    rightContent,
+    ...rest
+}: GridMenuProps) {
     return (
-        <SlideDownMenu {...props}>
+        <SlideDownMenu {...rest}>
             <div className="flex w-3/4">
-                <div className="flex flex-col pl-[5%] w-full gap-4">
-                    {props.leftContent ?? null}
-                </div>
-                <div className="flex flex-col pl-[5%] w-full gap-4">
-                    {props.rightContent ?? null}
-                </div>
+                <div className="flex flex-col pl-[5%] w-full gap-4">{leftContent ?? null}</div>
+                <div className="flex flex-col pl-[5%] w-full gap-4">{rightContent ?? null}</div>
             </div>
         </SlideDownMenu>
     );
