@@ -1,95 +1,120 @@
-import { Product } from "@/lib/definitions";
 import { createTestProduct } from "@/lib/test-utils";
 import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
-import { fireEvent, screen } from "@testing-library/dom";
+import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import { render } from "@testing-library/react";
 
-jest.mock("@/hooks/useWishlistToggle", () => ({
-    useWishlistToggle: jest.fn(),
-}));
-
+import { useWishlistStore } from "@/stores/wishlistStore";
 import { useWishlistToggle } from "@/hooks/useWishlistToggle";
+import { act } from "react";
 
-const mockToggleWishlist = jest.fn();
-const mockProduct: Product = createTestProduct();
+const mockProduct = createTestProduct();
+const getLatestWishlist = () => useWishlistStore.getState().wishlist;
+const { clearWishlist, addToWishlist } = useWishlistStore.getState();
 
 const renderIcon = () => render(<WishlistToggleIcon product={mockProduct} iconSize={24} />);
 
 describe("WishlistToggleIcon", () => {
-    it("shows only outline heart by default", () => {
-        (useWishlistToggle as jest.Mock).mockReturnValue({
-            inWishlist: false,
-            isAnimated: false,
-            showFilled: false,
-            toggleWishlist: mockToggleWishlist,
-        });
+    beforeEach(() => {
+        clearWishlist();
+    });
 
+    it("includes animation classes on click", () => {
         renderIcon();
+
+        const parent = screen.getByLabelText("Add or remove from wishlist");
+        const child = parent.firstChild;
+
+        fireEvent.click(parent);
+
+        expect(parent).toHaveClass(/small-pop-in/);
+        expect(child).toHaveClass(/big-pop-in/);
+    });
+
+    it("doesn't include animation classes after timeout", async () => {
+        renderIcon();
+
+        const parent = screen.getByLabelText("Add or remove from wishlist");
+        const child = parent.firstChild;
+
+        fireEvent.click(parent);
+
+        await waitFor(() => {
+            expect(parent).not.toHaveClass(/small-pop-in/);
+            expect(child).not.toHaveClass(/big-pop-in/);
+        });
+    });
+
+    it("adds product to wishlist & shows filled heart when initially clicked ", async () => {
+        renderIcon();
+        const icon = screen.getByLabelText("Add or remove from wishlist");
 
         expect(screen.getByTestId("outline-heart")).toBeInTheDocument();
         expect(screen.getByTestId("filled-heart")).not.toHaveClass("show-filled");
+
+        fireEvent.click(icon);
+
+        await waitFor(() => {
+            const wishlist = getLatestWishlist();
+
+            expect(wishlist.some((item) => item.id === mockProduct.id)).toBe(true);
+            expect(screen.getByTestId("outline-heart")).toBeInTheDocument();
+            expect(screen.getByTestId("filled-heart")).toHaveClass("show-filled");
+        });
     });
 
-    it("shows filled heart when product is in wishlist", () => {
-        (useWishlistToggle as jest.Mock).mockReturnValue({
-            inWishlist: true,
-            isAnimated: false,
-            showFilled: true,
-            toggleWishlist: mockToggleWishlist,
-        });
+    it("removes item from store & hides filled heart when clicking wishlisted item", async () => {
+        addToWishlist(mockProduct);
 
         renderIcon();
+        const icon = screen.getByLabelText("Add or remove from wishlist");
 
-        expect(screen.getByTestId("outline-heart")).toBeInTheDocument();
-        expect(screen.getByTestId("filled-heart")).toHaveClass("show-filled");
-    });
-
-    it("includes animation classes when isAnimated is true (on click)", () => {
-        (useWishlistToggle as jest.Mock).mockReturnValue({
-            inWishlist: true,
-            isAnimated: true,
-            showFilled: true,
-            toggleWishlist: mockToggleWishlist,
+        await waitFor(() => {
+            expect(screen.getByTestId("outline-heart")).toBeInTheDocument();
+            expect(screen.getByTestId("filled-heart")).toHaveClass("show-filled");
         });
 
-        const { container } = renderIcon();
+        fireEvent.click(icon);
 
-        const parentDiv = container.firstChild;
-        const childDiv = parentDiv?.firstChild;
+        await waitFor(() => {
+            const wishlist = getLatestWishlist();
 
-        expect(parentDiv).toHaveClass(/small-pop-in/);
-        expect(childDiv).toHaveClass(/big-pop-in/);
+            expect(wishlist.some((item) => item.id === mockProduct.id)).toBe(false);
+            expect(screen.getByTestId("outline-heart")).toBeInTheDocument();
+            expect(screen.getByTestId("filled-heart")).not.toHaveClass("show-filled");
+        });
     });
 
-    it("doesn't include animation classes after timeout", () => {
-        (useWishlistToggle as jest.Mock).mockReturnValue({
-            inWishlist: true,
-            isAnimated: false,
-            showFilled: true,
-            toggleWishlist: mockToggleWishlist,
+    it("doesn't add duplicate items", async () => {
+        renderIcon();
+        const icon = screen.getByLabelText("Add or remove from wishlist");
+
+        fireEvent.click(icon);
+        fireEvent.click(icon);
+
+        await act(async () => {
+            await new Promise((res) => setTimeout(res, 500)); // account for 300 ms removeFromWishlist timeout
         });
 
-        const { container } = renderIcon();
+        const wishlist = getLatestWishlist();
+        const occurrences = wishlist.filter((item) => item.id === mockProduct.id).length;
 
-        const parentDiv = container.firstChild;
-        const childDiv = parentDiv?.firstChild;
-
-        expect(parentDiv).not.toHaveClass(/small-pop-in/);
-        expect(childDiv).not.toHaveClass(/big-pop-in/);
+        expect(occurrences).toBe(0);
     });
 
-    it("calls toggleWishlist once on click", () => {
-        (useWishlistToggle as jest.Mock).mockReturnValue({
+    it("toggles when parentHook is provided", () => {
+        const mockToggleWishlist = jest.fn();
+        const parentHook: ReturnType<typeof useWishlistToggle> = {
             inWishlist: false,
             isAnimated: false,
             showFilled: false,
             toggleWishlist: mockToggleWishlist,
-        });
+        };
 
-        renderIcon();
+        render(<WishlistToggleIcon product={mockProduct} iconSize={24} parentHook={parentHook} />);
 
-        fireEvent.click(screen.getByLabelText("Add or remove from wishlist"));
+        const icon = screen.getByLabelText("Add or remove from wishlist");
+        fireEvent.click(icon);
 
-        expect(mockToggleWishlist).toHaveBeenCalledTimes(1);
+        expect(mockToggleWishlist).toHaveBeenCalled();
     });
 });

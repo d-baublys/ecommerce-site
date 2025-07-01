@@ -2,7 +2,7 @@ import { createTestProduct } from "@/lib/test-utils";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import WishlistToggleButton from "@/ui/components/buttons/WishlistToggleButton";
 import { fireEvent, render, waitFor } from "@testing-library/react";
-import React from "react";
+import React, { act } from "react";
 
 const mockProduct = createTestProduct();
 const getLatestWishlist = () => useWishlistStore.getState().wishlist;
@@ -49,5 +49,23 @@ describe("WishlistToggleButton", () => {
             expect(wishlist.some((item) => item.id === mockProduct.id)).toBe(false);
             expect(firstChild).toHaveTextContent("Add to Wishlist");
         });
+    });
+
+    it("doesn't add duplicate items", async () => {
+        const { container } = render(<WishlistToggleButton product={mockProduct} />);
+        const firstChild = container.firstChild;
+        if (!(firstChild instanceof Element)) throw new Error();
+
+        fireEvent.click(firstChild);
+        fireEvent.click(firstChild);
+
+        await act(async () => {
+            await new Promise((res) => setTimeout(res, 500)); // account for 300 ms removeFromWishlist timeout
+        });
+
+        const wishlist = getLatestWishlist();
+        const occurrences = wishlist.filter((item) => item.id === mockProduct.id).length;
+
+        expect(occurrences).toBe(0);
     });
 });
