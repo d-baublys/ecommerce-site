@@ -3,7 +3,7 @@ import { getProductData } from "@/lib/actions";
 import ProductPageClient from "./ProductPageClient";
 import MainLayout from "@/ui/layouts/MainLayout";
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function ProductPage({ params }: { params: { slug: string } }) {
     const { slug } = params;
     const productFetch = await getProductData({ slug: decodeURIComponent(slug) });
 

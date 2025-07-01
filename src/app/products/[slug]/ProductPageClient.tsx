@@ -46,12 +46,13 @@ export default function ProductPageClient({ productData }: { productData: Produc
                     className="flex flex-col md:w-1/2 gap-8 mt-8 md:mt-0 md:ml-4"
                 >
                     <div>
-                        <p>{productData.name}</p>
+                        <p data-testid="product-detail-name">{productData.name}</p>
                     </div>
                     <div className="font-semibold">
                         <p>{getLocalFormatting(productData.price)}</p>
                     </div>
                     <select
+                        aria-label="Size select"
                         className="p-2 bg-white border-2 rounded-md"
                         value={size}
                         required
