@@ -1,7 +1,6 @@
-import { createTestProduct, wrapWithErrorBoundary } from "@/lib/test-utils";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { createTestProduct } from "@/lib/test-utils";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import ProductPage from "@/app/products/[slug]/page";
-import * as utils from "@/lib/utils";
 
 const mockProduct = createTestProduct();
 const getLatestBag = () => useBagStore.getState().bag;
@@ -16,11 +15,6 @@ jest.mock("next/navigation", () => ({
     notFound: jest.fn(() => {
         throw new Error("notFound called");
     }),
-}));
-
-jest.mock("@/lib/utils", () => ({
-    __esModule: true,
-    ...jest.requireActual("@/lib/utils"),
 }));
 
 import { getProductData } from "@/lib/actions";
@@ -75,27 +69,49 @@ describe("ProductPage", () => {
         expect(btn).toHaveClass("!bg-go-color !border-go-color");
     });
 
-    it("disables product add button when the selected size reaches maximum bag quantity", async () => {
+    it("disables product add button when all remaining stock is added to bag", async () => {
         (getProductData as jest.Mock).mockResolvedValue({ data: [mockProduct] });
         await renderPage();
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });
 
-        fireEvent.change(screen.getByLabelText("Size select"), { target: { value: "s" } });
+        fireEvent.change(screen.getByLabelText("Size select"), { target: { value: "m" } });
 
         expect(btn).not.toBeDisabled();
         expect(btn).toHaveClass("!bg-go-color !border-go-color");
 
-        const checkStockSpy = jest.spyOn(utils, "checkStock").mockReturnValue(false); // mock reaching limit after next click
-
-        fireEvent.click(btn);
+        act(() => {
+            fireEvent.click(btn);
+            fireEvent.click(btn);
+            fireEvent.click(btn);
+        });
 
         expect(btn).toBeDisabled();
         expect(btn).toHaveClass(
             "!bg-component-color !border-component-color hover:!scale-none hover:!cursor-auto active:!drop-shadow-none"
         );
+    });
 
-        checkStockSpy.mockRestore();
+    it("disables product add button when added quantity reaches the prescribed limit", async () => {
+        (getProductData as jest.Mock).mockResolvedValue({ data: [mockProduct] });
+        await renderPage();
+
+        const btn = screen.getByRole("button", { name: "Add to Bag" });
+        const itemLimit = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
+
+        fireEvent.change(screen.getByLabelText("Size select"), { target: { value: "s" } });
+
+        act(() => {
+            for (let i = 0; i < itemLimit; i++) {
+                fireEvent.click(btn);
+            }
+        });
+
+        expect(btn).toBeDisabled();
+        expect(btn).toHaveClass(
+            "!bg-component-color !border-component-color hover:!scale-none hover:!cursor-auto active:!drop-shadow-none"
+        );
+        expect(getLatestBag()[0].quantity).toBe(itemLimit);
     });
 
     it("includes all required size options", async () => {

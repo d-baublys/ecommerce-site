@@ -104,7 +104,10 @@ export default function NavBarClient() {
                             <div className="relative">
                                 <IoBagOutline className="hover:scale-125 transition" />
                                 {hasMounted && itemCount > 0 && (
-                                    <div className="bag-item-count absolute flex justify-center items-center top-[-13px] right-[-10px] w-4 aspect-square [border-radius:50%] bg-red-500 text-contrasted text-[0.67rem]">
+                                    <div
+                                        aria-label="Bag item count"
+                                        className="bag-item-count absolute flex justify-center items-center top-[-13px] right-[-10px] w-4 aspect-square [border-radius:50%] bg-red-500 text-contrasted text-[0.67rem]"
+                                    >
                                         <span>{Math.min(itemCount, 99)}</span>
                                     </div>
                                 )}
