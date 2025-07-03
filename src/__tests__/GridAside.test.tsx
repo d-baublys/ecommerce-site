@@ -1,10 +1,10 @@
 import { PriceFilterKey, Product, Sizes } from "@/lib/definitions";
-import { createTestProductList, matchPriceRangeLabel, matchSizeLabel } from "@/lib/test-utils";
+import { createFakeProductList, matchPriceRangeLabel, matchSizeLabel } from "@/lib/test-utils";
 import GridAside from "@/ui/components/product-grid/GridAside";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-const mockProductList: Product[] = createTestProductList();
-const filteredMockList: Product[] = mockProductList.filter((product) =>
+const fakeProductList: Product[] = createFakeProductList();
+const filteredFakeProducts: Product[] = fakeProductList.filter((product) =>
     Object.values(product.stock).some((stockCount) => stockCount > 0)
 ); // parent would not pass list containing fully unstocked products
 
@@ -14,7 +14,7 @@ const mockPriceFiltersSetter = jest.fn();
 const renderGridAside = () => {
     render(
         <GridAside
-            allCategoryProducts={filteredMockList}
+            allCategoryProducts={filteredFakeProducts}
             sizeFilters={[]}
             setSizeFilters={mockSizeFiltersSetter}
             priceFilters={[]}
@@ -103,7 +103,7 @@ describe("GridAside", () => {
 
         const { rerender } = render(
             <GridAside
-                allCategoryProducts={filteredMockList}
+                allCategoryProducts={filteredFakeProducts}
                 sizeFilters={initialSizeFilters}
                 setSizeFilters={mockSizeFiltersSetter}
                 priceFilters={[]}
@@ -126,7 +126,7 @@ describe("GridAside", () => {
 
         rerender(
             <GridAside
-                allCategoryProducts={filteredMockList}
+                allCategoryProducts={filteredFakeProducts}
                 sizeFilters={updateResult}
                 setSizeFilters={mockSizeFiltersSetter}
                 priceFilters={[]}
@@ -142,7 +142,7 @@ describe("GridAside", () => {
 
         const { rerender } = render(
             <GridAside
-                allCategoryProducts={filteredMockList}
+                allCategoryProducts={filteredFakeProducts}
                 sizeFilters={initialSizeFilters}
                 setSizeFilters={mockSizeFiltersSetter}
                 priceFilters={[]}
@@ -163,7 +163,7 @@ describe("GridAside", () => {
 
         rerender(
             <GridAside
-                allCategoryProducts={filteredMockList}
+                allCategoryProducts={filteredFakeProducts}
                 sizeFilters={toggleOffResult}
                 setSizeFilters={mockSizeFiltersSetter}
                 priceFilters={[]}
@@ -180,7 +180,7 @@ describe("GridAside", () => {
 
         const { rerender } = render(
             <GridAside
-                allCategoryProducts={filteredMockList}
+                allCategoryProducts={filteredFakeProducts}
                 sizeFilters={[]}
                 setSizeFilters={mockSizeFiltersSetter}
                 priceFilters={initialPriceFilters}
@@ -201,7 +201,7 @@ describe("GridAside", () => {
 
         rerender(
             <GridAside
-                allCategoryProducts={filteredMockList}
+                allCategoryProducts={filteredFakeProducts}
                 sizeFilters={[]}
                 setSizeFilters={mockSizeFiltersSetter}
                 priceFilters={updateResult}
@@ -218,7 +218,7 @@ describe("GridAside", () => {
 
         const { rerender } = render(
             <GridAside
-                allCategoryProducts={filteredMockList}
+                allCategoryProducts={filteredFakeProducts}
                 sizeFilters={[]}
                 setSizeFilters={mockSizeFiltersSetter}
                 priceFilters={initialPriceFilters}
@@ -239,7 +239,7 @@ describe("GridAside", () => {
 
         rerender(
             <GridAside
-                allCategoryProducts={filteredMockList}
+                allCategoryProducts={filteredFakeProducts}
                 sizeFilters={[]}
                 setSizeFilters={mockSizeFiltersSetter}
                 priceFilters={toggleOffResult}

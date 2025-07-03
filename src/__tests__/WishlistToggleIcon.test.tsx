@@ -1,4 +1,4 @@
-import { createTestProduct } from "@/lib/test-utils";
+import { createFakeProduct } from "@/lib/test-utils";
 import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
 import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import { render } from "@testing-library/react";
@@ -7,11 +7,11 @@ import { useWishlistStore } from "@/stores/wishlistStore";
 import { useWishlistToggle } from "@/hooks/useWishlistToggle";
 import { act } from "react";
 
-const mockProduct = createTestProduct();
+const fakeProduct = createFakeProduct();
 const getLatestWishlist = () => useWishlistStore.getState().wishlist;
 const { clearWishlist, addToWishlist } = useWishlistStore.getState();
 
-const renderIcon = () => render(<WishlistToggleIcon product={mockProduct} iconSize={24} />);
+const renderIcon = () => render(<WishlistToggleIcon product={fakeProduct} iconSize={24} />);
 
 describe("WishlistToggleIcon", () => {
     beforeEach(() => {
@@ -56,14 +56,14 @@ describe("WishlistToggleIcon", () => {
         await waitFor(() => {
             const wishlist = getLatestWishlist();
 
-            expect(wishlist.some((item) => item.id === mockProduct.id)).toBe(true);
+            expect(wishlist.some((item) => item.id === fakeProduct.id)).toBe(true);
             expect(screen.getByTestId("outline-heart")).toBeInTheDocument();
             expect(screen.getByTestId("filled-heart")).toHaveClass("show-filled");
         });
     });
 
     it("removes item from store & hides filled heart when clicking wishlisted item", async () => {
-        addToWishlist(mockProduct);
+        addToWishlist(fakeProduct);
 
         renderIcon();
         const icon = screen.getByLabelText("Add or remove from wishlist");
@@ -78,7 +78,7 @@ describe("WishlistToggleIcon", () => {
         await waitFor(() => {
             const wishlist = getLatestWishlist();
 
-            expect(wishlist.some((item) => item.id === mockProduct.id)).toBe(false);
+            expect(wishlist.some((item) => item.id === fakeProduct.id)).toBe(false);
             expect(screen.getByTestId("outline-heart")).toBeInTheDocument();
             expect(screen.getByTestId("filled-heart")).not.toHaveClass("show-filled");
         });
@@ -96,7 +96,7 @@ describe("WishlistToggleIcon", () => {
         });
 
         const wishlist = getLatestWishlist();
-        const occurrences = wishlist.filter((item) => item.id === mockProduct.id).length;
+        const occurrences = wishlist.filter((item) => item.id === fakeProduct.id).length;
 
         expect(occurrences).toBe(0);
     });
@@ -110,7 +110,7 @@ describe("WishlistToggleIcon", () => {
             toggleWishlist: mockToggleWishlist,
         };
 
-        render(<WishlistToggleIcon product={mockProduct} iconSize={24} parentHook={parentHook} />);
+        render(<WishlistToggleIcon product={fakeProduct} iconSize={24} parentHook={parentHook} />);
 
         const icon = screen.getByLabelText("Add or remove from wishlist");
         fireEvent.click(icon);

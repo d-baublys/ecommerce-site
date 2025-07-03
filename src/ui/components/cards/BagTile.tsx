@@ -73,6 +73,8 @@ export default function BagTile({
                         </div>
                     )}
                     <IoClose
+                        aria-label="Remove from bag"
+                        title="Remove from bag"
                         onClick={handleDelete}
                         className="translate-x-1 cursor-pointer"
                         size={24}

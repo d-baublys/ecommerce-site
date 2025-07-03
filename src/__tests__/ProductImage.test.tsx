@@ -1,5 +1,5 @@
 import { Product } from "@/lib/definitions";
-import { createTestProduct } from "@/lib/test-utils";
+import { createFakeProduct } from "@/lib/test-utils";
 import ProductImage from "@/ui/components/ProductImage";
 import { screen, waitFor } from "@testing-library/dom";
 import { act, render } from "@testing-library/react";
@@ -12,9 +12,9 @@ jest.mock("next/image", () => ({
     },
 }));
 
-const mockProduct: Product = createTestProduct();
+const fakeProduct: Product = createFakeProduct();
 const renderProductImage = () => {
-    render(<ProductImage product={mockProduct} />);
+    render(<ProductImage product={fakeProduct} />);
 };
 
 describe("ProductImage", () => {
@@ -47,7 +47,7 @@ describe("ProductImage", () => {
 
     it("applies override classes correctly", () => {
         const { container } = render(
-            <ProductImage product={mockProduct} overrideClasses="!aspect-square" />
+            <ProductImage product={fakeProduct} overrideClasses="!aspect-square" />
         );
 
         expect(container.firstChild).toHaveClass("!aspect-square");

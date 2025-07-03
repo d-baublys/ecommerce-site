@@ -1,7 +1,7 @@
 "use client";
 
 import { Product, Sizes, VALID_SIZES } from "@/lib/definitions";
-import { checkStock, isolateInteraction, stringifyConvertPrice } from "@/lib/utils";
+import { checkStock, createBagItem, isolateInteraction, stringifyConvertPrice } from "@/lib/utils";
 import ProductLink from "@/ui/components/ProductLink";
 import { useEffect, useRef, useState } from "react";
 import RoundedButton from "@/ui/components/buttons/RoundedButton";
@@ -42,7 +42,7 @@ export default function ProductTile({ product }: { product: Product }) {
 
     const handleSizeClick = (e: React.TouchEvent | React.MouseEvent, size: Sizes) => {
         isolateInteraction(e);
-        const permitted = addToBag({ product, size, quantity: 1 });
+        const permitted = addToBag(createBagItem(product, size));
         permitted && setIsModalOpen(true);
     };
 

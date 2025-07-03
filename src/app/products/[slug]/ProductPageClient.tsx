@@ -5,13 +5,13 @@ import { useEffect, useState } from "react";
 import { Sizes, VALID_SIZES } from "@/lib/definitions";
 import { Product } from "@/lib/definitions";
 import GoButton from "@/ui/components/buttons/GoButton";
-import { IoBag, IoHeart, IoHeartOutline } from "react-icons/io5";
-import { checkStock } from "@/lib/utils";
+import { IoBag } from "react-icons/io5";
+import { checkStock, createBagItem } from "@/lib/utils";
 import ZoomableImage from "@/ui/components/ZoomableImage";
 import WishlistToggleButton from "@/ui/components/buttons/WishlistToggleButton";
 
 export default function ProductPageClient({ productData }: { productData: Product }) {
-    const [size, setSize] = useState<Sizes | "placeholder">("placeholder");
+    const [selectedSize, setSelectedSize] = useState<Sizes | "placeholder">("placeholder");
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
     const bag = useBagStore((state) => state.bag);
     const addToBag = useBagStore((state) => state.addToBag);
@@ -25,12 +25,12 @@ export default function ProductPageClient({ productData }: { productData: Produc
     useEffect(() => {
         const selectedAvailable = checkStock(
             productData,
-            size as keyof typeof productData.stock,
+            selectedSize as keyof typeof productData.stock,
             bag
         );
 
         setIsButtonDisabled(!selectedAvailable);
-    }, [size, bag, productData]);
+    }, [selectedSize, bag, productData]);
 
     return (
         <div className="flex grow justify-center items-start">
@@ -54,9 +54,9 @@ export default function ProductPageClient({ productData }: { productData: Produc
                     <select
                         aria-label="Size select"
                         className="p-2 bg-white border-2 rounded-md"
-                        value={size}
+                        value={selectedSize}
                         required
-                        onChange={(e) => setSize(e.target.value as Sizes)}
+                        onChange={(e) => setSelectedSize(e.target.value as Sizes)}
                     >
                         <option value="placeholder" hidden>
                             Please select a size
@@ -85,11 +85,9 @@ export default function ProductPageClient({ productData }: { productData: Produc
                         )}
                     </select>
                     <GoButton
-                        onClick={() =>
-                            addToBag({ product: productData, size: size as Sizes, quantity: 1 })
-                        }
-                        predicate={!(size === undefined || isButtonDisabled)}
-                        disabled={size === undefined || isButtonDisabled}
+                        onClick={() => addToBag(createBagItem(productData, selectedSize as Sizes))}
+                        predicate={!(selectedSize === undefined || isButtonDisabled)}
+                        disabled={selectedSize === undefined || isButtonDisabled}
                     >
                         <span>Add to Bag</span>
                         <IoBag />

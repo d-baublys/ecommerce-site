@@ -1,16 +1,16 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ProductTile from "@/ui/components/cards/ProductTile";
 import { Product } from "@/lib/definitions";
-import { createTestProduct } from "@/lib/test-utils";
+import { createFakeProduct } from "@/lib/test-utils";
 import { act } from "react";
 import { axe, toHaveNoViolations } from "jest-axe";
 
 expect.extend(toHaveNoViolations);
 
-const mockStockedProduct: Product = createTestProduct({ stock: { s: 3, m: 0, l: 8 } });
-const mockUnstockedProduct: Product = createTestProduct({ stock: { s: 0 } });
+const fakeStockedProduct: Product = createFakeProduct({ stock: { s: 3, m: 0, l: 8 } });
+const fakeUnstockedProduct: Product = createFakeProduct({ stock: { s: 0 } });
 
-const renderAndGetTile = (product: Product = mockStockedProduct) => {
+const renderAndGetTile = (product: Product = fakeStockedProduct) => {
     render(<ProductTile product={product} />);
     const tile = screen.getByText("Test Product 1").closest("div");
     if (!tile) throw new Error("No tile found");
@@ -65,7 +65,7 @@ describe("ProductTile", () => {
     });
 
     it("shows out of stock instead of quick add for unstocked products", () => {
-        const tile = renderAndGetTile(mockUnstockedProduct);
+        const tile = renderAndGetTile(fakeUnstockedProduct);
         fireEvent.mouseEnter(tile);
 
         expect(screen.queryByRole("button", { name: "Quick Add" })).not.toBeInTheDocument();
@@ -88,7 +88,7 @@ describe("ProductTile", () => {
         let container: HTMLElement;
 
         act(() => {
-            const result = render(<ProductTile product={mockStockedProduct} />);
+            const result = render(<ProductTile product={fakeStockedProduct} />);
             container = result.container;
         });
 

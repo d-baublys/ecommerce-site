@@ -10,7 +10,7 @@ import { getProductData } from "@/lib/actions";
 import { stringifyConvertPrice } from "@/lib/utils";
 import MainLayout from "@/ui/layouts/MainLayout";
 
-export default function Page() {
+export default function BagPage() {
     const [latestData, setLatestData] = useState<Product[]>();
     const [error, setError] = useState<Error | null>(null);
 
@@ -76,7 +76,7 @@ export default function Page() {
         <MainLayout subheaderText="My Bag">
             <div className="flex flex-col md:flex-row w-full h-full">
                 {!emptyBag ? (
-                    <ul className="flex flex-col w-full lg:gap-8">
+                    <ul data-testid="bag-tile-ul" className="flex flex-col w-full lg:gap-8">
                         {mergedItems.map((mergedItem) => (
                             <li
                                 key={`${mergedItem.product.id}-${mergedItem.size}`}
@@ -106,11 +106,11 @@ export default function Page() {
                     <div>
                         <div className="flex justify-between py-3">
                             <p>Subtotal</p>
-                            <p>£{stringifyConvertPrice(orderSubtotal)}</p>
+                            <p aria-label="Bag subtotal">£{stringifyConvertPrice(orderSubtotal)}</p>
                         </div>
                         <div className="flex justify-between py-3 border-b-2">
                             <p>Shipping</p>
-                            <p>
+                            <p aria-label="Shipping cost">
                                 {shippingCost ? (
                                     <>
                                         <span>£</span>
@@ -123,7 +123,7 @@ export default function Page() {
                         </div>
                         <div className="flex justify-between py-3 font-semibold">
                             <p>Total</p>
-                            <p>£{stringifyConvertPrice(orderTotal)}</p>
+                            <p aria-label="Bag total">£{stringifyConvertPrice(orderTotal)}</p>
                         </div>
                     </div>
                     {!(emptyBag || noStock) && (

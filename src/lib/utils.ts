@@ -159,14 +159,18 @@ export function extractSort(param: string | null) {
     return param && param in SORT_OPTIONS ? (param as ProductSortKey) : "placeholder";
 }
 
-export const isolateInteraction = (e: React.TouchEvent | React.MouseEvent) => {
+export function isolateInteraction(e: React.TouchEvent | React.MouseEvent) {
     e.preventDefault();
-};
+}
 
-export const getSkeletonSweep = () => {
+export function getSkeletonSweep() {
     return "before:content-[''] before:absolute before:inset-0 before:translate-x-[-100%] before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:[animation:skeletonSweep_1s_infinite]";
-};
+}
 
 export function escapeRegExp(string: string): string {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+export function createBagItem(product: Product, size: Sizes): BagItem {
+    return { product, size, quantity: 1 };
 }

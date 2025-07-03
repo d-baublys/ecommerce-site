@@ -1,6 +1,6 @@
 import { Product } from "@/lib/definitions";
 import {
-    createTestProductList,
+    createFakeProductList,
     matchPriceRangeLabel,
     matchSizeLabel,
     wrapWithErrorBoundary,
@@ -29,8 +29,8 @@ jest.mock("next/navigation", () => ({
 
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 
-const mockProductList = createTestProductList();
-const filteredMockList: Product[] = mockProductList.filter((product) =>
+const fakeProductList = createFakeProductList();
+const filteredFakeProducts: Product[] = fakeProductList.filter((product) =>
     Object.values(product.stock).some((stockCount) => stockCount > 0)
 ); // parent would not pass list containing fully unstocked products
 
@@ -44,10 +44,10 @@ const mockBothQuerysetsEmpty = () => {
     (fetchFilteredProducts as jest.Mock).mockResolvedValue([]);
 };
 const mockBothQuerysetsFull = () => {
-    (fetchFilteredProducts as jest.Mock).mockResolvedValue(filteredMockList);
+    (fetchFilteredProducts as jest.Mock).mockResolvedValue(filteredFakeProducts);
 };
 const mockFilterQuerysetEmpty = () => {
-    (fetchFilteredProducts as jest.Mock).mockResolvedValueOnce(filteredMockList); // for allCategoryProducts
+    (fetchFilteredProducts as jest.Mock).mockResolvedValueOnce(filteredFakeProducts); // for allCategoryProducts
     (fetchFilteredProducts as jest.Mock).mockResolvedValueOnce([]); // for filteredProducts
 };
 
