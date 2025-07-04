@@ -5,7 +5,7 @@ import { FEATURED_COUNT } from "@/lib/definitions";
 import BareLayout from "@/ui/layouts/BareLayout";
 import ProductImage from "@/ui/components/ProductImage";
 
-export default async function Home() {
+export default async function HomePage() {
     const featuredFetch = await getFeaturedProducts();
     let featuredList = featuredFetch.data;
 
@@ -43,7 +43,7 @@ export default async function Home() {
                 </div>
             </div>
             {featuredList ? (
-                <div className="featured-outer flex flex-col w-full min-h-[500px] bg-white">
+                <div aria-label="Featured products" className="featured-outer flex flex-col w-full min-h-[500px] bg-white">
                     <div className="p-(--gutter) xl:p-(--gutter-md) font-semibold text-sz-subheading lg:text-sz-subheading-lg">
                         <h2>Featured</h2>
                     </div>

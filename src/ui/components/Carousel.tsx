@@ -67,6 +67,7 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
             <div id="slider-container" className="relative max-w-(--carousel-width) h-4/5">
                 <ul
                     id="carousel-slider"
+                    data-testid="carousel-slider"
                     className="flex overflow-hidden gap-(--carousel-img-gap) px-(--carousel-img-w) h-full z-30"
                 >
                     {featuredList.map((featuredProd, idx) => (

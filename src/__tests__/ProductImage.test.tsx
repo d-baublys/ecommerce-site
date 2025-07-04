@@ -21,7 +21,7 @@ describe("ProductImage", () => {
     it("shows only the skeleton during loading", () => {
         renderProductImage();
 
-        const imgContainer = screen.getByAltText("Test product image").closest("div");
+        const imgContainer = screen.getByAltText("Test product image 1").closest("div");
         const skeleton = screen.getByTestId("image-skeleton");
 
         expect(imgContainer).toHaveClass("opacity-0");
@@ -31,7 +31,7 @@ describe("ProductImage", () => {
     it("shows only the image after it has loaded", async () => {
         renderProductImage();
 
-        const image = screen.getByAltText("Test product image");
+        const image = screen.getByAltText("Test product image 1");
         const imgContainer = image.closest("div");
         const skeleton = screen.queryByTestId("image-skeleton");
 

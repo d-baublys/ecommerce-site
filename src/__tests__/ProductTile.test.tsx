@@ -7,8 +7,10 @@ import { axe, toHaveNoViolations } from "jest-axe";
 
 expect.extend(toHaveNoViolations);
 
-const fakeStockedProduct: Product = createFakeProduct({ stock: { s: 3, m: 0, l: 8 } });
-const fakeUnstockedProduct: Product = createFakeProduct({ stock: { s: 0 } });
+const fakeStockedProduct: Product = createFakeProduct({
+    overrides: { stock: { s: 3, m: 0, l: 8 } },
+});
+const fakeUnstockedProduct: Product = createFakeProduct({ overrides: { stock: { s: 0 } } });
 
 const renderAndGetTile = (product: Product = fakeStockedProduct) => {
     render(<ProductTile product={product} />);

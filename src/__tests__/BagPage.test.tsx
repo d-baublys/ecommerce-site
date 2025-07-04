@@ -105,8 +105,8 @@ describe("BagPage", () => {
     });
 
     it("shows 'out of stock' in place of combobox when latest size stock is nil", async () => {
-        const fakeProduct = createFakeProduct({ stock: { s: 1 } });
-        const latestFakeProduct = createFakeProduct({ stock: { s: 0 } });
+        const fakeProduct = createFakeProduct({ overrides: { stock: { s: 1 } } });
+        const latestFakeProduct = createFakeProduct({ overrides: { stock: { s: 0 } } });
         const mockBagItem = createBagItem(fakeProduct, "s");
 
         addToBag(mockBagItem);
@@ -164,7 +164,7 @@ describe("BagPage", () => {
 
     it("caps quantity options per the prescribed limit", async () => {
         const itemLimit = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
-        const fakeProduct = createFakeProduct({ stock: { s: itemLimit + 5 } });
+        const fakeProduct = createFakeProduct({ overrides: { stock: { s: itemLimit + 5 } } });
 
         addToBag(createBagItem(fakeProduct, "s"));
         setUpResolvedFetch([fakeProduct]);
@@ -199,7 +199,7 @@ describe("BagPage", () => {
     });
 
     it("renders checkout button & shows correct shipping when at least some bag item sizes are stocked", async () => {
-        const fakeProduct = createFakeProduct({ stock: { s: 0, m: 1 } });
+        const fakeProduct = createFakeProduct({ overrides: { stock: { s: 0, m: 1 } } });
 
         addToBag(createBagItem(fakeProduct, "s"));
         addToBag(createBagItem(fakeProduct, "m"));
@@ -211,7 +211,7 @@ describe("BagPage", () => {
     });
 
     it("doesn't render checkout button & shows correct shipping when all bag item sizes are unstocked", async () => {
-        const fakeProduct = createFakeProduct({ stock: { s: 0, m: 0 } });
+        const fakeProduct = createFakeProduct({ overrides: { stock: { s: 0, m: 0 } } });
 
         addToBag(createBagItem(fakeProduct, "s"));
         addToBag(createBagItem(fakeProduct, "m"));

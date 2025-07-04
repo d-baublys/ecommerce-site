@@ -1,6 +1,7 @@
 import React from "react";
 import {
     BagItem,
+    Categories,
     PRICE_FILTER_OPTIONS,
     PriceFilterKey,
     Product,
@@ -9,17 +10,24 @@ import {
 } from "./definitions";
 import { processDateForClient, slugify } from "./utils";
 
-export function createFakeProduct(overrides: Partial<Product> = {}): Product {
-    const name = "Test Product 1";
+export function createFakeProduct({
+    idx = 0,
+    overrides,
+}: {
+    idx?: number;
+    overrides?: Partial<Product>;
+} = {}): Product {
+    idx += 1;
+    const name = `Test Product ${idx}`;
 
     return {
-        id: "test-id-1",
+        id: `test-id-${idx}`,
         name,
         gender: Object.keys(VALID_CATEGORIES)[0] as keyof typeof VALID_CATEGORIES,
         price: 2500,
         slug: slugify(name),
-        src: "/nonexistent-img.jpg",
-        alt: "Test product image",
+        src: `/nonexistent-img-${idx}.jpg`,
+        alt: `Test product image ${idx}`,
         dateAdded: processDateForClient(),
         stock: { s: 8, m: 3, l: 12 },
         ...overrides,
@@ -27,120 +35,84 @@ export function createFakeProduct(overrides: Partial<Product> = {}): Product {
 }
 
 export function createFakeProductList() {
-    const names = ["Test Product 1", "Test Product 2", "Test Product 3", "Test Product 4"];
-
-    return [
-        {
-            id: "test-id-1",
-            name: names[0],
-            gender: Object.keys(VALID_CATEGORIES)[0] as keyof typeof VALID_CATEGORIES,
-            price: 5500,
-            slug: slugify(names[0]),
-            src: "/nonexistent-img.jpg",
-            alt: "Test product image 1",
-            dateAdded: processDateForClient(),
-            stock: { s: 1, m: 0, l: 0 },
-        },
-        {
-            id: "test-id-2",
-            name: names[1],
-            gender: Object.keys(VALID_CATEGORIES)[1] as keyof typeof VALID_CATEGORIES,
-            price: 9900,
-            slug: slugify(names[1]),
-            src: "/nonexistent-img.jpg",
-            alt: "Test product image 2",
-            dateAdded: processDateForClient(),
-            stock: { s: 1, m: 1, l: 0 },
-        },
-        {
-            id: "test-id-3",
-            name: names[2],
-            gender: Object.keys(VALID_CATEGORIES)[1] as keyof typeof VALID_CATEGORIES,
-            price: 20100,
-            slug: slugify(names[2]),
-            src: "/nonexistent-img.jpg",
-            alt: "Test product image 3",
-            dateAdded: processDateForClient(),
-            stock: { s: 1, m: 1, l: 0 },
-        },
-        {
-            id: "test-id-4",
-            name: names[3],
-            gender: Object.keys(VALID_CATEGORIES)[0] as keyof typeof VALID_CATEGORIES,
-            price: 15000,
-            slug: slugify(names[3]),
-            src: "/nonexistent-img.jpg",
-            alt: "Test product image 4",
-            dateAdded: processDateForClient(),
-            stock: { s: 0, m: 0, l: 0 },
-        },
+    const prices = [5500, 9900, 20100, 15000];
+    const stocks = [
+        { s: 1, m: 0, l: 0 },
+        { s: 1, m: 1, l: 0 },
+        { s: 1, m: 1, l: 0 },
+        { s: 0, m: 0, l: 0 },
     ];
+    const products = Array.from({ length: 4 }).map((_, idx) =>
+        createFakeProduct({ idx, overrides: { price: prices[idx], stock: stocks[idx] } })
+    );
+
+    return products;
+}
+
+export function createLongProductList(): Product[] {
+    return Array.from({ length: 10 }).map((_, idx) => createFakeProduct({ idx }));
+}
+
+export function getFilteredFakeProducts() {
+    return createFakeProductList().filter((product) =>
+        Object.values(product.stock).some((stockCount) => stockCount > 0)
+    ); // in line with real database fetch excluding fully unstocked products
+}
+
+function createCustomBagItem(product: Product, size: Sizes, quantity: number): BagItem {
+    return { product, size, quantity };
 }
 
 export function createFakeBagItems(): BagItem[] {
-    const names = ["Test Product 1", "Test Product 2", "Test Product 3", "Test Product 4"];
-
-    return [
-        {
-            product: {
-                id: "test-id-1",
-                name: names[0],
-                gender: Object.keys(VALID_CATEGORIES)[0] as keyof typeof VALID_CATEGORIES,
-                price: 5500,
-                slug: slugify(names[0]),
-                src: "/nonexistent-img.jpg",
-                alt: "Test product image 1",
-                dateAdded: processDateForClient(),
-                stock: { s: 1, m: 0, l: 0 },
-            },
-            size: "s",
-            quantity: 1,
-        },
-        {
-            product: {
-                id: "test-id-2",
-                name: names[1],
-                gender: Object.keys(VALID_CATEGORIES)[1] as keyof typeof VALID_CATEGORIES,
-                price: 9900,
-                slug: slugify(names[1]),
-                src: "/nonexistent-img.jpg",
-                alt: "Test product image 2",
-                dateAdded: processDateForClient(),
-                stock: { s: 1, m: 3, l: 0 },
-            },
-            size: "m",
-            quantity: 2,
-        },
+    const prices = [5500, 9900];
+    const stocks = [
+        { s: 1, m: 0, l: 0 },
+        { s: 1, m: 3, l: 0 },
     ];
+    const validCategories = Object.keys(VALID_CATEGORIES);
+    const categories = [validCategories[0], validCategories[1]];
+    const sizes = ["s", "m"];
+    const quantities = [1, 2];
+
+    const products = Array.from({ length: 2 }).map((_, idx) =>
+        createFakeProduct({
+            idx,
+            overrides: {
+                price: prices[idx],
+                gender: categories[idx] as Categories,
+                stock: stocks[idx],
+            },
+        })
+    );
+
+    const bagItems = Array.from({ length: 2 }).map((_, idx) =>
+        createCustomBagItem(products[idx], sizes[idx] as Sizes, quantities[idx])
+    );
+
+    return bagItems;
 }
 
 export function getFakeUpdatedData(): Product[] {
-    const names = ["Test Product 1", "Test Product 2", "Test Product 3", "Test Product 4"];
-
-    return [
-        {
-            id: "test-id-1",
-            name: names[0],
-            gender: Object.keys(VALID_CATEGORIES)[0] as keyof typeof VALID_CATEGORIES,
-            price: 5500,
-            slug: slugify(names[0]),
-            src: "/nonexistent-img.jpg",
-            alt: "Test product image 1",
-            dateAdded: processDateForClient(),
-            stock: { s: 1, m: 0, l: 0 },
-        },
-        {
-            id: "test-id-2",
-            name: names[1],
-            gender: Object.keys(VALID_CATEGORIES)[1] as keyof typeof VALID_CATEGORIES,
-            price: 9900,
-            slug: slugify(names[1]),
-            src: "/nonexistent-img.jpg",
-            alt: "Test product image 2",
-            dateAdded: processDateForClient(),
-            stock: { s: 1, m: 1, l: 0 },
-        },
+    const prices = [5500, 9900];
+    const validCategories = Object.keys(VALID_CATEGORIES);
+    const categories = [validCategories[0], validCategories[1]];
+    const stocks = [
+        { s: 1, m: 0, l: 0 },
+        { s: 1, m: 1, l: 0 },
     ];
+
+    const products = Array.from({ length: 2 }).map((_, idx) =>
+        createFakeProduct({
+            idx: idx,
+            overrides: {
+                price: prices[idx],
+                gender: categories[idx] as Categories,
+                stock: stocks[idx],
+            },
+        })
+    );
+
+    return products;
 }
 
 class ErrorBoundary extends React.Component<

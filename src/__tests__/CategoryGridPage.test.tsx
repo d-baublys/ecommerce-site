@@ -1,6 +1,5 @@
-import { Product } from "@/lib/definitions";
 import {
-    createFakeProductList,
+    getFilteredFakeProducts,
     matchPriceRangeLabel,
     matchSizeLabel,
     wrapWithErrorBoundary,
@@ -29,10 +28,7 @@ jest.mock("next/navigation", () => ({
 
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 
-const fakeProductList = createFakeProductList();
-const filteredFakeProducts: Product[] = fakeProductList.filter((product) =>
-    Object.values(product.stock).some((stockCount) => stockCount > 0)
-); // parent would not pass list containing fully unstocked products
+const filteredFakeProducts = getFilteredFakeProducts();
 
 const testComponent = <CategoryGridPage category="all" />;
 const testComponentWithQuery = <CategoryGridPage category="all" query="testing-test" />;
