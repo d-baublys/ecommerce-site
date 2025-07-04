@@ -1,10 +1,6 @@
 import { createLongProductList, getFilteredFakeProducts } from "@/lib/test-utils";
 import { render, screen, waitFor, within } from "@testing-library/react";
 
-jest.mock("next/navigation", () => ({
-    usePathname: () => "/bag",
-}));
-
 jest.mock("@/lib/actions", () => ({
     getProductData: jest.fn(),
     getFeaturedProducts: jest.fn(),

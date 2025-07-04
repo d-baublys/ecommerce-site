@@ -4,7 +4,7 @@ import { useWishlistStore } from "@/stores/wishlistStore";
 import BaseGridPage from "@/ui/pages/BaseGridPage";
 import MainLayout from "@/ui/layouts/MainLayout";
 
-export default function Page() {
+export default function WishlistPage() {
     const wishlist = useWishlistStore((state) => state.wishlist);
 
     return (
