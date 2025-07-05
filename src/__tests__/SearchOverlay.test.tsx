@@ -28,9 +28,11 @@ const mockResolvedFetch = () => {
     (fetchFilteredProducts as jest.Mock).mockResolvedValue(productList);
 };
 const fireInputAndWait = async (queryText: string) => {
-    fireEvent.change(getInput(), { target: { value: queryText } });
+    await act(async () => {
+        fireEvent.change(getInput(), { target: { value: queryText } });
 
-    await new Promise((res) => setTimeout(res, 300));
+        await new Promise((res) => setTimeout(res, 300));
+    });
 };
 
 const prepStandard = async () => {

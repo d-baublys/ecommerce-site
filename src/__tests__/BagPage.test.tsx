@@ -2,6 +2,7 @@ import BagPage from "@/app/bag/page";
 import {
     createFakeBagItems,
     createFakeProduct,
+    getConsoleErrorSpy,
     getFakeUpdatedData,
     wrapWithErrorBoundary,
 } from "@/lib/test-utils";
@@ -60,12 +61,15 @@ describe("BagPage", () => {
     });
 
     it("throws an error when fetch fails", async () => {
+        const errorSpy = getConsoleErrorSpy();
         (getProductData as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
         render(wrapWithErrorBoundary(<BagPage />));
 
         await waitFor(() => {
             expect(screen.getByText(/Error caught by boundary/)).toBeInTheDocument();
         });
+
+        errorSpy.mockRestore();
     });
 
     it("updates subtotal if latest size stock has decreased to below bag quantity", async () => {

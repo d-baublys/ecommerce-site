@@ -1,6 +1,6 @@
 import { getFilteredFakeProducts, wrapWithErrorBoundary } from "@/lib/test-utils";
 import SearchBar from "@/ui/components/SearchBar";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 
 const pushMock = jest.fn();
 
@@ -42,9 +42,11 @@ const getSuggestionsContainer = () => screen.getByTestId("suggestions-ul");
 const getSuggestions = () => within(getSuggestionsContainer()).getAllByRole("listitem");
 
 const fireInputAndWait = async (queryText: string) => {
-    fireEvent.change(getInput(), { target: { value: queryText } });
+    await act(async () => {
+        fireEvent.change(getInput(), { target: { value: queryText } });
 
-    await new Promise((res) => setTimeout(res, 300));
+        await new Promise((res) => setTimeout(res, 300));
+    });
 };
 const prepStandard = async () => {
     mockResolvedFetch();

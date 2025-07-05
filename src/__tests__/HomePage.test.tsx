@@ -14,7 +14,7 @@ const fakeFeaturedList = getFilteredFakeProducts();
 const fakeProductList = createLongProductList();
 
 Element.prototype.scrollIntoView = jest.fn();
-Element.prototype.scrollTo = jest.fn();
+window.scrollTo = jest.fn();
 
 describe("HomePage", () => {
     it("displays an extant featured product list", async () => {

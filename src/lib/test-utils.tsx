@@ -145,11 +145,11 @@ export function wrapWithErrorBoundary(children: React.ReactNode) {
     return <ErrorBoundary>{children}</ErrorBoundary>;
 }
 
-export const matchSizeLabel = (size: Sizes, count: number) => {
+export function matchSizeLabel(size: Sizes, count: number) {
     return new RegExp(`${size.toUpperCase()}\\s\\(${count}\\)`);
-};
+}
 
-export const matchPriceRangeLabel = (filterKey: PriceFilterKey, count: number) => {
+export function matchPriceRangeLabel(filterKey: PriceFilterKey, count: number) {
     const pattern = isFinite(PRICE_FILTER_OPTIONS[filterKey].max)
         ? `[£$€]?${PRICE_FILTER_OPTIONS[filterKey].min / 100}-[£$€]?${
               PRICE_FILTER_OPTIONS[filterKey].max / 100 - 1
@@ -157,4 +157,8 @@ export const matchPriceRangeLabel = (filterKey: PriceFilterKey, count: number) =
         : `Over\\s[£$€]?${PRICE_FILTER_OPTIONS[filterKey].min / 100}\\s\\(${count}\\)`;
 
     return new RegExp(pattern);
-};
+}
+
+export function getConsoleErrorSpy() {
+    return jest.spyOn(console, "error").mockImplementation(() => {});
+}

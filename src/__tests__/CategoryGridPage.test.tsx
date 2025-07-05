@@ -1,4 +1,5 @@
 import {
+    getConsoleErrorSpy,
     getFilteredFakeProducts,
     matchPriceRangeLabel,
     matchSizeLabel,
@@ -56,12 +57,15 @@ describe("CategoryGridPage", () => {
     });
 
     it("throws an error when fetch fails", async () => {
+        const errorSpy = getConsoleErrorSpy();
         (fetchFilteredProducts as jest.Mock).mockRejectedValue(new Error("Fetch Failed"));
         render(wrapWithErrorBoundary(testComponent));
 
         await waitFor(() => {
             expect(screen.getByText(/Error caught by boundary/)).toBeInTheDocument();
         });
+
+        errorSpy.mockRestore();
     });
 
     it("shows correct number of products", async () => {

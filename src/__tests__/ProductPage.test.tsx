@@ -1,4 +1,4 @@
-import { createFakeProduct } from "@/lib/test-utils";
+import { createFakeProduct, getConsoleErrorSpy } from "@/lib/test-utils";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import ProductPage from "@/app/products/[slug]/page";
 
@@ -42,9 +42,12 @@ describe("ProductPage", () => {
     });
 
     it("throws an error when fetch fails", async () => {
+        const errorSpy = getConsoleErrorSpy();
         (getProductData as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
 
         expect(renderPage()).rejects.toThrow("Fetch failed");
+
+        errorSpy.mockRestore();
     });
 
     it("shows disabled product add button by default", async () => {
