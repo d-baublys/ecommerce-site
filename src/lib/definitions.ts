@@ -70,3 +70,9 @@ export const FEATURED_COUNT = 5;
 export const USER_ROLES = ["admin", "user"] as const;
 
 export type UserRoleOptions = (typeof USER_ROLES)[number];
+
+export type SearchBarConfig = {
+    isGlobalSearch: boolean;
+    showSuggestions: boolean;
+    placeholderText?: string;
+};

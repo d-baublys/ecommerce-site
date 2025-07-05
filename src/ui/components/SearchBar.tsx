@@ -1,17 +1,11 @@
 "use client";
 
-import { Product } from "@/lib/definitions";
+import { Product, SearchBarConfig } from "@/lib/definitions";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 import { debounce } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { SetStateAction, useEffect, useState } from "react";
 import { IoCloseCircle, IoSearch } from "react-icons/io5";
-
-type SearchBarConfig = {
-    isGlobalSearch: boolean;
-    showSuggestions: boolean;
-    placeholderText?: string;
-};
 
 export default function SearchBar({
     handleResultClick,
@@ -30,7 +24,6 @@ export default function SearchBar({
     const [query, setQuery] = useState<string>("");
     const [results, setResults] = useState<Product[]>([]);
     const [isResultLoading, setIsResultLoading] = useState<boolean>(false);
-    const [hasMounted, setHasMounted] = useState<boolean>(false);
 
     const router = useRouter();
 
@@ -40,19 +33,10 @@ export default function SearchBar({
 
             setProductList(productFetch);
             if (parentSetter) parentSetter(productFetch);
-            setHasMounted(true);
         };
 
         getData();
     }, []);
-
-    if (productList === undefined && hasMounted) {
-        return (
-            <p className="flex items-center h-full">
-                Error fetching product data. Please try again later.
-            </p>
-        );
-    }
 
     const debouncedResults = debounce((currQuery) => {
         const results = productList!.filter((product) =>
@@ -106,6 +90,8 @@ export default function SearchBar({
                 <div className="flex justify-center items-center w-12 h-full">
                     {options?.isGlobalSearch && (
                         <IoSearch
+                            title="Submit search"
+                            aria-label="Submit search"
                             className={query ? "cursor-pointer" : ""}
                             onClick={(e) => handleSubmit(e)}
                             size={20}
@@ -120,12 +106,17 @@ export default function SearchBar({
                     placeholder={options?.placeholderText ?? "Search products..."}
                 ></input>
                 <div className="flex justify-center items-center w-12 text-[1.75rem]">
-                    <IoCloseCircle onClick={() => clearAll()} className="cursor-pointer" />
+                    <IoCloseCircle
+                        title="Clear search"
+                        aria-label="Clear search"
+                        onClick={() => clearAll()}
+                        className="cursor-pointer"
+                    />
                 </div>
             </div>
             {query && options?.showSuggestions && (
                 <div className="mx-4 min-h-[100px] px-2 py-2 border-t border-background-lighter bg-background-lightest z-100">
-                    <ul>
+                    <ul data-testid="suggestions-ul">
                         {results?.length > 0 &&
                             results.map((product) => (
                                 <li
