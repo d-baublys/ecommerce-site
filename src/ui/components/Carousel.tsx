@@ -101,6 +101,8 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                     className="flex absolute justify-center left-0 top-1/2 gap-(--carousel-img-w) translate-y-[-50%] w-full z-50"
                 >
                     <button
+                        title="Previous item"
+                        aria-label="Previous item"
                         id="carousel-nav-back"
                         className="cursor-pointer mr-[calc(var(--carousel-img-gap)/2)] translate-x-[50%]"
                         onClick={navBack}
@@ -108,6 +110,8 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                         <IoChevronBackSharp className="text-component-color" size={36} />
                     </button>
                     <button
+                        title="Next item"
+                        aria-label="Next item"
                         id="carousel-nav-forward"
                         className="cursor-pointer ml-[calc(var(--carousel-img-gap)/2)] translate-x-[-50%]"
                         onClick={navForward}
