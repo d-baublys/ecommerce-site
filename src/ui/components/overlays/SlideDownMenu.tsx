@@ -27,7 +27,11 @@ export default function SlideDownMenu({
                         <div className="flex justify-center pt-[5rem] h-min">{children}</div>
                     </div>
                     <div className="fixed top-20 right-4 p-1 bg-background-lightest rounded-full z-[100]">
-                        <CloseButton onClick={() => predicateSetter(false)} />
+                        <CloseButton
+                            title="Close menu"
+                            aria-label="Close menu"
+                            onClick={() => predicateSetter(false)}
+                        />
                     </div>
                 </>
             )}

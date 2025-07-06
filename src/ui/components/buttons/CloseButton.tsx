@@ -1,9 +1,9 @@
 import { IoClose } from "react-icons/io5";
 
-export default function CloseButton({ onClick }: { onClick: () => void }) {
+export default function CloseButton(props: React.HtmlHTMLAttributes<HTMLButtonElement>) {
     return (
-        <div className="flex items-center">
-            <IoClose className="cursor-pointer" onClick={onClick} size={24} />
-        </div>
+        <button type="button" className="flex items-center" {...props}>
+            <IoClose className="cursor-pointer" size={24} />
+        </button>
     );
 }

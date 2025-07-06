@@ -44,11 +44,13 @@ export default function AdminLoginPage() {
                 >
                     <div className="flex flex-col w-full gap-8 mt-8">
                         <LogInInput
+                            name="username"
                             labelText="Username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                         />
                         <LogInInput
+                            name="password"
                             type="password"
                             labelText="Password"
                             value={password}

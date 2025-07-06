@@ -137,10 +137,12 @@ export default function ProductStockTable({
                             </td>
                             <td>
                                 {tableMode === "edit" && (
-                                    <StockRowDelete
-                                        stockObjSetter={setLocalStockObj}
-                                        size={stockSize as Sizes}
-                                    />
+                                    <div className="flex grow justify-center items-center">
+                                        <StockRowDelete
+                                            stockObjSetter={setLocalStockObj}
+                                            size={stockSize as Sizes}
+                                        />
+                                    </div>
                                 )}
                             </td>
                         </tr>

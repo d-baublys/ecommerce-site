@@ -4,26 +4,32 @@ import { useWishlistToggle } from "@/hooks/useWishlistToggle";
 import { Product } from "@/lib/definitions";
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
 
+interface WishlistToggleIconProps extends React.HtmlHTMLAttributes<HTMLButtonElement> {
+    product: Product;
+    iconSize: number;
+    parentHook?: ReturnType<typeof useWishlistToggle>;
+    overrideClasses?: string;
+}
+
 export default function WishlistToggleIcon({
     product,
     iconSize,
     parentHook,
     overrideClasses,
-}: {
-    product: Product;
-    iconSize: number;
-    parentHook?: ReturnType<typeof useWishlistToggle>;
-    overrideClasses?: string;
-}) {
+    ...props
+}: WishlistToggleIconProps) {
     const { isAnimated, showFilled, toggleWishlist } = parentHook ?? useWishlistToggle(product);
 
     return (
-        <div
+        <button
+            type="button"
             className={`p-1 bg-white [border-radius:50%] ${overrideClasses ?? ""} ${
                 isAnimated ? "[animation:small-pop-in_0.3s_ease]" : ""
             }`}
             onClick={toggleWishlist}
+            title="Add or remove from wishlist"
             aria-label="Add or remove from wishlist"
+            {...props}
         >
             <div
                 className={`relative flex justify-center items-center translate-y-[1px] aspect-square text-black ${
@@ -39,6 +45,6 @@ export default function WishlistToggleIcon({
                 />
                 <IoHeartOutline data-testid="outline-heart" size={iconSize} />
             </div>
-        </div>
+        </button>
     );
 }

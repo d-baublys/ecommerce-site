@@ -1,4 +1,7 @@
 import { defineConfig } from "cypress";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export default defineConfig({
     e2e: {
@@ -6,5 +9,9 @@ export default defineConfig({
             // implement node event listeners here
         },
         baseUrl: "http://localhost:3000/",
+    },
+    env: {
+        adminUsername: process.env.ADMIN_USERNAME,
+        adminPassword: process.env.ADMIN_PASSWORD,
     },
 });

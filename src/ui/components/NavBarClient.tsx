@@ -71,7 +71,10 @@ export default function NavBarClient() {
                             />
                         </Link>
                     </div>
-                    <div className="w-full justify-center order-2 sm:order-1 px-(--gutter) lg:px-(--gutter-md) hidden sm:flex">
+                    <div
+                        id="main-entry"
+                        className="w-full justify-center order-2 sm:order-1 px-(--gutter) lg:px-(--gutter-md) hidden sm:flex"
+                    >
                         <Link href={`/category/all`}>Shop</Link>
                     </div>
                     <div className="flex w-full justify-end gap-2 md:gap-4 order-3 px-(--gutter) lg:px-(--gutter-md)">
@@ -153,11 +156,13 @@ export default function NavBarClient() {
                 </div>
             </nav>
             <SlideDownColumnsMenu
+                id="nav-mobile-menu"
                 predicate={isMenuOpen}
                 predicateSetter={setIsMenuOpen}
                 overrideClasses="sm:hidden"
                 leftContent={
                     <Link
+                        id="mobile-entry"
                         href={`/category/all`}
                         onClick={() => setIsMenuOpen(false)}
                         className="p-1 rounded-full"
@@ -215,10 +220,7 @@ export default function NavBarClient() {
                                 className="flex items-center gap-4 p-1 rounded-full"
                                 onClick={() => setIsMenuOpen(false)}
                             >
-                                <IoCog
-                                    className="hover:scale-125 transition"
-                                    aria-label="Wishlist"
-                                />
+                                <IoCog className="hover:scale-125 transition" aria-label="Admin" />
                                 <span>Admin</span>
                             </Link>
                         )}

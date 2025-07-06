@@ -2,7 +2,6 @@ import RoundedButton, { RoundedButtonProps } from "@/ui/components/buttons/Round
 
 interface GoButtonProps extends RoundedButtonProps {
     predicate: boolean;
-    overrideClasses?: string;
 }
 
 export default function GoButton({ predicate, overrideClasses, ...props }: GoButtonProps) {
