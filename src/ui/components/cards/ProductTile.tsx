@@ -46,6 +46,13 @@ export default function ProductTile({ product }: { product: Product }) {
         permitted && setIsModalOpen(true);
     };
 
+    const handleBlur = (e: React.FocusEvent) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+            setIsHovered(false);
+            setIsQuickAddActive(false);
+        }
+    };
+
     useEffect(() => {
         const handleOffTouch = (e: TouchEvent) => {
             if (tileRef.current && !tileRef.current.contains(e?.target as Node)) {
@@ -61,71 +68,85 @@ export default function ProductTile({ product }: { product: Product }) {
 
     return (
         <>
-            <ProductLink slug={product.slug}>
+            <div
+                ref={tileRef}
+                className="relative flex flex-col justify-evenly min-h-[200px] h-min gap-4 text-sz-label-button lg:text-sz-label-button-lg z-0"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => {
+                    setIsHovered(false);
+                    setIsQuickAddActive(false);
+                }}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                onTouchCancel={handleTouchEnd}
+                data-testid="product-tile"
+            >
                 <div
-                    ref={tileRef}
-                    className="relative flex flex-col justify-evenly min-h-[200px] h-min gap-4 text-sz-label-button lg:text-sz-label-button-lg z-0"
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => {
-                        setIsHovered(false);
-                        setIsQuickAddActive(false);
-                    }}
-                    onTouchStart={handleTouchStart}
-                    onTouchEnd={handleTouchEnd}
-                    onTouchCancel={handleTouchEnd}
+                    tabIndex={0}
+                    onFocus={() => setIsHovered(true)}
+                    onBlur={handleBlur}
+                    className="relative w-full aspect-[4/5] outline-none"
                 >
-                    <div className="relative w-full aspect-[4/5]">
+                    <ProductLink tabIndex={-1} slug={product.slug}>
                         <ProductImage product={product} />
-                        {isHovered && (
-                            <div>
-                                <div className="absolute top-0 right-0 m-2">
-                                    <WishlistToggleIcon product={product} iconSize={24} />
-                                </div>
-                                <div className="absolute bottom-0 left-0 w-full p-2 md:p-3">
-                                    {availableSizes.length === 0 ? (
-                                        <div
-                                            className="flex justify-center items-center px-6 py-2 bg-background-lightest border-white rounded-full cursor-auto"
-                                            onClick={isolateInteraction}
-                                        >
-                                            <p>Out of stock</p>
-                                        </div>
-                                    ) : isQuickAddActive ? (
-                                        <ul
-                                            className="flex flex-wrap justify-center gap-[2%] md:gap-[5%] p-2 bg-background-lightest rounded-full cursor-auto"
-                                            onClick={isolateInteraction}
-                                        >
-                                            {availableSizes.map((size) => (
-                                                <li key={size} className="p-1">
-                                                    <button
-                                                        className="flex justify-center items-center h-8 md:h-10 aspect-square bg-white text-sz-label-button md:text-sz-label-button-lg [border-radius:50%] cursor-pointer"
-                                                        onClick={(e) =>
-                                                            handleSizeClick(e, size as Sizes)
-                                                        }
-                                                    >
-                                                        {size.toUpperCase()}
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <RoundedButton
-                                            overrideClasses="w-full"
-                                            onClick={handleQuickAddClick}
-                                        >
-                                            Quick Add
-                                        </RoundedButton>
-                                    )}
-                                </div>
+                    </ProductLink>
+                    {isHovered && (
+                        <div>
+                            <div className="absolute top-0 right-0 m-2">
+                                <WishlistToggleIcon product={product} iconSize={24} />
                             </div>
-                        )}
-                    </div>
-                    <p>{product.name}</p>
-                    <p className="font-semibold">
-                        <span>£</span>
-                        <span>{stringifyConvertPrice(product.price)}</span>
-                    </p>
+                            <div className="absolute bottom-0 left-0 w-full p-2 md:p-3">
+                                {availableSizes.length === 0 ? (
+                                    <div
+                                        className="flex justify-center items-center px-6 py-2 bg-background-lightest border-white rounded-full cursor-auto"
+                                        onClick={isolateInteraction}
+                                    >
+                                        <p>Out of stock</p>
+                                    </div>
+                                ) : isQuickAddActive ? (
+                                    <ul
+                                        className="flex flex-wrap justify-center gap-[2%] md:gap-[5%] p-2 bg-background-lightest rounded-full cursor-auto"
+                                        onClick={isolateInteraction}
+                                    >
+                                        {availableSizes.map((size) => (
+                                            <li key={size} className="p-1">
+                                                <button
+                                                    className="flex justify-center items-center h-8 md:h-10 aspect-square bg-white text-sz-label-button md:text-sz-label-button-lg rounded-circle cursor-pointer"
+                                                    onClick={(e) =>
+                                                        handleSizeClick(e, size as Sizes)
+                                                    }
+                                                >
+                                                    {size.toUpperCase()}
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <RoundedButton
+                                        overrideClasses="w-full"
+                                        onClick={handleQuickAddClick}
+                                        aria-haspopup="listbox"
+                                        aria-expanded={isQuickAddActive}
+                                    >
+                                        Quick Add
+                                    </RoundedButton>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
-            </ProductLink>
+
+                <ProductLink slug={product.slug}>
+                    <div className="flex flex-col grow gap-4">
+                        <p>{product.name}</p>
+                        <p className="font-semibold">
+                            <span>£</span>
+                            <span>{stringifyConvertPrice(product.price)}</span>
+                        </p>
+                    </div>
+                </ProductLink>
+            </div>
+
             {isModalOpen && (
                 <BagConfirmModal
                     handleClose={() => setIsModalOpen(false)}

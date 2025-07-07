@@ -4,7 +4,7 @@ import ProductPageClient from "./ProductPageClient";
 import MainLayout from "@/ui/layouts/MainLayout";
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {
-    const { slug } = params;
+    const { slug } = await params;
     const productFetch = await getProductData({ slug: decodeURIComponent(slug) });
 
     if (!productFetch.data.length) {

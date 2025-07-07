@@ -45,6 +45,7 @@
     --text-sz-label-button-lg: 0.875rem;
     --text-sz-smallest: 0.75rem;
     --breakpoint-xs: 480px;
+    --radius-circle: 50%;
 }
 
 body {

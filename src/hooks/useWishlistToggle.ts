@@ -15,7 +15,7 @@ export function useWishlistToggle(product: Product) {
         setShowFilled(inWishlist);
     }, [wishlist]);
 
-    const toggleWishlist = (e: React.TouchEvent | React.MouseEvent) => {
+    const toggleWishlist = (e: React.TouchEvent | React.MouseEvent | React.KeyboardEvent) => {
         isolateInteraction(e);
 
         setIsAnimated(true);

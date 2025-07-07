@@ -159,7 +159,7 @@ export function extractSort(param: string | null) {
     return param && param in SORT_OPTIONS ? (param as ProductSortKey) : "placeholder";
 }
 
-export function isolateInteraction(e: React.TouchEvent | React.MouseEvent) {
+export function isolateInteraction(e: React.TouchEvent | React.MouseEvent | React.KeyboardEvent) {
     e.preventDefault();
 }
 

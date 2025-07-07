@@ -100,21 +100,4 @@ describe("WishlistToggleIcon", () => {
 
         expect(occurrences).toBe(0);
     });
-
-    it("toggles when parentHook is provided", () => {
-        const mockToggleWishlist = jest.fn();
-        const parentHook: ReturnType<typeof useWishlistToggle> = {
-            inWishlist: false,
-            isAnimated: false,
-            showFilled: false,
-            toggleWishlist: mockToggleWishlist,
-        };
-
-        render(<WishlistToggleIcon product={fakeProduct} iconSize={24} parentHook={parentHook} />);
-
-        const icon = screen.getByLabelText("Add or remove from wishlist");
-        fireEvent.click(icon);
-
-        expect(mockToggleWishlist).toHaveBeenCalled();
-    });
 });

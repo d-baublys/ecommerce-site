@@ -16,7 +16,7 @@ const setUpFakeWishlist = () =>
     fakeProductList.forEach((item) => {
         addToWishlist(item);
     });
-const getAllTiles = () => within(screen.getByTestId("product-grid")).getAllByRole("link");
+const getAllTiles = () => screen.getAllByTestId("product-tile");
 
 describe("WishlistPage", () => {
     beforeEach(() => {

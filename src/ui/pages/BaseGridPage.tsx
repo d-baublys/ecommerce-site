@@ -23,7 +23,7 @@ export default function BaseGridPage({
             <div className="flex flex-row grow">
                 {asideContent ?? null}
                 <div className="flex flex-col w-full overflow-clip">
-                    <div className="flex justify-between w-full pb-4 font-semibold">
+                    <div className="flex justify-between w-full p-0.5 pb-4 font-semibold">
                         <p className="flex items-center gap-1">
                             <span>{displayedProducts.length}</span>
                             <span>{pluralise("Item", displayedProducts.length)}</span>

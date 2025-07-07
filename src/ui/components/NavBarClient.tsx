@@ -79,7 +79,7 @@ export default function NavBarClient() {
                     </div>
                     <div className="flex w-full justify-end gap-2 md:gap-4 order-3 px-(--gutter) lg:px-(--gutter-md)">
                         <button
-                            className="cursor-pointer p-2 [border-radius:50%]"
+                            className="cursor-pointer p-2 rounded-circle"
                             title="Search"
                             aria-label="Search"
                         >
@@ -90,7 +90,7 @@ export default function NavBarClient() {
                         </button>
                         <Link
                             href={"/wishlist"}
-                            className="items-center p-2 [border-radius:50%] hidden sm:flex"
+                            className="items-center p-2 rounded-circle hidden sm:flex"
                         >
                             <IoHeartOutline
                                 className="hover:scale-125 transition"
@@ -100,7 +100,7 @@ export default function NavBarClient() {
                         </Link>
                         <Link
                             href={"/bag"}
-                            className="relative items-center p-2 [border-radius:50%] hidden sm:flex"
+                            className="relative items-center p-2 rounded-circle hidden sm:flex"
                             title="Bag"
                             aria-label="Bag"
                         >
@@ -109,7 +109,7 @@ export default function NavBarClient() {
                                 {hasMounted && itemCount > 0 && (
                                     <div
                                         aria-label="Bag item count"
-                                        className="bag-item-count absolute flex justify-center items-center top-[-13px] right-[-10px] w-4 aspect-square [border-radius:50%] bg-red-500 text-contrasted text-[0.67rem]"
+                                        className="bag-item-count absolute flex justify-center items-center top-[-13px] right-[-10px] w-4 aspect-square rounded-circle bg-red-500 text-contrasted text-[0.67rem]"
                                     >
                                         <span>{Math.min(itemCount, 99)}</span>
                                     </div>
@@ -117,7 +117,7 @@ export default function NavBarClient() {
                             </div>
                         </Link>
                         <button
-                            className={`p-2 [border-radius:50%] hidden sm:block ${
+                            className={`p-2 rounded-circle hidden sm:block ${
                                 isAdmin ? "cursor-pointer" : ""
                             }`}
                             onClick={() => {
@@ -131,7 +131,7 @@ export default function NavBarClient() {
                             />
                         </button>
                         <button
-                            className="p-2 [border-radius:50%] block sm:hidden cursor-pointer"
+                            className="p-2 rounded-circle block sm:hidden cursor-pointer"
                             onClick={() => setIsMenuOpen(true)}
                         >
                             <IoMenu
@@ -143,7 +143,7 @@ export default function NavBarClient() {
                         {isAdmin && (
                             <Link
                                 href={"/admin"}
-                                className="items-center p-2 [border-radius:50%] hidden sm:flex"
+                                className="items-center p-2 rounded-circle hidden sm:flex"
                             >
                                 <IoCog
                                     className="hover:scale-125 transition"
@@ -192,7 +192,7 @@ export default function NavBarClient() {
                             <div className="relative">
                                 <IoBagOutline className="hover:scale-125 transition" />
                                 {hasMounted && itemCount > 0 && (
-                                    <div className="bag-item-count absolute flex justify-center items-center top-[-13px] right-[-10px] w-4 aspect-square [border-radius:50%] bg-red-500 text-contrasted text-[0.67rem]">
+                                    <div className="bag-item-count absolute flex justify-center items-center top-[-13px] right-[-10px] w-4 aspect-square rounded-circle bg-red-500 text-contrasted text-[0.67rem]">
                                         <span>{Math.min(itemCount, 99)}</span>
                                     </div>
                                 )}
