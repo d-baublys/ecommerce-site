@@ -1,4 +1,4 @@
-describe("HomePage", () => {
+describe("Home page", () => {
     it("should rotate product carousel correctly", () => {
         cy.visit("/");
 

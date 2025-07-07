@@ -1,9 +1,8 @@
 import { email, password } from "../support/credentials";
 
-describe("Admin Routes", () => {
+describe("Admin route protection", () => {
     it("redirects to admin log in page if accessing an admin path unauthenticated", () => {
         cy.visit("/admin");
-
         cy.url().should("contain", "/admin/login");
     });
 
