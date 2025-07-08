@@ -128,7 +128,7 @@ export default function GridAside({
         ) : null;
 
     return (
-        <div className="h-min border-b-1">
+        <div className="w-full h-min border-b-1">
             <AccordionSection text="Size">
                 {generateButtonList({
                     dataObj: sizesObj,

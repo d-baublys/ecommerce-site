@@ -5,16 +5,9 @@ import { useSearchStore } from "@/stores/searchStore";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-    IoBagOutline,
-    IoCog,
-    IoHeartOutline,
-    IoMenu,
-    IoPersonOutline,
-    IoSearchOutline,
-} from "react-icons/io5";
 import { signOut, useSession } from "next-auth/react";
-import SlideDownColumnsMenu from "./overlays/SlideDownColumnsMenu";
+import SlideDownColumnsMenu from "@/ui/components/overlays/SlideDownColumnsMenu";
+import { renderConditionalIcons, renderFixedIcons } from "@/lib/navIcons";
 
 export default function NavBarClient() {
     const [isScrollingUp, setIsScrollingUp] = useState(false);
@@ -42,13 +35,18 @@ export default function NavBarClient() {
         return () => window.removeEventListener("scroll", scrollUpSticky);
     }, []);
 
+    const closeSearchAll = () => {
+        setIsSearchLoaded(false);
+        setTimeout(() => setIsSearchOpen(false), 200);
+    };
+
     const handleSearchClick = () => {
+        setIsMenuOpen(false);
         if (!isSearchOpen) {
             setIsSearchOpen(true);
             setTimeout(() => setIsSearchLoaded(true), 0);
         } else {
-            setIsSearchLoaded(false);
-            setTimeout(() => setIsSearchOpen(false), 200);
+            closeSearchAll();
         }
     };
 
@@ -78,80 +76,15 @@ export default function NavBarClient() {
                         <Link href={`/category/all`}>Shop</Link>
                     </div>
                     <div className="flex w-full justify-end gap-2 md:gap-4 order-3 px-(--gutter) lg:px-(--gutter-md)">
-                        <button
-                            className="cursor-pointer p-2 rounded-circle"
-                            title="Search"
-                            aria-label="Search"
-                        >
-                            <IoSearchOutline
-                                onClick={handleSearchClick}
-                                className="hover:scale-125 transition"
-                            />
-                        </button>
-                        <Link
-                            href={"/wishlist"}
-                            className="items-center p-2 rounded-circle hidden sm:flex"
-                        >
-                            <IoHeartOutline
-                                className="hover:scale-125 transition"
-                                title="Wishlist"
-                                aria-label="Wishlist"
-                            />
-                        </Link>
-                        <Link
-                            href={"/bag"}
-                            className="relative items-center p-2 rounded-circle hidden sm:flex"
-                            title="Bag"
-                            aria-label="Bag"
-                        >
-                            <div className="relative">
-                                <IoBagOutline className="hover:scale-125 transition" />
-                                {hasMounted && itemCount > 0 && (
-                                    <div
-                                        aria-label="Bag item count"
-                                        className="bag-item-count absolute flex justify-center items-center top-[-13px] right-[-10px] w-4 aspect-square rounded-circle bg-red-500 text-contrasted text-[0.67rem]"
-                                    >
-                                        <span>{Math.min(itemCount, 99)}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </Link>
-                        <button
-                            className={`p-2 rounded-circle hidden sm:block ${
-                                isAdmin ? "cursor-pointer" : ""
-                            }`}
-                            onClick={() => {
-                                isAdmin && setIsAccountOpen(true);
-                            }}
-                        >
-                            <IoPersonOutline
-                                className="hover:scale-125 transition"
-                                title="Account"
-                                aria-label="Account"
-                            />
-                        </button>
-                        <button
-                            className="p-2 rounded-circle block sm:hidden cursor-pointer"
-                            onClick={() => setIsMenuOpen(true)}
-                        >
-                            <IoMenu
-                                className="hover:scale-125 transition"
-                                title="Menu"
-                                aria-label="Menu"
-                            />
-                        </button>
-                        {isAdmin && (
-                            <Link
-                                href={"/admin"}
-                                className="items-center p-2 rounded-circle hidden sm:flex"
-                            >
-                                <IoCog
-                                    className="hover:scale-125 transition"
-                                    title="Admin"
-                                    aria-label="Admin"
-                                />
-                            </Link>
-                        )}
+                        {renderFixedIcons({ handleSearchClick, setIsMenuOpen, closeSearchAll })}
+                        {renderConditionalIcons({
+                            isForMenu: false,
+                            isAdmin,
+                            hasMounted,
+                            itemCount,
+                            setIsMenuOpen,
+                            setIsAccountOpen,
+                        })}
                     </div>
                 </div>
             </nav>
@@ -172,58 +105,14 @@ export default function NavBarClient() {
                 }
                 rightContent={
                     <>
-                        <Link
-                            href={"/wishlist"}
-                            className="flex items-center gap-4 p-1 rounded-full"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            <IoHeartOutline
-                                className="hover:scale-125 transition"
-                                aria-label="Wishlist"
-                            />
-                            <span>Wishlist</span>
-                        </Link>
-                        <Link
-                            href={"/bag"}
-                            className="relative flex items-center gap-4 p-1 rounded-full"
-                            aria-label="Bag"
-                            onClick={() => setIsMenuOpen(false)}
-                        >
-                            <div className="relative">
-                                <IoBagOutline className="hover:scale-125 transition" />
-                                {hasMounted && itemCount > 0 && (
-                                    <div className="bag-item-count absolute flex justify-center items-center top-[-13px] right-[-10px] w-4 aspect-square rounded-circle bg-red-500 text-contrasted text-[0.67rem]">
-                                        <span>{Math.min(itemCount, 99)}</span>
-                                    </div>
-                                )}
-                            </div>
-                            <span>Bag</span>
-                        </Link>
-                        <button
-                            className={`flex items-center gap-4 p-1 rounded-full ${
-                                isAdmin ? "cursor-pointer" : ""
-                            }`}
-                            onClick={() => {
-                                isAdmin && setIsAccountOpen(true);
-                                isAdmin && setIsMenuOpen(false);
-                            }}
-                        >
-                            <IoPersonOutline
-                                className="hover:scale-125 transition"
-                                aria-label="Account"
-                            />
-                            <span>Account</span>
-                        </button>
-                        {isAdmin && (
-                            <Link
-                                href={"/admin"}
-                                className="flex items-center gap-4 p-1 rounded-full"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                <IoCog className="hover:scale-125 transition" aria-label="Admin" />
-                                <span>Admin</span>
-                            </Link>
-                        )}
+                        {renderConditionalIcons({
+                            isForMenu: true,
+                            isAdmin,
+                            hasMounted,
+                            itemCount,
+                            setIsMenuOpen,
+                            setIsAccountOpen,
+                        })}
                     </>
                 }
             />

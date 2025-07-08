@@ -89,8 +89,13 @@ export default function SearchBar({
             <div className="flex items-center w-full h-searchbar-height bg-background-lightest rounded-full">
                 <div className="flex justify-center items-center w-12 h-full">
                     {options?.isGlobalSearch && (
-                        <button type="submit" title="Submit search" aria-label="Submit search">
-                            <IoSearch className={query ? "cursor-pointer" : ""} size={20} />
+                        <button
+                            type="submit"
+                            title="Submit search"
+                            aria-label="Submit search"
+                            className={`p-1 rounded-circle ${query ? "cursor-pointer" : ""}`}
+                        >
+                            <IoSearch size={20} />
                         </button>
                     )}
                 </div>
@@ -107,7 +112,7 @@ export default function SearchBar({
                         type="button"
                         title="Clear search"
                         aria-label="Clear search"
-                        className="cursor-pointer"
+                        className="cursor-pointer rounded-circle"
                         onClick={() => clearAll()}
                     >
                         <IoCloseCircle />

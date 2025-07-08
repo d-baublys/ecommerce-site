@@ -2,7 +2,7 @@
 
 import { Categories, Product, StockTableMode, VALID_CATEGORIES } from "@/lib/definitions";
 import FormInput from "@/ui/components/forms/FormInput";
-import RoundedButton from "@/ui/components/buttons/RoundedButton";
+import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import { useEffect, useRef, useState } from "react";
 import {
     convertValidPrice,
@@ -185,10 +185,12 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                         overrideClasses="hidden"
                     />
                     <div className="flex items-center gap-4">
-                        <RoundedButton onClick={handleBrowse}>
-                            <IoFolder />
-                            <span>Browse</span>
-                        </RoundedButton>
+                        <div>
+                            <PlainRoundedButton onClick={handleBrowse}>
+                                <IoFolder />
+                                <span>Browse</span>
+                            </PlainRoundedButton>
+                        </div>
                         <p>{fileName}</p>
                     </div>
                 </div>
@@ -219,24 +221,24 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                 </div>
                 <div className="flex justify-between gap-8">
                     {productChanged && (
-                        <RoundedButton overrideClasses="w-full" onClick={handleSubmit}>
+                        <PlainRoundedButton onClick={handleSubmit}>
                             {mode === "add" ? "Add" : "Save"}
-                        </RoundedButton>
+                        </PlainRoundedButton>
                     )}
                     {productChanged && (
-                        <RoundedButton overrideClasses="w-full" onClick={handleCancel}>
-                            Cancel
-                        </RoundedButton>
+                        <PlainRoundedButton onClick={handleCancel}>Cancel</PlainRoundedButton>
                     )}
                 </div>
                 {mode === "edit" && (
                     <div className="flex justify-center w-full pt-4 border-t">
-                        <RoundedButton
-                            overrideClasses="!bg-danger-color !text-contrasted !border-danger-color"
-                            onClick={() => handleDelete(provisionalDataObj.id)}
-                        >
-                            Delete
-                        </RoundedButton>
+                        <div>
+                            <PlainRoundedButton
+                                overrideClasses="!bg-danger-color !text-contrasted !border-danger-color"
+                                onClick={() => handleDelete(provisionalDataObj.id)}
+                            >
+                                Delete
+                            </PlainRoundedButton>
+                        </div>
                     </div>
                 )}
             </form>

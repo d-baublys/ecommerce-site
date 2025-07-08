@@ -52,7 +52,7 @@ export default function ProductPageClient({ productData }: { productData: Produc
                         <p>{getLocalFormatting(productData.price)}</p>
                     </div>
                     <select
-                        aria-label="Size select"
+                        aria-label="Size selection"
                         className="p-2 bg-white border-2 rounded-md"
                         value={selectedSize}
                         required

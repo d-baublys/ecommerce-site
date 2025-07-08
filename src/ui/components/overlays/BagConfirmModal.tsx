@@ -1,7 +1,6 @@
 import { IoCheckmarkCircle } from "react-icons/io5";
 import Modal, { ModalProps } from "@/ui/components/overlays/Modal";
-import RoundedButton from "@/ui/components/buttons/RoundedButton";
-import Link from "next/link";
+import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 
 export default function BagConfirmModal({
     handleClose,
@@ -21,9 +20,7 @@ export default function BagConfirmModal({
                     <IoCheckmarkCircle className="shrink-0 text-go-color" size={36} />
                     <p className="text-center text-sz-interm">Item added to bag</p>
                 </div>
-                <Link href={"/bag"}>
-                    <RoundedButton>View Bag</RoundedButton>
-                </Link>
+                <PlainRoundedButtonLink href={"/bag"}>View Bag</PlainRoundedButtonLink>
             </div>
         </Modal>
     );

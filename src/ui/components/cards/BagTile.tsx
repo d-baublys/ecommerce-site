@@ -2,20 +2,20 @@
 
 import { MergedBagItem } from "@/lib/definitions";
 import Link from "next/link";
-import { IoClose } from "react-icons/io5";
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect } from "react";
-import { stringifyConvertPrice } from "@/lib/utils";
+import { buildProductUrl, stringifyConvertPrice } from "@/lib/utils";
 import ProductImage from "@/ui/components/ProductImage";
+import CloseButton from "@/ui/components/buttons/CloseButton";
 
 export default function BagTile({
     bagItem,
     handleDelete,
-    productLink,
+    productSlug,
 }: {
     bagItem: MergedBagItem;
     handleDelete?: () => void;
-    productLink: string;
+    productSlug: string;
 }) {
     const productData = bagItem.product;
     const updateQuantity = useBagStore((state) => state.updateQuantity);
@@ -32,7 +32,7 @@ export default function BagTile({
 
     return (
         <div className="flex h-40 w-full">
-            <Link className="w-full" href={productLink}>
+            <Link className="w-full" href={buildProductUrl(productSlug)}>
                 {
                     <div className="flex h-full grow gap-2 sm:gap-8">
                         <ProductImage product={productData} overrideClasses="aspect-3/4" />
@@ -72,12 +72,11 @@ export default function BagTile({
                             <p>Out of stock</p>
                         </div>
                     )}
-                    <IoClose
+                    <CloseButton
                         aria-label="Remove from bag"
                         title="Remove from bag"
                         onClick={handleDelete}
-                        className="translate-x-1 cursor-pointer"
-                        size={24}
+                        className="translate-x-1"
                     />
                 </div>
             </div>

@@ -1,20 +1,18 @@
-import RoundedButton, { RoundedButtonProps } from "@/ui/components/buttons/RoundedButton";
+import { getGoButtonClasses } from "@/lib/ui-class-repo";
+import RoundedButtonMain, {
+    RoundedButtonProps,
+} from "@/ui/components/buttons/base/RoundedButtonMain";
 
 interface GoButtonProps extends RoundedButtonProps {
     predicate: boolean;
 }
 
-export default function GoButton({ predicate, overrideClasses, ...props }: GoButtonProps) {
+export default function GoButton({ predicate, overrideClasses, ...restProps }: GoButtonProps) {
+    const goButtonClasses = getGoButtonClasses(predicate);
+
     return (
-        <RoundedButton
-            overrideClasses={`text-contrasted ${
-                predicate
-                    ? "!bg-go-color !border-go-color"
-                    : "!bg-component-color !border-component-color hover:!scale-none hover:!cursor-auto active:!drop-shadow-none"
-            } ${overrideClasses ?? ""}`}
-            {...props}
-        >
-            {props.children}
-        </RoundedButton>
+        <RoundedButtonMain overrideClasses={`${goButtonClasses} ${overrideClasses}`} {...restProps}>
+            {restProps.children}
+        </RoundedButtonMain>
     );
 }

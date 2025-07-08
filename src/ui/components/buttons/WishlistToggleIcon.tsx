@@ -45,7 +45,7 @@ export default function WishlistToggleIcon({
         return (
             <button
                 type="button"
-                className={buildOuterClasses()}
+                className={`cursor-pointer ${buildOuterClasses()}`}
                 onClick={toggleWishlist}
                 title="Add or remove from wishlist"
                 aria-label="Add or remove from wishlist"

@@ -2,11 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { IoChevronBackSharp, IoChevronForwardSharp } from "react-icons/io5";
-import { debounce } from "@/lib/utils";
-import ProductLink from "@/ui/components/ProductLink";
+import { buildProductUrl, debounce } from "@/lib/utils";
 import { Product } from "@/lib/definitions";
-import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import ProductImage from "@/ui/components/ProductImage";
+import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 
 export default function Carousel({ featuredList }: { featuredList: Product[] }) {
     const [activeFeatured, setActiveFeatured] = useState(0);
@@ -80,11 +79,11 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                                 product={featuredProd}
                                 overrideClasses="snap-center rounded-2xl drop-shadow-(--tile-shadow) overflow-hidden"
                             />
-                            <ProductLink slug={featuredProd.slug}>
-                                <RoundedButton overrideClasses="absolute left-[50%] bottom-1/6 translate-x-[-50%] z-50">
+                            <div className="absolute left-[50%] bottom-1/6 translate-x-[-50%] z-50">
+                                <PlainRoundedButtonLink href={buildProductUrl(featuredProd.slug)}>
                                     View
-                                </RoundedButton>
-                            </ProductLink>
+                                </PlainRoundedButtonLink>
+                            </div>
                         </li>
                     ))}
                 </ul>
@@ -104,6 +103,7 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                         title="Previous item"
                         aria-label="Previous item"
                         id="carousel-nav-back"
+                        tabIndex={-1}
                         className="cursor-pointer mr-[calc(var(--carousel-img-gap)/2)] translate-x-[50%]"
                         onClick={navBack}
                     >
@@ -113,6 +113,7 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                         title="Next item"
                         aria-label="Next item"
                         id="carousel-nav-forward"
+                        tabIndex={-1}
                         className="cursor-pointer ml-[calc(var(--carousel-img-gap)/2)] translate-x-[-50%]"
                         onClick={navForward}
                     >

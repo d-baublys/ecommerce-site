@@ -1,0 +1,168 @@
+import Link from "next/link";
+import {
+    IoBagOutline,
+    IoCog,
+    IoHeartOutline,
+    IoMenu,
+    IoPersonOutline,
+    IoSearchOutline,
+} from "react-icons/io5";
+
+type ConditionalNavIcon = {
+    renderIcon: (isForMenu: boolean) => React.ReactNode;
+    isVisible: (isAdmin: boolean) => boolean;
+};
+
+interface RenderFixedIconsParams {
+    handleSearchClick: () => void;
+    setIsMenuOpen: (isOpen: boolean) => void;
+    closeSearchAll: () => void;
+}
+
+interface RenderConditionalIconsParams {
+    isForMenu: boolean;
+    isAdmin: boolean;
+    hasMounted: boolean;
+    itemCount: number;
+    setIsMenuOpen: (isOpen: boolean) => void;
+    setIsAccountOpen: (isOpen: boolean) => void;
+}
+
+const commonNavClasses = "relative p-2 rounded-circle items-center";
+const hoverAnimation = "hover:scale-125 transition";
+const displayClasses = "hidden sm:flex";
+const fixedNavClasses = `${commonNavClasses} ${hoverAnimation} cursor-pointer`;
+const conditionalNavClasses = `${commonNavClasses} ${hoverAnimation} ${displayClasses}`;
+const menuIconClasses = "flex items-center gap-4 p-1 rounded-full";
+const getConditionalSwitchedClasses = (isForMenu: boolean) =>
+    isForMenu ? menuIconClasses : conditionalNavClasses;
+
+export function renderFixedIcons({
+    handleSearchClick,
+    setIsMenuOpen,
+    closeSearchAll,
+}: RenderFixedIconsParams) {
+    const navIcons = [
+        <button
+            key="search"
+            title="Search"
+            aria-label="Search"
+            className={fixedNavClasses}
+            onClick={handleSearchClick}
+        >
+            <IoSearchOutline />
+        </button>,
+        <button
+            key="menu"
+            title="Menu"
+            aria-label="Menu"
+            className={`block sm:hidden ${fixedNavClasses}`}
+            onClick={() => {
+                setIsMenuOpen(true);
+                closeSearchAll();
+            }}
+        >
+            <IoMenu />
+        </button>,
+    ];
+
+    return navIcons;
+}
+
+export function renderConditionalIcons({
+    isForMenu,
+    isAdmin,
+    hasMounted,
+    itemCount,
+    setIsMenuOpen,
+    setIsAccountOpen,
+}: RenderConditionalIconsParams): React.ReactNode[] {
+    const navIcons: ConditionalNavIcon[] = [
+        {
+            renderIcon: (isForMenu) => (
+                <Link
+                    key={`wishlist-${isForMenu}`}
+                    title="Wishlist"
+                    aria-label="Wishlist"
+                    href={"/wishlist"}
+                    className={getConditionalSwitchedClasses(isForMenu)}
+                    onClick={() => setIsMenuOpen(false)}
+                >
+                    <IoHeartOutline />
+                    {isForMenu && <span>Wishlist</span>}
+                </Link>
+            ),
+            isVisible: () => true,
+        },
+        {
+            renderIcon: (isForMenu) => (
+                <Link
+                    key={`bag-${isForMenu}`}
+                    title="Bag"
+                    aria-label="Bag"
+                    href={"/bag"}
+                    className={`${
+                        isForMenu ? menuIconClasses : `${displayClasses} ${commonNavClasses}`
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                >
+                    <div className="relative">
+                        <IoBagOutline className={`${isForMenu ? "" : hoverAnimation}`} />
+                        {hasMounted && itemCount > 0 && (
+                            <div
+                                aria-label="Bag item count"
+                                className="bag-item-count absolute flex justify-center items-center top-[-13px] right-[-10px] w-4 aspect-square rounded-circle bg-red-500 text-contrasted text-[0.67rem]"
+                            >
+                                <span>{Math.min(itemCount, 99)}</span>
+                            </div>
+                        )}
+                    </div>
+                    {isForMenu && <span>Bag</span>}
+                </Link>
+            ),
+            isVisible: () => true,
+        },
+        {
+            renderIcon: (isForMenu) => (
+                <button
+                    key={`account-${isForMenu}`}
+                    title="Account"
+                    aria-label="Account"
+                    className={`${getConditionalSwitchedClasses(isForMenu)} ${
+                        isAdmin ? "cursor-pointer" : ""
+                    }`}
+                    onClick={() => {
+                        if (!isAdmin) return;
+                        setIsAccountOpen(true);
+                        setIsMenuOpen(false);
+                    }}
+                >
+                    <IoPersonOutline />
+                    {isForMenu && <span>Account</span>}
+                </button>
+            ),
+            isVisible: () => true,
+        },
+        {
+            renderIcon: (isForMenu) => (
+                <Link
+                    key={`admin-${isForMenu}`}
+                    title="Admin"
+                    aria-label="Admin"
+                    href={"/admin"}
+                    className={getConditionalSwitchedClasses(isForMenu)}
+                    onClick={() => setIsMenuOpen(false)}
+                >
+                    <IoCog />
+                    {isForMenu && <span>Admin</span>}
+                </Link>
+            ),
+            isVisible: (isAdmin) => isAdmin,
+        },
+    ];
+
+    const renderIcons = (isForMenu: boolean) =>
+        navIcons.map((item) => (item.isVisible(isAdmin) ? item.renderIcon(isForMenu) : null));
+
+    return renderIcons(isForMenu).filter(Boolean);
+}

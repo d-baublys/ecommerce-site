@@ -2,7 +2,7 @@
 
 import { Product, Sizes, StockTableMode, VALID_SIZES } from "@/lib/definitions";
 import { isUnique, isValidSize } from "@/lib/utils";
-import RoundedButton from "@/ui/components/buttons/RoundedButton";
+import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import StockTableInput from "@/ui/components/forms/StockTableInput";
 import StockRowDelete from "@/ui/components/buttons/StockRowDelete";
 import { useEffect, useState } from "react";
@@ -73,19 +73,35 @@ export default function ProductStockTable({
         <div className="flex flex-col py-4 bg-background-lighter rounded-md ">
             <div className="flex justify-between h-12 px-8">
                 {tableMode === "display" && Object.keys(localStockObj)?.length > 0 && (
-                    <RoundedButton onClick={() => setTableMode("edit")}>Edit</RoundedButton>
+                    <div>
+                        <PlainRoundedButton onClick={() => setTableMode("edit")}>
+                            Edit
+                        </PlainRoundedButton>
+                    </div>
                 )}
                 {tableMode === "edit" && (
-                    <RoundedButton onClick={() => handleApply()}>Apply</RoundedButton>
+                    <div>
+                        <PlainRoundedButton onClick={() => handleApply()}>Apply</PlainRoundedButton>
+                    </div>
                 )}
                 {tableMode === "add" && (
-                    <RoundedButton onClick={() => handleAdd()}>Add</RoundedButton>
+                    <div>
+                        <PlainRoundedButton onClick={() => handleAdd()}>Add</PlainRoundedButton>
+                    </div>
                 )}
                 {tableMode === "display" && (
-                    <RoundedButton onClick={() => setTableMode("add")}>+ Add Size</RoundedButton>
+                    <div>
+                        <PlainRoundedButton onClick={() => setTableMode("add")}>
+                            + Add Size
+                        </PlainRoundedButton>
+                    </div>
                 )}
                 {(tableMode === "edit" || tableMode === "add") && (
-                    <RoundedButton onClick={() => handleCancel()}>Cancel</RoundedButton>
+                    <div>
+                        <PlainRoundedButton onClick={() => handleCancel()}>
+                            Cancel
+                        </PlainRoundedButton>
+                    </div>
                 )}
             </div>
             <div className="flex justify-center h-8 p-2">

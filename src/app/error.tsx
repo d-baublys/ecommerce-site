@@ -1,6 +1,6 @@
 "use client"; // must for error files
 
-import RoundedButton from "@/ui/components/buttons/RoundedButton";
+import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import BareLayout from "@/ui/layouts/BareLayout";
 
 export default function Error({
@@ -13,7 +13,9 @@ export default function Error({
     return (
         <BareLayout>
             <p>{error ? `${error.message}` : "Something went wrong!"}</p>
-            <RoundedButton onClick={() => reset()}>Try Again</RoundedButton>
+            <div>
+                <PlainRoundedButton onClick={() => reset()}>Try Again</PlainRoundedButton>
+            </div>
         </BareLayout>
     );
 }

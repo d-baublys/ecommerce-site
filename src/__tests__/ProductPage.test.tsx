@@ -56,8 +56,8 @@ describe("ProductPage", () => {
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });
         expect(btn).toBeDisabled();
-        expect(btn).toHaveClass(
-            "!bg-component-color !border-component-color hover:!scale-none hover:!cursor-auto active:!drop-shadow-none"
+        expect(btn.firstChild).toHaveClass(
+            "bg-component-color border-component-color hover:!scale-none hover:!cursor-auto active:!drop-shadow-none"
         );
     });
 
@@ -65,11 +65,11 @@ describe("ProductPage", () => {
         (getProductData as jest.Mock).mockResolvedValue({ data: [fakeProduct] });
         await renderPage();
 
-        fireEvent.change(screen.getByLabelText("Size select"), { target: { value: "s" } });
+        fireEvent.change(screen.getByLabelText("Size selection"), { target: { value: "s" } });
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });
         expect(btn).not.toBeDisabled();
-        expect(btn).toHaveClass("!bg-go-color !border-go-color");
+        expect(btn.firstChild).toHaveClass("bg-go-color border-go-color");
     });
 
     it("disables product add button when all remaining stock is added to bag", async () => {
@@ -78,10 +78,10 @@ describe("ProductPage", () => {
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });
 
-        fireEvent.change(screen.getByLabelText("Size select"), { target: { value: "m" } });
+        fireEvent.change(screen.getByLabelText("Size selection"), { target: { value: "m" } });
 
         expect(btn).not.toBeDisabled();
-        expect(btn).toHaveClass("!bg-go-color !border-go-color");
+        expect(btn.firstChild).toHaveClass("bg-go-color border-go-color");
 
         act(() => {
             fireEvent.click(btn);
@@ -90,8 +90,8 @@ describe("ProductPage", () => {
         });
 
         expect(btn).toBeDisabled();
-        expect(btn).toHaveClass(
-            "!bg-component-color !border-component-color hover:!scale-none hover:!cursor-auto active:!drop-shadow-none"
+        expect(btn.firstChild).toHaveClass(
+            "bg-component-color border-component-color hover:!scale-none hover:!cursor-auto active:!drop-shadow-none"
         );
     });
 
@@ -102,7 +102,7 @@ describe("ProductPage", () => {
         const btn = screen.getByRole("button", { name: "Add to Bag" });
         const itemLimit = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
 
-        fireEvent.change(screen.getByLabelText("Size select"), { target: { value: "s" } });
+        fireEvent.change(screen.getByLabelText("Size selection"), { target: { value: "s" } });
 
         act(() => {
             for (let i = 0; i < itemLimit; i++) {
@@ -111,8 +111,8 @@ describe("ProductPage", () => {
         });
 
         expect(btn).toBeDisabled();
-        expect(btn).toHaveClass(
-            "!bg-component-color !border-component-color hover:!scale-none hover:!cursor-auto active:!drop-shadow-none"
+        expect(btn.firstChild).toHaveClass(
+            "bg-component-color border-component-color hover:!scale-none hover:!cursor-auto active:!drop-shadow-none"
         );
         expect(getLatestBag()[0].quantity).toBe(itemLimit);
     });
@@ -138,7 +138,7 @@ describe("ProductPage", () => {
         expect(selectedOption).not.toBeDisabled();
         expect(selectedOption).toHaveTextContent(`M`);
 
-        fireEvent.change(screen.getByLabelText("Size select"), { target: { value: "m" } });
+        fireEvent.change(screen.getByLabelText("Size selection"), { target: { value: "m" } });
 
         act(() => {
             fireEvent.click(btn);
@@ -158,7 +158,7 @@ describe("ProductPage", () => {
         const btn = screen.getByRole("button", { name: "Add to Bag" });
         const itemLimit = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
 
-        fireEvent.change(screen.getByLabelText("Size select"), { target: { value: "s" } });
+        fireEvent.change(screen.getByLabelText("Size selection"), { target: { value: "s" } });
 
         act(() => {
             for (let i = 0; i < itemLimit + 5; i++) {

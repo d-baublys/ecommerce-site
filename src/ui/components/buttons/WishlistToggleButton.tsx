@@ -1,16 +1,16 @@
 "use client";
 
 import { Product } from "@/lib/definitions";
-import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
 import { useWishlistToggle } from "@/hooks/useWishlistToggle";
+import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 
 export default function WishlistToggleButton({ product }: { product: Product }) {
     const parentHook = useWishlistToggle(product);
     const { isAnimated, toggleWishlist, inWishlist } = parentHook;
 
     return (
-        <RoundedButton
+        <PlainRoundedButton
             onClick={toggleWishlist}
             overrideClasses={`${isAnimated ? "[animation:small-pop-in_0.3s_ease]" : ""}`}
         >
@@ -23,6 +23,6 @@ export default function WishlistToggleButton({ product }: { product: Product }) 
                     overrideClasses={"!bg-transparent !p-0"}
                 />
             </div>
-        </RoundedButton>
+        </PlainRoundedButton>
     );
 }

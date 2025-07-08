@@ -1,7 +1,7 @@
 "use client";
 
 import { Product } from "@/lib/definitions";
-import { getSkeletonSweep } from "@/lib/utils";
+import { getSkeletonSweep } from "@/lib/ui-class-repo";
 import Image from "next/image";
 import { useState } from "react";
 

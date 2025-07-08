@@ -1,14 +1,20 @@
 "use client";
 
 import { Product, Sizes, VALID_SIZES } from "@/lib/definitions";
-import { checkStock, createBagItem, isolateInteraction, stringifyConvertPrice } from "@/lib/utils";
-import ProductLink from "@/ui/components/ProductLink";
+import {
+    buildProductUrl,
+    checkStock,
+    createBagItem,
+    isolateInteraction,
+    stringifyConvertPrice,
+} from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
-import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import { useBagStore } from "@/stores/bagStore";
 import BagConfirmModal from "@/ui/components/overlays/BagConfirmModal";
 import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
 import ProductImage from "@/ui/components/ProductImage";
+import Link from "next/link";
+import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 
 export default function ProductTile({ product }: { product: Product }) {
     const { bag, addToBag } = useBagStore((state) => state);
@@ -87,9 +93,9 @@ export default function ProductTile({ product }: { product: Product }) {
                     onBlur={handleBlur}
                     className="relative w-full aspect-[4/5] outline-none"
                 >
-                    <ProductLink tabIndex={-1} slug={product.slug}>
+                    <Link tabIndex={-1} href={buildProductUrl(product.slug)}>
                         <ProductImage product={product} />
-                    </ProductLink>
+                    </Link>
                     {isHovered && (
                         <div>
                             <div className="absolute top-0 right-0 m-2">
@@ -122,21 +128,20 @@ export default function ProductTile({ product }: { product: Product }) {
                                         ))}
                                     </ul>
                                 ) : (
-                                    <RoundedButton
-                                        overrideClasses="w-full"
+                                    <PlainRoundedButton
                                         onClick={handleQuickAddClick}
                                         aria-haspopup="listbox"
                                         aria-expanded={isQuickAddActive}
                                     >
                                         Quick Add
-                                    </RoundedButton>
+                                    </PlainRoundedButton>
                                 )}
                             </div>
                         </div>
                     )}
                 </div>
 
-                <ProductLink slug={product.slug}>
+                <Link href={buildProductUrl(product.slug)}>
                     <div className="flex flex-col grow gap-4">
                         <p>{product.name}</p>
                         <p className="font-semibold">
@@ -144,7 +149,7 @@ export default function ProductTile({ product }: { product: Product }) {
                             <span>{stringifyConvertPrice(product.price)}</span>
                         </p>
                     </div>
-                </ProductLink>
+                </Link>
             </div>
 
             {isModalOpen && (

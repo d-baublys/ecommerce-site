@@ -1,9 +1,13 @@
 import { IoClose } from "react-icons/io5";
 
-export default function CloseButton(props: React.HtmlHTMLAttributes<HTMLButtonElement>) {
+interface CloseButtonProps extends React.HtmlHTMLAttributes<HTMLButtonElement> {
+    size?: number;
+}
+
+export default function CloseButton({ size = 24, className, ...restProps }: CloseButtonProps) {
     return (
-        <button type="button" className="flex items-center" {...props}>
-            <IoClose className="cursor-pointer" size={24} />
+        <button type="button" className={`flex items-center rounded-circle ${className}`} {...restProps}>
+            <IoClose className="cursor-pointer" size={size} />
         </button>
     );
 }

@@ -5,8 +5,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import DisplayTile from "@/ui/components/cards/DisplayTile";
-import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import SearchBar from "@/ui/components/SearchBar";
+import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
+import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 
 export default function AdminProductsClient() {
     const router = useRouter();
@@ -27,9 +28,9 @@ export default function AdminProductsClient() {
     return (
         <div className="flex flex-col grow w-full justify-center items-center">
             <div className="flex justify-center mb-8">
-                <Link href={`${pathname}/add-product`}>
-                    <RoundedButton>+ Add Product</RoundedButton>
-                </Link>
+                <PlainRoundedButtonLink href={`${pathname}/add-product`}>
+                    + Add Product
+                </PlainRoundedButtonLink>
             </div>
             <div className="w-full h-10 mb-8">
                 <SearchBar
@@ -42,7 +43,7 @@ export default function AdminProductsClient() {
             <ul className="flex flex-row justify-evenly items-center w-full">
                 {Object.keys(VALID_CATEGORIES).map((category) => (
                     <li key={category}>
-                        <RoundedButton
+                        <PlainRoundedButton
                             onClick={() =>
                                 setFilter((curr) =>
                                     curr === category ? null : (category as Categories)
@@ -54,7 +55,7 @@ export default function AdminProductsClient() {
                             }`}
                         >
                             {VALID_CATEGORIES[category as Categories]}
-                        </RoundedButton>
+                        </PlainRoundedButton>
                     </li>
                 ))}
             </ul>

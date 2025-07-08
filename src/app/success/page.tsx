@@ -1,11 +1,10 @@
 import stripe from "@/lib/stripe";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { IoCheckmarkCircle } from "react-icons/io5";
 import { SuccessBagClearClient } from "./SuccessBagClearClient";
-import RoundedButton from "@/ui/components/buttons/RoundedButton";
 import BareLayout from "@/ui/layouts/BareLayout";
 import { getOrder } from "@/lib/actions";
+import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 
 export default async function Page({ searchParams }: { searchParams: { session_id?: string } }) {
     const params = await searchParams;
@@ -42,9 +41,9 @@ export default async function Page({ searchParams }: { searchParams: { session_i
                         </p>
                     </div>
                 </div>
-                <Link href={"/"}>
-                    <RoundedButton>Home</RoundedButton>
-                </Link>
+                <div>
+                    <PlainRoundedButtonLink href={"/"}>Home</PlainRoundedButtonLink>
+                </div>
             </div>
         </BareLayout>
     );

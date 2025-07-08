@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-interface ListButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ListButtonProps extends React.ButtonHTMLAttributes<HTMLDivElement> {
     link?: string;
     relativeLink?: boolean;
     overrideClasses?: string;
@@ -17,14 +17,14 @@ export default function ListButton({
 }: ListButtonProps) {
     const pathname = usePathname();
 
+    // as div for valid wrapping by anchor
     const buttonContent = () => (
-        <button
-            type="button"
+        <div
             className={`flex items-center gap-2 w-full h-16 p-4 bg-white border-2 border-background-lightest hover:border-black active:drop-shadow-(--button-shadow) transition ${overrideClasses}`}
             {...props}
         >
             • {props.children}
-        </button>
+        </div>
     );
 
     if (link)

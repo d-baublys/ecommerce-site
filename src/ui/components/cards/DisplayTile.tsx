@@ -1,8 +1,8 @@
 "use client";
 
 import { Product } from "@/lib/definitions";
-import { IoClose } from "react-icons/io5";
 import ProductImage from "@/ui/components/ProductImage";
+import CloseButton from "@/ui/components/buttons/CloseButton";
 
 export default function DisplayTile({
     productData,
@@ -21,10 +21,11 @@ export default function DisplayTile({
             </div>
             <div className="flex flex-col justify-between items-end h-full">
                 {handleDelete && (
-                    <IoClose
+                    <CloseButton
+                        title="Remove from list"
+                        aria-label="Remove from list"
                         onClick={handleDelete}
-                        className="translate-x-1 cursor-pointer"
-                        size={24}
+                        className="translate-x-1"
                     />
                 )}
             </div>

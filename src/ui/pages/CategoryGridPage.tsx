@@ -17,7 +17,7 @@ import { extractFilters, extractSort } from "@/lib/utils";
 import { IoChevronDown } from "react-icons/io5";
 import SlideDownMenu from "@/ui/components/overlays/SlideDownMenu";
 import BaseGridPage from "@/ui/pages/BaseGridPage";
-import RoundedButton from "@/ui/components/buttons/RoundedButton";
+import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -240,12 +240,12 @@ export default function CategoryGridPage({
                 {isQueryLoading && loadingIndicator()}
                 {shouldRenderFilterBtn && (
                     <div className="fixed bottom-[5%] left-1/2 translate-x-[-50%] lg:hidden">
-                        <RoundedButton
+                        <PlainRoundedButton
                             overrideClasses="!bg-black !text-contrasted !border-black [filter:drop-shadow(0_0_2px_rgba(255,255,255,0.5))]"
                             onClick={() => setIsFilterOpen(true)}
                         >
                             Filter
-                        </RoundedButton>
+                        </PlainRoundedButton>
                     </div>
                 )}
                 <SlideDownMenu
@@ -254,13 +254,15 @@ export default function CategoryGridPage({
                     predicateSetter={setIsFilterOpen}
                     overrideClasses="lg:hidden"
                 >
-                    <GridAside
-                        allCategoryProducts={allCategoryProducts}
-                        sizeFilters={sizeFilters}
-                        setSizeFilters={setSizeFilters}
-                        priceFilters={priceFilters}
-                        setPriceFilters={setPriceFilters}
-                    />
+                    <div className="flex w-full max-w-[500px]">
+                        <GridAside
+                            allCategoryProducts={allCategoryProducts}
+                            sizeFilters={sizeFilters}
+                            setSizeFilters={setSizeFilters}
+                            priceFilters={priceFilters}
+                            setPriceFilters={setPriceFilters}
+                        />
+                    </div>
                 </SlideDownMenu>
             </div>
         );
