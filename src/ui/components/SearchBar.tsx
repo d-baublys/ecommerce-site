@@ -24,6 +24,8 @@ export default function SearchBar({
     const [query, setQuery] = useState<string>("");
     const [results, setResults] = useState<Product[]>([]);
     const [isResultLoading, setIsResultLoading] = useState<boolean>(false);
+    const [activeIdx, setActiveIdx] = useState<number>(-1);
+    const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
     const router = useRouter();
 
@@ -80,6 +82,35 @@ export default function SearchBar({
         handleSearchClose && handleSearchClose();
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (!(results?.length && options.showSuggestions)) return;
+
+        if (e.key === "ArrowDown") {
+            const newIndex =
+                activeIdx === results.length - 1 ? -1 : (activeIdx + 1) % results.length;
+            newIndex >= 0 && setQuery(results[newIndex].name);
+            setActiveIdx(newIndex);
+        }
+
+        if (e.key === "ArrowUp") {
+            const newIndex =
+                activeIdx === 0
+                    ? -1
+                    : (activeIdx - 1 + (results.length + 1)) % (results.length + 1);
+            newIndex >= 0 && setQuery(results[newIndex].name);
+            setActiveIdx(newIndex);
+        }
+
+        if (e.key === "Enter" && activeIdx >= 0) {
+            handleClick(results[activeIdx]);
+        }
+    };
+
+    const handleInputBlur = () => {
+        setShowSuggestions(false);
+        setActiveIdx(-1);
+    };
+
     return (
         <form
             role="search"
@@ -101,11 +132,15 @@ export default function SearchBar({
                 </div>
                 <input
                     name="search"
+                    autoComplete="off"
                     className="w-full h-full outline-none"
                     value={query}
                     disabled={productList === undefined}
                     onChange={(e) => handleSearch(e)}
                     placeholder={options?.placeholderText ?? "Search products..."}
+                    onKeyDown={handleKeyDown}
+                    onFocus={() => setShowSuggestions(true)}
+                    onBlur={handleInputBlur}
                 ></input>
                 <div className="flex justify-center items-center w-12 text-[1.75rem]">
                     <button
@@ -119,14 +154,16 @@ export default function SearchBar({
                     </button>
                 </div>
             </div>
-            {query && options?.showSuggestions && (
+            {query && options?.showSuggestions && showSuggestions && (
                 <div className="mx-4 min-h-[100px] px-2 py-2 border-t border-background-lighter bg-background-lightest z-100">
                     <ul data-testid="suggestions-ul">
                         {results?.length > 0 &&
-                            results.map((product) => (
+                            results.map((product, idx) => (
                                 <li
                                     key={product.id}
-                                    className="flex items-center p-1 cursor-pointer bg-background-lightest hover:brightness-90 active:brightness-90"
+                                    className={`flex items-center p-1 cursor-pointer bg-background-lightest hover:brightness-90 active:brightness-90 ${
+                                        activeIdx === idx ? "brightness-90" : ""
+                                    }`}
                                     onClick={() => handleClick(product)}
                                 >
                                     <div className="flex shrink-0 mr-2">
