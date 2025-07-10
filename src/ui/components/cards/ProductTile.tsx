@@ -155,7 +155,7 @@ export default function ProductTile({ product }: { product: Product }) {
             {isModalOpen && (
                 <BagConfirmModal
                     handleClose={() => setIsModalOpen(false)}
-                    scrollPredicate={isModalOpen}
+                    isOpenState={isModalOpen}
                     hasCloseButton={true}
                 />
             )}

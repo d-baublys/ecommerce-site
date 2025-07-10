@@ -20,7 +20,7 @@ export default function DeleteConfirmModal() {
     if (!isModalOpen) return null;
 
     return (
-        <Modal handleClose={handleCancel} scrollPredicate={isModalOpen}>
+        <Modal handleClose={handleCancel} isOpenState={isModalOpen}>
             <div className="flex flex-col grow justify-evenly text-center">
                 <p className="text-center">Are you sure you want to delete this product?</p>
                 <p>This cannot be undone.</p>

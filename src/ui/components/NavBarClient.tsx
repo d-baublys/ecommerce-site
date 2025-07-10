@@ -90,8 +90,8 @@ export default function NavBarClient() {
             </nav>
             <SlideDownColumnsMenu
                 id="nav-mobile-menu"
-                predicate={isMenuOpen}
-                predicateSetter={setIsMenuOpen}
+                isOpenState={isMenuOpen}
+                handleClose={() => setIsMenuOpen(false)}
                 overrideClasses="sm:hidden"
                 leftContent={
                     <Link
@@ -117,8 +117,8 @@ export default function NavBarClient() {
                 }
             />
             <SlideDownColumnsMenu
-                predicate={isAccountOpen}
-                predicateSetter={setIsAccountOpen}
+                isOpenState={isAccountOpen}
+                handleClose={() => setIsAccountOpen(false)}
                 leftContent={
                     <button
                         onClick={async () => {

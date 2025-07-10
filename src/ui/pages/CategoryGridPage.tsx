@@ -250,8 +250,8 @@ export default function CategoryGridPage({
                 )}
                 <SlideDownMenu
                     aria-label="Filter menu"
-                    predicate={isFilterOpen}
-                    predicateSetter={setIsFilterOpen}
+                    isOpenState={isFilterOpen}
+                    handleClose={() => setIsFilterOpen(false)}
                     overrideClasses="lg:hidden"
                 >
                     <div className="flex w-full max-w-[500px]">

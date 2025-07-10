@@ -8,6 +8,7 @@ import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import DarkBackdrop from "@/ui/components/overlays/DarkBackdrop";
 import CloseButton from "@/ui/components/buttons/CloseButton";
 import { useEffect } from "react";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 export default function SearchOverlay() {
     const { isSearchOpen, setIsSearchOpen, isSearchLoaded, setIsSearchLoaded } = useSearchStore(
@@ -33,6 +34,8 @@ export default function SearchOverlay() {
         closeOverlay();
     }, [pathname]);
 
+    const trapRef = useFocusTrap(isSearchOpen, closeOverlay);
+
     if (!isSearchOpen && !isSearchLoaded) return null;
 
     return (
@@ -49,6 +52,9 @@ export default function SearchOverlay() {
                 className={`absolute top-0 left-0 flex justify-center w-full min-h-screen md:min-h-[400px] bg-white drop-shadow-xl z-[1500] [transition:all_0.2s_ease-out] ${
                     isSearchLoaded ? "opacity-100" : "opacity-0"
                 }`}
+                ref={trapRef}
+                role="dialog"
+                aria-modal="true"
             >
                 <div
                     className={`flex flex-col items-center w-5/6 xs:w-3/4 md:w-1/2 pb-4 [transition:all_0.4s_ease-out] ${

@@ -3,11 +3,12 @@
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import DarkBackdrop from "@/ui/components/overlays/DarkBackdrop";
 import CloseButton from "@/ui/components/buttons/CloseButton";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 export interface ModalProps {
     children: React.ReactNode;
     handleClose: () => void;
-    scrollPredicate: boolean;
+    isOpenState: boolean;
     hasCloseButton?: boolean;
     overrideClasses?: string;
 }
@@ -15,11 +16,13 @@ export interface ModalProps {
 export default function Modal({
     children,
     handleClose,
-    scrollPredicate,
+    isOpenState,
     hasCloseButton,
     overrideClasses,
 }: ModalProps) {
-    useBodyScrollLock(scrollPredicate);
+    useBodyScrollLock(isOpenState);
+
+    const trapRef = useFocusTrap(isOpenState, handleClose);
 
     return (
         <>
@@ -35,6 +38,9 @@ export default function Modal({
                     className={`relative flex min-w-[300px] w-full max-w-[400px] h-[250px] bg-white p-8 rounded-2xl drop-shadow-2xl [animation:small-pop-in_0.3s_ease] ${
                         overrideClasses ?? ""
                     }`}
+                    ref={trapRef}
+                    role="dialog"
+                    aria-modal="true"
                 >
                     {hasCloseButton && (
                         <div className="absolute top-0 right-0 p-4">

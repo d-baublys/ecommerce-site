@@ -1,27 +1,33 @@
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import CloseButton from "@/ui/components/buttons/CloseButton";
 
 export interface MenuProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
-    predicate: boolean;
-    predicateSetter: React.Dispatch<React.SetStateAction<boolean>>;
+    isOpenState: boolean;
+    handleClose: () => void;
     overrideClasses?: string;
 }
 
 export default function SlideDownMenu({
     children,
-    predicate,
-    predicateSetter,
+    isOpenState,
+    handleClose,
     overrideClasses,
     ...props
 }: MenuProps) {
+    const trapRef = useFocusTrap(isOpenState, handleClose);
+
     return (
         <div
             className={`fixed left-0 w-screen h-full bg-white [transition:all_0.3s_ease-in-out] overflow-auto z-50 ${
                 overrideClasses ?? ""
-            } ${predicate ? "top-0" : "top-[-250%]"}`}
+            } ${isOpenState ? "top-0" : "top-[-250%]"}`}
             {...props}
+            ref={trapRef}
+            role="dialog"
+            aria-modal="true"
         >
-            {predicate && (
+            {isOpenState && (
                 <>
                     <div className="relative inset-0 mx-4 my-(--nav-height)">
                         <div className="flex justify-center pt-[5rem] h-min">{children}</div>
@@ -30,7 +36,7 @@ export default function SlideDownMenu({
                         <CloseButton
                             title="Close menu"
                             aria-label="Close menu"
-                            onClick={() => predicateSetter(false)}
+                            onClick={handleClose}
                         />
                     </div>
                 </>

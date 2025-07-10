@@ -4,7 +4,7 @@ import { Product, SearchBarConfig } from "@/lib/definitions";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 import { debounce } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import { IoCloseCircle, IoSearch } from "react-icons/io5";
 
 export default function SearchBar({
@@ -26,6 +26,7 @@ export default function SearchBar({
     const [isResultLoading, setIsResultLoading] = useState<boolean>(false);
     const [activeIdx, setActiveIdx] = useState<number>(-1);
     const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const router = useRouter();
 
@@ -38,10 +39,18 @@ export default function SearchBar({
         };
 
         getData();
+
+        const focusTimeout = setTimeout(() => {
+            inputRef.current?.focus();
+        }, 500);
+
+        return () => clearTimeout(focusTimeout);
     }, []);
 
     const debouncedResults = debounce((currQuery) => {
-        const results = productList!.filter((product) =>
+        if (!productList) return;
+
+        const results = productList.filter((product) =>
             product.name.toLowerCase().includes((currQuery as string).toLowerCase())
         );
         setResults(results);
@@ -131,6 +140,7 @@ export default function SearchBar({
                     )}
                 </div>
                 <input
+                    ref={inputRef}
                     name="search"
                     autoComplete="off"
                     className="w-full h-full outline-none"
