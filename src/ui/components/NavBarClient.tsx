@@ -4,18 +4,22 @@ import { useBagStore } from "@/stores/bagStore";
 import { useSearchStore } from "@/stores/searchStore";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import SlideDownColumnsMenu from "@/ui/components/overlays/SlideDownColumnsMenu";
 import { renderConditionalIcons, renderFixedIcons } from "@/lib/navIcons";
+import { useRestoreFocus } from "@/hooks/useRestoreFocus";
 
 export default function NavBarClient() {
     const [isScrollingUp, setIsScrollingUp] = useState(false);
     const [hasMounted, setHasMounted] = useState<boolean>(false);
     const itemCount = useBagStore((state) => state.getTotalBagCount());
-    const { isSearchOpen, setIsSearchOpen, setIsSearchLoaded } = useSearchStore((state) => state);
+    const { isSearchOpen, isSearchLoaded, setIsSearchOpen, setIsSearchLoaded } = useSearchStore(
+        (state) => state
+    );
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const [isAccountOpen, setIsAccountOpen] = useState<boolean>(false);
+    const elementRef = useRef<HTMLElement>(null);
 
     const session = useSession();
     const isAdmin = !!session?.data?.user;
@@ -45,14 +49,41 @@ export default function NavBarClient() {
         if (!isSearchOpen) {
             setIsSearchOpen(true);
             setTimeout(() => setIsSearchLoaded(true), 0);
+            elementRef.current = document.activeElement as HTMLElement;
         } else {
             closeSearchAll();
         }
     };
 
+    const handleMenuClick = () => {
+        setIsMenuOpen(true);
+        closeSearchAll();
+        if (!isMenuOpen) {
+            elementRef.current = document.activeElement as HTMLElement;
+        }
+    };
+
+    const handleMenuClose = () => {
+        setIsMenuOpen(false);
+    };
+
+    const handleAccountClick = () => {
+        if (!isAdmin) return;
+        setIsAccountOpen(true);
+        handleMenuClose();
+        if (!isAccountOpen) {
+            elementRef.current = document.activeElement as HTMLElement;
+        }
+    };
+
+    useRestoreFocus(isSearchLoaded, elementRef);
+    useRestoreFocus(isMenuOpen, elementRef);
+    useRestoreFocus(isAccountOpen, elementRef);
+
     return (
         <>
             <nav
+                id="navbar"
                 className={`sticky flex justify-center items-center w-full h-nav-height bg-white text-black drop-shadow-(--nav-shadow) z-[9999] ${
                     isScrollingUp ? "top-0" : "top-[calc(var(--nav-height)*-1)]"
                 } [transition:top_0.5s_ease]`}
@@ -76,14 +107,17 @@ export default function NavBarClient() {
                         <Link href={`/category/all`}>Shop</Link>
                     </div>
                     <div className="flex w-full justify-end gap-2 md:gap-4 order-3 px-(--gutter) lg:px-(--gutter-md)">
-                        {renderFixedIcons({ handleSearchClick, setIsMenuOpen, closeSearchAll })}
+                        {renderFixedIcons({
+                            handleSearchClick,
+                            handleMenuClick,
+                        })}
                         {renderConditionalIcons({
                             isForMenu: false,
                             isAdmin,
                             hasMounted,
                             itemCount,
-                            setIsMenuOpen,
-                            setIsAccountOpen,
+                            handleMenuClose,
+                            handleAccountClick,
                         })}
                     </div>
                 </div>
@@ -110,8 +144,8 @@ export default function NavBarClient() {
                             isAdmin,
                             hasMounted,
                             itemCount,
-                            setIsMenuOpen,
-                            setIsAccountOpen,
+                            handleMenuClose,
+                            handleAccountClick,
                         })}
                     </>
                 }

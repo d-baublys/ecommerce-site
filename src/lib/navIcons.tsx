@@ -15,8 +15,7 @@ type ConditionalNavIcon = {
 
 interface RenderFixedIconsParams {
     handleSearchClick: () => void;
-    setIsMenuOpen: (isOpen: boolean) => void;
-    closeSearchAll: () => void;
+    handleMenuClick: () => void;
 }
 
 interface RenderConditionalIconsParams {
@@ -24,8 +23,8 @@ interface RenderConditionalIconsParams {
     isAdmin: boolean;
     hasMounted: boolean;
     itemCount: number;
-    setIsMenuOpen: (isOpen: boolean) => void;
-    setIsAccountOpen: (isOpen: boolean) => void;
+    handleMenuClose: () => void;
+    handleAccountClick: () => void;
 }
 
 const commonNavClasses = "relative p-2 rounded-circle items-center";
@@ -37,11 +36,7 @@ const menuIconClasses = "flex items-center gap-4 p-1 rounded-full";
 const getConditionalSwitchedClasses = (isForMenu: boolean) =>
     isForMenu ? menuIconClasses : conditionalNavClasses;
 
-export function renderFixedIcons({
-    handleSearchClick,
-    setIsMenuOpen,
-    closeSearchAll,
-}: RenderFixedIconsParams) {
+export function renderFixedIcons({ handleSearchClick, handleMenuClick }: RenderFixedIconsParams) {
     const navIcons = [
         <button
             key="search"
@@ -57,10 +52,7 @@ export function renderFixedIcons({
             title="Menu"
             aria-label="Menu"
             className={`block sm:hidden ${fixedNavClasses}`}
-            onClick={() => {
-                setIsMenuOpen(true);
-                closeSearchAll();
-            }}
+            onClick={handleMenuClick}
         >
             <IoMenu />
         </button>,
@@ -74,8 +66,8 @@ export function renderConditionalIcons({
     isAdmin,
     hasMounted,
     itemCount,
-    setIsMenuOpen,
-    setIsAccountOpen,
+    handleMenuClose,
+    handleAccountClick,
 }: RenderConditionalIconsParams): React.ReactNode[] {
     const navIcons: ConditionalNavIcon[] = [
         {
@@ -86,7 +78,7 @@ export function renderConditionalIcons({
                     aria-label="Wishlist"
                     href={"/wishlist"}
                     className={getConditionalSwitchedClasses(isForMenu)}
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={handleMenuClose}
                 >
                     <IoHeartOutline />
                     {isForMenu && <span>Wishlist</span>}
@@ -104,7 +96,7 @@ export function renderConditionalIcons({
                     className={`${
                         isForMenu ? menuIconClasses : `${displayClasses} ${commonNavClasses}`
                     }`}
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={handleMenuClose}
                 >
                     <div className="relative">
                         <IoBagOutline className={`${isForMenu ? "" : hoverAnimation}`} />
@@ -131,11 +123,7 @@ export function renderConditionalIcons({
                     className={`${getConditionalSwitchedClasses(isForMenu)} ${
                         isAdmin ? "cursor-pointer" : ""
                     }`}
-                    onClick={() => {
-                        if (!isAdmin) return;
-                        setIsAccountOpen(true);
-                        setIsMenuOpen(false);
-                    }}
+                    onClick={handleAccountClick}
                 >
                     <IoPersonOutline />
                     {isForMenu && <span>Account</span>}
@@ -151,7 +139,7 @@ export function renderConditionalIcons({
                     aria-label="Admin"
                     href={"/admin"}
                     className={getConditionalSwitchedClasses(isForMenu)}
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={handleMenuClose}
                 >
                     <IoCog />
                     {isForMenu && <span>Admin</span>}

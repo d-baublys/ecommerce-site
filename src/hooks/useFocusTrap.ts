@@ -1,3 +1,4 @@
+import { getAllTabbable } from "@/lib/utils";
 import { useEffect, useRef } from "react";
 
 export function useFocusTrap(isOpen: boolean, handleClose: () => void) {
@@ -7,9 +8,7 @@ export function useFocusTrap(isOpen: boolean, handleClose: () => void) {
         if (!(isOpen && containerRef.current)) return;
 
         const modal = containerRef.current;
-        const containerElements = modal.querySelectorAll<HTMLElement>(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
+        const containerElements = getAllTabbable(modal);
         const firstElement = containerElements[0];
         const lastElement = containerElements[containerElements.length - 1];
 

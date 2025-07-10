@@ -174,3 +174,9 @@ export function createBagItem(product: Product, size: Sizes): BagItem {
 export function buildProductUrl(slug: string) {
     return `/products/${encodeURIComponent(slug)}`;
 }
+
+export function getAllTabbable(container: HTMLElement) {
+    return container.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+}
