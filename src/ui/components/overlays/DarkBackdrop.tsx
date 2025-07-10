@@ -9,7 +9,7 @@ export default function DarkBackdrop({
         <div
             id="modal-backdrop"
             onClick={onClick}
-            className={`fixed top-0 left-0 w-full min-h-screen bg-black opacity-75 z-[1000] ${
+            className={`fixed top-0 left-0 w-full min-h-screen bg-black opacity-75 z-[9000] ${
                 overrideClasses ?? ""
             }`}
         ></div>

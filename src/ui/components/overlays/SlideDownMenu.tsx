@@ -1,3 +1,5 @@
+"use client";
+
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import CloseButton from "@/ui/components/buttons/CloseButton";
 
@@ -19,7 +21,7 @@ export default function SlideDownMenu({
 
     return (
         <div
-            className={`fixed left-0 w-screen h-full bg-white [transition:all_0.3s_ease-in-out] overflow-auto z-50 ${
+            className={`fixed left-0 w-screen h-full bg-white [transition:all_0.3s_ease-in-out] overflow-auto z-[9999] ${
                 overrideClasses ?? ""
             } ${isOpenState ? "top-0" : "top-[-250%]"}`}
             {...props}
@@ -32,7 +34,7 @@ export default function SlideDownMenu({
                     <div className="relative inset-0 mx-4 my-(--nav-height)">
                         <div className="flex justify-center pt-[5rem] h-min">{children}</div>
                     </div>
-                    <div className="fixed top-20 right-4 p-1 bg-background-lightest rounded-full z-[100]">
+                    <div className="fixed top-10 right-4 sm:right-8 p-1 bg-background-lightest rounded-full z-[100]">
                         <CloseButton
                             title="Close menu"
                             aria-label="Close menu"

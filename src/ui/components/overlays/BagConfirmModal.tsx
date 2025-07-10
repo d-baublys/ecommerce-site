@@ -15,7 +15,9 @@ export default function BagConfirmModal(props: Omit<ModalProps, "children">) {
                     <IoCheckmarkCircle className="shrink-0 text-go-color" size={36} />
                     <p className="text-center text-sz-interm">Item added to bag</p>
                 </div>
-                <PlainRoundedButtonLink href={"/bag"}>View Bag</PlainRoundedButtonLink>
+                <PlainRoundedButtonLink href={"/bag"} overrideClasses="!bg-background-lightest">
+                    View Bag
+                </PlainRoundedButtonLink>
             </div>
         </Modal>
     );

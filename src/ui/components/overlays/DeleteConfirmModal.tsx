@@ -25,7 +25,12 @@ export default function DeleteConfirmModal() {
                 <p className="text-center">Are you sure you want to delete this product?</p>
                 <p>This cannot be undone.</p>
                 <div className="flex justify-center items-center w-full mt-4 gap-4 md:gap-8">
-                    <PlainRoundedButton onClick={handleConfirm}>Confirm</PlainRoundedButton>
+                    <PlainRoundedButton
+                        onClick={handleConfirm}
+                        overrideClasses="!bg-background-lightest"
+                    >
+                        Confirm
+                    </PlainRoundedButton>
                     <PlainRoundedButton onClick={handleCancel}>Cancel</PlainRoundedButton>
                 </div>
             </div>

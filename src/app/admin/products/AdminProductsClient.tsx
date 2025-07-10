@@ -28,7 +28,10 @@ export default function AdminProductsClient() {
     return (
         <div className="flex flex-col grow w-full justify-center items-center">
             <div className="flex justify-center mb-8">
-                <PlainRoundedButtonLink href={`${pathname}/add-product`}>
+                <PlainRoundedButtonLink
+                    href={`${pathname}/add-product`}
+                    overrideClasses="!bg-background-lightest"
+                >
                     + Add Product
                 </PlainRoundedButtonLink>
             </div>

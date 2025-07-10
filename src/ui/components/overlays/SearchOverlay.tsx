@@ -49,7 +49,7 @@ export default function SearchOverlay() {
 
             <div
                 id="search-overlay-container"
-                className={`absolute top-0 left-0 flex justify-center w-full min-h-screen md:min-h-[400px] bg-white drop-shadow-xl z-[1500] [transition:all_0.2s_ease-out] ${
+                className={`absolute top-0 left-0 flex justify-center w-full min-h-screen md:min-h-[400px] bg-white drop-shadow-xl z-[9999] [transition:all_0.2s_ease-out] ${
                     isSearchLoaded ? "opacity-100" : "opacity-0"
                 }`}
                 ref={trapRef}
@@ -61,7 +61,7 @@ export default function SearchOverlay() {
                         isSearchLoaded ? "opacity-100 translate-0" : "opacity-0 translate-y-6"
                     }`}
                 >
-                    <div className="flex justify-center items-start w-full mt-[13rem]">
+                    <div className="flex justify-center items-start w-full mt-[11.5rem]">
                         <SearchBar
                             handleResultClick={handleResultClick}
                             handleSearchClose={() => closeOverlay()}

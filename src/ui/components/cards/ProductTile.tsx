@@ -104,7 +104,7 @@ export default function ProductTile({ product }: { product: Product }) {
                             <div className="absolute bottom-0 left-0 w-full p-2 md:p-3">
                                 {availableSizes.length === 0 ? (
                                     <div
-                                        className="flex justify-center items-center px-6 py-2 bg-background-lightest border-white rounded-full cursor-auto"
+                                        className="flex justify-center items-center px-6 py-2 bg-background-lightest border rounded-full"
                                         onClick={isolateInteraction}
                                     >
                                         <p>Out of stock</p>
