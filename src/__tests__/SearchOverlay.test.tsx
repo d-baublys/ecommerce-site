@@ -29,6 +29,7 @@ const mockResolvedFetch = () => {
 };
 const fireInputAndWait = async (queryText: string) => {
     await act(async () => {
+        getInput().focus();
         fireEvent.change(getInput(), { target: { value: queryText } });
 
         await new Promise((res) => setTimeout(res, 300));

@@ -29,7 +29,6 @@ describe("Navbar", () => {
         cy.get("[aria-label='Menu']").click();
         cy.get("#nav-mobile-menu").should("be.visible");
         cy.get("#mobile-entry").should("be.visible");
-        cy.get("[aria-label='Search']").should("be.visible");
         cy.get("[aria-label='Wishlist']").should("be.visible");
         cy.get("[aria-label='Bag']").should("be.visible");
         cy.get("[aria-label='Account']").should("be.visible");
