@@ -11,12 +11,14 @@ export default function SearchBar({
     handleResultClick,
     handleSearchClose,
     options,
+    inputRef,
     parentSetter,
     parentQuerySetter,
 }: {
     handleResultClick: (product: Product) => void;
     handleSearchClose?: () => void;
     options: SearchBarConfig;
+    inputRef?: React.RefObject<HTMLInputElement | null>;
     parentSetter?: React.Dispatch<SetStateAction<Product[]>>;
     parentQuerySetter?: React.Dispatch<SetStateAction<string | null>>;
 }) {
@@ -26,7 +28,6 @@ export default function SearchBar({
     const [isResultLoading, setIsResultLoading] = useState<boolean>(false);
     const [activeIdx, setActiveIdx] = useState<number>(-1);
     const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
-    const inputRef = useRef<HTMLInputElement>(null);
 
     const router = useRouter();
 
@@ -39,12 +40,6 @@ export default function SearchBar({
         };
 
         getData();
-
-        const focusTimeout = setTimeout(() => {
-            inputRef.current?.focus();
-        }, 500);
-
-        return () => clearTimeout(focusTimeout);
     }, []);
 
     const debouncedResults = debounce((currQuery) => {

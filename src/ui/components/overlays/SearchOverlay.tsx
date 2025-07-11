@@ -7,7 +7,7 @@ import { useSearchStore } from "@/stores/searchStore";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import DarkBackdrop from "@/ui/components/overlays/DarkBackdrop";
 import CloseButton from "@/ui/components/buttons/CloseButton";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 export default function SearchOverlay() {
@@ -19,6 +19,7 @@ export default function SearchOverlay() {
 
     const router = useRouter();
     const pathname = usePathname();
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const closeOverlay = () => {
         setIsSearchLoaded(false);
@@ -29,6 +30,14 @@ export default function SearchOverlay() {
         closeOverlay();
         router.push(`/products/${encodeURIComponent(product.slug)}`);
     };
+
+    useEffect(() => {
+        const focusTimeout = setTimeout(() => {
+            inputRef.current?.focus();
+        }, 500);
+
+        return () => clearTimeout(focusTimeout);
+    }, [isSearchLoaded]);
 
     useEffect(() => {
         closeOverlay();
@@ -63,6 +72,7 @@ export default function SearchOverlay() {
                 >
                     <div className="flex justify-center items-start w-full mt-[11.5rem]">
                         <SearchBar
+                            inputRef={inputRef}
                             handleResultClick={handleResultClick}
                             handleSearchClose={() => closeOverlay()}
                             options={{ isGlobalSearch: true, showSuggestions: true }}

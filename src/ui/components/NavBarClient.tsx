@@ -89,7 +89,10 @@ export default function NavBarClient() {
                 } [transition:top_0.5s_ease]`}
             >
                 <div className="flex justify-evenly items-center w-full min-h-full">
-                    <div className="flex justify-start sm:justify-center w-full sm:w-auto px-(--gutter) sm:px-0 order-1 sm:order-2">
+                    <div
+                        id="site-logo"
+                        className="flex justify-start sm:justify-center w-full sm:w-auto px-(--gutter) sm:px-0 order-1 sm:order-2"
+                    >
                         <Link href={"/"} className="relative">
                             <Image
                                 src="/dbwearopt.svg"
@@ -151,6 +154,7 @@ export default function NavBarClient() {
                 }
             />
             <SlideDownColumnsMenu
+                id="account-menu"
                 isOpenState={isAccountOpen}
                 handleClose={() => setIsAccountOpen(false)}
                 leftContent={
