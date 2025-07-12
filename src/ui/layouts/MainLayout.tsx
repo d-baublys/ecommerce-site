@@ -7,12 +7,8 @@ export interface MainLayoutProps {
     noCrumbs?: boolean;
 }
 
-export default function MainLayout({
-    children,
-    subheaderText,
-    lastCrumbText,
-    noCrumbs,
-}: MainLayoutProps) {
+export default function MainLayout(props: MainLayoutProps) {
+    const { children, subheaderText, lastCrumbText, noCrumbs } = props;
     return (
         <MainWrapperWithSubheader
             subheaderText={subheaderText}

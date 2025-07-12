@@ -2,12 +2,8 @@ import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { MainLayoutProps } from "@/ui/layouts/MainLayout";
 import MainWrapper from "@/ui/layouts/MainWrapper";
 
-export default function MainWrapperWithSubheader({
-    children,
-    subheaderText,
-    lastCrumbText,
-    noCrumbs,
-}: MainLayoutProps) {
+export default function MainWrapperWithSubheader(props: MainLayoutProps) {
+    const { children, subheaderText, lastCrumbText, noCrumbs } = props;
     return (
         <div className="flex flex-col grow">
             <MainWrapper overrideClasses="!h-36 !max-h-36 !pb-0">

@@ -13,13 +13,8 @@ export interface ModalProps {
     overrideClasses?: string;
 }
 
-export default function Modal({
-    children,
-    handleClose,
-    isOpenState,
-    hasCloseButton,
-    overrideClasses,
-}: ModalProps) {
+export default function Modal(props: ModalProps) {
+    const { children, handleClose, isOpenState, hasCloseButton, overrideClasses } = props;
     useBodyScrollLock(isOpenState);
 
     const trapRef = useFocusTrap(isOpenState, handleClose);

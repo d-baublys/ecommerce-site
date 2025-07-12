@@ -7,27 +7,30 @@ import { useRouter } from "next/navigation";
 import { SetStateAction, useEffect, useRef, useState } from "react";
 import { IoCloseCircle, IoSearch } from "react-icons/io5";
 
-export default function SearchBar({
-    handleResultClick,
-    handleSearchClose,
-    options,
-    inputRef,
-    parentSetter,
-    parentQuerySetter,
-}: {
+interface SearchBarProps {
     handleResultClick: (product: Product) => void;
     handleSearchClose?: () => void;
     options: SearchBarConfig;
     inputRef?: React.RefObject<HTMLInputElement | null>;
     parentSetter?: React.Dispatch<SetStateAction<Product[]>>;
     parentQuerySetter?: React.Dispatch<SetStateAction<string | null>>;
-}) {
+}
+
+export default function SearchBar(props: SearchBarProps) {
     const [productList, setProductList] = useState<Product[]>();
     const [query, setQuery] = useState<string>("");
     const [results, setResults] = useState<Product[]>([]);
     const [isResultLoading, setIsResultLoading] = useState<boolean>(false);
     const [activeIdx, setActiveIdx] = useState<number>(-1);
     const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+    const {
+        handleResultClick,
+        handleSearchClose,
+        options,
+        inputRef,
+        parentSetter,
+        parentQuerySetter,
+    } = props;
 
     const router = useRouter();
 

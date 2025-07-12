@@ -9,7 +9,7 @@ import {
 } from "react-icons/io5";
 
 type ConditionalNavIcon = {
-    renderIcon: (isForMenu: boolean) => React.ReactNode;
+    renderIcon: (isForMenu: boolean) => React.JSX.Element;
     isVisible: (isAdmin: boolean) => boolean;
 };
 
@@ -36,7 +36,9 @@ const menuIconClasses = "flex items-center gap-4 p-1 rounded-full";
 const getConditionalSwitchedClasses = (isForMenu: boolean) =>
     isForMenu ? menuIconClasses : conditionalNavClasses;
 
-export function renderFixedIcons({ handleSearchClick, handleMenuClick }: RenderFixedIconsParams) {
+export function renderFixedIcons(params: RenderFixedIconsParams): React.JSX.Element[] {
+    const { handleSearchClick, handleMenuClick } = params;
+
     const navIcons = [
         <button
             key="search"
@@ -61,14 +63,10 @@ export function renderFixedIcons({ handleSearchClick, handleMenuClick }: RenderF
     return navIcons;
 }
 
-export function renderConditionalIcons({
-    isForMenu,
-    isAdmin,
-    hasMounted,
-    itemCount,
-    handleMenuClose,
-    handleAccountClick,
-}: RenderConditionalIconsParams): React.ReactNode[] {
+export function renderConditionalIcons(params: RenderConditionalIconsParams): React.JSX.Element[] {
+    const { isForMenu, isAdmin, hasMounted, itemCount, handleMenuClose, handleAccountClick } =
+        params;
+
     const navIcons: ConditionalNavIcon[] = [
         {
             renderIcon: (isForMenu) => (
@@ -150,7 +148,7 @@ export function renderConditionalIcons({
     ];
 
     const renderIcons = (isForMenu: boolean) =>
-        navIcons.map((item) => (item.isVisible(isAdmin) ? item.renderIcon(isForMenu) : null));
+        navIcons.flatMap((item) => (item.isVisible(isAdmin) ? [item.renderIcon(isForMenu)] : []));
 
-    return renderIcons(isForMenu).filter(Boolean);
+    return renderIcons(isForMenu);
 }
