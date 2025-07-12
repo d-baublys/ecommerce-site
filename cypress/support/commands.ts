@@ -35,3 +35,38 @@
 //     }
 //   }
 // }
+
+import { email, password } from "./credentials";
+
+declare global {
+    namespace Cypress {
+        interface Chainable {
+            logInAsAdmin(): Chainable<void>;
+            visitHome(): Chainable<void>;
+            lessThanSmallBreakpoint(): Chainable<void>;
+            smallBreakpoint(): Chainable<void>;
+        }
+    }
+}
+
+Cypress.Commands.add("visitHome", () => {
+    cy.visit("/");
+});
+
+Cypress.Commands.add("logInAsAdmin", () => {
+    cy.intercept("GET", "/api/auth/session").as("auth-check");
+    cy.visit("/admin");
+    cy.get("input[name='username']").type(email);
+    cy.get("input[name='password']").type(password);
+    cy.get("button[type='submit']").click();
+    cy.wait("@auth-check");
+    cy.location("pathname").should("eq", "/admin");
+});
+
+Cypress.Commands.add("lessThanSmallBreakpoint", () => {
+    cy.viewport(639, 600);
+});
+
+Cypress.Commands.add("smallBreakpoint", () => {
+    cy.viewport(640, 600);
+});

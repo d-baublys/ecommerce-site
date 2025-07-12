@@ -8,7 +8,7 @@ export default defineConfig({
         setupNodeEvents(on, config) {
             // implement node event listeners here
         },
-        baseUrl: "http://localhost:3000/",
+        baseUrl: process.env.NEXT_PUBLIC_APP_URL,
     },
     env: {
         adminUsername: process.env.ADMIN_USERNAME,
