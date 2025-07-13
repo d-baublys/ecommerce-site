@@ -30,13 +30,13 @@ export function useFocusTrap(isOpen: boolean, handleClose: () => void) {
             handleClose();
         };
 
-        modal.addEventListener("keydown", handleTabPress);
-        modal.addEventListener("keydown", handleEscPress);
+        document.addEventListener("keydown", handleTabPress);
+        document.addEventListener("keydown", handleEscPress);
         firstElement.focus();
 
         return () => {
-            modal.removeEventListener("keydown", handleTabPress);
-            modal.removeEventListener("keydown", handleEscPress);
+            document.removeEventListener("keydown", handleTabPress);
+            document.removeEventListener("keydown", handleEscPress);
         };
     }, [isOpen]);
 

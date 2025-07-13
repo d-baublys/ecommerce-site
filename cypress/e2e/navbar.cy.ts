@@ -1,4 +1,4 @@
-describe("Navbar", () => {
+describe("Navbar base tests", () => {
     it("shows the expected navbar items in mobile viewports", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
@@ -59,14 +59,6 @@ describe("Navbar", () => {
         cy.get("#nav-mobile-menu").should("not.be.visible");
     });
 
-    it("restores focus when mobile-only menu is closed", () => {
-        cy.lessThanSmallBreakpoint();
-        cy.visitHome();
-        cy.get("[aria-label='Menu']").click();
-        cy.get("[aria-label='Close menu']").click();
-        cy.get("[aria-label='Menu']").should("have.focus");
-    });
-
     it("navigates correctly when clicking 'Shop' link", () => {
         cy.visitHome();
         cy.get("#main-entry").click();
@@ -118,20 +110,28 @@ describe("Navbar", () => {
         cy.get("#navbar").should("be.visible");
     });
 
-    it("restores focus when account menu is closed", () => {
-        cy.logInAsAdmin();
-        cy.get("[aria-label='Account']").click();
-        cy.get("[aria-label='Close menu']").click();
-        cy.get("[aria-label='Account']").should("have.focus");
-    });
-
-    it("doesn't render admin button when unauthenticated", () => {
+    it("doesn't render admin button in the navbar when unauthenticated", () => {
         cy.visitHome();
         cy.get("[aria-label='Admin']").should("not.exist");
     });
 
-    it("renders admin button when authenticated", () => {
+    it("renders admin button in the navbar when authenticated", () => {
         cy.logInAsAdmin();
+        cy.get("[aria-label='Admin']").should("exist");
+    });
+
+    it("doesn't render admin button in the mobile menu when unauthenticated", () => {
+        cy.lessThanSmallBreakpoint();
+        cy.visitHome();
+        cy.get("[aria-label='Menu']").click();
+        cy.get("[aria-label='Admin']").should("not.exist");
+    });
+
+    it("renders admin button in the mobile menu when authenticated", () => {
+        cy.lessThanSmallBreakpoint();
+        cy.logInAsAdmin();
+        cy.visitHome();
+        cy.get("[aria-label='Menu']").click();
         cy.get("[aria-label='Admin']").should("exist");
     });
 
@@ -152,5 +152,50 @@ describe("Navbar", () => {
         cy.scrollTo("top", { duration: 500 });
         cy.get("#navbar").should("be.visible");
         cy.get("#navbar").should("have.class", "top-0");
+    });
+});
+
+describe("Navbar accessibility tests", () => {
+    it("restores focus when mobile-only menu is closed", () => {
+        cy.lessThanSmallBreakpoint();
+        cy.visitHome();
+        cy.get("[aria-label='Menu']").click();
+        cy.get("[aria-label='Close menu']").click();
+        cy.get("[aria-label='Menu']").should("have.focus");
+    });
+
+    it("restores focus when account menu is closed", () => {
+        cy.logInAsAdmin();
+        cy.get("[aria-label='Account']").click();
+        cy.get("[aria-label='Close menu']").click();
+        cy.get("[aria-label='Account']").should("have.focus");
+    });
+
+    it("should have the expected focus-trapped tabbing sequence in the mobile-only menu", () => {
+        cy.lessThanSmallBreakpoint();
+        cy.visitHome();
+        cy.get("[aria-label='Menu']").click();
+        cy.get("#mobile-entry").should("be.focused");
+        cy.press(Cypress.Keyboard.Keys.TAB);
+        cy.get("[aria-label='Wishlist']").should("be.focused");
+        cy.press(Cypress.Keyboard.Keys.TAB);
+        cy.get("[aria-label='Bag']").should("be.focused");
+        cy.press(Cypress.Keyboard.Keys.TAB);
+        cy.get("[aria-label='Account']").should("be.focused");
+        cy.press(Cypress.Keyboard.Keys.TAB);
+        cy.get("[aria-label='Close menu']").should("be.focused");
+        cy.press(Cypress.Keyboard.Keys.TAB);
+        cy.get("#mobile-entry").should("be.focused");
+    });
+
+    it.only("should have the expected focus-trapped tabbing sequence in the account menu", () => {
+        cy.logInAsAdmin();
+        cy.visitHome();
+        cy.get("[aria-label='Account']").click();
+        cy.get("button").contains("Log Out").should("be.focused");
+        cy.press(Cypress.Keyboard.Keys.TAB);
+        cy.get("[aria-label='Close menu']").should("be.focused");
+        cy.press(Cypress.Keyboard.Keys.TAB);
+        cy.get("button").contains("Log Out").should("be.focused");
     });
 });

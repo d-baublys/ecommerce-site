@@ -6,7 +6,11 @@ interface CloseButtonProps extends React.HtmlHTMLAttributes<HTMLButtonElement> {
 
 export default function CloseButton({ size = 24, className, ...restProps }: CloseButtonProps) {
     return (
-        <button type="button" className={`flex items-center rounded-circle ${className}`} {...restProps}>
+        <button
+            type="button"
+            className={`flex items-center rounded-circle ${className ?? ""}`}
+            {...restProps}
+        >
             <IoClose className="cursor-pointer" size={size} />
         </button>
     );
