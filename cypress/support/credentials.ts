@@ -1,2 +1,2 @@
-export const email = Cypress.env("adminUsername");
-export const password = Cypress.env("adminPassword");
+export const email = Cypress.env("ADMIN_USERNAME");
+export const password = Cypress.env("ADMIN_PASSWORD");

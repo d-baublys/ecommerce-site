@@ -1,159 +1,160 @@
 import { Prisma, PrismaClient } from "../generated/prisma";
 import { slugify } from "../src/lib/utils";
-import { Categories, Sizes } from "@/lib/definitions";
+import { Categories, Product, Sizes } from "@/lib/definitions";
 
 const prisma = new PrismaClient();
 
-const generatePrice = () => (25 + Math.floor(Math.random() * (300 - 25))) * 100; // random between £25 and £299 in p
+const prices: number[] = [2500, 3300, 5100, 7200, 10500, 13500, 18300, 21000]; // 2/2/2/1/1
+prices.push(...prices); // mirror for each category
 
-const products = [
+const createAlternatingStock = (rows: number) => {
+    const result: number[][] = [];
+
+    for (let i = 0; i < rows; i++) {
+        if (i % 2 === 0) {
+            result.push([10, 8, 6, 4, 2]);
+        } else {
+            result.push([2, 4, 6, 8, 10]);
+        }
+    }
+    return result;
+};
+
+const stockCounts: number[][] = createAlternatingStock(16);
+const dates: string[] = [
+    "2025-07-01",
+    "2025-07-02",
+    "2025-07-03",
+    "2025-07-04",
+    "2025-07-04",
+    "2025-07-03",
+    "2025-07-02",
+    "2025-07-01",
+];
+dates.push(...dates); // mirror for each category
+
+const productStubs: Omit<Product, "id" | "dateAdded" | "slug" | "price" | "stock">[] = [
     {
         name: "Black & large white graphic",
         gender: "womens",
-        price: generatePrice(),
         src: "/tshirt1.jpg",
         alt: "Black t-shirt with large white graphic",
-        size: ["xs", "s", "m", "l", "xl"],
     },
     {
         name: "White & dark company logo",
         gender: "womens",
-        price: generatePrice(),
         src: "/tshirt2.jpg",
         alt: "White t-shirt with dark company name print",
-        size: ["xs", "s", "m", "l", "xl"],
     },
     {
         name: "Black & small white print",
         gender: "womens",
-        price: generatePrice(),
         src: "/tshirt7.jpg",
         alt: "Black t-shirt with small white text print",
-        size: ["xs", "s", "m", "l", "xl"],
     },
     {
         name: "Black & small white print 2",
         gender: "womens",
-        price: generatePrice(),
         src: "/tshirt8.jpg",
         alt: "Black t-shirt with small white text print",
-        size: ["xs", "s", "m", "l", "xl"],
     },
     {
         name: "White & multicolour paint graphic",
         gender: "womens",
-        price: generatePrice(),
         src: "/tshirt10.jpg",
         alt: "White t-shirt with multicolour paint graphic",
-        size: ["xs", "s", "m", "l", "xl"],
     },
     {
         name: "Black & orange logo",
         gender: "womens",
-        price: generatePrice(),
         src: "/tshirt11.jpg",
         alt: "Black t-shirt with medium orange logo",
-        size: ["xs", "s", "m", "l", "xl"],
     },
     {
         name: "Black & white striped",
         gender: "womens",
-        price: generatePrice(),
         src: "/tshirt14.jpg",
         alt: "Black & white striped t-shirt with faint text print",
-        size: ["xs", "s", "m", "l", "xl"],
     },
     {
         name: "White & medium dark print",
         gender: "womens",
-        price: generatePrice(),
         src: "/tshirt16.jpg",
         alt: "White t-shirt with dark text print",
-        size: ["xs", "s", "m", "l", "xl"],
     },
     {
         name: "White & small dark graphic",
         gender: "mens",
-        price: generatePrice(),
         src: "/tshirt3.jpg",
         alt: "White t-shirt with small dark graphic",
-        size: ["s", "m", "l", "xl", "xxl"],
     },
     {
         name: "White & large dark logo",
         gender: "mens",
-        price: generatePrice(),
         src: "/tshirt4.jpg",
         alt: "White t-shirt with large dark company logo",
-        size: ["s", "m", "l", "xl", "xxl"],
     },
     {
         name: "Blue & large white print",
         gender: "mens",
-        price: generatePrice(),
         src: "/tshirt5.jpg",
         alt: "Blue t-shirt with large white text print",
-        size: ["s", "m", "l", "xl", "xxl"],
     },
     {
         name: "Black & medium mixed print",
         gender: "mens",
-        price: generatePrice(),
         src: "/tshirt6.jpg",
         alt: "Black t-shirt with medium mixed-colour print",
-        size: ["s", "m", "l", "xl", "xxl"],
     },
     {
         name: "Red & small dark logo",
         gender: "mens",
-        price: generatePrice(),
         src: "/tshirt9.jpg",
         alt: "Red t-shirt with small black logo",
-        size: ["s", "m", "l", "xl", "xxl"],
     },
     {
         name: "Black & medium white print",
         gender: "mens",
-        price: generatePrice(),
         src: "/tshirt12.jpg",
         alt: "Black t-shirt with white text print",
-        size: ["s", "m", "l", "xl", "xxl"],
     },
     {
         name: "Dark grey & small logo",
         gender: "mens",
-        price: generatePrice(),
         src: "/tshirt13.jpg",
         alt: "Dark grey t-shirt with small yellow logo",
-        size: ["s", "m", "l", "xl", "xxl"],
     },
     {
         name: "Black & small company logo",
         gender: "mens",
-        price: generatePrice(),
         src: "/tshirt15.jpg",
         alt: "Black t-shirt with small multicolour company logo",
-        size: ["s", "m", "l", "xl", "xxl"],
     },
 ];
 
 async function main() {
-    for (let product of products) {
+    const mensSizes: Sizes[] = ["s", "m", "l", "xl", "xxl"];
+    const womensSizes: Sizes[] = ["xs", "s", "m", "l", "xl"];
+
+    for (let i in productStubs) {
+        const product = productStubs[i];
+        const productSizes = product.gender === "mens" ? mensSizes : womensSizes;
+
         const createdProduct = await prisma.product.create({
             data: {
                 name: product.name,
                 gender: product.gender as Categories,
-                price: product.price,
+                price: prices[i],
                 slug: slugify(product.name),
                 src: product.src,
                 alt: product.alt,
-                dateAdded: new Date(),
+                dateAdded: new Date(dates[i]),
             },
         });
 
-        const stockEntries: Prisma.StockCreateManyInput[] = product.size.map((size) => ({
+        const stockEntries: Prisma.StockCreateManyInput[] = productSizes.map((size, idx) => ({
             size: size as Sizes,
-            quantity: Math.floor(Math.random() * 20),
+            quantity: stockCounts[i][idx],
             productId: createdProduct.id,
         }));
 

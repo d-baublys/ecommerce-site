@@ -1,7 +1,8 @@
 import { defineConfig } from "cypress";
 import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config();
+dotenv.config({ path: path.resolve(process.cwd(), ".env.test") });
 
 export default defineConfig({
     e2e: {
@@ -11,7 +12,6 @@ export default defineConfig({
         baseUrl: process.env.NEXT_PUBLIC_APP_URL,
     },
     env: {
-        adminUsername: process.env.ADMIN_USERNAME,
-        adminPassword: process.env.ADMIN_PASSWORD,
+        ...process.env,
     },
 });
