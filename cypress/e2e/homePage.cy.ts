@@ -1,7 +1,15 @@
 describe("Home page", () => {
-    it("should rotate product carousel correctly", () => {
-        cy.visit("/");
+    beforeEach(() => {
+        cy.visitHome();
+    });
 
+    it("renders the hero section correctly", () => {
+        cy.get("h1").should("contain.text", "Summer 2025 styles here and now.");
+        cy.get("a").contains("Shop >>>").click();
+        cy.location("pathname").should("eq", "/category/all");
+    });
+
+    it("should rotate product carousel correctly", () => {
         cy.get("#carousel-slider").then(($slider) => {
             const sliderBounds = $slider[0].getBoundingClientRect();
 
@@ -12,11 +20,8 @@ describe("Home page", () => {
                 expect(firstProdBounds.right).to.be.at.most(sliderBounds.right);
             });
         });
-
         cy.get("#carousel-nav-forward").click();
-
         cy.wait(500);
-
         cy.get("#carousel-slider").then(($slider) => {
             const sliderBounds = $slider[0].getBoundingClientRect();
 

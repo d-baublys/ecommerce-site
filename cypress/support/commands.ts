@@ -45,6 +45,8 @@ declare global {
             visitHome(): Chainable<void>;
             lessThanSmallBreakpoint(): Chainable<void>;
             smallBreakpoint(): Chainable<void>;
+            lessThanLargeBreakpoint(): Chainable<void>;
+            largeBreakpoint(): Chainable<void>;
         }
     }
 }
@@ -69,4 +71,12 @@ Cypress.Commands.add("lessThanSmallBreakpoint", () => {
 
 Cypress.Commands.add("smallBreakpoint", () => {
     cy.viewport(640, 600);
+});
+
+Cypress.Commands.add("largeBreakpoint", () => {
+    cy.viewport(1024, 600);
+});
+
+Cypress.Commands.add("lessThanLargeBreakpoint", () => {
+    cy.viewport(1023, 600);
 });

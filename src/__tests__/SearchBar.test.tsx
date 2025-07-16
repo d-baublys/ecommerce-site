@@ -1,4 +1,4 @@
-import { getFilteredFakeProducts, wrapWithErrorBoundary } from "@/lib/test-utils";
+import { createFakeProductList } from "@/lib/test-utils";
 import SearchBar from "@/ui/components/SearchBar";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 
@@ -10,14 +10,14 @@ jest.mock("next/navigation", () => ({
     }),
 }));
 
-jest.mock("@/lib/fetching-utils", () => ({
-    fetchFilteredProducts: jest.fn(),
+jest.mock("@/lib/actions", () => ({
+    getProductData: jest.fn(),
 }));
 
-import { fetchFilteredProducts } from "@/lib/fetching-utils";
 import { Product } from "@/lib/definitions";
+import { getProductData } from "@/lib/actions";
 
-const productList = getFilteredFakeProducts();
+const productList = { data: createFakeProductList() };
 
 const mockResultClick = jest.fn();
 
@@ -30,11 +30,11 @@ const renderLocalSearch = () =>
     );
 
 const mockResolvedFetch = () => {
-    (fetchFilteredProducts as jest.Mock).mockResolvedValue(productList);
+    (getProductData as jest.Mock).mockResolvedValue(productList);
 };
 
 const mockFailedFetch = () => {
-    (fetchFilteredProducts as jest.Mock).mockResolvedValue(undefined);
+    (getProductData as jest.Mock).mockResolvedValue(undefined);
 };
 
 const getInput = () => screen.getByRole("textbox");
@@ -63,7 +63,7 @@ describe("SearchBar", () => {
         await prepStandard();
         await fireInputAndWait("Test");
 
-        expect(within(getSuggestionsContainer()).getAllByRole("listitem").length).toBe(3);
+        expect(within(getSuggestionsContainer()).getAllByRole("listitem").length).toBe(4);
     });
 
     it("displays fallback when there are no suggestions", async () => {

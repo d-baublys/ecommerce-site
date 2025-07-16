@@ -188,7 +188,7 @@ describe("Navbar accessibility tests", () => {
         cy.get("#mobile-entry").should("be.focused");
     });
 
-    it.only("should have the expected focus-trapped tabbing sequence in the account menu", () => {
+    it("should have the expected focus-trapped tabbing sequence in the account menu", () => {
         cy.logInAsAdmin();
         cy.visitHome();
         cy.get("[aria-label='Account']").click();

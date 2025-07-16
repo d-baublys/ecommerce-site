@@ -254,7 +254,7 @@ export default function CategoryGridPage({
                     handleClose={() => setIsFilterOpen(false)}
                     overrideClasses="lg:hidden"
                 >
-                    <div className="flex w-full max-w-[500px]">
+                    <div className="mobile-filtering flex w-full max-w-[500px]">
                         <GridAside
                             allCategoryProducts={allCategoryProducts}
                             sizeFilters={sizeFilters}

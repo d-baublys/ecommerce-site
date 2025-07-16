@@ -1,5 +1,6 @@
 "use client";
 
+import { getProductData } from "@/lib/actions";
 import { Product, SearchBarConfig } from "@/lib/definitions";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 import { debounce } from "@/lib/utils";
@@ -36,7 +37,9 @@ export default function SearchBar(props: SearchBarProps) {
 
     useEffect(() => {
         const getData = async () => {
-            const productFetch = await fetchFilteredProducts({ category: "all" });
+            const productFetch = options.isGlobalSearch
+                ? await fetchFilteredProducts({ category: "all" })
+                : (await getProductData())?.data;
 
             setProductList(productFetch);
             if (parentSetter) parentSetter(productFetch);
@@ -114,8 +117,10 @@ export default function SearchBar(props: SearchBarProps) {
     };
 
     const handleInputBlur = () => {
-        setShowSuggestions(false);
-        setActiveIdx(-1);
+        setTimeout(() => {
+            setShowSuggestions(false);
+            setActiveIdx(-1);
+        }, 200);
     };
 
     return (
@@ -164,7 +169,7 @@ export default function SearchBar(props: SearchBarProps) {
             </div>
             {query && options?.showSuggestions && showSuggestions && (
                 <div className="mx-4 min-h-[100px] px-2 py-2 border-t border-background-lighter bg-background-lightest z-100">
-                    <ul data-testid="suggestions-ul">
+                    <ul className="suggestions-container" data-testid="suggestions-ul">
                         {results?.length > 0 &&
                             results.map((product, idx) => (
                                 <li

@@ -96,21 +96,19 @@ export default function GridAside({
         );
     };
 
-    type generateButtonListProps<T extends string> = {
+    type generateButtonListParams<T extends string> = {
         dataObj: Record<T, number>;
         filterArr: T[];
         handleClick: (key: T) => void;
         labelCreator: (key: T, count: number) => React.JSX.Element;
+        className: string;
     };
 
-    const generateButtonList = <T extends string>({
-        dataObj,
-        filterArr,
-        handleClick,
-        labelCreator,
-    }: generateButtonListProps<T>) =>
-        Object.entries(dataObj).length > 0 ? (
-            <ul className="flex flex-wrap py-4 gap-4">
+    const generateButtonList = <T extends string>(params: generateButtonListParams<T>) => {
+        const { dataObj, filterArr, handleClick, labelCreator, className } = params;
+
+        return Object.entries(dataObj).length > 0 ? (
+            <ul className={`${className} flex flex-wrap py-4 gap-4`}>
                 {Object.entries(dataObj).map(([key, count]) =>
                     (count as number) > 0 ? (
                         <li key={key}>
@@ -126,6 +124,7 @@ export default function GridAside({
                 )}
             </ul>
         ) : null;
+    };
 
     return (
         <div className="w-full h-min border-b-1">
@@ -135,6 +134,7 @@ export default function GridAside({
                     filterArr: sizeFilters,
                     handleClick: handleSizePress,
                     labelCreator: createSizeLabel,
+                    className: "size-btn-container",
                 })}
             </AccordionSection>
             <AccordionSection text="Price">
@@ -143,6 +143,7 @@ export default function GridAside({
                     filterArr: priceFilters,
                     handleClick: handlePricePress,
                     labelCreator: createPriceLabel,
+                    className: "price-btn-container",
                 })}
             </AccordionSection>
         </div>

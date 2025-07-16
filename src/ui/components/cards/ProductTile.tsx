@@ -76,7 +76,7 @@ export default function ProductTile({ product }: { product: Product }) {
         <>
             <div
                 ref={tileRef}
-                className="relative flex flex-col justify-evenly min-h-[200px] h-min gap-4 text-sz-label-button lg:text-sz-label-button-lg z-0"
+                className="product-tile relative flex flex-col justify-evenly min-h-[200px] h-min gap-4 text-sz-label-button lg:text-sz-label-button-lg z-0"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => {
                     setIsHovered(false);
@@ -85,6 +85,7 @@ export default function ProductTile({ product }: { product: Product }) {
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
                 onTouchCancel={handleTouchEnd}
+                data-date-added={product.dateAdded}
                 data-testid="product-tile"
             >
                 <div
@@ -143,8 +144,8 @@ export default function ProductTile({ product }: { product: Product }) {
 
                 <Link href={buildProductUrl(product.slug)}>
                     <div className="flex flex-col grow gap-4">
-                        <p>{product.name}</p>
-                        <p className="font-semibold">
+                        <p className="tile-name">{product.name}</p>
+                        <p className="tile-price font-semibold">
                             <span>£</span>
                             <span>{stringifyConvertPrice(product.price)}</span>
                         </p>
