@@ -80,7 +80,7 @@ export async function updateStockOnPurchase(productId: string, size: Sizes, quan
     const currentStock = stockItem.quantity;
 
     if (quantity > currentStock) {
-        throw new Error(`Quantity exceeds stock for size ${size}`);
+        throw new Error(`Quantity exceeds stock for size "${size.toUpperCase()}"`);
     }
 
     const updatedStock = currentStock - quantity;
@@ -163,29 +163,26 @@ export async function createOrder({
     }
 }
 
-export async function getOrder(where?: Prisma.OrderWhereInput) {
+type GetOrderParams = {
+    sessionId?: string;
+    orderId?: number;
+};
+
+export async function getOrder({ sessionId, orderId }: GetOrderParams) {
+    const whereQuery = {
+        ...(sessionId && { sessionId }),
+        ...(orderId && { id: orderId }),
+    };
+
     try {
         const order = await prisma.order.findFirst({
-            where: where,
+            where: whereQuery,
         });
 
         return { data: order };
     } catch (error) {
         console.error("Error fetching order data: ", error);
         throw new Error("Error fetching order data. Please try again later.");
-    }
-}
-
-export async function updateOrder(orderId: number, status: OrderStatus) {
-    try {
-        await prisma.order.update({
-            where: { id: orderId },
-            data: { status },
-        });
-        return { success: true };
-    } catch (error) {
-        console.error("Error updating order: ", error);
-        return { success: false };
     }
 }
 
@@ -218,7 +215,7 @@ export async function getFeaturedProducts() {
 
         const products: Product[] = rawProducts.map((item) => ({
             ...item.product,
-            dateAdded: item.product.dateAdded.toString(),
+            dateAdded: processDateForClient(item.product.dateAdded),
             stock: buildStockObj(item.product.stock),
         }));
 
@@ -238,6 +235,20 @@ export async function clearFeaturedProducts() {
         return { success: false };
     }
 }
+
+// !!!TO-DO!!!
+// export async function updateOrder(orderId: number, status: OrderStatus) {
+//     try {
+//         await prisma.order.update({
+//             where: { id: orderId },
+//             data: { status },
+//         });
+//         return { success: true };
+//     } catch (error) {
+//         console.error("Error updating order: ", error);
+//         return { success: false };
+//     }
+// }
 
 // !!!TO-DO!!!
 // export async function getUser(identifier: string, password: string) {
