@@ -172,34 +172,36 @@ export default function CategoryGridPage({
 
     const sortingUnit = () => {
         return (
-            <div id="product-sort-input" className="flex items-center gap-1 translate-x-4">
+            <div id="product-sort-input" className="relative flex items-center gap-1.5 xs:gap-3">
                 <label
                     htmlFor="sort-select"
-                    className={`pr-2 whitespace-nowrap pointer-events-none ${
-                        productSort !== "placeholder"
-                            ? "translate-x-[10%] md:translate-0"
-                            : "translate-x-[120%]"
+                    className={`whitespace-nowrap pointer-events-none ${
+                        productSort !== "placeholder" ? "block" : "hidden"
                     }`}
                 >
                     Sort By
                 </label>
                 <select
                     id="sort-select"
-                    className={`pr-5 font-normal appearance-none cursor-pointer ${
-                        productSort !== "placeholder" ? "" : "max-w-[100px] lg:max-w-[115px]"
+                    className={`pr-4 xs:pr-5 appearance-none cursor-pointer focus:max-w-none ${
+                        productSort !== "placeholder"
+                            ? "font-normal"
+                            : "max-w-[85px] lg:max-w-[95px] font-semibold"
                     }`}
                     onChange={(e) => setProductSort(e.target.value as ProductSortKey)}
                     value={productSort}
                 >
-                    <option disabled hidden value="placeholder"></option>
+                    <option disabled hidden value="placeholder">
+                        Sort By
+                    </option>
                     {Object.entries(SORT_OPTIONS).map(([key, sortData]) => (
-                        <option key={key} value={key}>
+                        <option key={key} value={key} className="font-normal">
                             {sortData.displayName}
                         </option>
                     ))}
                 </select>
                 <IoChevronDown
-                    className="relative translate-x-[-150%] extra-stroked pointer-events-none"
+                    className="absolute right-0 translate-y-[1px] extra-stroked pointer-events-none"
                     size={14}
                 />
             </div>
