@@ -86,6 +86,18 @@ describe("Search overlay base tests", () => {
         cy.location("pathname").should("eq", "/");
     });
 
+    it("excludes unstocked products from suggestions", () => {
+        cy.get("#search-overlay-container input[name='search']").type("logo");
+        cy.get("#search-overlay-container .suggestions-container").should(
+            "contain",
+            "White & large dark logo"
+        );
+        cy.get("#search-overlay-container .suggestions-container").should(
+            "not.contain",
+            "Black & small company logo"
+        );
+    });
+
     it("closes as expected", () => {
         cy.get("#search-overlay-container [aria-label='Close search']").click();
         cy.get("#search-overlay-container").should("not.exist");

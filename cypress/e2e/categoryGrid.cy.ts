@@ -8,8 +8,8 @@ describe("Category grid page desktop viewport tests", () => {
     });
 
     it("has correct number of items", () => {
-        cy.get(".grid-tile-container .product-tile").should("have.length", "16");
-        cy.contains(/16\s*Items/);
+        cy.get(".grid-tile-container .product-tile").should("have.length", "15");
+        cy.contains(/15\s*Items/); // 16 total less 1 unstocked
     });
 
     it("doesn't show the filter button", () => {
@@ -33,44 +33,148 @@ describe("Category grid page desktop viewport tests", () => {
         cy.contains("button", "Size").click();
         cy.contains(".size-btn-container button", "XXL").click();
         cy.wait(1000);
-        cy.get(".grid-tile-container .product-tile").should("have.length", "8");
-        cy.contains(/8\s*Items/);
+        cy.get(".grid-tile-container .product-tile").should("have.length", "7");
+        cy.contains(/7\s*Items/);
     });
 
     it("filters correctly on compound size filter selection", () => {
         cy.contains("button", "Size").click();
         cy.contains(".size-btn-container button", "XS").click();
+        cy.wait(1000);
         cy.contains(".size-btn-container button", "XXL").click();
         cy.wait(1000);
-        cy.get(".grid-tile-container .product-tile").should("have.length", "16");
-        cy.contains(/16\s*Items/);
+        cy.get(".grid-tile-container .product-tile").should("have.length", "15");
+        cy.contains(/15\s*Items/);
     });
 
     it("filters correctly on single price filter selection", () => {
         cy.contains("button", "Price").click();
         cy.contains(".price-btn-container button", "Over").click();
         cy.wait(1000);
-        cy.get(".grid-tile-container .product-tile").should("have.length", "2");
-        cy.contains(/2\s*Items/);
+        cy.get(".grid-tile-container .product-tile").should("have.length", "1");
+        cy.contains(/1\s*Item/);
     });
 
     it("filters correctly on compound price filter selection", () => {
         cy.contains("button", "Price").click();
         cy.contains(".price-btn-container button", "0-").click();
+        cy.wait(1000);
         cy.contains(".price-btn-container button", "Over").click();
         cy.wait(1000);
-        cy.get(".grid-tile-container .product-tile").should("have.length", "6");
-        cy.contains(/6\s*Items/);
+        cy.get(".grid-tile-container .product-tile").should("have.length", "5");
+        cy.contains(/5\s*Items/);
     });
 
     it("filters correctly on combined size and price filter selection", () => {
         cy.contains("button", "Size").click();
         cy.contains("button", "Price").click();
         cy.contains(".size-btn-container button", "XXL").click();
+        cy.wait(1000);
         cy.contains(".price-btn-container button", "Over").click();
+        cy.wait(1000);
+        cy.get(".grid-tile-container .product-tile").should("have.length", "0");
+        cy.contains(/0\s*Items/);
+    });
+});
+
+describe("Category grid page mobile viewport base tests", () => {
+    beforeEach(() => {
+        cy.lessThanLargeBreakpoint();
+        cy.visit("/category/all");
+        cy.wait(1000);
+    });
+
+    it("has correct number of items", () => {
+        cy.get(".grid-tile-container .product-tile").should("have.length", "15");
+        cy.contains(/15\s*Items/); // 16 total less 1 unstocked
+    });
+
+    it("shows the filter button", () => {
+        cy.contains("button", "Filter").should("be.visible");
+    });
+});
+
+describe("Category grid page mobile viewport filtering tests", () => {
+    beforeEach(() => {
+        cy.lessThanLargeBreakpoint();
+        cy.visit("/category/all");
+        cy.wait(1000);
+        cy.contains("button", "Filter").click();
+    });
+
+    it("should have the expected number of size filters", () => {
+        cy.contains(".mobile-filtering button", "Size").click();
+        cy.get(".mobile-filtering .size-btn-container li").should(
+            "have.length",
+            `${VALID_SIZES.length}`
+        );
+    });
+
+    it("should have the expected number of price filters", () => {
+        cy.contains(".mobile-filtering button", "Size").click();
+        cy.get(".mobile-filtering .price-btn-container li").should(
+            "have.length",
+            `${Object.keys(PRICE_FILTER_OPTIONS).length}`
+        );
+    });
+
+    it("filters correctly on single size filter selection", () => {
+        cy.contains(".mobile-filtering button", "Size").click();
+        cy.contains(".mobile-filtering .size-btn-container button", "XXL").click();
+        cy.get("[aria-label='Close menu']").click();
+        cy.wait(1000);
+        cy.get(".grid-tile-container .product-tile").should("have.length", "7");
+        cy.contains(/7\s*Items/);
+    });
+
+    it("filters correctly on compound size filter selection", () => {
+        cy.contains(".mobile-filtering button", "Size").click();
+        cy.contains(".mobile-filtering .size-btn-container button", "XS").click();
+        cy.wait(1000);
+        cy.contains(".mobile-filtering .size-btn-container button", "XXL").click();
+        cy.get("[aria-label='Close menu']").click();
+        cy.wait(1000);
+        cy.get(".grid-tile-container .product-tile").should("have.length", "15");
+        cy.contains(/15\s*Items/);
+    });
+
+    it("filters correctly on single price filter selection", () => {
+        cy.contains(".mobile-filtering button", "Price").click();
+        cy.contains(".mobile-filtering .price-btn-container button", "Over").click();
+        cy.get("[aria-label='Close menu']").click();
         cy.wait(1000);
         cy.get(".grid-tile-container .product-tile").should("have.length", "1");
         cy.contains(/1\s*Item/);
+    });
+
+    it("filters correctly on compound price filter selection", () => {
+        cy.contains(".mobile-filtering button", "Price").click();
+        cy.contains(".mobile-filtering .price-btn-container button", "0-").click();
+        cy.wait(1000);
+        cy.contains(".mobile-filtering .price-btn-container button", "Over").click();
+        cy.get("[aria-label='Close menu']").click();
+        cy.wait(1000);
+        cy.get(".grid-tile-container .product-tile").should("have.length", "5");
+        cy.contains(/5\s*Items/);
+    });
+
+    it("filters correctly on combined size and price filter selection", () => {
+        cy.contains(".mobile-filtering button", "Size").click();
+        cy.contains(".mobile-filtering button", "Price").click();
+        cy.contains(".mobile-filtering .size-btn-container button", "XXL").click();
+        cy.wait(1000);
+        cy.contains(".mobile-filtering .price-btn-container button", "Over").click();
+        cy.get("[aria-label='Close menu']").click();
+        cy.wait(1000);
+        cy.get(".grid-tile-container .product-tile").should("have.length", "0");
+        cy.contains(/0\s*Items/);
+    });
+});
+
+describe("Category grid page viewport-agnostic tests", () => {
+    beforeEach(() => {
+        cy.visit("/category/all");
+        cy.wait(1000);
     });
 
     it("sorts by price in ascending order correctly", () => {
@@ -136,92 +240,20 @@ describe("Category grid page desktop viewport tests", () => {
     });
 });
 
-describe("Category grid page mobile viewport tests", () => {
-    beforeEach(() => {
-        cy.lessThanLargeBreakpoint();
-        cy.visit("/category/all");
-        cy.wait(1000);
-    });
-
-    it("has correct number of items", () => {
-        cy.get(".grid-tile-container .product-tile").should("have.length", "16");
-        cy.contains(/16\s*Items/);
-    });
-
-    it("shows the filter button", () => {
-        cy.contains("button", "Filter").should("be.visible");
-    });
-
-    it("should have the expected number of size filters", () => {
-        cy.contains("button", "Filter").click();
-        cy.contains(".mobile-filtering button", "Size").click();
-        cy.get(".mobile-filtering .size-btn-container li").should(
-            "have.length",
-            `${VALID_SIZES.length}`
-        );
-    });
-
-    it("should have the expected number of price filters", () => {
-        cy.contains("button", "Filter").click();
-        cy.contains(".mobile-filtering button", "Size").click();
-        cy.get(".mobile-filtering .price-btn-container li").should(
-            "have.length",
-            `${Object.keys(PRICE_FILTER_OPTIONS).length}`
-        );
-    });
-
-    it("filters correctly on compound size filter selection", () => {
-        cy.contains("button", "Filter").click();
-        cy.contains(".mobile-filtering button", "Size").click();
-        cy.contains(".mobile-filtering button", "XS").click();
-        cy.contains(".mobile-filtering button", "XXL").click();
-        cy.get(".grid-tile-container .product-tile").should("have.length", "8");
-        cy.contains(/8\s*Items/);
-    });
-
-    it("filters correctly on single price filter selection", () => {
-        cy.contains("button", "Filter").click();
-        cy.contains(".mobile-filtering button", "Price").click();
-        cy.contains(".mobile-filtering button", "Over").click();
-        cy.get(".grid-tile-container .product-tile").should("have.length", "2");
-        cy.contains(/2\s*Items/);
-    });
-
-    it("filters correctly on compound price filter selection", () => {
-        cy.contains("button", "Filter").click();
-        cy.contains(".mobile-filtering button", "Price").click();
-        cy.contains(".mobile-filtering button", "0-").click();
-        cy.contains(".mobile-filtering  button", "Over").click();
-        cy.get(".grid-tile-container .product-tile").should("have.length", "6");
-        cy.contains(/6\s*Items/);
-    });
-
-    it("filters correctly on combined size and price filter selection", () => {
-        cy.contains("button", "Filter").click();
-        cy.contains(".mobile-filtering button", "Size").click();
-        cy.contains(".mobile-filtering button", "Price").click();
-        cy.contains(".mobile-filtering button", "XXL").click();
-        cy.contains(".mobile-filtering button", "Over").click();
-        cy.get(".grid-tile-container .product-tile").should("have.length", "1");
-        cy.contains(/1\s*Item/);
-    });
-});
-
 describe("Category grid page accessbility tests", () => {
     beforeEach(() => {
+        cy.largeBreakpoint();
         cy.visit("/category/all");
         cy.wait(1000);
     });
 
     it("should prevent focus to filters when accordion sections are collapsed", () => {
-        cy.largeBreakpoint();
         cy.contains("button", "Size").focus();
         cy.press(Cypress.Keyboard.Keys.TAB);
         cy.contains("button", "Price").should("have.focus");
     });
 
     it("should allow focus to filters when accordion sections are open", () => {
-        cy.largeBreakpoint();
         cy.contains("button", "Size").click();
         cy.press(Cypress.Keyboard.Keys.TAB);
         cy.contains("button", "Price").should("not.have.focus");

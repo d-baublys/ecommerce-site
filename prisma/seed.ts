@@ -11,7 +11,9 @@ const createAlternatingStock = (rows: number) => {
     const result: number[][] = [];
 
     for (let i = 0; i < rows; i++) {
-        if (i % 2 === 0) {
+        if (i === rows - 1) {
+            result.push([0, 0, 0, 0, 0]);
+        } else if (i % 2 === 0) {
             result.push([10, 8, 6, 4, 2]);
         } else {
             result.push([2, 4, 6, 8, 10]);
