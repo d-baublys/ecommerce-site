@@ -102,7 +102,7 @@ export default function ProductTile({ product }: { product: Product }) {
                             <div className="absolute top-0 right-0 m-2">
                                 <WishlistToggleIcon product={product} iconSize={24} />
                             </div>
-                            <div className="absolute bottom-0 left-0 w-full p-2 md:p-3">
+                            <div className="lower-hover-container absolute bottom-0 left-0 w-full p-2 md:p-3">
                                 {availableSizes.length === 0 ? (
                                     <div
                                         className="flex justify-center items-center px-6 py-2 bg-background-lightest border rounded-full"
@@ -158,6 +158,7 @@ export default function ProductTile({ product }: { product: Product }) {
                     handleClose={() => setIsModalOpen(false)}
                     isOpenState={isModalOpen}
                     hasCloseButton={true}
+                    overrideClasses="bag-confirm-modal"
                 />
             )}
         </>

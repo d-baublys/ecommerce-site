@@ -125,7 +125,7 @@ describe("CategoryGridPage", () => {
 
         (fetchFilteredProducts as jest.Mock).mockClear();
 
-        const filterBtn = await screen.findByRole("button", { name: matchSizeLabel("m", 2) });
+        const filterBtn = await screen.findByRole("button", { name: matchSizeLabel(2, "M") });
         fireEvent.click(filterBtn);
 
         await waitFor(() => {
@@ -143,7 +143,9 @@ describe("CategoryGridPage", () => {
 
         (fetchFilteredProducts as jest.Mock).mockClear();
 
-        const filterBtn = await screen.findByRole("button", { name: matchPriceRangeLabel("e", 1) });
+        const filterBtn = await screen.findByRole("button", {
+            name: matchPriceRangeLabel(1, "200"),
+        });
         fireEvent.click(filterBtn);
 
         await waitFor(() => {
@@ -228,20 +230,20 @@ describe("CategoryGridPage", () => {
         renderPage();
 
         await waitFor(() => {
-            fireEvent.click(screen.getByRole("button", { name: matchSizeLabel("m", 2) }));
+            fireEvent.click(screen.getByRole("button", { name: matchSizeLabel(2, "M") }));
             fireEvent.click(
                 screen.getByRole("button", {
-                    name: matchSizeLabel("s", 3),
+                    name: matchSizeLabel(3, "S"),
                 })
             );
             fireEvent.click(
                 screen.getByRole("button", {
-                    name: matchPriceRangeLabel("b", 2),
+                    name: matchPriceRangeLabel(2, "50", "99"),
                 })
             );
             fireEvent.click(
                 screen.getByRole("button", {
-                    name: matchPriceRangeLabel("e", 1),
+                    name: matchPriceRangeLabel(1, "200"),
                 })
             );
             fireEvent.change(screen.getByLabelText("Sort By"), { target: { value: "b" } });

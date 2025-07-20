@@ -31,7 +31,7 @@ export default function BagTile({
     }, [latestQuantity]);
 
     return (
-        <div className="flex h-40 w-full">
+        <div className="bag-tile flex h-40 w-full">
             <Link className="w-full" href={buildProductUrl(productSlug)}>
                 {
                     <div className="flex h-full grow gap-2 sm:gap-8">

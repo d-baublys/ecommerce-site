@@ -1,13 +1,5 @@
 import React from "react";
-import {
-    BagItem,
-    Categories,
-    PRICE_FILTER_OPTIONS,
-    PriceFilterKey,
-    Product,
-    Sizes,
-    VALID_CATEGORIES,
-} from "./definitions";
+import { BagItem, Categories, Product, Sizes, VALID_CATEGORIES } from "./definitions";
 import { processDateForClient, slugify } from "./utils";
 
 export function createFakeProduct({
@@ -145,16 +137,18 @@ export function wrapWithErrorBoundary(children: React.ReactNode) {
     return <ErrorBoundary>{children}</ErrorBoundary>;
 }
 
-export function matchSizeLabel(size: Sizes, count: number) {
-    return new RegExp(`${size.toUpperCase()}\\s\\(${count}\\)`);
+export function matchSizeLabel(count: number, upperCaseSizeString: string) {
+    return new RegExp(`${upperCaseSizeString}\\s*\\(${count}\\)`);
 }
 
-export function matchPriceRangeLabel(filterKey: PriceFilterKey, count: number) {
-    const pattern = isFinite(PRICE_FILTER_OPTIONS[filterKey].max)
-        ? `[£$€]?${PRICE_FILTER_OPTIONS[filterKey].min / 100}-[£$€]?${
-              PRICE_FILTER_OPTIONS[filterKey].max / 100 - 1
-          }\\s\\(${count}\\)`
-        : `Over\\s[£$€]?${PRICE_FILTER_OPTIONS[filterKey].min / 100}\\s\\(${count}\\)`;
+export function matchPriceRangeLabel(
+    count: number,
+    lowerBoundString: string,
+    upperBoundString?: string
+) {
+    const pattern = upperBoundString
+        ? `[£$€]{1}${lowerBoundString}-[£$€]{1}${upperBoundString}\\s*\\(${count}\\)`
+        : `Over\\s*[£$€]{1}${lowerBoundString}\\s*\\(${count}\\)`;
 
     return new RegExp(pattern);
 }

@@ -29,37 +29,37 @@ describe("GridAside", () => {
 
         expect(
             screen.getByRole("button", {
-                name: matchSizeLabel("s", 3),
+                name: matchSizeLabel(3, "S"),
             })
         ).toBeInTheDocument();
 
         expect(
             screen.getByRole("button", {
-                name: matchSizeLabel("m", 2),
+                name: matchSizeLabel(2, "M"),
             })
         ).toBeInTheDocument();
 
         expect(
             screen.queryByRole("button", {
-                name: matchSizeLabel("xs", 0),
+                name: matchSizeLabel(2, "XS"),
             })
         ).not.toBeInTheDocument();
 
         expect(
             screen.queryByRole("button", {
-                name: matchSizeLabel("l", 0),
+                name: matchSizeLabel(0, "L"),
             })
         ).not.toBeInTheDocument();
 
         expect(
             screen.queryByRole("button", {
-                name: matchSizeLabel("xl", 0),
+                name: matchSizeLabel(0, "XL"),
             })
         ).not.toBeInTheDocument();
 
         expect(
             screen.queryByRole("button", {
-                name: matchSizeLabel("xxl", 0),
+                name: matchSizeLabel(0, "XXL"),
             })
         ).not.toBeInTheDocument();
     });
@@ -69,31 +69,31 @@ describe("GridAside", () => {
 
         expect(
             screen.getByRole("button", {
-                name: matchPriceRangeLabel("b", 2),
+                name: matchPriceRangeLabel(2, "50", "99"),
             })
         ).toBeInTheDocument();
 
         expect(
             screen.getByRole("button", {
-                name: matchPriceRangeLabel("e", 1),
+                name: matchPriceRangeLabel(1, "200"),
             })
         ).toBeInTheDocument();
 
         expect(
             screen.queryByRole("button", {
-                name: matchPriceRangeLabel("a", 0),
+                name: matchPriceRangeLabel(0, "0", "49"),
             })
         ).not.toBeInTheDocument();
 
         expect(
             screen.queryByRole("button", {
-                name: matchPriceRangeLabel("c", 0),
+                name: matchPriceRangeLabel(0, "100", "149"),
             })
         ).not.toBeInTheDocument();
 
         expect(
             screen.queryByRole("button", {
-                name: matchPriceRangeLabel("d", 0),
+                name: matchPriceRangeLabel(0, "150", "199"),
             })
         ).not.toBeInTheDocument();
     });
@@ -112,7 +112,7 @@ describe("GridAside", () => {
         );
 
         const sizeButton = screen.getByRole("button", {
-            name: matchSizeLabel("s", 3),
+            name: matchSizeLabel(3, "S"),
         });
 
         expect(sizeButton).not.toHaveClass("border-black");
@@ -151,7 +151,7 @@ describe("GridAside", () => {
         );
 
         const sizeButton = screen.getByRole("button", {
-            name: matchSizeLabel("s", 3),
+            name: matchSizeLabel(3, "S"),
         });
 
         expect(sizeButton).toHaveClass("border-black");
@@ -189,7 +189,7 @@ describe("GridAside", () => {
         );
 
         const priceRangeBtn = screen.getByRole("button", {
-            name: matchPriceRangeLabel("b", 2),
+            name: matchPriceRangeLabel(2, "50", "99"),
         });
 
         expect(priceRangeBtn).not.toHaveClass("border-black");
@@ -227,7 +227,7 @@ describe("GridAside", () => {
         );
 
         const sizeButton = screen.getByRole("button", {
-            name: matchPriceRangeLabel("b", 2),
+            name: matchPriceRangeLabel(2, "50", "99"),
         });
 
         expect(sizeButton).toHaveClass("border-black");

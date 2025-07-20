@@ -223,7 +223,7 @@ export default function CategoryGridPage({
                 aria-label="Filtering aside"
                 className="hidden lg:flex [flex:1_0_250px] mr-8"
             >
-                <div className="sticky top-(--nav-height) w-full">
+                <div className="desktop-filtering sticky top-(--nav-height) w-full">
                     <GridAside
                         allCategoryProducts={allCategoryProducts}
                         sizeFilters={sizeFilters}
