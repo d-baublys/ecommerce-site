@@ -32,7 +32,7 @@ describe("Navbar base tests", () => {
         cy.get("[aria-label='Account']").should("be.visible");
     });
 
-    it("should stack the mobile-only menu above the navbar", () => {
+    it("stacks the mobile-only menu above the navbar", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
         cy.get("[aria-label='Menu'").click();
@@ -62,28 +62,28 @@ describe("Navbar base tests", () => {
     it("navigates correctly when clicking 'Shop' link", () => {
         cy.visitHome();
         cy.get("#main-entry").click();
-        cy.url().should("contain", "/category/all");
+        cy.location("pathname").should("eq", "/category/all");
     });
 
     it("navigates correctly when clicking the site logo", () => {
         cy.visit("/admin");
         cy.get("#site-logo").click();
-        cy.url().should("contain", "/");
+        cy.location("pathname").should("eq", "/");
     });
 
     it("navigates correctly when clicking 'Wishlist' link button", () => {
         cy.visitHome();
         cy.get("[aria-label='Wishlist']").click();
-        cy.url().should("contain", "/wishlist");
+        cy.location("pathname").should("eq", "/wishlist");
     });
 
     it("navigates correctly when clicking 'Bag' link button", () => {
         cy.visitHome();
         cy.get("[aria-label='Bag']").click();
-        cy.url().should("contain", "/bag");
+        cy.location("pathname").should("eq", "/bag");
     });
 
-    it("shouldn't open the account menu when not logged in as admin", () => {
+    it("doesn't open the account menu when not logged in as admin", () => {
         cy.visitHome();
         cy.get("[aria-label='Account']").click();
         cy.get("#account-menu").should("not.be.visible");
@@ -96,7 +96,7 @@ describe("Navbar base tests", () => {
         cy.contains("button", "Log Out").should("be.visible");
     });
 
-    it("should stack the account menu above the navbar", () => {
+    it("stacks the account menu above the navbar", () => {
         cy.logInAsAdmin();
         cy.get("[aria-label='Account']").click();
         cy.get("#navbar").should("not.be.visible");
@@ -171,7 +171,7 @@ describe("Navbar accessibility tests", () => {
         cy.get("[aria-label='Account']").should("have.focus");
     });
 
-    it("should have the expected focus-trapped tabbing sequence in the mobile-only menu", () => {
+    it("traps focus in the expected tabbing sequence when the mobile-only menu is open", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
         cy.get("[aria-label='Menu']").click();
@@ -188,7 +188,7 @@ describe("Navbar accessibility tests", () => {
         cy.get("#mobile-entry").should("be.focused");
     });
 
-    it("should have the expected focus-trapped tabbing sequence in the account menu", () => {
+    it("traps focus in the expected tabbing sequence when the account menu is open", () => {
         cy.logInAsAdmin();
         cy.visitHome();
         cy.get("[aria-label='Account']").click();

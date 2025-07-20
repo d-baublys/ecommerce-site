@@ -115,9 +115,8 @@ describe("Product grid page viewport-agnostic tests", () => {
 
             expect(prices).to.not.deep.equal(sortedAsc);
         });
-        cy.get("#sort-select").select("a");
+        cy.get("#sort-select").select("Price (Low to High)");
         cy.wait(1000);
-        cy.get("#sort-select").find("option:selected").should("have.text", "Price (Low to High)");
         cy.get(".tile-price").then((tilePrices) => {
             const prices = [...tilePrices].map((price) =>
                 parseFloat(price.innerText.replace("£", ""))
@@ -137,9 +136,8 @@ describe("Product grid page viewport-agnostic tests", () => {
 
             expect(prices).to.not.deep.equal(sortedDesc);
         });
-        cy.get("#sort-select").select("b");
+        cy.get("#sort-select").select("Price (High to Low)");
         cy.wait(1000);
-        cy.get("#sort-select").find("option:selected").should("have.text", "Price (High to Low)");
         cy.get(".tile-price").then((tilePrices) => {
             const prices = [...tilePrices].map((price) =>
                 parseFloat(price.innerText.replace("£", ""))
@@ -157,9 +155,8 @@ describe("Product grid page viewport-agnostic tests", () => {
 
             expect(dates).to.not.deep.equal(sortedDates);
         });
-        cy.get("#sort-select").select("c");
+        cy.get("#sort-select").select("Newest");
         cy.wait(1000);
-        cy.get("#sort-select").find("option:selected").should("have.text", "Newest");
         cy.get(".tile-price").then(($tiles) => {
             const dates = [...$tiles].map((tile) => new Date(tile.getAttribute("data-date-added")));
             const sortedDates = [...dates].sort((a, b) => a.getTime() - b.getTime());

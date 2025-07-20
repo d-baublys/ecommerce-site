@@ -5,11 +5,11 @@ describe("Home page", () => {
 
     it("renders the hero section correctly", () => {
         cy.get("h1").should("contain.text", "Summer 2025 styles here and now.");
-        cy.get("a").contains("Shop >>>").click();
+        cy.contains("a", "Shop >>>").click();
         cy.location("pathname").should("eq", "/category/all");
     });
 
-    it("should rotate product carousel correctly", () => {
+    it("rotates product carousel correctly", () => {
         cy.get("#carousel-slider").then(($slider) => {
             const sliderBounds = $slider[0].getBoundingClientRect();
 
