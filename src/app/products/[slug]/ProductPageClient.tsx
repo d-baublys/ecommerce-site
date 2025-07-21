@@ -73,11 +73,11 @@ export default function ProductPageClient({ productData }: { productData: Produc
                                         key={productSize}
                                         value={productSize}
                                         className={`${
-                                            !thisSizeAvailable && "text-component-color"
+                                            !thisSizeAvailable ? "text-component-color" : ""
                                         }`}
                                         disabled={!thisSizeAvailable}
                                     >
-                                        {productSize.toUpperCase()}{" "}
+                                        {productSize.toUpperCase()}
                                         {!thisSizeAvailable && " - out of stock"}
                                     </option>
                                 );

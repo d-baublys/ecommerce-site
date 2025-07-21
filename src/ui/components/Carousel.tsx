@@ -133,7 +133,7 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                                     setActiveFeatured(idx);
                                 }}
                                 className={`carousel-dot w-auto h-3 aspect-square rounded-full ${
-                                    activeFeatured === idx && "bg-component-color"
+                                    activeFeatured === idx ? "bg-component-color" : ""
                                 } border-2 border-component-color transition`}
                             ></button>
                         </li>

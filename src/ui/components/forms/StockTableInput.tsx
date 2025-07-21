@@ -44,7 +44,7 @@ export default function StockTableInput({
             disabled={!editable}
             min={0}
             className={`min-w-8 w-16 bg-white rounded-sm my-2 border-2 text-center ${
-                !editable && "border-contrasted"
+                !editable ? "border-contrasted" : ""
             }`}
             onChange={(e) => handleChange(e)}
             {...props}
