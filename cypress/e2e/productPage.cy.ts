@@ -8,7 +8,7 @@ describe("Product page", () => {
     });
 
     it("includes all applicable sizes as options", () => {
-        cy.get("[aria-label='Size selection'] option:not([hidden])").should("have.length", "5");
+        cy.get("[aria-label='Size selection'] option:not([hidden])").should("have.length", 5);
     });
 
     it("appends 'out of stock' to unstocked size options", () => {
@@ -29,7 +29,7 @@ describe("Product page", () => {
         cy.get("[aria-label='Size selection'] option:not([disabled]):not([hidden])").as(
             "enabled-options"
         );
-        cy.get("@enabled-options").should("have.length", "2");
+        cy.get("@enabled-options").should("have.length", 2);
         cy.get("@enabled-options").eq(0).should("have.text", "L");
         cy.get("@enabled-options").eq(1).should("have.text", "XL");
     });
@@ -46,7 +46,7 @@ describe("Product page", () => {
         cy.contains("button", "Add to Bag").click();
         cy.contains("button", "Add to Bag").click();
         cy.visit("/bag");
-        cy.get("[data-testid='bag-tile-ul'] .bag-tile").should("have.length", "2"); // 2 sizes, 3 total quantity
+        cy.get("[data-testid='bag-tile-ul'] .bag-tile").should("have.length", 2); // 2 sizes, 3 total quantity
         cy.get(".bag-count-badge").should("have.text", "3");
     });
 
@@ -56,7 +56,7 @@ describe("Product page", () => {
             "enabled-options"
         );
         cy.contains("button", "Add to Bag").click();
-        cy.get("@enabled-options").should("have.length", "1");
+        cy.get("@enabled-options").should("have.length", 1);
         cy.get("@enabled-options").eq(0).should("have.text", "XL");
         cy.get("[aria-label='Size selection'] option").should("contain.text", "L - out of stock");
         cy.contains("button", "Add to Bag").should("be.disabled");
@@ -65,12 +65,12 @@ describe("Product page", () => {
     it("toggles product wishlisting on 'add to wishlist' button click", () => {
         cy.contains("button", "Add to Wishlist").click();
         cy.visit("/wishlist");
-        cy.get(".grid-tile-container .product-tile").should("have.length", "1");
-        cy.contains(/1\s*Item/);
+        cy.get(".grid-tile-container .product-tile").should("have.length", 1);
+        cy.contains(/1\s*Item/).should("be.visible");
         cy.visit("/products/white-&-medium-dark-print");
         cy.contains("button", "Remove from Wishlist").click();
         cy.go("back");
-        cy.get(".grid-tile-container .product-tile").should("have.length", "0");
-        cy.contains(/0\s*Items/);
+        cy.get(".grid-tile-container .product-tile").should("have.length", 0);
+        cy.contains(/0\s*Items/).should("be.visible");
     });
 });

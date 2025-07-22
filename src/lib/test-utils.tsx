@@ -147,8 +147,8 @@ export function matchPriceRangeLabel(
     upperBoundString?: string
 ) {
     const pattern = upperBoundString
-        ? `[£$€]{1}${lowerBoundString}-[£$€]{1}${upperBoundString}\\s*\\(${count}\\)`
-        : `Over\\s*[£$€]{1}${lowerBoundString}\\s*\\(${count}\\)`;
+        ? `[£$€]${lowerBoundString}-[£$€]${upperBoundString}\\s*\\(${count}\\)`
+        : `Over\\s*[£$€]${lowerBoundString}\\s*\\(${count}\\)`;
 
     return new RegExp(pattern);
 }

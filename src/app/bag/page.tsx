@@ -76,7 +76,11 @@ export default function BagPage() {
         <MainLayout subheaderText="My Bag">
             <div className="flex flex-col md:flex-row w-full h-full">
                 {!emptyBag ? (
-                    <ul data-testid="bag-tile-ul" className="flex flex-col w-full lg:gap-8">
+                    <ul
+                        id="bag-tile-container"
+                        data-testid="bag-tile-ul"
+                        className="flex flex-col w-full lg:gap-8"
+                    >
                         {mergedItems.map((mergedItem) => (
                             <li
                                 key={`${mergedItem.product.id}-${mergedItem.size}`}

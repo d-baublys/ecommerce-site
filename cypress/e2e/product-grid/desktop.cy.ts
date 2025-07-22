@@ -8,8 +8,8 @@ describe("Product grid page desktop viewport tests", () => {
     });
 
     it("displays the correct number of items", () => {
-        cy.get(".grid-tile-container .product-tile").should("have.length", "15");
-        cy.contains(/15\s*Items/); // 16 total less 1 unstocked
+        cy.get(".grid-tile-container .product-tile").should("have.length", 15);
+        cy.contains(/15\s*Items/).should("be.visible"); // 16 total less 1 unstocked
     });
 
     it("displays the expected UI for the viewport", () => {
@@ -19,7 +19,7 @@ describe("Product grid page desktop viewport tests", () => {
 
     it("displays the correct number of size filters", () => {
         cy.get(".desktop-filtering").contains("button", "Size").click();
-        cy.get(".desktop-filtering .size-btn-container li").should("have.length", "6");
+        cy.get(".desktop-filtering .size-btn-container li").should("have.length", 6);
         cy.get(".desktop-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XS"))
             .should("be.visible");
@@ -42,7 +42,7 @@ describe("Product grid page desktop viewport tests", () => {
 
     it("displays the correct number of price filters", () => {
         cy.get(".desktop-filtering").contains("button", "Price").click();
-        cy.get(".desktop-filtering .price-btn-container li").should("have.length", "5");
+        cy.get(".desktop-filtering .price-btn-container li").should("have.length", 5);
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(4, "0", "49"))
             .should("be.visible");
@@ -66,8 +66,8 @@ describe("Product grid page desktop viewport tests", () => {
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
         cy.wait(1000);
-        cy.get(".grid-tile-container .product-tile").should("have.length", "7");
-        cy.contains(/7\s*Items/);
+        cy.get(".grid-tile-container .product-tile").should("have.length", 7);
+        cy.contains(/7\s*Items/).should("be.visible");
     });
 
     it("filters correctly on compound size filter selection", () => {
@@ -80,8 +80,8 @@ describe("Product grid page desktop viewport tests", () => {
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
         cy.wait(1000);
-        cy.get(".grid-tile-container .product-tile").should("have.length", "14");
-        cy.contains(/14\s*Items/);
+        cy.get(".grid-tile-container .product-tile").should("have.length", 14);
+        cy.contains(/14\s*Items/).should("be.visible");
     });
 
     it("filters correctly on single price filter selection", () => {
@@ -90,8 +90,8 @@ describe("Product grid page desktop viewport tests", () => {
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
         cy.wait(1000);
-        cy.get(".grid-tile-container .product-tile").should("have.length", "1");
-        cy.contains(/1\s*Item/);
+        cy.get(".grid-tile-container .product-tile").should("have.length", 1);
+        cy.contains(/1\s*Item/).should("be.visible");
     });
 
     it("filters correctly on compound price filter selection", () => {
@@ -104,8 +104,8 @@ describe("Product grid page desktop viewport tests", () => {
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
         cy.wait(1000);
-        cy.get(".grid-tile-container .product-tile").should("have.length", "5");
-        cy.contains(/5\s*Items/);
+        cy.get(".grid-tile-container .product-tile").should("have.length", 5);
+        cy.contains(/5\s*Items/).should("be.visible");
     });
 
     it("filters correctly on combined size and price filter selection", () => {
@@ -119,8 +119,22 @@ describe("Product grid page desktop viewport tests", () => {
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
         cy.wait(1000);
-        cy.get(".grid-tile-container .product-tile").should("have.length", "0");
-        cy.contains(/0\s*Items/);
+        cy.get(".grid-tile-container .product-tile").should("have.length", 0);
+        cy.contains(/0\s*Items/).should("be.visible");
+    });
+
+    it("displays the correct message when filtering returns no results", () => {
+        cy.get(".desktop-filtering").contains("button", "Size").click();
+        cy.get(".desktop-filtering").contains("button", "Price").click();
+        cy.get(".desktop-filtering .size-btn-container")
+            .contains("button", matchSizeLabel(7, "XXL"))
+            .click();
+        cy.wait(1000);
+        cy.get(".desktop-filtering .price-btn-container")
+            .contains("button", matchPriceRangeLabel(1, "200"))
+            .click();
+        cy.wait(1000);
+        cy.contains("No products matching your filter").should("be.visible");
     });
 
     it("displays conditional product tile elements on mouse hover only", () => {

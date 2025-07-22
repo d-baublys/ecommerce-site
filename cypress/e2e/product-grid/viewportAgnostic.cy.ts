@@ -7,13 +7,22 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.wait(1000);
     });
 
-    it("adds product to the wishlist on heart icon click", () => {
+    it("toggles item wishlisting on heart icon click", () => {
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
         cy.get("@test-tile").trigger("mouseover");
         cy.get("@test-tile").find("[aria-label='Add or remove from wishlist']").click();
         cy.visit("/wishlist");
-        cy.get(".grid-tile-container .product-tile").should("have.length", "1");
-        cy.contains(/1\s*Item/);
+        cy.get(".grid-tile-container .product-tile").should("have.length", 1);
+        cy.contains(/1\s*Item/).should("be.visible");
+
+        cy.go("back");
+        cy.get(".grid-tile-container .product-tile").first().as("test-tile");
+        cy.get("@test-tile").trigger("mouseover");
+        cy.get("@test-tile").find("[aria-label='Add or remove from wishlist']").click();
+        cy.go("forward");
+        cy.get(".grid-tile-container .product-tile").should("have.length", 0);
+        cy.contains(/0\s*Items/).should("be.visible");
+        cy.contains("Your wishlist is empty!").should("be.visible");
     });
 
     it("displays correct number of size options on quick add click", () => {
@@ -29,7 +38,7 @@ describe("Product grid page viewport-agnostic tests", () => {
 
         cy.get("@test-tile").contains("button", /^L$/).should("be.visible");
         cy.get("@test-tile").contains("button", /^XL$/).should("be.visible");
-        cy.get("@test-tile").find(".lower-hover-container li").should("have.length", "2");
+        cy.get("@test-tile").find(".lower-hover-container li").should("have.length", 2);
     });
 
     it("adds product to the bag on quick add size icon click and updates navbar UI", () => {
@@ -48,7 +57,7 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.get("#close-modal-button").click();
 
         cy.visit("/bag");
-        cy.get("[data-testid='bag-tile-ul'] .bag-tile").should("have.length", "1");
+        cy.get("[data-testid='bag-tile-ul'] .bag-tile").should("have.length", 1);
         cy.get(".bag-count-badge").should("be.visible");
         cy.get(".bag-count-badge").should("have.text", "1");
     });
@@ -71,7 +80,7 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.get("@test-tile").contains("button", "Quick Add").click();
 
         cy.get("@test-tile").contains("button", /^L$/).should("not.exist");
-        cy.get("@test-tile").find(".lower-hover-container li").should("have.length", "1");
+        cy.get("@test-tile").find(".lower-hover-container li").should("have.length", 1);
     });
 
     it("displays quick add button substitute when product becomes completely unstocked", () => {
