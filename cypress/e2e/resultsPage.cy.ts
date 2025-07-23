@@ -3,7 +3,7 @@ describe("Search results page", () => {
         cy.visitHome();
         cy.wait(1000);
         cy.get("[aria-label='Search']").click();
-        cy.get("#search-overlay-container input[name='search']").as("search-input");
+        cy.get("#search-overlay-container [aria-label='Search input']").as("search-input");
     });
 
     it("shows a message when search returns no results", () => {

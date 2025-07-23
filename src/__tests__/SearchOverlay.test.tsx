@@ -25,7 +25,7 @@ const productList = getFilteredFakeProducts();
 
 const renderSearchOverlay = () => render(<SearchOverlay />);
 
-const getInput = () => screen.getByRole("textbox");
+const getInput = () => screen.getByRole("searchbox");
 const getSuggestionsContainer = () => screen.getByTestId("suggestions-ul");
 const mockResolvedFetch = () => {
     (fetchFilteredProducts as jest.Mock).mockResolvedValue(productList);

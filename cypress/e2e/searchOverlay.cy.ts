@@ -14,7 +14,7 @@ describe("Search overlay base tests", () => {
     });
 
     it("navigates to search results page on 'Enter' key press when no suggestion is selected", () => {
-        cy.get("#search-overlay-container input[name='search']").type("logo");
+        cy.get("#search-overlay-container [aria-label='Search input']").type("logo");
         cy.get("#search-overlay-container .suggestions-container li").should(
             "have.length.greaterThan",
             0
@@ -25,7 +25,7 @@ describe("Search overlay base tests", () => {
     });
 
     it("navigates to the product page on 'Enter' key press when a suggestion is selected", () => {
-        cy.get("#search-overlay-container input[name='search']").as("search-input");
+        cy.get("#search-overlay-container [aria-label='Search input']").as("search-input");
 
         cy.get("@search-input").type("logo");
         cy.get("#search-overlay-container .suggestions-container li").should(
@@ -39,7 +39,7 @@ describe("Search overlay base tests", () => {
     });
 
     it("navigates to search results page on submit button click when no suggestion is selected", () => {
-        cy.get("#search-overlay-container input[name='search']").type("logo");
+        cy.get("#search-overlay-container [aria-label='Search input']").type("logo");
         cy.get("#search-overlay-container .suggestions-container li").should(
             "have.length.greaterThan",
             0
@@ -50,7 +50,7 @@ describe("Search overlay base tests", () => {
     });
 
     it("navigates to search results page on submit button click when a suggestion is selected", () => {
-        cy.get("#search-overlay-container input[name='search']").as("search-input");
+        cy.get("#search-overlay-container [aria-label='Search input']").as("search-input");
 
         cy.get("@search-input").type("logo");
         cy.get("#search-overlay-container .suggestions-container li").should(
@@ -64,7 +64,7 @@ describe("Search overlay base tests", () => {
     });
 
     it("navigates to the product page on suggestion click", () => {
-        cy.get("#search-overlay-container input[name='search']").type("logo");
+        cy.get("#search-overlay-container [aria-label='Search input']").type("logo");
 
         cy.get("#search-overlay-container .suggestions-container li").as("suggestions-list");
 
@@ -75,7 +75,7 @@ describe("Search overlay base tests", () => {
     });
 
     it("shows fallback when there are no suggestions", () => {
-        cy.get("#search-overlay-container input[name='search']").type("logoo");
+        cy.get("#search-overlay-container [aria-label='Search input']").type("logoo");
 
         cy.get("#search-overlay-container .suggestions-container li").as("suggestions-list");
 
@@ -87,7 +87,7 @@ describe("Search overlay base tests", () => {
     });
 
     it("excludes unstocked products from suggestions", () => {
-        cy.get("#search-overlay-container input[name='search']").type("logo");
+        cy.get("#search-overlay-container [aria-label='Search input']").type("logo");
         cy.get("#search-overlay-container .suggestions-container").should(
             "contain",
             "White & large dark logo"
@@ -113,7 +113,7 @@ describe("Search overlay accessibility tests", () => {
     });
 
     it("gives focus to the input on opening", () => {
-        cy.get("#search-overlay-container input[name='search']").should("be.focused");
+        cy.get("#search-overlay-container [aria-label='Search input']").should("be.focused");
     });
 
     it("restores focus on closing", () => {
@@ -122,7 +122,7 @@ describe("Search overlay accessibility tests", () => {
     });
 
     it("traps focus correctly", () => {
-        cy.get("#search-overlay-container input[name='search']").as("search-input");
+        cy.get("#search-overlay-container [aria-label='Search input']").as("search-input");
 
         cy.get("@search-input").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
@@ -133,5 +133,18 @@ describe("Search overlay accessibility tests", () => {
         cy.get("#search-overlay-container [aria-label='Submit search']").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
         cy.get("@search-input").should("be.focused");
+    });
+
+    it("has no accessibility violations in the base page state", () => {
+        cy.wait(500);
+        cy.injectAxe();
+        cy.checkA11y();
+    });
+
+    it("has no accessibility violations when displaying suggestions", () => {
+        cy.get("#search-overlay-container [aria-label='Search input']").type("logo");
+        cy.wait(500);
+        cy.injectAxe();
+        cy.checkA11y();
     });
 });

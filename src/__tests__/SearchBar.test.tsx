@@ -37,7 +37,7 @@ const mockFailedFetch = () => {
     (getProductData as jest.Mock).mockResolvedValue(undefined);
 };
 
-const getInput = () => screen.getByRole("textbox");
+const getInput = () => screen.getByRole("searchbox");
 const getSuggestionsContainer = () => screen.getByTestId("suggestions-ul");
 const getSuggestions = () => within(getSuggestionsContainer()).getAllByRole("listitem");
 

@@ -144,7 +144,8 @@ export default function SearchBar(props: SearchBarProps) {
                 </div>
                 <input
                     ref={inputRef}
-                    name="search"
+                    type="search"
+                    aria-label="Search input"
                     autoComplete="off"
                     className="w-full h-full outline-none"
                     value={query}

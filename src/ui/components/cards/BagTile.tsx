@@ -55,6 +55,7 @@ export default function BagTile({
                 <div className="flex items-center gap-2 pr-2">
                     {stock ? (
                         <select
+                            aria-label="Quantity selection"
                             value={bagItem.quantity}
                             className="h-10 w-10 pl-1 border-2 rounded-md bg-white"
                             onChange={(e) =>

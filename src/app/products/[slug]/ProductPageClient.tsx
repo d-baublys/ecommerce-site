@@ -46,7 +46,7 @@ export default function ProductPageClient({ productData }: { productData: Produc
                     className="flex flex-col md:w-1/2 gap-8 mt-8 md:mt-0 md:ml-4"
                 >
                     <div>
-                        <p data-testid="product-detail-name">{productData.name}</p>
+                        <h1 data-testid="product-detail-name">{productData.name}</h1>
                     </div>
                     <div className="font-semibold">
                         <p>{getLocalFormatting(productData.price)}</p>

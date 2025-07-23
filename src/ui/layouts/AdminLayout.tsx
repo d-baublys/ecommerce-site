@@ -5,7 +5,7 @@ export default function AdminLayout(props: MainLayoutProps) {
     const { children, subheaderText, lastCrumbText, noCrumbs } = props;
     return (
         <div className="flex flex-col grow">
-            <div className="flex justify-center items-center w-full p-2 bg-background-lighter text-sz-subheading lg:text-sz-subheading-lg text-contrasted font-semibold">
+            <div className="flex justify-center items-center w-full p-2 bg-background text-sz-subheading lg:text-sz-subheading-lg text-contrasted font-semibold">
                 <h1>Administration</h1>
             </div>
             <MainWrapperWithSubheader

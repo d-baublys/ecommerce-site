@@ -129,6 +129,7 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                     {featuredList.map((_, idx) => (
                         <li key={idx} className="flex">
                             <button
+                                aria-label={`Scroll to product ${idx + 1}`}
                                 onClick={() => {
                                     setActiveFeatured(idx);
                                 }}

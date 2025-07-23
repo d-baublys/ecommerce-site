@@ -199,4 +199,23 @@ describe("Navbar accessibility tests", () => {
         cy.press(Cypress.Keyboard.Keys.TAB);
         cy.get("button").contains("Log Out").should("be.focused");
     });
+
+    it("has no accessibility violations when the mobile-only menu is open", () => {
+        cy.lessThanSmallBreakpoint();
+        cy.logInAsAdmin();
+        cy.visitHome();
+        cy.get("[aria-label='Menu']").click();
+        cy.wait(500);
+        cy.injectAxe();
+        cy.checkA11y();
+    });
+
+    it("has no accessibility violations when the account menu is open", () => {
+        cy.logInAsAdmin();
+        cy.visitHome();
+        cy.get("[aria-label='Account']").click();
+        cy.wait(500);
+        cy.injectAxe();
+        cy.checkA11y();
+    });
 });

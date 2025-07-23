@@ -125,4 +125,10 @@ describe("Bag page populated tests", () => {
         cy.wait("@createCheckoutSession").its("response.statusCode").should("eq", 200);
         cy.wait("@getStripeSessionCookie").its("response.statusCode").should("eq", 200);
     });
+
+    it("has no accessibility violations", () => {
+        cy.wait(500);
+        cy.injectAxe();
+        cy.checkA11y();
+    });
 });

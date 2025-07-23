@@ -183,6 +183,7 @@ export default function CategoryGridPage({
                 </label>
                 <select
                     id="sort-select"
+                    aria-label="Product sorting selection"
                     className={`pr-4 xs:pr-5 appearance-none cursor-pointer focus:max-w-none ${
                         productSort !== "placeholder"
                             ? "font-normal"

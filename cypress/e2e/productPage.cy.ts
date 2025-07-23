@@ -73,4 +73,17 @@ describe("Product page", () => {
         cy.get(".grid-tile-container .product-tile").should("have.length", 0);
         cy.contains(/0\s*Items/).should("be.visible");
     });
+
+    it("has no accessibility violations in the base page state", () => {
+        cy.wait(500);
+        cy.injectAxe();
+        cy.checkA11y();
+    });
+
+    it("has no accessibility violations when a size is selected", () => {
+        cy.get("[aria-label='Size selection']").select("L");
+        cy.wait(500);
+        cy.injectAxe();
+        cy.checkA11y();
+    });
 });

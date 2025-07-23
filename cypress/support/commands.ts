@@ -37,6 +37,7 @@
 // }
 
 import { email, password } from "./credentials";
+import "cypress-axe";
 
 declare global {
     namespace Cypress {
