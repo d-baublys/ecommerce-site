@@ -2,8 +2,11 @@ import { Sizes } from "@/lib/definitions";
 import { createFakeProductList } from "@/lib/test-utils";
 import { useBagStore } from "@/stores/bagStore";
 import NavBarClient from "@/ui/components/NavBarClient";
-import { screen } from "@testing-library/dom";
+import { screen, waitFor } from "@testing-library/dom";
 import { act, render } from "@testing-library/react";
+import { axe, toHaveNoViolations } from "jest-axe";
+
+expect.extend(toHaveNoViolations);
 
 jest.mock("next-auth/react", () => ({
     useSession: jest.fn(),
@@ -75,5 +78,15 @@ describe("NavBar", () => {
         renderNavBar();
 
         expect(screen.getByLabelText("Admin")).toBeInTheDocument();
+    });
+
+    it("has no accessibility violations", async () => {
+        getSessionWithAuth();
+        const { container } = renderNavBar();
+
+        await waitFor(async () => {
+            const results = await axe(container);
+            expect(results).toHaveNoViolations();
+        });
     });
 });

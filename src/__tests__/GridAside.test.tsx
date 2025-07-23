@@ -1,7 +1,10 @@
 import { PriceFilterKey, Product, Sizes } from "@/lib/definitions";
 import { createFakeProductList, matchPriceRangeLabel, matchSizeLabel } from "@/lib/test-utils";
 import GridAside from "@/ui/components/product-grid/GridAside";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { axe, toHaveNoViolations } from "jest-axe";
+
+expect.extend(toHaveNoViolations);
 
 const fakeProductList: Product[] = createFakeProductList();
 const filteredFakeProducts: Product[] = fakeProductList.filter((product) =>
@@ -249,5 +252,22 @@ describe("GridAside", () => {
 
         expect(toggleOffResult).toEqual([]);
         expect(sizeButton).not.toHaveClass("border-black");
+    });
+
+    it("has no accessibility violations", async () => {
+        const { container } = render(
+            <GridAside
+                allCategoryProducts={filteredFakeProducts}
+                sizeFilters={[]}
+                setSizeFilters={mockSizeFiltersSetter}
+                priceFilters={[]}
+                setPriceFilters={mockPriceFiltersSetter}
+            />
+        );
+
+        await waitFor(async () => {
+            const results = await axe(container);
+            expect(results).toHaveNoViolations();
+        });
     });
 });

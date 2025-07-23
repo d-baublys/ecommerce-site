@@ -127,6 +127,7 @@ export default function NavBarClient() {
             </nav>
             <SlideDownColumnsMenu
                 id="nav-mobile-menu"
+                aria-label="Navigation menu"
                 isOpenState={isMenuOpen}
                 handleClose={() => setIsMenuOpen(false)}
                 overrideClasses="sm:hidden"
@@ -155,6 +156,7 @@ export default function NavBarClient() {
             />
             <SlideDownColumnsMenu
                 id="account-menu"
+                aria-label="Account menu"
                 isOpenState={isAccountOpen}
                 handleClose={() => setIsAccountOpen(false)}
                 leftContent={

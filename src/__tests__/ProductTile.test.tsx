@@ -86,13 +86,8 @@ describe("ProductTile", () => {
         expect(screen.getByText("Item added to bag")).toBeInTheDocument();
     });
 
-    it("has no accessiblity violations", async () => {
-        let container: HTMLElement;
-
-        act(() => {
-            const result = render(<ProductTile product={fakeStockedProduct} />);
-            container = result.container;
-        });
+    it("has no accessibility violations", async () => {
+        const { container } = render(<ProductTile product={fakeStockedProduct} />);
 
         await waitFor(async () => {
             const results = await axe(container);

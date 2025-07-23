@@ -3,6 +3,9 @@ import { useWishlistStore } from "@/stores/wishlistStore";
 import WishlistToggleButton from "@/ui/components/buttons/WishlistToggleButton";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import React, { act } from "react";
+import { axe, toHaveNoViolations } from "jest-axe";
+
+expect.extend(toHaveNoViolations);
 
 const fakeProduct = createFakeProduct();
 const getLatestWishlist = () => useWishlistStore.getState().wishlist;
@@ -67,5 +70,14 @@ describe("WishlistToggleButton", () => {
         const occurrences = wishlist.filter((item) => item.id === fakeProduct.id).length;
 
         expect(occurrences).toBe(0);
+    });
+
+    it("has no accessibility violations", async () => {
+        const { container } = render(<WishlistToggleButton product={fakeProduct} />);
+
+        await waitFor(async () => {
+            const results = await axe(container);
+            expect(results).toHaveNoViolations();
+        });
     });
 });

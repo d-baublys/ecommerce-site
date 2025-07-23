@@ -2,10 +2,11 @@ import { createFakeProduct } from "@/lib/test-utils";
 import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
 import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import { render } from "@testing-library/react";
-
 import { useWishlistStore } from "@/stores/wishlistStore";
-import { useWishlistToggle } from "@/hooks/useWishlistToggle";
 import { act } from "react";
+import { axe, toHaveNoViolations } from "jest-axe";
+
+expect.extend(toHaveNoViolations);
 
 const fakeProduct = createFakeProduct();
 const getLatestWishlist = () => useWishlistStore.getState().wishlist;
@@ -99,5 +100,14 @@ describe("WishlistToggleIcon", () => {
         const occurrences = wishlist.filter((item) => item.id === fakeProduct.id).length;
 
         expect(occurrences).toBe(0);
+    });
+
+    it("has no accessibility violations", async () => {
+        const { container } = renderIcon();
+
+        await waitFor(async () => {
+            const results = await axe(container);
+            expect(results).toHaveNoViolations();
+        });
     });
 });

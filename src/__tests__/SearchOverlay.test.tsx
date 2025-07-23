@@ -1,5 +1,8 @@
 import { getFilteredFakeProducts } from "@/lib/test-utils";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { axe, toHaveNoViolations } from "jest-axe";
+
+expect.extend(toHaveNoViolations);
 
 const pushMock = jest.fn();
 
@@ -79,5 +82,15 @@ describe("SearchOverlay", () => {
         fireEvent.click(firstSuggestion);
 
         expect(pushMock).toHaveBeenCalledWith("/products/test-product-1");
+    });
+
+    it("has no accessibility violations", async () => {
+        await prepStandard();
+        const container = screen.getByTestId("search-overlay-container");
+
+        await waitFor(async () => {
+            const results = await axe(container);
+            expect(results).toHaveNoViolations();
+        });
     });
 });

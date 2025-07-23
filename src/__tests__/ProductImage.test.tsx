@@ -3,6 +3,9 @@ import { createFakeProduct } from "@/lib/test-utils";
 import ProductImage from "@/ui/components/ProductImage";
 import { screen, waitFor } from "@testing-library/dom";
 import { act, render } from "@testing-library/react";
+import { axe, toHaveNoViolations } from "jest-axe";
+
+expect.extend(toHaveNoViolations);
 
 jest.mock("next/image", () => ({
     __esModule: true,
@@ -13,9 +16,7 @@ jest.mock("next/image", () => ({
 }));
 
 const fakeProduct: Product = createFakeProduct();
-const renderProductImage = () => {
-    render(<ProductImage product={fakeProduct} />);
-};
+const renderProductImage = () => render(<ProductImage product={fakeProduct} />);
 
 describe("ProductImage", () => {
     it("shows only the skeleton during loading", () => {
@@ -51,5 +52,14 @@ describe("ProductImage", () => {
         );
 
         expect(container.firstChild).toHaveClass("!aspect-square");
+    });
+
+    it("has no accessibility violations", async () => {
+        const { container } = renderProductImage();
+
+        await waitFor(async () => {
+            const results = await axe(container);
+            expect(results).toHaveNoViolations();
+        });
     });
 });
