@@ -1,3 +1,5 @@
+"use client";
+
 export default function DarkBackdrop({
     onClick,
     overrideClasses,

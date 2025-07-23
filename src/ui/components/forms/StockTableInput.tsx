@@ -1,6 +1,7 @@
+"use client";
+
 import { Product, Sizes, StockTableMode } from "@/lib/definitions";
 import { isValidStock } from "@/lib/utils";
-import React from "react";
 
 interface StockTableInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     type: "text" | "number";

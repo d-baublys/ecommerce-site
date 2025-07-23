@@ -63,6 +63,7 @@ describe("Navbar base tests", () => {
         cy.visitHome();
         cy.get("#main-entry").click();
         cy.location("pathname").should("eq", "/category/all");
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
     });
 
     it("navigates correctly when clicking the site logo", () => {

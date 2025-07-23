@@ -10,6 +10,7 @@ export default defineConfig({
             // implement node event listeners here
         },
         baseUrl: process.env.NEXT_PUBLIC_APP_URL,
+        experimentalRunAllSpecs: true,
     },
     env: {
         ...process.env,

@@ -1,3 +1,5 @@
+"use client";
+
 import { getGoButtonClasses } from "@/lib/ui-class-repo";
 import RoundedButtonMain, {
     RoundedButtonProps,

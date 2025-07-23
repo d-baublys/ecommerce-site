@@ -5,7 +5,7 @@ import { Product, SearchBarConfig } from "@/lib/definitions";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 import { debounce } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { SetStateAction, useEffect, useRef, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { IoCloseCircle, IoSearch } from "react-icons/io5";
 
 interface SearchBarProps {

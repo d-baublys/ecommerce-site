@@ -1,3 +1,5 @@
+"use client";
+
 import { Product, Sizes } from "@/lib/definitions";
 import { IoTrash } from "react-icons/io5";
 

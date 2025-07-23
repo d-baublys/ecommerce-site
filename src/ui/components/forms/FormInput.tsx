@@ -1,3 +1,5 @@
+"use client";
+
 interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     legend: string;
     overrideClasses?: string;
