@@ -22,7 +22,7 @@
     --searchbar-height: 2.5rem;
 }
 
-@theme inline {
+@theme {
     --color-background: var(--background);
     --color-background-lighter: var(--background-lighter);
     --color-background-lightest: var(--background-lightest);
@@ -46,6 +46,62 @@
     --text-sz-smallest: 0.75rem;
     --breakpoint-xs: 480px;
     --radius-circle: 50%;
+    --animate-skeleton-sweep: skeleton-sweep 1s infinite;
+    --animate-loading-sequence: loading-sequence 1s infinite;
+    --animate-small-pop-in: small-pop-in 0.3s ease;
+    --animate-big-pop-in: big-pop-in 0.3s ease 0.1s;
+
+    @keyframes skeleton-sweep {
+        100% {
+            translate: 100%;
+        }
+    }
+
+    @keyframes loading-sequence {
+        0% {
+            background-color: var(--component-color);
+        }
+
+        25% {
+            background-color: transparent;
+        }
+
+        75% {
+            background-color: transparent;
+        }
+
+        100% {
+            background-color: var(--component-color);
+        }
+    }
+
+    @keyframes small-pop-in {
+        0% {
+            scale: 100%;
+        }
+
+        50% {
+            scale: 110%;
+        }
+
+        100% {
+            scale: 100%;
+        }
+    }
+
+    @keyframes big-pop-in {
+        0% {
+            scale: 100%;
+        }
+
+        50% {
+            scale: 125%;
+        }
+
+        100% {
+            scale: 100%;
+        }
+    }
 }
 
 body {
@@ -63,30 +119,6 @@ body {
 .extra-stroked {
     path {
         stroke-width: 75px;
-    }
-}
-
-@keyframes skeletonSweep {
-    100% {
-        translate: 100%;
-    }
-}
-
-@keyframes loadingSequence {
-    0% {
-        background-color: var(--component-color);
-    }
-
-    25% {
-        background-color: transparent;
-    }
-
-    75% {
-        background-color: transparent;
-    }
-
-    100% {
-        background-color: var(--component-color);
     }
 }
 
@@ -119,34 +151,6 @@ body {
     background-image: var(--zoomed-bg);
     background-size: 200%;
     background-position: var(--image-x) var(--image-y);
-}
-
-@keyframes small-pop-in {
-    0% {
-        scale: 100%;
-    }
-
-    50% {
-        scale: 110%;
-    }
-
-    100% {
-        scale: 100%;
-    }
-}
-
-@keyframes big-pop-in {
-    0% {
-        scale: 100%;
-    }
-
-    50% {
-        scale: 125%;
-    }
-
-    100% {
-        scale: 100%;
-    }
 }
 
 .rounded-btn {

@@ -19,13 +19,13 @@ export default function WishlistToggleIcon({
 
     const buildOuterClasses = () =>
         `p-1 bg-white rounded-circle ${overrideClasses ?? ""} ${
-            isAnimated ? "[animation:small-pop-in_0.3s_ease]" : ""
+            isAnimated ? "animate-small-pop-in" : ""
         }`;
 
     const renderCentralContent = () => (
         <div
             className={`relative flex justify-center items-center translate-y-[1px] aspect-square text-black ${
-                isAnimated ? "[animation:big-pop-in_0.3s_ease_0.1s]" : ""
+                isAnimated ? "animate-big-pop-in" : ""
             }`}
         >
             <IoHeart

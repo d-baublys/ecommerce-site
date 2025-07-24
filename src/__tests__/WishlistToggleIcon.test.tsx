@@ -27,8 +27,8 @@ describe("WishlistToggleIcon", () => {
 
         fireEvent.click(parent);
 
-        expect(parent).toHaveClass(/small-pop-in/);
-        expect(child).toHaveClass(/big-pop-in/);
+        expect(parent).toHaveClass(/animate-small-pop-in/);
+        expect(child).toHaveClass(/animate-big-pop-in/);
     });
 
     it("doesn't include animation classes after timeout", async () => {
@@ -40,8 +40,8 @@ describe("WishlistToggleIcon", () => {
         fireEvent.click(parent);
 
         await waitFor(() => {
-            expect(parent).not.toHaveClass(/small-pop-in/);
-            expect(child).not.toHaveClass(/big-pop-in/);
+            expect(parent).not.toHaveClass(/animate-small-pop-in/);
+            expect(child).not.toHaveClass(/animate-big-pop-in/);
         });
     });
 

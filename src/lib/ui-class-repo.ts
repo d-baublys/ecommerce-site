@@ -1,5 +1,5 @@
 export function getSkeletonSweep() {
-    return "before:content-[''] before:absolute before:inset-0 before:translate-x-[-100%] before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:[animation:skeletonSweep_1s_infinite]";
+    return "before:content-[''] before:absolute before:inset-0 before:translate-x-[-100%] before:bg-gradient-to-r before:from-transparent before:via-white before:to-transparent before:animate-skeleton-sweep";
 }
 
 export function getPlainButtonClasses() {

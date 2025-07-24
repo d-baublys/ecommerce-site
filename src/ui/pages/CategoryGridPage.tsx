@@ -162,7 +162,7 @@ export default function CategoryGridPage({
                     {Array.from({ length: 5 }).map((_, idx) => (
                         <div
                             key={idx}
-                            className={`loading-circle w-auto h-3 aspect-square rounded-full border-2 border-component-color [animation:loadingSequence_1s_infinite]`}
+                            className={`loading-circle w-auto h-3 aspect-square rounded-full border-2 border-component-color animate-loading-sequence`}
                         ></div>
                     ))}
                 </div>

@@ -12,7 +12,7 @@ export default function WishlistToggleButton({ product }: { product: Product }) 
     return (
         <PlainRoundedButton
             onClick={toggleWishlist}
-            overrideClasses={`${isAnimated ? "[animation:small-pop-in_0.3s_ease]" : ""}`}
+            overrideClasses={`${isAnimated ? "animate-small-pop-in" : ""}`}
         >
             <span>{!inWishlist ? "Add to Wishlist" : "Remove from Wishlist"}</span>
             <div className="translate-y-[-1px]">
