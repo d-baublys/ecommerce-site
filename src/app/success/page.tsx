@@ -5,8 +5,17 @@ import { SuccessBagClearClient } from "./SuccessBagClearClient";
 import BareLayout from "@/ui/layouts/BareLayout";
 import { getOrder } from "@/lib/actions";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
+import { Metadata } from "next";
 
-export default async function Page({ searchParams }: { searchParams: { session_id?: string } }) {
+export const metadata: Metadata = {
+    title: "Purchase Success",
+};
+
+export default async function PurchaseSuccessPage({
+    searchParams,
+}: {
+    searchParams: { session_id?: string };
+}) {
     const params = await searchParams;
     const session_id = params.session_id;
 

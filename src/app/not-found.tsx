@@ -1,5 +1,10 @@
 import BareLayout from "@/ui/layouts/BareLayout";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Not Found",
+};
 
 export default function NotFound() {
     return (

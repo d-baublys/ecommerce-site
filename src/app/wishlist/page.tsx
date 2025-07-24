@@ -1,15 +1,10 @@
-"use client";
+import { Metadata } from "next";
+import WishlistPageClient from "./WishlistPageClient";
 
-import { useWishlistStore } from "@/stores/wishlistStore";
-import BaseGridPage from "@/ui/pages/BaseGridPage";
-import MainLayout from "@/ui/layouts/MainLayout";
+export const metadata: Metadata = {
+    title: "My Wishlist",
+};
 
 export default function WishlistPage() {
-    const wishlist = useWishlistStore((state) => state.wishlist);
-
-    return (
-        <MainLayout subheaderText="My Wishlist">
-            <BaseGridPage displayedProducts={wishlist} noProductMessage="Your wishlist is empty!" />
-        </MainLayout>
-    );
+    return <WishlistPageClient />;
 }

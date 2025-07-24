@@ -1,5 +1,10 @@
 import MainLayout from "@/ui/layouts/MainLayout";
 import CategoryGridPage from "@/ui/pages/CategoryGridPage";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Search",
+};
 
 export default async function SearchResultsPage({ searchParams }: { searchParams: { q: string } }) {
     const params = await searchParams;

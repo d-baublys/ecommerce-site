@@ -1,5 +1,10 @@
 import AdminLayout from "@/ui/layouts/AdminLayout";
 import ListButton from "@/ui/components/buttons/ListButton";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Admin",
+};
 
 export default function AdminPage() {
     return (

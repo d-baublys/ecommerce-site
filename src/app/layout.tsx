@@ -6,7 +6,10 @@ import { lexendExa } from "@/ui/fonts";
 import SearchOverlay from "@/ui/components/overlays/SearchOverlay";
 
 export const metadata: Metadata = {
-    title: "DB-Wear",
+    title: {
+        template: "%s | DB-Wear",
+        default: "DB-Wear",
+    },
     description: 'The "Next" best thing in t-shirts.',
 };
 

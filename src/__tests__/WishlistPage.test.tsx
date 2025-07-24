@@ -1,5 +1,5 @@
 import { getFilteredFakeProducts } from "@/lib/test-utils";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 
 jest.mock("next/navigation", () => ({
     usePathname: () => "/wishlist",

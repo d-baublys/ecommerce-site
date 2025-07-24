@@ -4,6 +4,11 @@ import Link from "next/link";
 import { FEATURED_COUNT } from "@/lib/definitions";
 import BareLayout from "@/ui/layouts/BareLayout";
 import ProductImage from "@/ui/components/ProductImage";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Home | DB-Wear",
+};
 
 export default async function HomePage() {
     const featuredFetch = await getFeaturedProducts();
