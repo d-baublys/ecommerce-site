@@ -2,11 +2,15 @@ import MainLayout from "@/ui/layouts/MainLayout";
 import CategoryGridPage from "@/ui/pages/CategoryGridPage";
 import { Metadata } from "next";
 
+type AsyncParams = {
+    searchParams: Promise<{ q: string }>;
+};
+
 export const metadata: Metadata = {
     title: "Search",
 };
 
-export default async function SearchResultsPage({ searchParams }: { searchParams: { q: string } }) {
+export default async function SearchResultsPage({ searchParams }: AsyncParams) {
     const params = await searchParams;
     let query = params.q;
     if (!query) query = "";

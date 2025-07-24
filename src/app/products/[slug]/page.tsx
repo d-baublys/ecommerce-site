@@ -4,11 +4,11 @@ import ProductPageClient from "./ProductPageClient";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { Metadata } from "next";
 
-export async function generateMetadata({
-    params,
-}: {
-    params: { slug: string };
-}): Promise<Metadata> {
+type AsyncParams = {
+    params: Promise<{ slug: string }>;
+};
+
+export async function generateMetadata({ params }: AsyncParams): Promise<Metadata> {
     const { slug } = await params;
     const productFetch = await getProductData({ slug: decodeURIComponent(slug) });
 
@@ -18,7 +18,7 @@ export async function generateMetadata({
     return { title };
 }
 
-export default async function ProductPage({ params }: { params: { slug: string } }) {
+export default async function ProductPage({ params }: AsyncParams) {
     const { slug } = await params;
     const productFetch = await getProductData({ slug: decodeURIComponent(slug) });
 

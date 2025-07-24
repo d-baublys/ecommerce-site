@@ -6,11 +6,15 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+type AsyncParams = {
+    params: Promise<{ slug: string }>;
+};
+
 export const metadata: Metadata = {
     title: "Edit product | Admin",
 };
 
-export default async function ProductViewEditPage({ params }: { params: { slug: string } }) {
+export default async function ProductViewEditPage({ params }: AsyncParams) {
     const { slug } = await params;
     const productFetch = await getProductData({ slug: decodeURIComponent(slug) });
 

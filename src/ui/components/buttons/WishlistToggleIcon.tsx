@@ -15,7 +15,9 @@ export default function WishlistToggleIcon({
     parentHook?: ReturnType<typeof useWishlistToggle>;
     overrideClasses?: string;
 }) {
-    const { isAnimated, showFilled, toggleWishlist } = parentHook ?? useWishlistToggle(product);
+    const localHook = useWishlistToggle(product);
+    const { isAnimated, showFilled, toggleWishlist } = parentHook ?? localHook;
+    const isStandalone = parentHook === undefined;
 
     const buildOuterClasses = () =>
         `p-1 bg-white rounded-circle ${overrideClasses ?? ""} ${
@@ -39,19 +41,17 @@ export default function WishlistToggleIcon({
         </div>
     );
 
-    if (parentHook !== undefined) {
-        return <div className={buildOuterClasses()}>{renderCentralContent()}</div>;
-    } else {
-        return (
-            <button
-                type="button"
-                className={`cursor-pointer ${buildOuterClasses()}`}
-                onClick={toggleWishlist}
-                title="Add or remove from wishlist"
-                aria-label="Add or remove from wishlist"
-            >
-                {renderCentralContent()}
-            </button>
-        );
-    }
+    return isStandalone ? (
+        <button
+            type="button"
+            className={`cursor-pointer ${buildOuterClasses()}`}
+            onClick={toggleWishlist}
+            title="Add or remove from wishlist"
+            aria-label="Add or remove from wishlist"
+        >
+            {renderCentralContent()}
+        </button>
+    ) : (
+        <div className={buildOuterClasses()}>{renderCentralContent()}</div>
+    );
 }

@@ -7,15 +7,15 @@ import { getOrder } from "@/lib/actions";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 import { Metadata } from "next";
 
+type AsyncParams = {
+    searchParams: Promise<{ session_id: string }>;
+};
+
 export const metadata: Metadata = {
     title: "Purchase Success",
 };
 
-export default async function PurchaseSuccessPage({
-    searchParams,
-}: {
-    searchParams: { session_id?: string };
-}) {
+export default async function PurchaseSuccessPage({ searchParams }: AsyncParams) {
     const params = await searchParams;
     const session_id = params.session_id;
 
