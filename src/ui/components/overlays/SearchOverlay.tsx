@@ -72,7 +72,7 @@ export default function SearchOverlay() {
                         isSearchLoaded ? "opacity-100 translate-0" : "opacity-0 translate-y-6"
                     }`}
                 >
-                    <div className="flex justify-center items-start w-full mt-[11.5rem]">
+                    <div className="flex justify-center items-start w-full searchbar-positioning">
                         <SearchBar
                             inputRef={inputRef}
                             handleResultClick={handleResultClick}

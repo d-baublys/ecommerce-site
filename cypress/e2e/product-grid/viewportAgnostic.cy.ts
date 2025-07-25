@@ -62,6 +62,22 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.get(".bag-count-badge").should("have.text", "1");
     });
 
+    it("locks scrolling when bag confirm modal is open", () => {
+        cy.get(".desktop-filtering").contains("button", "Price").click();
+        cy.get(".desktop-filtering .price-btn-container button").first().click();
+        cy.wait(1000);
+        cy.get(".grid-tile-container .product-tile").first().as("test-tile");
+
+        cy.get("@test-tile").trigger("mouseover");
+        cy.get("@test-tile").contains("button", "Quick Add").click();
+        cy.get("@test-tile").find(".lower-hover-container li").first().click();
+        cy.get(".bag-confirm-modal").should("be.visible");
+        cy.get("body").should("have.css", "overflow", "hidden");
+
+        cy.get("#close-modal-button").click();
+        cy.get("body").should("not.have.css", "overflow", "hidden");
+    });
+
     it("removes a size option in quick add if it becomes unstocked", () => {
         cy.get(".desktop-filtering").contains("button", "Price").click();
         cy.get(".desktop-filtering .price-btn-container")

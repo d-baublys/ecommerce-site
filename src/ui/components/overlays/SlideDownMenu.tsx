@@ -1,5 +1,6 @@
 "use client";
 
+import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import CloseButton from "@/ui/components/buttons/CloseButton";
 
@@ -18,6 +19,8 @@ export default function SlideDownMenu({
     ...props
 }: MenuProps) {
     const trapRef = useFocusTrap(isOpenState, handleClose);
+
+    useBodyScrollLock(isOpenState);
 
     return (
         <div

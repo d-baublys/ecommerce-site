@@ -234,3 +234,21 @@ body {
     transform: scaleY(1);
     opacity: 1;
 }
+
+.searchbar-positioning {
+    margin-top: 11.5rem;
+}
+
+.suggestions-height-cap {
+    max-height: calc(100vh - 16rem);
+}
+
+@media screen and (max-height: 500px) and (orientation: landscape) {
+    .searchbar-positioning {
+        margin-top: 6rem;
+    }
+
+    .suggestions-height-cap {
+        max-height: calc(100vh - 10.5rem);
+    }
+}

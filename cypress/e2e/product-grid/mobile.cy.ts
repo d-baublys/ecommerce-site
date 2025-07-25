@@ -16,6 +16,13 @@ describe("Product grid page mobile viewport base tests", () => {
         cy.get("#filter-aside").should("not.be.visible");
         cy.contains("button", "Filter").should("be.visible");
     });
+
+    it("locks scrolling when the filtering menu is open", () => {
+        cy.contains("button", "Filter").click();
+        cy.get("body").should("have.css", "overflow", "hidden");
+        cy.get("[aria-label='Close menu']").click();
+        cy.get("body").should("not.have.css", "overflow", "hidden");
+    });
 });
 
 describe("Category grid page mobile viewport filtering tests", () => {

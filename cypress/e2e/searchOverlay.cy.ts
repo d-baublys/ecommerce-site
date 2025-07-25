@@ -103,6 +103,12 @@ describe("Search overlay base tests", () => {
         cy.get("#search-overlay-container").should("not.exist");
         cy.get("#navbar").should("be.visible");
     });
+
+    it("locks scrolling when overlay is open", () => {
+        cy.get("body").should("have.css", "overflow", "hidden");
+        cy.get("#search-overlay-container [aria-label='Close search']").click();
+        cy.get("body").should("not.have.css", "overflow", "hidden");
+    });
 });
 
 describe("Search overlay accessibility tests", () => {

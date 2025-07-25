@@ -154,6 +154,23 @@ describe("Navbar base tests", () => {
         cy.get("#navbar").should("be.visible");
         cy.get("#navbar").should("have.class", "top-0");
     });
+
+    it("locks scrolling when the mobile-only menu is open", () => {
+        cy.lessThanSmallBreakpoint();
+        cy.visitHome();
+        cy.get("[aria-label='Menu']").click();
+        cy.get("body").should("have.css", "overflow", "hidden");
+        cy.get("[aria-label='Close menu']").click();
+        cy.get("body").should("not.have.css", "overflow", "hidden");
+    });
+
+    it("locks scrolling when the account menu is open", () => {
+        cy.logInAsAdmin();
+        cy.get("[aria-label='Account']").click();
+        cy.get("body").should("have.css", "overflow", "hidden");
+        cy.get("[aria-label='Close menu']").click();
+        cy.get("body").should("not.have.css", "overflow", "hidden");
+    });
 });
 
 describe("Navbar accessibility tests", () => {

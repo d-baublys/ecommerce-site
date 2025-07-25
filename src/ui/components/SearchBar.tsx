@@ -126,7 +126,7 @@ export default function SearchBar(props: SearchBarProps) {
     return (
         <form
             role="search"
-            className="relative flex flex-col w-full"
+            className="relative flex flex-col w-full max-w-[calc(100%-26px)]"
             onSubmit={(e) => handleSubmit(e)}
         >
             <div className="flex items-center w-full h-searchbar-height bg-background-lightest rounded-full">
@@ -170,7 +170,10 @@ export default function SearchBar(props: SearchBarProps) {
             </div>
             {query && options?.showSuggestions && showSuggestions && (
                 <div className="mx-4 min-h-[100px] px-2 py-2 border-t border-background-lighter bg-background-lightest z-100">
-                    <ul className="suggestions-container" data-testid="suggestions-ul">
+                    <ul
+                        className="suggestions-container suggestions-height-cap overflow-scroll"
+                        data-testid="suggestions-ul"
+                    >
                         {results?.length > 0 &&
                             results.map((product, idx) => (
                                 <li
