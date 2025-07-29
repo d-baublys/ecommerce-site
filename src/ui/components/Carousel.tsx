@@ -16,7 +16,7 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
         if (isScrolling) return;
         setIsScrolling(true);
         setActiveFeatured((prev) => {
-            return prev !== 0 ? prev - 1 : featuredList.length - 1;
+            return prev > 0 ? prev - 1 : featuredList.length - 1;
         });
     }
 
@@ -80,7 +80,10 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                                 overrideClasses="snap-center rounded-2xl drop-shadow-(--tile-shadow) overflow-hidden"
                             />
                             <div className="absolute left-[50%] bottom-1/6 translate-x-[-50%] z-50">
-                                <PlainRoundedButtonLink href={buildProductUrl(featuredProd.slug)}>
+                                <PlainRoundedButtonLink
+                                    href={buildProductUrl(featuredProd.slug)}
+                                    tabIndex={activeFeatured === idx ? 0 : -1}
+                                >
                                     View
                                 </PlainRoundedButtonLink>
                             </div>
