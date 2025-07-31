@@ -16,7 +16,7 @@ Simulated checkout details:
 ## Stack
 - **Frontend:** Next.js with App Router
 - **Backend:** Next.js with API routes
-- **Database:** Postgres
+- **Database:** PostgreSQL
 - **Hosting:** Vercel
 
 ## Lessons
@@ -27,7 +27,7 @@ Simulated checkout details:
 - Building interactive elements with complex logic, such as zoomable images
 - Using Jest and Cypress for extensive unit and end-to-end test coverage
 - How to assure the app is accessible through manual and automated means
-- Using local Postgres databases for development and test data
+- Using local PostgreSQL databases for development and test data
 
 ## Demonstrates
 - Accommodating both desktop and mobile devices and various screen sizes

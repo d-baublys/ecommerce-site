@@ -61,7 +61,7 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
     return (
         <div
             id="carousel-master"
-            className="flex flex-col items-center grow w-full h-[500px] min-h-[500px]"
+            className="flex flex-col items-center grow w-full h-[500px] min-h-[500px] sm:h-[700px] sm:min-h-[700px]"
         >
             <div id="slider-container" className="relative max-w-(--carousel-width) h-4/5">
                 <ul

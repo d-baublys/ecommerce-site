@@ -16,9 +16,9 @@
     --gutter-sm: 0.5rem;
     --gutter: 2rem;
     --gutter-md: 4rem;
-    --carousel-img-w: min(50vw, 350px);
+    --carousel-img-w: min(50vw, 500px);
     --carousel-img-gap: calc(var(--carousel-img-w) / 4);
-    --carousel-width: min(100vw, 700px);
+    --carousel-width: min(100vw, 1000px);
     --searchbar-height: 2.5rem;
 }
 
