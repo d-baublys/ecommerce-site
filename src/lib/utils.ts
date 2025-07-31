@@ -1,4 +1,4 @@
-import { Stock } from "../../generated/prisma";
+import { Stock } from "@prisma/client";
 import {
     BagItem,
     Product,

@@ -1,6 +1,6 @@
 "use server";
 
-import { Prisma } from "../../generated/prisma";
+import { Prisma } from "@prisma/client";
 import { ItemMetadata, OrderStatus, Product, Sizes } from "./definitions";
 import { prisma } from "./prisma";
 import { buildStockObj, extractProductFields, mapStockForDb, processDateForClient } from "./utils";

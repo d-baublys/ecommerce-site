@@ -12,7 +12,7 @@ import {
 } from "@/lib/actions";
 import { prisma } from "@/lib/prisma";
 import { createFakeProduct, createFakeProductList, getConsoleErrorSpy } from "@/lib/test-utils";
-import { FeaturedProduct, OrderItem, Sizes, Stock } from "../../generated/prisma";
+import { FeaturedProduct, OrderItem, Sizes, Stock } from "@prisma/client";
 
 jest.mock("@/lib/prisma", () => ({
     prisma: {

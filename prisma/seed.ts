@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "../generated/prisma";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { slugify } from "../src/lib/utils";
 import { Categories, Product, Sizes } from "@/lib/definitions";
 
