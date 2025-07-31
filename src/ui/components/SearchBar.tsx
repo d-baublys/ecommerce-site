@@ -171,7 +171,7 @@ export default function SearchBar(props: SearchBarProps) {
             {query && options?.showSuggestions && showSuggestions && (
                 <div className="mx-4 min-h-[100px] px-2 py-2 border-t border-background-lighter bg-background-lightest z-100">
                     <ul
-                        className="suggestions-container suggestions-height-cap overflow-scroll"
+                        className="suggestions-container suggestions-height-cap overflow-scroll no-scrollbar"
                         data-testid="suggestions-ul"
                     >
                         {results?.length > 0 &&
