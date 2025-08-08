@@ -6,7 +6,7 @@ describe("Admin route protection", () => {
     });
 
     it("redirects to admin log in page if accessing an admin path unauthenticated", () => {
-        cy.location("pathname").should("eq", "/admin/login");
+        cy.location("pathname").should("eq", "/login");
     });
 
     it("shows the correct UI on successful admin login", () => {

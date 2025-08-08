@@ -1,6 +1,6 @@
-describe("Admin login page", () => {
+describe("Login page", () => {
     beforeEach(() => {
-        cy.visit("/admin/login");
+        cy.visit("/login");
     });
 
     it("has no accessibility violations", () => {
