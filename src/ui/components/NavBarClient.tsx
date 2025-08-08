@@ -9,6 +9,7 @@ import { signOut, useSession } from "next-auth/react";
 import SlideDownColumnsMenu from "@/ui/components/overlays/SlideDownColumnsMenu";
 import { renderConditionalIcons, renderFixedIcons } from "@/lib/navIcons";
 import { useRestoreFocus } from "@/hooks/useRestoreFocus";
+import { useRouter } from "next/navigation";
 
 export default function NavBarClient() {
     const [isScrollingUp, setIsScrollingUp] = useState(false);
@@ -22,7 +23,9 @@ export default function NavBarClient() {
     const elementRef = useRef<HTMLElement>(null);
 
     const session = useSession();
-    const isAdmin = !!session?.data?.user;
+    const router = useRouter();
+    const isLoggedIn = session.status === "authenticated";
+    const isAdmin = session?.data?.user?.role === "admin";
 
     useEffect(() => {
         let lastScroll = window.scrollY;
@@ -68,11 +71,14 @@ export default function NavBarClient() {
     };
 
     const handleAccountClick = () => {
-        if (!isAdmin) return;
-        setIsAccountOpen(true);
-        handleMenuClose();
-        if (!isAccountOpen) {
-            elementRef.current = document.activeElement as HTMLElement;
+        if (!isLoggedIn) {
+            router.push("/login");
+        } else {
+            setIsAccountOpen(true);
+            handleMenuClose();
+            if (!isAccountOpen) {
+                elementRef.current = document.activeElement as HTMLElement;
+            }
         }
     };
 
@@ -161,6 +167,11 @@ export default function NavBarClient() {
                 isOpenState={isAccountOpen}
                 handleClose={() => setIsAccountOpen(false)}
                 leftContent={
+                    <Link href={"/orders"} className="p-1 rounded-full">
+                        My Orders
+                    </Link>
+                }
+                rightContent={
                     <button
                         onClick={async () => {
                             setIsAccountOpen(false);

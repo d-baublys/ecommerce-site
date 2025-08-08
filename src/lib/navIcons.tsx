@@ -118,9 +118,7 @@ export function renderConditionalIcons(params: RenderConditionalIconsParams): Re
                     key={`account-${isForMenu}`}
                     title="Account"
                     aria-label="Account"
-                    className={`${getConditionalSwitchedClasses(isForMenu)} ${
-                        isAdmin ? "cursor-pointer" : ""
-                    }`}
+                    className={`${getConditionalSwitchedClasses(isForMenu)} cursor-pointer`}
                     onClick={handleAccountClick}
                 >
                     <IoPersonOutline />

@@ -10,6 +10,7 @@ import {
     ProductSortKey,
     SORT_OPTIONS,
 } from "./definitions";
+import bcrypt from "bcryptjs";
 
 export function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number) {
     let timer: ReturnType<typeof setTimeout>;
@@ -179,4 +180,12 @@ export function getAllTabbable(container: HTMLElement) {
     return container.querySelectorAll<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
+}
+
+export async function hashPassword(password: string) {
+    return await bcrypt.hash(password, 12);
+}
+
+export async function comparePasswords(password: string, hash: string) {
+    return await bcrypt.compare(password, hash);
 }

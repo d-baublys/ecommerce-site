@@ -1,9 +1,15 @@
 "use server";
 
 import { Prisma } from "@prisma/client";
-import { ItemMetadata, OrderStatus, Product, Sizes } from "./definitions";
+import { ItemMetadata, OrderStatus, Product, Sizes, UserRoleOptions } from "./definitions";
 import { prisma } from "./prisma";
-import { buildStockObj, extractProductFields, mapStockForDb, processDateForClient } from "./utils";
+import {
+    buildStockObj,
+    extractProductFields,
+    hashPassword,
+    mapStockForDb,
+    processDateForClient,
+} from "./utils";
 
 export async function productAdd(productData: Product) {
     try {
@@ -236,6 +242,52 @@ export async function clearFeaturedProducts() {
     }
 }
 
+export async function createUser(email: string, password: string, role: UserRoleOptions = "user") {
+    if (password.length < 8) {
+        return { message: "Your password must have a minimum of 8 characters." };
+    }
+
+    try {
+        const result = await prisma.user.findFirst({
+            where: { email },
+        });
+
+        if (result) {
+            return { message: "An account with this email address already exists." };
+        }
+    } catch (error) {
+        console.error("Error checking for existing user: ", error);
+        return { success: false };
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    try {
+        await prisma.user.create({
+            data: { email, password: hashedPassword, role },
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error creating user: ", error);
+        return { success: false };
+    }
+}
+
+export async function getUser(email: string) {
+    try {
+        const result = await prisma.user.findFirst({
+            where: { email },
+        });
+        return result
+            ? { email: result.email, password: result.password, role: result.role }
+            : null;
+    } catch (error) {
+        console.error("Error fetching user data: ", error);
+        throw new Error("Error fetching user data. Please try again later.");
+    }
+}
+
 // !!!TO-DO!!!
 // export async function updateOrder(orderId: number, status: OrderStatus) {
 //     try {
@@ -247,19 +299,6 @@ export async function clearFeaturedProducts() {
 //     } catch (error) {
 //         console.error("Error updating order: ", error);
 //         return { success: false };
-//     }
-// }
-
-// !!!TO-DO!!!
-// export async function getUser(identifier: string, password: string) {
-//     try {
-//         const result = await prisma.user.findFirst({
-//             where: { OR: [{ username: identifier }, { email: identifier }], password },
-//         });
-//         return result ? { user: result.username, password: result.password } : null;
-//     } catch (error) {
-//         console.error("Error fetching user data: ", error);
-//         throw new Error("Error fetching user data. Please try again later.");
 //     }
 // }
 

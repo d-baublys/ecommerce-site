@@ -1,31 +1,41 @@
+import { getUser } from "@/lib/actions";
+import { comparePasswords } from "@/lib/utils";
 import NextAuth, { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+
+export const runtime = "nodejs";
 
 const authOptions: NextAuthConfig = {
     providers: [
         Credentials({
-            credentials: {
-                username: { label: "Username", type: "text" },
-                password: { label: "Password", type: "password" },
-            },
             async authorize(credentials) {
-                const adminUsername = process.env.ADMIN_USERNAME;
-                const adminPassword = process.env.ADMIN_PASSWORD;
+                const user = await getUser(credentials.email as string);
 
-                if (!(adminUsername && adminPassword)) {
-                    throw new Error("Missing admin login env variables");
+                if (user) {
+                    const verifiedPassword = await comparePasswords(
+                        credentials.password as string,
+                        user.password
+                    );
+
+                    if (verifiedPassword) {
+                        return { email: user.email, role: user.role };
+                    }
                 }
 
-                if (
-                    credentials?.username === adminUsername &&
-                    credentials?.password === adminPassword
-                ) {
-                    return { id: "1", name: "admin" };
-                }
                 return null;
             },
         }),
     ],
+    callbacks: {
+        jwt({ token, user }) {
+            if (user) token.role = user.role;
+            return token;
+        },
+        session({ session, token }) {
+            session.user.role = token.role as string;
+            return session;
+        },
+    },
     secret: process.env.AUTH_SECRET,
 };
 

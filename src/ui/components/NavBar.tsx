@@ -7,8 +7,8 @@ export default async function NavBar() {
 
     if (session && session.user) {
         session.user = {
-            name: session.user.name,
             email: session.user.email,
+            role: session.user.role,
         };
     }
 

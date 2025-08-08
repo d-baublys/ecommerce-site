@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { slugify } from "../src/lib/utils";
+import { hashPassword, slugify } from "@/lib/utils";
 import { Categories, Product, Sizes } from "@/lib/definitions";
 
 const prisma = new PrismaClient();
@@ -164,6 +164,21 @@ async function main() {
             data: stockEntries,
         });
     }
+
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminEmail || !adminPassword)
+        throw new Error("Missing admin email or password env variables.");
+    const hashedPassword = await hashPassword(adminPassword);
+
+    await prisma.user.create({
+        data: {
+            email: adminEmail,
+            password: hashedPassword,
+            role: "admin",
+        },
+    });
 }
 
 main()
