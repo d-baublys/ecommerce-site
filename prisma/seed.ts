@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { hashPassword, slugify } from "@/lib/utils";
-import { Categories, Product, Sizes } from "@/lib/definitions";
+import { slugify } from "../src/lib/utils";
+import { Categories, Product, Sizes } from "../src/lib/definitions";
+import { createUser } from "../src/lib/actions";
 
 const prisma = new PrismaClient();
 
@@ -167,18 +168,19 @@ async function main() {
 
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPassword = process.env.ADMIN_PASSWORD;
+    const standardEmail = process.env.STANDARD_EMAIL;
+    const standardPassword = process.env.STANDARD_PASSWORD;
 
-    if (!adminEmail || !adminPassword)
-        throw new Error("Missing admin email or password env variables.");
-    const hashedPassword = await hashPassword(adminPassword);
+    if (!adminEmail || !adminPassword) {
+        throw new Error("Missing admin user email or password env variables.");
+    }
 
-    await prisma.user.create({
-        data: {
-            email: adminEmail,
-            password: hashedPassword,
-            role: "admin",
-        },
-    });
+    if (!standardEmail || !standardPassword) {
+        throw new Error("Missing standard user email or password env variables.");
+    }
+
+    await createUser(adminEmail, adminPassword, "admin");
+    await createUser(standardEmail, standardPassword, "user");
 }
 
 main()

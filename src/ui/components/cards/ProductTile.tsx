@@ -157,7 +157,6 @@ export default function ProductTile({ product }: { product: Product }) {
                 <BagConfirmModal
                     handleClose={() => setIsModalOpen(false)}
                     isOpenState={isModalOpen}
-                    hasCloseButton={true}
                     overrideClasses="bag-confirm-modal"
                 />
             )}

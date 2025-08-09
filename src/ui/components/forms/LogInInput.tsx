@@ -1,19 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { isolateInteraction } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 
 interface LogInInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     labelText: string;
+    showRedOverride: boolean;
+    isPasswordInput: boolean;
     overrideClasses?: string;
 }
 
 export default function LogInInput({
     type = "text",
     labelText,
+    showRedOverride,
+    isPasswordInput,
     overrideClasses,
     ...props
 }: LogInInputProps) {
     const [showRed, setShowRed] = useState<boolean>();
+    const [typeProp, setTypeProp] = useState(type);
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+    const togglePasswordVisibility = (e: React.MouseEvent) => {
+        isolateInteraction(e);
+        setIsPasswordVisible((prev) => !prev);
+    };
+
+    useEffect(() => {
+        setShowRed(showRedOverride);
+    }, [showRedOverride]);
+
+    useEffect(() => {
+        if (!isPasswordInput) return;
+
+        setTypeProp(isPasswordVisible ? "text" : "password");
+    }, [isPasswordVisible]);
 
     return (
         <label className="relative block group">
@@ -25,7 +48,7 @@ export default function LogInInput({
                 {labelText}
             </span>
             <input
-                type={type}
+                type={typeProp}
                 className={`w-full border-b-2 p-1 outline-none ${
                     showRed ? " border-red-500" : "focus:border-blue-700"
                 } ${overrideClasses}`}
@@ -33,6 +56,14 @@ export default function LogInInput({
                 onBlur={() => props.value === "" && setShowRed(true)}
                 {...props}
             ></input>
+            {isPasswordInput && (
+                <div
+                    className="absolute right-0 top-0 translate-y-1/3 -translate-x-1/3"
+                    onClick={togglePasswordVisibility}
+                >
+                    {isPasswordVisible ? <IoEyeOff size={20} /> : <IoEye size={20} />}
+                </div>
+            )}
             {showRed && (
                 <div className="mt-1">
                     <p className="text-sz-smallest text-red-500">Please fill out this field.</p>

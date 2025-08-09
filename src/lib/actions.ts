@@ -1,7 +1,7 @@
 "use server";
 
 import { Prisma } from "@prisma/client";
-import { ItemMetadata, OrderStatus, Product, Sizes, UserRoleOptions } from "./definitions";
+import { CredentialsError, ItemMetadata, Product, Sizes, UserRoleOptions } from "./definitions";
 import { prisma } from "./prisma";
 import {
     buildStockObj,
@@ -243,21 +243,29 @@ export async function clearFeaturedProducts() {
 }
 
 export async function createUser(email: string, password: string, role: UserRoleOptions = "user") {
-    if (password.length < 8) {
-        return { message: "Your password must have a minimum of 8 characters." };
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const validEmail = emailPattern.test(email);
+
+    if (!validEmail) {
+        throw new CredentialsError("Invalid email address provided.");
     }
 
+    let user;
+
     try {
-        const result = await prisma.user.findFirst({
+        user = await prisma.user.findFirst({
             where: { email },
         });
-
-        if (result) {
-            return { message: "An account with this email address already exists." };
-        }
     } catch (error) {
         console.error("Error checking for existing user: ", error);
-        return { success: false };
+    }
+
+    if (user) {
+        throw new CredentialsError("An account with this email address already exists.");
+    }
+
+    if (password.length < 8) {
+        throw new CredentialsError("Your password must have a minimum of 8 characters.");
     }
 
     const hashedPassword = await hashPassword(password);
@@ -266,11 +274,8 @@ export async function createUser(email: string, password: string, role: UserRole
         await prisma.user.create({
             data: { email, password: hashedPassword, role },
         });
-
-        return { success: true };
     } catch (error) {
         console.error("Error creating user: ", error);
-        return { success: false };
     }
 }
 
