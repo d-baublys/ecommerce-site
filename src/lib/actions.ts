@@ -192,6 +192,20 @@ export async function getOrder({ sessionId, orderId }: GetOrderParams) {
     }
 }
 
+export async function getUserOrders({ userId }: { userId: number }) {
+    try {
+        const orders = await prisma.order.findMany({
+            where: { userId },
+            include: { items: { include: { product: true } } },
+        });
+
+        return { data: orders };
+    } catch (error) {
+        console.error("Error fetching order data: ", error);
+        throw new Error("Error fetching order data. Please try again later.");
+    }
+}
+
 export async function createFeaturedProducts(dataObj: Product[]) {
     try {
         await prisma.featuredProduct.createMany({
@@ -285,7 +299,7 @@ export async function getUser(email: string) {
             where: { email },
         });
         return result
-            ? { email: result.email, password: result.password, role: result.role }
+            ? { id: result.id, email: result.email, password: result.password, role: result.role }
             : null;
     } catch (error) {
         console.error("Error fetching user data: ", error);

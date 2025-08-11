@@ -144,6 +144,16 @@ export function processDateForClient(date?: Date) {
     return (date ? date : new Date()).toISOString().split("T")[0];
 }
 
+export function processDateForClientDate(date?: Date) {
+    return (date ? date : new Date())
+        .toLocaleDateString("en-us", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+        })
+        .replace(/,/g, "");
+}
+
 export function pluralise(word: string, count: number) {
     return count === 1 ? word : word + "s";
 }

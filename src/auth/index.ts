@@ -18,7 +18,7 @@ const authOptions: NextAuthConfig = {
                     );
 
                     if (verifiedPassword) {
-                        return { email: user.email, role: user.role };
+                        return { id: user.id, email: user.email, role: user.role };
                     }
                 }
 

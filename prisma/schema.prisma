@@ -48,7 +48,7 @@ model Product {
     dateAdded       DateTime          @default(now())
     stock           Stock[]
     featuredProduct FeaturedProduct[]
-    orderItem       OrderItem[]       @ignore
+    orderItem       OrderItem[]
 }
 
 model Stock {

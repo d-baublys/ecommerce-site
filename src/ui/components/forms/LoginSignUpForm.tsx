@@ -5,7 +5,7 @@ import { IoWarningOutline } from "react-icons/io5";
 import GoButton from "@/ui/components/buttons/GoButton";
 import LogInInput from "@/ui/components/forms/LogInInput";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import ConstrainedLayout from "@/ui/layouts/ConstrainedLayout";
 import { createUser } from "@/lib/actions";
@@ -19,6 +19,8 @@ export default function LoginSignUpForm({ variant }: { variant: "login" | "signu
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [inSubmitState, setInSubmitState] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectPath = searchParams.get("redirect_after");
 
     const handleLogIn = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -34,7 +36,7 @@ export default function LoginSignUpForm({ variant }: { variant: "login" | "signu
         });
 
         if (!response?.error) {
-            router.push("/");
+            redirectPath ? router.push(`/${redirectPath}?from_login=true`) : router.push("/");
         } else {
             if (response?.error === "CredentialsSignin") {
                 setError("Incorrect email address or password. Please try again.");

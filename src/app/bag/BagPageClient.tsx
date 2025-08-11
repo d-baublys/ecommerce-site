@@ -9,6 +9,8 @@ import { MergedBagItem, Product } from "@/lib/definitions";
 import { getProductData } from "@/lib/actions";
 import { stringifyConvertPrice } from "@/lib/utils";
 import MainLayout from "@/ui/layouts/MainLayout";
+import { useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function BagPageClient() {
     const [latestData, setLatestData] = useState<Product[]>();
@@ -18,6 +20,9 @@ export default function BagPageClient() {
     const emptyBag = !bag.length;
     const noStock = !useBagStore((state) => state.getTotalBagCount());
     const bagProductIds = bag.map((bagItem) => bagItem.product.id);
+    const router = useRouter();
+    const session = useSession();
+    const searchParams = useSearchParams();
 
     const orderSubtotal = bag.reduce(
         (subTotal, bagItem) => subTotal + bagItem.product.price * bagItem.quantity,
@@ -25,6 +30,8 @@ export default function BagPageClient() {
     );
     const shippingCost = !emptyBag && orderSubtotal ? 500 : 0;
     const orderTotal = orderSubtotal + shippingCost;
+
+    const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
     useEffect(() => {
         if (!hasHydrated) return;
@@ -41,6 +48,33 @@ export default function BagPageClient() {
         getData();
     }, [hasHydrated]);
 
+    const goToCheckout = async () => {
+        const res = await fetch("/api/create-checkout-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                bagItems: bag,
+                shippingCost,
+                userId: session.data?.user.id,
+            }),
+        });
+        const data = await res.json();
+        if (data.url) {
+            await stripePromise;
+            window.location.href = data.url;
+        } else {
+            setError(new Error("Error starting checkout. Please try again later."));
+        }
+    };
+
+    useEffect(() => {
+        const redirect = searchParams.get("from_login");
+
+        if (redirect === "true" && session.status === "authenticated") {
+            goToCheckout();
+        }
+    }, [session]);
+
     if (error) throw error;
 
     if (!latestData) return null;
@@ -52,24 +86,13 @@ export default function BagPageClient() {
         return { ...item, latestSizeStock };
     });
 
-    const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-
     const handleCheckout = async () => {
-        const res = await fetch("/api/create-checkout-session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                bagItems: bag,
-                shippingCost,
-            }),
-        });
-        const data = await res.json();
-        if (data.url) {
-            await stripePromise;
-            window.location.href = data.url;
-        } else {
-            setError(new Error("Error starting checkout. Please try again later."));
+        if (session.status !== "authenticated") {
+            router.push("/login?redirect_after=bag");
+            return;
         }
+
+        goToCheckout();
     };
 
     return (

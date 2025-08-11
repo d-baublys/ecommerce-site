@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         const shippingTotal = Number(session.metadata.shippingCost);
         const orderTotal = subTotal + shippingTotal;
 
-        let userId; // to-do?
+        const userId = Number(session.metadata.userId);
         const email = session.customer_details?.email;
 
         if (!email) return new Response("Customer email address not found", { status: 400 });
