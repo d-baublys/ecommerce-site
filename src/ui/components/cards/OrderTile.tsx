@@ -1,30 +1,46 @@
-import { Order, OrderItem, Product } from "@prisma/client";
-import ProductImage from "../ProductImage";
-import { processDateForClientDate } from "@/lib/utils";
+import {
+    addReturnWindowDelta,
+    checkIsWithinReturnWindow,
+    processDateForClientDate,
+    stringifyConvertPrice,
+} from "@/lib/utils";
+import ProductListTile from "@/ui/components/cards/ProductListTile";
+import { OrderData } from "@/lib/definitions";
+import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 
-interface OrderTileProps {
-    orderData: Order & { items: (OrderItem & { product: Product })[] };
-}
+export default function OrderTile({ orderData }: { orderData: OrderData }) {
+    const isOrderWithinReturnWindow = checkIsWithinReturnWindow(orderData.createdAt);
 
-export default function OrderTile({ orderData }: OrderTileProps) {
+    const buildEndContent = () => (
+        <div className="flex h-full">
+            <div>
+                <p>{`Return window ${
+                    isOrderWithinReturnWindow ? "closes" : "closed"
+                } ${processDateForClientDate(addReturnWindowDelta(orderData.createdAt))}`}</p>
+                {isOrderWithinReturnWindow && (
+                    <div className="mt-4">
+                        <PlainRoundedButton overrideClasses="!bg-background-lightest">
+                            Request Return
+                        </PlainRoundedButton>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+
     return (
-        <div className="flex flex-col w-full border-2 p-2 gap-2 bg-white">
-            <p>Ordered {`${processDateForClientDate(orderData.createdAt)}`}</p>
-            {orderData.items.map((orderItem) => (
-                <div key={orderItem.id} className="flex h-28 w-full bg-white">
-                    <div className="flex h-full grow gap-2 sm:gap-8">
-                        <ProductImage product={orderItem.product} overrideClasses="aspect-square" />
-                        <div className="flex flex-col justify-between">
-                            <div className="font-semibold">
-                                {orderItem.product.name.toUpperCase()}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex flex-col justify-between items-end h-full bg-amber-300">
-                        <select></select>
-                    </div>
-                </div>
-            ))}
+        <div>
+            <div className="flex justify-between p-2 border-2 border-b-0">
+                <p>{`Ordered on ${processDateForClientDate(orderData.createdAt)}`}</p>
+                <p>{`Total £${stringifyConvertPrice(orderData.total)}`}</p>
+                <p>{`Order # ${orderData.id}`}</p>
+            </div>
+            <ProductListTile
+                data={orderData}
+                wrapWithLink={true}
+                showSize={true}
+                endContent={buildEndContent()}
+            />
         </div>
     );
 }

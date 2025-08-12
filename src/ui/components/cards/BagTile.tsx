@@ -1,12 +1,11 @@
 "use client";
 
 import { MergedBagItem } from "@/lib/definitions";
-import Link from "next/link";
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect } from "react";
-import { buildProductUrl, stringifyConvertPrice } from "@/lib/utils";
-import ProductImage from "@/ui/components/ProductImage";
+import { stringifyConvertPrice } from "@/lib/utils";
 import CloseButton from "@/ui/components/buttons/CloseButton";
+import ProductListTile from "@/ui/components/cards/ProductListTile";
 
 export default function BagTile({
     bagItem,
@@ -30,57 +29,50 @@ export default function BagTile({
         }
     }, [latestQuantity]);
 
-    return (
-        <div className="bag-tile flex h-40 w-full">
-            <Link className="w-full" href={buildProductUrl(productSlug)}>
-                {
-                    <div className="flex h-full grow gap-2 sm:gap-8">
-                        <ProductImage product={productData} overrideClasses="aspect-3/4" />
-                        <div className="flex flex-col justify-between">
-                            <div className="text-sz-interm lg:text-sz-interm-lg font-semibold">
-                                <p>{productData.name.toUpperCase()}</p>
-                            </div>
-                            <div className="text-component-color">
-                                <p>Size - {bagItem.size.toUpperCase()}</p>
-                            </div>
-                        </div>
+    const buildEndContent = () => (
+        <div className="flex flex-col justify-between items-end h-full">
+            <p className="text-sz-interm lg:text-sz-interm-lg">
+                <span>£</span>
+                <span>{stringifyConvertPrice(productData.price * bagItem.quantity)}</span>
+            </p>
+            <div className="flex items-center gap-2 pr-2">
+                {stock ? (
+                    <select
+                        aria-label="Quantity selection"
+                        value={bagItem.quantity}
+                        className="h-10 w-10 pl-1 border-2 rounded-md bg-white"
+                        onChange={(e) =>
+                            updateQuantity(productData.id, bagItem.size, Number(e.target.value))
+                        }
+                    >
+                        {Array.from({ length: maxQty }, (_, idx) => (
+                            <option value={idx + 1} key={idx}>
+                                {idx + 1}
+                            </option>
+                        ))}
+                    </select>
+                ) : (
+                    <div className="flex justify-center w-full text-end text-component-color">
+                        <p>Out of stock</p>
                     </div>
-                }
-            </Link>
-            <div className="flex flex-col justify-between items-end h-full w-24 ml-8">
-                <p className="text-sz-interm lg:text-sz-interm-lg">
-                    <span>£</span>
-                    <span>{stringifyConvertPrice(productData.price * bagItem.quantity)}</span>
-                </p>
-                <div className="flex items-center gap-2 pr-2">
-                    {stock ? (
-                        <select
-                            aria-label="Quantity selection"
-                            value={bagItem.quantity}
-                            className="h-10 w-10 pl-1 border-2 rounded-md bg-white"
-                            onChange={(e) =>
-                                updateQuantity(productData.id, bagItem.size, Number(e.target.value))
-                            }
-                        >
-                            {Array.from({ length: maxQty }, (_, idx) => (
-                                <option value={idx + 1} key={idx}>
-                                    {idx + 1}
-                                </option>
-                            ))}
-                        </select>
-                    ) : (
-                        <div className="flex justify-center w-full text-end text-component-color">
-                            <p>Out of stock</p>
-                        </div>
-                    )}
-                    <CloseButton
-                        aria-label="Remove from bag"
-                        title="Remove from bag"
-                        onClick={handleDelete}
-                        className="translate-x-1"
-                    />
-                </div>
+                )}
+                <CloseButton
+                    aria-label="Remove from bag"
+                    title="Remove from bag"
+                    onClick={handleDelete}
+                    className="translate-x-1"
+                />
             </div>
         </div>
+    );
+
+    return (
+        <ProductListTile
+            data={bagItem}
+            wrapWithLink={true}
+            showSize={true}
+            endContent={buildEndContent()}
+            internalOverrides="!h-40"
+        />
     );
 }

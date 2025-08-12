@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import ProductTile from "@/ui/components/cards/ProductTile";
+import ProductGridTile from "@/ui/components/cards/ProductGridTile";
 import { Product } from "@/lib/definitions";
 import { createFakeProduct } from "@/lib/test-utils";
 import { act } from "react";
@@ -13,13 +13,13 @@ const fakeStockedProduct: Product = createFakeProduct({
 const fakeUnstockedProduct: Product = createFakeProduct({ overrides: { stock: { s: 0 } } });
 
 const renderAndGetTile = (product: Product = fakeStockedProduct) => {
-    render(<ProductTile product={product} />);
+    render(<ProductGridTile product={product} />);
     const tile = screen.getByText("Test Product 1").closest("div");
     if (!tile) throw new Error("No tile found");
     return tile;
 };
 
-describe("ProductTile", () => {
+describe("ProductGridTile", () => {
     it("renders product name and price", () => {
         renderAndGetTile();
         const container = screen.getByText("£").parentElement;
@@ -87,7 +87,7 @@ describe("ProductTile", () => {
     });
 
     it("has no accessibility violations", async () => {
-        const { container } = render(<ProductTile product={fakeStockedProduct} />);
+        const { container } = render(<ProductGridTile product={fakeStockedProduct} />);
 
         await waitFor(async () => {
             const results = await axe(container);

@@ -1,4 +1,4 @@
-import { Stock } from "@prisma/client";
+import { Stock as PrismaStock, Product as PrismaProduct } from "@prisma/client";
 import {
     BagItem,
     Product,
@@ -9,6 +9,9 @@ import {
     VALID_SIZES,
     ProductSortKey,
     SORT_OPTIONS,
+    OrderData,
+    OrderItemWithClientProductNoStock,
+    REFUND_WINDOW,
 } from "./definitions";
 import bcrypt from "bcryptjs";
 
@@ -87,6 +90,30 @@ export function createEmptyProduct(): Product {
     };
 }
 
+export function convertPrismaProduct(product: PrismaProduct & { stock: PrismaStock[] }): Product {
+    return {
+        ...product,
+        dateAdded: processDateForClient(product.dateAdded),
+        stock: buildStockObj(product.stock),
+    };
+}
+
+export function convertMultiplePrismaProducts(
+    products: (PrismaProduct & { stock: PrismaStock[] })[]
+): Product[] {
+    return products.reduce(
+        (arr, current) => [...arr, convertPrismaProduct(current)],
+        [] as Product[]
+    );
+}
+
+export function convertOrderProducts(data: OrderData): OrderItemWithClientProductNoStock[] {
+    return data.items.map((item) => ({
+        ...item,
+        product: { ...item.product, dateAdded: processDateForClient(item.product.dateAdded) },
+    }));
+}
+
 export function containsClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: string) {
     const element = document.getElementById(id);
     return element ? element.contains(e.target as Node) : false;
@@ -125,7 +152,7 @@ export function mapStockForDb(productData: Product) {
     }));
 }
 
-export function buildStockObj(stock: Stock[]) {
+export function buildStockObj(stock: PrismaStock[]) {
     return stock.reduce((acc, stockItem) => {
         acc[stockItem.size] = stockItem.quantity;
         return acc;
@@ -198,4 +225,12 @@ export async function hashPassword(password: string) {
 
 export async function comparePasswords(password: string, hash: string) {
     return await bcrypt.compare(password, hash);
+}
+
+export function checkIsWithinReturnWindow(date: Date) {
+    return Date.now() - date.getTime() <= REFUND_WINDOW;
+}
+
+export function addReturnWindowDelta(date: Date) {
+    return new Date(date.getTime() + REFUND_WINDOW);
 }

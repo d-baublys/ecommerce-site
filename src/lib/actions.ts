@@ -4,11 +4,10 @@ import { Prisma } from "@prisma/client";
 import { CredentialsError, ItemMetadata, Product, Sizes, UserRoleOptions } from "./definitions";
 import { prisma } from "./prisma";
 import {
-    buildStockObj,
+    convertMultiplePrismaProducts,
     extractProductFields,
     hashPassword,
     mapStockForDb,
-    processDateForClient,
 } from "./utils";
 
 export async function productAdd(productData: Product) {
@@ -38,11 +37,7 @@ export async function getProductData(
             orderBy: orderBy ? orderBy : { name: "asc" },
         });
 
-        const products: Product[] = rawProducts.map((product) => ({
-            ...product,
-            dateAdded: processDateForClient(product.dateAdded),
-            stock: buildStockObj(product.stock),
-        }));
+        const products: Product[] = convertMultiplePrismaProducts(rawProducts);
 
         return { data: products };
     } catch (error) {
@@ -233,11 +228,9 @@ export async function getFeaturedProducts() {
             },
         });
 
-        const products: Product[] = rawProducts.map((item) => ({
-            ...item.product,
-            dateAdded: processDateForClient(item.product.dateAdded),
-            stock: buildStockObj(item.product.stock),
-        }));
+        const products: Product[] = convertMultiplePrismaProducts(
+            rawProducts.map((item) => item.product)
+        );
 
         return { data: products };
     } catch (error) {

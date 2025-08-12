@@ -16,7 +16,7 @@ import ProductImage from "@/ui/components/ProductImage";
 import Link from "next/link";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 
-export default function ProductTile({ product }: { product: Product }) {
+export default function ProductGridTile({ product }: { product: Product }) {
     const { bag, addToBag } = useBagStore((state) => state);
 
     const [isHovered, setIsHovered] = useState<boolean>(false);

@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Order, OrderItem, Prisma, Product as PrismaProduct } from "@prisma/client";
 
 export const PRODUCT_BASE_FIELDS = {
     name: "",
@@ -15,6 +15,10 @@ export const VALID_SIZES = ["xs", "s", "m", "l", "xl", "xxl"] as const;
 export const VALID_CATEGORIES = { mens: "Men's", womens: "Women's" } as const;
 
 export type ProductBase = typeof PRODUCT_BASE_FIELDS;
+
+export type ProductNoStock = ProductBase & {
+    id: string;
+};
 
 export type Product = ProductBase & {
     id: string;
@@ -41,6 +45,12 @@ export type ItemMetadata = {
     quantity: number;
 };
 
+export type OrderItemWithPrismaProduct = OrderItem & { product: PrismaProduct };
+
+export type OrderItemWithClientProductNoStock = OrderItem & { product: ProductNoStock };
+
+export type OrderData = Order & { items: OrderItemWithPrismaProduct[] };
+
 export type OrderStatus = "paid" | "refunded";
 
 export type ProductFormMode = "add" | "edit";
@@ -66,6 +76,8 @@ export const SORT_OPTIONS = {
 export type ProductSortKey = keyof typeof SORT_OPTIONS;
 
 export const FEATURED_COUNT = 5;
+
+export const REFUND_WINDOW = 1000 * 60 * 60 * 24 * 30; // 30 days in ms
 
 export const USER_ROLES = ["admin", "user"] as const;
 

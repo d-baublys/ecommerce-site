@@ -167,7 +167,11 @@ export default function NavBarClient() {
                 isOpenState={isAccountOpen}
                 handleClose={() => setIsAccountOpen(false)}
                 leftContent={
-                    <Link href={"/orders"} className="p-1 rounded-full">
+                    <Link
+                        href={"/orders"}
+                        className="p-1 rounded-full"
+                        onClick={() => setIsAccountOpen(false)}
+                    >
                         My Orders
                     </Link>
                 }
