@@ -20,12 +20,12 @@ export default function NavBarClient() {
     );
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const [isAccountOpen, setIsAccountOpen] = useState<boolean>(false);
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const elementRef = useRef<HTMLElement>(null);
 
     const session = useSession();
     const router = useRouter();
-    const isLoggedIn = session.status === "authenticated";
-    const isAdmin = session?.data?.user?.role === "admin";
 
     useEffect(() => {
         let lastScroll = window.scrollY;
@@ -41,6 +41,11 @@ export default function NavBarClient() {
 
         return () => window.removeEventListener("scroll", scrollUpSticky);
     }, []);
+
+    useEffect(() => {
+        setIsLoggedIn(session.status === "authenticated");
+        setIsAdmin(session?.data?.user?.role === "admin");
+    }, [session]);
 
     const closeSearchAll = () => {
         setIsSearchLoaded(false);

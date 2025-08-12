@@ -5,6 +5,7 @@ import { getUserOrders } from "@/lib/actions";
 import MainLayout from "@/ui/layouts/MainLayout";
 import OrderTile from "@/ui/components/cards/OrderTile";
 import { OrderData } from "@/lib/definitions";
+import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 
 export const metadata: Metadata = {
     title: "My Orders",
@@ -13,23 +14,19 @@ export const metadata: Metadata = {
 export default async function OrdersPage() {
     const session = await auth();
 
-    if (session && session.user) {
-        session.user = {
-            id: session.user.id,
-            email: session.user.email,
-            role: session.user.role,
-        };
-    } else {
+    if (!(session && session.user)) {
         redirect("/login?redirect_after=orders");
     }
 
-    const ordersFetch = await getUserOrders({ userId: session.user.id });
+    if (session.user.id === undefined) throw new Error("User ID not found");
+
+    const ordersFetch = await getUserOrders({ userId: Number(session.user.id) });
     const orderData: OrderData[] = ordersFetch.data;
 
     return (
         <MainLayout subheaderText="My Orders">
             <div className="flex flex-col md:flex-row w-full h-full">
-                {orderData.length ? (
+                {orderData?.length ? (
                     <ul
                         id="order-tile-container"
                         data-testid="order-tile-ul"
@@ -42,8 +39,13 @@ export default async function OrdersPage() {
                         ))}
                     </ul>
                 ) : (
-                    <div className="flex justify-center items-center w-full h-full p-8 md:p-0">
-                        <p>{"You have no orders yet"}</p>
+                    <div className="flex justify-center flex-col items-center w-full h-full p-8 md:p-0 gap-8">
+                        <p>{"You have no orders yet!"}</p>
+                        <div>
+                            <PlainRoundedButtonLink href={"/category/all"}>
+                                Shop
+                            </PlainRoundedButtonLink>
+                        </div>
                     </div>
                 )}
             </div>

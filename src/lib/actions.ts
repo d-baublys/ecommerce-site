@@ -190,7 +190,7 @@ export async function getOrder({ sessionId, orderId }: GetOrderParams) {
 export async function getUserOrders({ userId }: { userId: number }) {
     try {
         const orders = await prisma.order.findMany({
-            where: { userId },
+            where: { userId: Number(userId) },
             include: { items: { include: { product: true } } },
         });
 
