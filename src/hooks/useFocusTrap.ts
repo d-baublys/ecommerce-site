@@ -13,12 +13,22 @@ export function useFocusTrap(isOpen: boolean, handleClose: () => void) {
         const lastElement = containerElements[containerElements.length - 1];
 
         const handleTabPress = (e: KeyboardEvent) => {
-            if (e.key !== "Tab") return;
+            const currentActive = document.activeElement;
 
-            if (e.shiftKey && document.activeElement === firstElement) {
+            if (!(e.key === "Tab" && currentActive instanceof HTMLElement)) return;
+
+            if (
+                e.shiftKey &&
+                (currentActive === firstElement ||
+                    !Array.from(containerElements).includes(currentActive))
+            ) {
                 e.preventDefault();
                 lastElement.focus();
-            } else if (!e.shiftKey && document.activeElement === lastElement) {
+            } else if (
+                !e.shiftKey &&
+                (currentActive === lastElement ||
+                    !Array.from(containerElements).includes(currentActive))
+            ) {
                 e.preventDefault();
                 firstElement.focus();
             }
@@ -32,7 +42,6 @@ export function useFocusTrap(isOpen: boolean, handleClose: () => void) {
 
         document.addEventListener("keydown", handleTabPress);
         document.addEventListener("keydown", handleEscPress);
-        firstElement.focus();
 
         return () => {
             document.removeEventListener("keydown", handleTabPress);
