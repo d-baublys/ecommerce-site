@@ -11,6 +11,7 @@ import { stringifyConvertPrice } from "@/lib/utils";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 
 export default function BagPageClient() {
     const [latestData, setLatestData] = useState<Product[]>();
@@ -55,7 +56,7 @@ export default function BagPageClient() {
             body: JSON.stringify({
                 bagItems: bag,
                 shippingCost,
-                userId: session.data?.user.id,
+                userId: session.data?.user?.id,
             }),
         });
         const data = await res.json();
@@ -120,8 +121,13 @@ export default function BagPageClient() {
                         ))}
                     </ul>
                 ) : (
-                    <div className="flex justify-center items-center w-full h-full p-8 md:p-0">
+                    <div className="flex flex-col justify-center items-center w-full h-full p-8 md:p-0 gap-8">
                         <p>{"Your bag is empty!"}</p>
+                        <div>
+                            <PlainRoundedButtonLink href={"/category/all"}>
+                                Shop
+                            </PlainRoundedButtonLink>
+                        </div>
                     </div>
                 )}
                 <div className="flex flex-col px-8 py-6 w-full h-min md:w-2/5 md:ml-8 justify-evenly bg-background-lightest rounded-sm">

@@ -281,6 +281,7 @@ export default function CategoryGridPage({
                     ? "No products matching your search"
                     : "No products to display"
             }
+            linkWhenEmptyList={false}
             categoryTabs={shouldRenderTabs && categoryTabs()}
             asideContent={shouldRenderAside && asideContent()}
             fixedOverlays={!options?.noOverlays && fixedOverlays()}

@@ -9,7 +9,11 @@ export default function WishlistPageClient() {
 
     return (
         <MainLayout subheaderText="My Wishlist">
-            <BaseGridPage displayedProducts={wishlist} noProductMessage="Your wishlist is empty!" />
+            <BaseGridPage
+                displayedProducts={wishlist}
+                noProductMessage="Your wishlist is empty!"
+                linkWhenEmptyList={true}
+            />
         </MainLayout>
     );
 }

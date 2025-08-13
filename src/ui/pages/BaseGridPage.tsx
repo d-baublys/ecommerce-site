@@ -1,22 +1,27 @@
 import { Product } from "@/lib/definitions";
 import { pluralise } from "@/lib/utils";
 import ProductGrid from "@/ui/components/product-grid/ProductGrid";
+import PlainRoundedButtonLink from "../components/buttons/PlainRoundedButtonLink";
 
-export default function BaseGridPage({
-    displayedProducts,
-    noProductMessage,
-    categoryTabs,
-    asideContent,
-    fixedOverlays,
-    sortingUnit,
-}: {
+interface BaseGridPageProps {
     displayedProducts: Product[];
     noProductMessage: string;
+    linkWhenEmptyList: boolean;
     categoryTabs?: React.ReactNode;
     asideContent?: React.ReactNode;
     fixedOverlays?: React.ReactNode;
     sortingUnit?: React.ReactNode;
-}) {
+}
+
+export default function BaseGridPage({
+    displayedProducts,
+    noProductMessage,
+    linkWhenEmptyList,
+    categoryTabs,
+    asideContent,
+    fixedOverlays,
+    sortingUnit,
+}: BaseGridPageProps) {
     return (
         <>
             {categoryTabs ?? null}
@@ -34,8 +39,15 @@ export default function BaseGridPage({
                         {displayedProducts.length > 0 ? (
                             <ProductGrid productList={displayedProducts} />
                         ) : (
-                            <div className="flex justify-center items-center w-full p-4 gap-4">
+                            <div className="flex flex-col justify-center items-center w-full p-4 gap-8">
                                 <p className="text-center">{noProductMessage}</p>
+                                {linkWhenEmptyList && (
+                                    <div>
+                                        <PlainRoundedButtonLink href={"/category/all"}>
+                                            Shop
+                                        </PlainRoundedButtonLink>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
