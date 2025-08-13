@@ -13,7 +13,10 @@ export default function GoButton({ predicate, overrideClasses, ...restProps }: G
     const goButtonClasses = getGoButtonClasses(predicate);
 
     return (
-        <RoundedButtonMain overrideClasses={`${goButtonClasses} ${overrideClasses}`} {...restProps}>
+        <RoundedButtonMain
+            overrideClasses={`${goButtonClasses} ${overrideClasses ?? ""}`}
+            {...restProps}
+        >
             {restProps.children}
         </RoundedButtonMain>
     );

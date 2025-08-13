@@ -37,7 +37,7 @@ export default function ProductListTile(props: ProductListTileProps) {
 
     const renderCentralContent = (product: Product | ProductNoStock, size?: Sizes) => {
         return (
-            <div className={`flex grow h-28 gap-2 sm:gap-8 ${internalOverrides}`}>
+            <div className={`flex grow h-28 gap-2 sm:gap-8 ${internalOverrides ?? ""}`}>
                 <ProductImage product={product} overrideClasses="aspect-3/4" />
                 <div className="flex flex-col justify-between">
                     <div className="text-sz-interm lg:text-sz-interm-lg font-semibold">
@@ -54,7 +54,7 @@ export default function ProductListTile(props: ProductListTileProps) {
     };
 
     return (
-        <div className={`flex w-full flex-row bg-white border-2 p-2 ${externalOverrides}`}>
+        <div className={`flex w-full flex-row bg-white border-2 p-2 ${externalOverrides ?? ""}`}>
             <div className="flex flex-col w-full gap-2">
                 {dataArr.map((itemData) => {
                     const productData = "product" in itemData ? itemData.product : itemData;

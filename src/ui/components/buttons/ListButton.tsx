@@ -20,7 +20,9 @@ export default function ListButton({
     // as div for valid wrapping by anchor
     const buttonContent = () => (
         <div
-            className={`flex items-center gap-2 w-full h-16 p-4 bg-white border-2 border-background-lightest hover:border-black active:drop-shadow-(--button-shadow) transition ${overrideClasses}`}
+            className={`flex items-center gap-2 w-full h-16 p-4 bg-white border-2 border-background-lightest hover:border-black active:drop-shadow-(--button-shadow) transition ${
+                overrideClasses ?? ""
+            }`}
             {...props}
         >
             • {props.children}

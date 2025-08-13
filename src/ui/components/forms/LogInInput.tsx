@@ -50,10 +50,10 @@ export default function LogInInput({
             <div
                 className={`w-full border-b-2 p-1 outline-none cursor-text ${
                     showRed ? " border-red-500" : "focus-within:border-blue-700"
-                } ${overrideClasses}`}
+                } ${overrideClasses ?? ""}`}
             >
                 <input
-                    className="w-[95%] outline-none"
+                    className="w-[calc(100%-2.25rem)] outline-none"
                     type={typeProp}
                     onFocus={() => setShowRed(false)}
                     onBlur={() => props.value === "" && setShowRed(true)}
@@ -63,7 +63,7 @@ export default function LogInInput({
             {isPasswordInput && (
                 <button
                     type="button"
-                    className="absolute right-0 top-0 translate-y-1/12 -translate-x-1/6 p-1 rounded-circle cursor-pointer"
+                    className="absolute right-0 top-0 lg:translate-y-1/12 -translate-x-1/6 p-1 rounded-circle cursor-pointer"
                     onClick={togglePasswordVisibility}
                 >
                     {isPasswordVisible ? <IoEyeOff size={20} /> : <IoEye size={20} />}
