@@ -37,14 +37,14 @@ export default function ProductListTile(props: ProductListTileProps) {
 
     const renderCentralContent = (product: Product | ProductNoStock, size?: Sizes) => {
         return (
-            <div className={`flex grow h-28 gap-2 sm:gap-8 ${internalOverrides ?? ""}`}>
-                <ProductImage product={product} overrideClasses="aspect-3/4" />
+            <div className={`flex grow gap-2 sm:gap-8 ${internalOverrides ?? ""}`}>
+                <ProductImage product={product} overrideClasses="flex aspect-3/4 min-h-28 !h-auto"/>
                 <div className="flex flex-col justify-between">
-                    <div className="text-sz-interm lg:text-sz-interm-lg font-semibold">
+                    <div className="sm:text-sz-interm lg:text-sz-interm-lg font-semibold">
                         <p>{product.name.toUpperCase()}</p>
                     </div>
                     {size && showSize && (
-                        <div className="text-component-color">
+                        <div className="text-component-color mt-2">
                             <p>Size - {size.toUpperCase()}</p>
                         </div>
                     )}
@@ -74,7 +74,7 @@ export default function ProductListTile(props: ProductListTileProps) {
                     );
                 })}
             </div>
-            <div className="flex items-end min-h-full ml-8">{endContent ?? null}</div>
+            <div className="flex items-end max-w-[33%] min-h-full ml-4 md:ml-8">{endContent ?? null}</div>
         </div>
     );
 }

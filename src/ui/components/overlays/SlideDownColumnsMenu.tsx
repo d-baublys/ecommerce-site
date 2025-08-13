@@ -12,7 +12,7 @@ export default function SlideDownColumnsMenu({
 }: GridMenuProps) {
     return (
         <SlideDownMenu {...rest}>
-            <div className="flex w-3/4">
+            <div className="flex w-3/4 max-w-[900px]">
                 <div className="flex flex-col pl-[5%] w-full gap-4">{leftContent ?? null}</div>
                 <div className="flex flex-col pl-[5%] w-full gap-4">{rightContent ?? null}</div>
             </div>

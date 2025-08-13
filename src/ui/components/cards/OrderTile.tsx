@@ -19,7 +19,7 @@ export default function OrderTile({ orderData }: { orderData: OrderData }) {
                 } ${processDateForClientDate(addReturnWindowDelta(orderData.createdAt))}`}</p>
                 {isOrderWithinReturnWindow && (
                     <div className="mt-4">
-                        <PlainRoundedButton overrideClasses="!bg-background-lightest">
+                        <PlainRoundedButton overrideClasses="!bg-background-lightest !px-2">
                             Request Return
                         </PlainRoundedButton>
                     </div>
@@ -30,7 +30,7 @@ export default function OrderTile({ orderData }: { orderData: OrderData }) {
 
     return (
         <div>
-            <div className="flex justify-between p-2 border-2 border-b-0">
+            <div className="flex justify-between p-2 border-2 border-b-0 gap-4">
                 <p>{`Ordered on ${processDateForClientDate(orderData.createdAt)}`}</p>
                 <p>{`Total £${stringifyConvertPrice(orderData.total)}`}</p>
                 <p>{`Order # ${orderData.id}`}</p>
@@ -40,6 +40,7 @@ export default function OrderTile({ orderData }: { orderData: OrderData }) {
                 wrapWithLink={true}
                 showSize={true}
                 endContent={buildEndContent()}
+                internalOverrides="!min-h-40"
             />
         </div>
     );
