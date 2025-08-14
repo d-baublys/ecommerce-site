@@ -10,7 +10,7 @@ import {
 } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { useBagStore } from "@/stores/bagStore";
-import BagConfirmModal from "@/ui/components/overlays/BagConfirmModal";
+import AddSuccessModal from "@/ui/components/overlays/AddSuccessModal";
 import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
 import ProductImage from "@/ui/components/ProductImage";
 import Link from "next/link";
@@ -154,7 +154,7 @@ export default function ProductGridTile({ product }: { product: Product }) {
             </div>
 
             {isModalOpen && (
-                <BagConfirmModal
+                <AddSuccessModal
                     handleClose={() => setIsModalOpen(false)}
                     isOpenState={isModalOpen}
                     overrideClasses="bag-confirm-modal"

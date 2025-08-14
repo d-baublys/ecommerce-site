@@ -1,6 +1,6 @@
 import SuccessModal, { BaseSuccessModalProps } from "@/ui/components/overlays/SuccessModal";
 
-export default function BagConfirmModal(props: BaseSuccessModalProps) {
+export default function AddSuccessModal(props: BaseSuccessModalProps) {
     return (
         <SuccessModal
             {...props}

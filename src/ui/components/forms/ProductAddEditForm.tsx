@@ -18,7 +18,7 @@ import ProductStockTable from "./ProductStockTable";
 import { useModalStore } from "@/stores/modalStore";
 import { productAdd, productDelete, productUpdate } from "@/lib/actions";
 import { useRouter } from "next/navigation";
-import DeleteConfirmModal from "../overlays/DeleteConfirmModal";
+import DeleteConfirmModal from "@/ui/components/overlays/DeleteConfirmModal";
 
 export default function ProductAddEditForm({ productData }: { productData?: Product }) {
     const dataObj = productData ? productData : createEmptyProduct();
@@ -30,7 +30,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
 
     const [price, setPrice] = useState<string>(stringifyConvertPrice(dataObj.price));
     const [message, setMessage] = useState<string | null>();
-    const openModal = useModalStore((state) => state.openModal);
+    const { openModal } = useModalStore((state) => state);
 
     const fileBrowseRef = useRef<HTMLInputElement | null>(null);
     const handleBrowse = () => {

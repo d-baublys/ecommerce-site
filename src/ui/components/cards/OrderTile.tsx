@@ -1,3 +1,5 @@
+"use client";
+
 import {
     addReturnWindowDelta,
     checkIsWithinReturnWindow,
@@ -7,9 +9,21 @@ import {
 import ProductListTile from "@/ui/components/cards/ProductListTile";
 import { OrderData } from "@/lib/definitions";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
+import { useModalStore } from "@/stores/modalStore";
+import { updateOrder } from "@/lib/actions";
 
 export default function OrderTile({ orderData }: { orderData: OrderData }) {
     const isOrderWithinReturnWindow = checkIsWithinReturnWindow(orderData.createdAt);
+
+    const { openModal } = useModalStore((state) => state);
+
+    const handleConfirm = async (orderId: OrderData["id"]) => {
+        const returnConfirm = await openModal();
+
+        if (returnConfirm) {
+            await updateOrder(orderId, "refunded");
+        }
+    };
 
     const buildEndContent = () => (
         <div className="flex h-full">
@@ -19,7 +33,10 @@ export default function OrderTile({ orderData }: { orderData: OrderData }) {
                 } ${processDateForClientDate(addReturnWindowDelta(orderData.createdAt))}`}</p>
                 {isOrderWithinReturnWindow && (
                     <div className="mt-4">
-                        <PlainRoundedButton overrideClasses="!bg-background-lightest !px-2">
+                        <PlainRoundedButton
+                            onClick={() => handleConfirm(orderData.id)}
+                            overrideClasses="!bg-background-lightest !px-2"
+                        >
                             Request Return
                         </PlainRoundedButton>
                     </div>

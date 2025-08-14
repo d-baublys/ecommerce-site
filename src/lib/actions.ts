@@ -1,7 +1,14 @@
 "use server";
 
 import { Prisma } from "@prisma/client";
-import { CredentialsError, ItemMetadata, Product, Sizes, UserRoleOptions } from "./definitions";
+import {
+    CredentialsError,
+    ItemMetadata,
+    OrderStatus,
+    Product,
+    Sizes,
+    UserRoleOptions,
+} from "./definitions";
 import { prisma } from "./prisma";
 import {
     convertMultiplePrismaProducts,
@@ -201,6 +208,19 @@ export async function getUserOrders({ userId }: { userId: number }) {
     }
 }
 
+export async function updateOrder(orderId: number, status: OrderStatus) {
+    try {
+        await prisma.order.update({
+            where: { id: orderId },
+            data: { status },
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating order: ", error);
+        return { success: false };
+    }
+}
+
 export async function createFeaturedProducts(dataObj: Product[]) {
     try {
         await prisma.featuredProduct.createMany({
@@ -299,34 +319,3 @@ export async function getUser(email: string) {
         throw new Error("Error fetching user data. Please try again later.");
     }
 }
-
-// !!!TO-DO!!!
-// export async function updateOrder(orderId: number, status: OrderStatus) {
-//     try {
-//         await prisma.order.update({
-//             where: { id: orderId },
-//             data: { status },
-//         });
-//         return { success: true };
-//     } catch (error) {
-//         console.error("Error updating order: ", error);
-//         return { success: false };
-//     }
-// }
-
-// !!!TO-DO!!!
-// export async function authenticate(formData: FormData, prevState?: string) {
-//     try {
-//         await signInServer("credentials", formData);
-//     } catch (error) {
-//         if (error instanceof AuthError) {
-//             switch (error.type) {
-//                 case "CredentialsSignin":
-//                     return "Invalid credentials";
-//                 default:
-//                     return "Something went wrong";
-//             }
-//         }
-//         throw error;
-//     }
-// }
