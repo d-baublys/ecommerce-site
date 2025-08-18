@@ -25,7 +25,7 @@ export default function Modal(props: ModalProps) {
             <div
                 id="modal-container"
                 onClick={handleClose}
-                className="fixed top-0 left-0 flex flex-col w-full justify-center items-center min-h-screen z-[9999] px-4"
+                className="fixed top-0 left-0 flex flex-col justify-center items-center global-constraints overlay-constraints z-[9999] px-4"
             >
                 <div
                     id="modal"

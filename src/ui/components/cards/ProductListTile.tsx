@@ -16,7 +16,7 @@ interface ProductListTileProps {
     data: Product | Product[] | BagItem | OrderData;
     wrapWithLink: boolean;
     showSize: boolean;
-    endContent?: React.ReactNode;
+    endContent?: React.ReactNode | ((idx: number) => React.ReactNode);
     externalOverrides?: string;
     internalOverrides?: string;
 }
@@ -38,7 +38,10 @@ export default function ProductListTile(props: ProductListTileProps) {
     const renderCentralContent = (product: Product | ProductNoStock, size?: Sizes) => {
         return (
             <div className={`flex grow gap-2 sm:gap-8 ${internalOverrides ?? ""}`}>
-                <ProductImage product={product} overrideClasses="flex aspect-3/4 min-h-28 !h-auto"/>
+                <ProductImage
+                    product={product}
+                    overrideClasses="flex aspect-3/4 min-h-28 !h-auto"
+                />
                 <div className="flex flex-col justify-between">
                     <div className="sm:text-sz-interm lg:text-sz-interm-lg font-semibold">
                         <p>{product.name.toUpperCase()}</p>
@@ -56,25 +59,38 @@ export default function ProductListTile(props: ProductListTileProps) {
     return (
         <div className={`flex w-full flex-row bg-white border-2 p-2 ${externalOverrides ?? ""}`}>
             <div className="flex flex-col w-full gap-2">
-                {dataArr.map((itemData) => {
+                {dataArr.map((itemData, idx) => {
                     const productData = "product" in itemData ? itemData.product : itemData;
                     const hasSize = "size" in itemData;
-                    return wrapWithLink ? (
-                        <Link
+                    return (
+                        <div
                             key={`${productData.id}-${hasSize ? itemData.size : 1}`}
-                            className="w-full"
-                            href={buildProductUrl(productData.slug)}
+                            className="flex flex-row"
                         >
-                            {renderCentralContent(productData, hasSize ? itemData.size : undefined)}
-                        </Link>
-                    ) : (
-                        <div key={`${productData.id}-${hasSize ? itemData.size : 1}`}>
-                            {renderCentralContent(productData, hasSize ? itemData.size : undefined)}
+                            {wrapWithLink ? (
+                                <Link className="w-full" href={buildProductUrl(productData.slug)}>
+                                    {renderCentralContent(
+                                        productData,
+                                        hasSize ? itemData.size : undefined
+                                    )}
+                                </Link>
+                            ) : (
+                                renderCentralContent(
+                                    productData,
+                                    hasSize ? itemData.size : undefined
+                                )
+                            )}
+                            <div className="flex items-end max-w-[33%] min-h-full ml-4 md:ml-8">
+                                {typeof endContent === "function"
+                                    ? endContent(idx)
+                                    : endContent !== null
+                                    ? endContent
+                                    : null}
+                            </div>
                         </div>
                     );
                 })}
             </div>
-            <div className="flex items-end max-w-[33%] min-h-full ml-4 md:ml-8">{endContent ?? null}</div>
         </div>
     );
 }

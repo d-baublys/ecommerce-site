@@ -59,7 +59,7 @@ export default function SearchOverlay() {
             <div
                 id="search-overlay-container"
                 data-testid="search-overlay-container"
-                className={`absolute top-0 left-0 flex justify-center w-full min-h-screen md:min-h-[400px] bg-white drop-shadow-xl z-[9999] [transition:all_0.2s_ease-out] ${
+                className={`absolute top-0 left-0 flex justify-center global-constraints overlay-constraints search-overlay-constraints bg-white drop-shadow-xl z-[9999] [transition:all_0.2s_ease-out] ${
                     isSearchLoaded ? "opacity-100" : "opacity-0"
                 }`}
                 ref={trapRef}

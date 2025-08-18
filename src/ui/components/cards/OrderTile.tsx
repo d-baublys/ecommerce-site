@@ -75,36 +75,55 @@ export default function OrderTile(props: OrderTileProps) {
         }
     };
 
-    const buildEndContent = () => (
-        <div className="flex h-full">
-            <div>
-                <p>{orderInfo}</p>
-                {orderStatus === "paid" && isOrderWithinReturnWindow && (
-                    <div className="mt-4">
-                        <PlainRoundedButton
-                            onClick={() => handleConfirm(orderData.id)}
-                            overrideClasses="!bg-background-lightest !px-2"
-                        >
-                            Request Return
-                        </PlainRoundedButton>
-                    </div>
-                )}
+    const buildEndContent = (idx: number) => (
+        <div className="flex flex-col justify-between items-end h-full">
+            <p className="text-sz-interm lg:text-sz-interm-lg">
+                <span>£</span>
+                <span>
+                    {stringifyConvertPrice(
+                        orderData.items[idx].price * orderData.items[idx].quantity
+                    )}
+                </span>
+            </p>
+            <div className="flex items-center gap-2 pr-2">
+                <p>{`Qty ${orderData.items[idx].quantity}`}</p>
             </div>
         </div>
     );
 
     return (
         <div>
-            <div className="flex justify-between p-2 border-2 border-b-0 gap-4">
-                <p>{`Ordered ${processDateForClientDate(orderData.createdAt)}`}</p>
-                <p>{`Total £${stringifyConvertPrice(orderData.total)}`}</p>
-                <p>{`Order # ${orderData.id}`}</p>
+            <div className="grid grid-cols-12 min-w-[35rem] p-2 border-2 border-b-0">
+                <div className="flex items-center col-span-6">
+                    <p className="font-semibold">{`Order # ${orderData.id}`}</p>
+                </div>
+                <div className="flex justify-end items-center col-span-6">
+                    <p className="font-semibold">{`Total £${stringifyConvertPrice(
+                        orderData.total
+                    )}`}</p>
+                </div>
+                <div className="flex items-center col-span-6 h-min">
+                    <p>{`Ordered ${processDateForClientDate(orderData.createdAt)}`}</p>
+                </div>
+                <div className="flex flex-col items-end col-span-6">
+                    <p className="whitespace-nowrap">{orderInfo}</p>
+                    {orderStatus === "paid" && isOrderWithinReturnWindow && (
+                        <div className="mt-2">
+                            <PlainRoundedButton
+                                onClick={() => handleConfirm(orderData.id)}
+                                overrideClasses="!bg-background-lightest !px-2"
+                            >
+                                Request Return
+                            </PlainRoundedButton>
+                        </div>
+                    )}
+                </div>
             </div>
             <ProductListTile
                 data={orderData}
                 wrapWithLink={true}
                 showSize={true}
-                endContent={buildEndContent()}
+                endContent={(idx) => buildEndContent(idx)}
                 internalOverrides="!min-h-40"
             />
         </div>
