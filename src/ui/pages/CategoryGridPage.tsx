@@ -197,7 +197,7 @@ export default function CategoryGridPage({
                     </option>
                     {Object.entries(SORT_OPTIONS).map(([key, sortData]) => (
                         <option key={key} value={key} className="font-normal">
-                            {sortData.displayName}
+                            {sortData.label}
                         </option>
                     ))}
                 </select>

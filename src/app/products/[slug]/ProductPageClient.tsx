@@ -36,7 +36,7 @@ export default function ProductPageClient({ productData }: { productData: Produc
         <div className="flex grow justify-center items-start">
             <div
                 id="product-container"
-                className="flex flex-col md:flex-row grow w-full max-w-[900px]"
+                className="flex flex-col md:flex-row grow w-full max-w-[1000px]"
             >
                 <div className="flex justify-center w-full md:w-1/2">
                     <ZoomableImage productData={productData} />

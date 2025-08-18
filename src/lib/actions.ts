@@ -128,6 +128,7 @@ export async function createOrder({
     total,
     sessionId,
     email,
+    paymentIntentId,
     userId,
 }: {
     items: ItemMetadata[];
@@ -136,6 +137,7 @@ export async function createOrder({
     total: number;
     sessionId: string;
     email: string;
+    paymentIntentId: string;
     userId?: number;
 }) {
     try {
@@ -155,6 +157,8 @@ export async function createOrder({
                 },
                 sessionId,
                 email,
+                status: "paid",
+                paymentIntentId,
             },
         };
 
@@ -199,6 +203,7 @@ export async function getUserOrders({ userId }: { userId: number }) {
         const orders = await prisma.order.findMany({
             where: { userId: Number(userId) },
             include: { items: { include: { product: true } } },
+            orderBy: { createdAt: "desc" },
         });
 
         return { data: orders };
@@ -208,11 +213,34 @@ export async function getUserOrders({ userId }: { userId: number }) {
     }
 }
 
-export async function updateOrder(orderId: number, status: OrderStatus) {
+export async function getOrders() {
+    try {
+        const orders = await prisma.order.findMany({
+            include: { items: { include: { product: true } } },
+            orderBy: { createdAt: "desc" },
+        });
+
+        return { data: orders };
+    } catch (error) {
+        console.error("Error fetching order data: ", error);
+        throw new Error("Error fetching order data. Please try again later.");
+    }
+}
+
+interface updateOrderParams {
+    orderId: number;
+    status: OrderStatus;
+    returnRequestedAt?: Date;
+    refundedAt?: Date;
+}
+
+export async function updateOrder(params: updateOrderParams) {
+    const { orderId, status, returnRequestedAt, refundedAt } = params;
+
     try {
         await prisma.order.update({
             where: { id: orderId },
-            data: { status },
+            data: { status, returnRequestedAt, refundedAt },
         });
         return { success: true };
     } catch (error) {

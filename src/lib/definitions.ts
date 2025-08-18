@@ -51,7 +51,29 @@ export type OrderItemWithClientProductNoStock = OrderItem & { product: ProductNo
 
 export type OrderData = Order & { items: OrderItemWithPrismaProduct[] };
 
-export type OrderStatus = "paid" | "refunded";
+export const ORDER_STATUS_OPTIONS = {
+    paid: "Paid",
+    pendingReturn: "Pending Return",
+    refunded: "Refunded",
+};
+
+export const ORDER_TABLE_COLUMNS: {
+    key: keyof Omit<Order, "paymentIntentId" | "sessionId">;
+    label: string;
+}[] = [
+    { key: "id", label: "Order Id" },
+    { key: "userId", label: "Customer Id" },
+    { key: "email", label: "Customer Email" },
+    { key: "subTotal", label: "Subtotal" },
+    { key: "shippingTotal", label: "Shipping" },
+    { key: "total", label: "Total" },
+    { key: "createdAt", label: "Date Created" },
+    { key: "returnRequestedAt", label: "Date Return Requested" },
+    { key: "refundedAt", label: "Date Refunded" },
+    { key: "status", label: "Status" },
+];
+
+export type OrderStatus = keyof typeof ORDER_STATUS_OPTIONS;
 
 export type ProductFormMode = "add" | "edit";
 
@@ -68,9 +90,9 @@ export const PRICE_FILTER_OPTIONS = {
 export type PriceFilterKey = keyof typeof PRICE_FILTER_OPTIONS;
 
 export const SORT_OPTIONS = {
-    a: { sort: { price: "asc" as Prisma.SortOrder }, displayName: "Price (Low to High)" },
-    b: { sort: { price: "desc" as Prisma.SortOrder }, displayName: "Price (High to Low)" },
-    c: { sort: { dateAdded: "desc" as Prisma.SortOrder }, displayName: "Newest" },
+    a: { sort: { price: "asc" as Prisma.SortOrder }, label: "Price (Low to High)" },
+    b: { sort: { price: "desc" as Prisma.SortOrder }, label: "Price (High to Low)" },
+    c: { sort: { dateAdded: "desc" as Prisma.SortOrder }, label: "Newest" },
 };
 
 export type ProductSortKey = keyof typeof SORT_OPTIONS;
@@ -82,12 +104,6 @@ export const REFUND_WINDOW = 1000 * 60 * 60 * 24 * 30; // 30 days in ms
 export const USER_ROLES = ["admin", "user"] as const;
 
 export type UserRoleOptions = (typeof USER_ROLES)[number];
-
-export type SearchBarConfig = {
-    isGlobalSearch: boolean;
-    showSuggestions: boolean;
-    placeholderText?: string;
-};
 
 export class CredentialsError extends Error {
     constructor(message: string) {

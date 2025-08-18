@@ -1,17 +1,17 @@
-import { IoCheckmarkCircle } from "react-icons/io5";
+import { IoWarningOutline } from "react-icons/io5";
 import Modal, { ModalProps } from "@/ui/components/overlays/Modal";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
-import PlainRoundedButton from "../buttons/PlainRoundedButton";
+import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 
 export type BaseSuccessModalProps = Omit<ModalProps, "children" | "hasCloseButton">;
 
-export interface SuccessModalProps extends BaseSuccessModalProps {
+export interface FailureModalProps extends BaseSuccessModalProps {
     message: string | React.JSX.Element;
     buttonLink?: string;
     buttonText?: string;
 }
 
-export default function SuccessModal(props: SuccessModalProps) {
+export default function FailureModal(props: FailureModalProps) {
     return (
         <Modal
             handleClose={props.handleClose}
@@ -21,7 +21,7 @@ export default function SuccessModal(props: SuccessModalProps) {
         >
             <div className="flex flex-col justify-evenly items-center grow">
                 <div className="flex flex-col items-center gap-4 p-4">
-                    <IoCheckmarkCircle className="shrink-0 text-go-color" size={36} />
+                    <IoWarningOutline className="shrink-0 text-danger-color" size={36} />
                     <p className="text-center text-sz-interm">{props.message}</p>
                 </div>
                 {props.buttonLink && props.buttonText ? (

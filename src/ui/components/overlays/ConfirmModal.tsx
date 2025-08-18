@@ -5,7 +5,7 @@ import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import Modal from "@/ui/components/overlays/Modal";
 
 interface BaseConfirmModalProps {
-    promptText: string | React.ReactNode;
+    promptText: string | React.JSX.Element;
 }
 
 export default function ConfirmModal(props: BaseConfirmModalProps) {

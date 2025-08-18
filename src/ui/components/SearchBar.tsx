@@ -1,12 +1,18 @@
 "use client";
 
 import { getProductData } from "@/lib/actions";
-import { Product, SearchBarConfig } from "@/lib/definitions";
+import { Product } from "@/lib/definitions";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 import { debounce } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { SetStateAction, useEffect, useState } from "react";
 import { IoCloseCircle, IoSearch } from "react-icons/io5";
+
+type SearchBarConfig = {
+    isGlobalSearch: boolean;
+    showSuggestions: boolean;
+    placeholderText?: string;
+};
 
 interface SearchBarProps {
     handleResultClick: (product: Product) => void;
