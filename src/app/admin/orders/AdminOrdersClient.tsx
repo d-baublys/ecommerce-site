@@ -135,54 +135,67 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderDat
 
     return (
         <>
-            <table className="w-full border-spacing-2">
-                <thead>
-                    <tr>
-                        {ORDER_TABLE_COLUMNS.map((column, idx) => (
-                            <th key={`col-${idx}`} className="border-2 p-4 bg-background-lightest">
-                                <div className="flex justify-center items-center gap-1">
-                                    <span>{column.label}</span>
-                                    <button
-                                        onClick={() => handleSortClick(column.key)}
-                                        className="cursor-pointer"
-                                    >
-                                        <FaSort />
-                                    </button>
-                                </div>
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody className="border-2">
-                    {sortedData.map((order) => (
-                        <tr key={order.id} className="border-2">
-                            {ORDER_TABLE_COLUMNS.map((column, colIdx) => {
-                                const cellData: string | number | null = processCellData(
-                                    order[column.key],
-                                    column
-                                );
-
-                                return (
-                                    <td key={`${order.id}-${colIdx}`} className="border-2 p-2">
-                                        {<p>{cellData}</p>}
-                                        {column.key === "status" &&
-                                            order.status === "pendingReturn" && (
-                                                <div className="mt-4">
-                                                    <PlainRoundedButton
-                                                        onClick={() => handleApproval(order.id)}
-                                                        overrideClasses="!bg-background-lightest px-2"
-                                                    >
-                                                        Approve Refund
-                                                    </PlainRoundedButton>
-                                                </div>
-                                            )}
-                                    </td>
-                                );
-                            })}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <div className="flex justify-center items-center grow">
+                {ordersData.length ? (
+                    <div className="overflow-x-scroll max-w-[88vw]">
+                        <table className="border-spacing-2">
+                            <thead>
+                                <tr>
+                                    {ORDER_TABLE_COLUMNS.map((column, idx) => (
+                                        <th
+                                            key={`col-${idx}`}
+                                            className="border-2 p-4 bg-background-lightest"
+                                        >
+                                            <div className="flex justify-center items-center gap-1">
+                                                <span>{column.label}</span>
+                                                <button
+                                                    onClick={() => handleSortClick(column.key)}
+                                                    className="cursor-pointer"
+                                                >
+                                                    <FaSort />
+                                                </button>
+                                            </div>
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody className="border-2">
+                                {sortedData.map((order) => (
+                                    <tr key={order.id} className="border-2">
+                                        {ORDER_TABLE_COLUMNS.map((column, colIdx) => {
+                                            const cellData: string | number | null =
+                                                processCellData(order[column.key], column);
+                                            return (
+                                                <td
+                                                    key={`${order.id}-${colIdx}`}
+                                                    className="border-2 p-2"
+                                                >
+                                                    {<p>{cellData}</p>}
+                                                    {column.key === "status" &&
+                                                        order.status === "pendingReturn" && (
+                                                            <div className="mt-4">
+                                                                <PlainRoundedButton
+                                                                    onClick={() =>
+                                                                        handleApproval(order.id)
+                                                                    }
+                                                                    overrideClasses="!bg-background-lightest px-2"
+                                                                >
+                                                                    Approve Refund
+                                                                </PlainRoundedButton>
+                                                            </div>
+                                                        )}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <p>No orders to show</p>
+                )}
+            </div>
             {isSuccessModalOpen && (
                 <Modal
                     handleClose={() => setIsSuccessModalOpen(false)}

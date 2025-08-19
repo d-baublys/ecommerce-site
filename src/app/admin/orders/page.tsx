@@ -15,11 +15,7 @@ export default async function AdminProductsPage() {
     return (
         <AdminWrapper>
             <MainWrapperWithSubheader subheaderText="Orders">
-                {ordersData.length ? (
-                    <AdminOrdersClient ordersData={ordersData} />
-                ) : (
-                    <p>No orders to show</p>
-                )}
+                <AdminOrdersClient ordersData={ordersData} />
             </MainWrapperWithSubheader>
         </AdminWrapper>
     );

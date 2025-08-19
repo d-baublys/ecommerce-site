@@ -61,7 +61,7 @@ export const ORDER_TABLE_COLUMNS: {
     key: keyof Omit<Order, "paymentIntentId" | "sessionId">;
     label: string;
 }[] = [
-    { key: "id", label: "Order Id" },
+    { key: "id", label: "Order #" },
     { key: "userId", label: "Customer Id" },
     { key: "email", label: "Customer Email" },
     { key: "subTotal", label: "Subtotal" },
