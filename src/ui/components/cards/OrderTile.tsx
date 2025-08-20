@@ -93,7 +93,7 @@ export default function OrderTile(props: OrderTileProps) {
 
     return (
         <div>
-            <div className="grid grid-cols-12 min-w-[35rem] p-2 border-2 border-b-0">
+            <div className="grid grid-cols-12 min-w-[35rem] p-2 bg-background-lightest rounded-tl-lg rounded-tr-lg">
                 <div className="flex items-center col-span-6">
                     <p className="font-semibold">{`Order #${orderData.id}`}</p>
                 </div>
@@ -111,7 +111,7 @@ export default function OrderTile(props: OrderTileProps) {
                         <div className="mt-2">
                             <PlainRoundedButton
                                 onClick={() => handleConfirm(orderData.id)}
-                                overrideClasses="!bg-background-lightest !px-2"
+                                overrideClasses="!px-2"
                             >
                                 Request Return
                             </PlainRoundedButton>
@@ -124,7 +124,7 @@ export default function OrderTile(props: OrderTileProps) {
                 wrapWithLink={true}
                 showSize={true}
                 endContent={(idx) => buildEndContent(idx)}
-                internalOverrides="!min-h-40"
+                internalOverrides="!h-40"
             />
         </div>
     );

@@ -11,7 +11,7 @@ export default function ConstrainedLayout(props: MainLayoutProps) {
             noCrumbs={noCrumbs}
         >
             <div className="flex justify-center grow">
-                <div className="flex flex-col w-full justify-center items-center max-w-[1000px] min-w-[300px] sm:min-w-[500px]">
+                <div className="flex flex-col w-full justify-center items-center max-w-[1000px]">
                     {children}
                 </div>
             </div>

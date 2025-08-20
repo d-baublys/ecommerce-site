@@ -21,11 +21,13 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body
-                className={`${lexendExa.variable} antialiased text-sz-base lg:text-sz-base-lg w-full global-constraints`}
+                className={`${lexendExa.variable} antialiased text-sz-base lg:text-sz-base-lg global-constraints`}
             >
                 <div className="flex flex-col justify-center items-center w-fit min-w-full min-h-screen">
                     <NavBar />
-                    <main className="relative flex grow min-w-full min-h-full bg-white">{children}</main>
+                    <main className="relative flex grow min-w-full min-h-full bg-white">
+                        {children}
+                    </main>
                     <Footer />
                 </div>
                 <SearchOverlay />
