@@ -95,7 +95,7 @@ export default function OrderTile(props: OrderTileProps) {
         <div>
             <div className="grid grid-cols-12 min-w-[35rem] p-2 border-2 border-b-0">
                 <div className="flex items-center col-span-6">
-                    <p className="font-semibold">{`Order # ${orderData.id}`}</p>
+                    <p className="font-semibold">{`Order #${orderData.id}`}</p>
                 </div>
                 <div className="flex justify-end items-center col-span-6">
                     <p className="font-semibold">{`Total £${stringifyConvertPrice(

@@ -189,6 +189,7 @@ export async function getOrder({ sessionId, orderId }: GetOrderParams) {
     try {
         const order = await prisma.order.findFirst({
             where: whereQuery,
+            include: { items: { include: { product: true } } },
         });
 
         return { data: order };

@@ -10,9 +10,13 @@ import {
 import { processDateForClient, stringifyConvertPrice } from "@/lib/utils";
 import { useModalStore } from "@/stores/modalStore";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
+import RoundedTable from "@/ui/components/forms/RoundedTable";
+import TableBodyCell from "@/ui/components/forms/TableBodyCell";
+import TableHeadCell from "@/ui/components/forms/TableHeadCell";
 import ConfirmModal from "@/ui/components/overlays/ConfirmModal";
 import FailureModal from "@/ui/components/overlays/FailureModal";
 import Modal from "@/ui/components/overlays/Modal";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaSort } from "react-icons/fa";
@@ -30,7 +34,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderDat
     const { openModal } = useModalStore((state) => state);
     const router = useRouter();
 
-    const issueRefund = async (orderId: OrderData["id"]) => {
+    const requestRefund = async (orderId: OrderData["id"]) => {
         const res = await fetch("/api/refund", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -90,7 +94,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderDat
         const returnConfirm = await openModal();
 
         if (returnConfirm) {
-            const refund = await issueRefund(orderId);
+            const refund = await requestRefund(orderId);
 
             if (refund.success) {
                 const orderUpdate = await updateOrder({
@@ -133,64 +137,85 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderDat
         }
     };
 
+    const buildHeadCells = () =>
+        ORDER_TABLE_COLUMNS.map((column, colIdx) => (
+            <TableHeadCell
+                key={column.key}
+                variant={
+                    colIdx === 0
+                        ? "leftEnd"
+                        : colIdx === ORDER_TABLE_COLUMNS.length - 1
+                        ? "rightEnd"
+                        : "middle"
+                }
+                overrideClasses="p-4"
+            >
+                <div className="flex justify-center items-center gap-1">
+                    <span>{column.label}</span>
+                    <button onClick={() => handleSortClick(column.key)} className="cursor-pointer">
+                        <FaSort />
+                    </button>
+                </div>
+            </TableHeadCell>
+        ));
+
+    const buildBodyCells = () =>
+        sortedData.map((order, rowIdx) => (
+            <tr key={`order-${order.id}`}>
+                {ORDER_TABLE_COLUMNS.map((column, colIdx) => {
+                    const cellData: string | number | null = processCellData(
+                        order[column.key],
+                        column
+                    );
+                    return (
+                        <TableBodyCell
+                            key={`${order.id}-${column.key}`}
+                            variant={
+                                colIdx === 0
+                                    ? "leftEnd"
+                                    : colIdx === ORDER_TABLE_COLUMNS.length - 1
+                                    ? "rightEnd"
+                                    : "middle"
+                            }
+                            isLastRow={rowIdx === sortedData.length - 1}
+                            overrideClasses="p-2"
+                        >
+                            {column.key === "id" ? (
+                                <Link
+                                    href={`/admin/orders/${order.id}`}
+                                    className="font-semibold underline decoration-1"
+                                >
+                                    {cellData}
+                                </Link>
+                            ) : (
+                                <p>{cellData}</p>
+                            )}
+                            {column.key === "status" && order.status === "pendingReturn" && (
+                                <div className="mt-4">
+                                    <PlainRoundedButton
+                                        onClick={() => handleApproval(order.id)}
+                                        overrideClasses="!bg-background-lightest px-2"
+                                    >
+                                        Approve Refund
+                                    </PlainRoundedButton>
+                                </div>
+                            )}
+                        </TableBodyCell>
+                    );
+                })}
+            </tr>
+        ));
+
     return (
         <>
             <div className="flex justify-center items-center grow">
                 {ordersData.length ? (
                     <div className="overflow-x-scroll max-w-[88vw]">
-                        <table className="border-spacing-2">
-                            <thead>
-                                <tr>
-                                    {ORDER_TABLE_COLUMNS.map((column, idx) => (
-                                        <th
-                                            key={`col-${idx}`}
-                                            className="border-2 p-4 bg-background-lightest"
-                                        >
-                                            <div className="flex justify-center items-center gap-1">
-                                                <span>{column.label}</span>
-                                                <button
-                                                    onClick={() => handleSortClick(column.key)}
-                                                    className="cursor-pointer"
-                                                >
-                                                    <FaSort />
-                                                </button>
-                                            </div>
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody className="border-2">
-                                {sortedData.map((order) => (
-                                    <tr key={order.id} className="border-2">
-                                        {ORDER_TABLE_COLUMNS.map((column, colIdx) => {
-                                            const cellData: string | number | null =
-                                                processCellData(order[column.key], column);
-                                            return (
-                                                <td
-                                                    key={`${order.id}-${colIdx}`}
-                                                    className="border-2 p-2"
-                                                >
-                                                    {<p>{cellData}</p>}
-                                                    {column.key === "status" &&
-                                                        order.status === "pendingReturn" && (
-                                                            <div className="mt-4">
-                                                                <PlainRoundedButton
-                                                                    onClick={() =>
-                                                                        handleApproval(order.id)
-                                                                    }
-                                                                    overrideClasses="!bg-background-lightest px-2"
-                                                                >
-                                                                    Approve Refund
-                                                                </PlainRoundedButton>
-                                                            </div>
-                                                        )}
-                                                </td>
-                                            );
-                                        })}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <RoundedTable
+                            tableHeadCells={buildHeadCells()}
+                            tableBodyCells={buildBodyCells()}
+                            overrideClasses="p-2"
+                        />
                     </div>
                 ) : (
                     <p>No orders to show</p>

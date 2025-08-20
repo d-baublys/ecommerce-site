@@ -58,7 +58,7 @@ export default function ProductListTile(props: ProductListTileProps) {
 
     return (
         <div className={`flex w-full flex-row bg-white border-2 p-2 ${externalOverrides ?? ""}`}>
-            <div className="flex flex-col w-full gap-2">
+            <div className="flex flex-col w-full gap-8">
                 {dataArr.map((itemData, idx) => {
                     const productData = "product" in itemData ? itemData.product : itemData;
                     const hasSize = "size" in itemData;
