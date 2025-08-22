@@ -10,6 +10,13 @@ expect.extend(toHaveNoViolations);
 
 jest.mock("next-auth/react", () => ({
     useSession: jest.fn(),
+    signOut: jest.fn(),
+}));
+
+jest.mock("next/navigation", () => ({
+    useRouter: () => ({
+        push: jest.fn(),
+    }),
 }));
 
 import { useSession } from "next-auth/react";
@@ -21,13 +28,20 @@ const renderNavBar = () => render(<NavBarClient />);
 const getSessionWithAuth = () => {
     (useSession as jest.Mock).mockReturnValue({
         data: {
-            user: "test-user",
-            email: "test@email.com",
+            user: {
+                id: "1",
+                email: "test@email.com",
+                role: "admin",
+            },
         },
+        status: "authenticated",
     });
 };
 const getSessionWithoutAuth = () => {
-    (useSession as jest.Mock).mockReturnValue(null);
+    (useSession as jest.Mock).mockReturnValue({
+        data: null,
+        status: "unauthenticated",
+    });
 };
 
 describe("NavBar", () => {

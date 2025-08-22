@@ -68,6 +68,15 @@ export default function BagPageClient() {
         }
     };
 
+    const handleCheckout = async () => {
+        if (session.status === "unauthenticated") {
+            router.push("/login?redirect_after=bag");
+            return;
+        } else if (session.status === "authenticated") {
+            goToCheckout();
+        }
+    };
+
     useEffect(() => {
         const redirect = searchParams.get("from_login");
 
@@ -86,15 +95,6 @@ export default function BagPageClient() {
 
         return { ...item, latestSizeStock };
     });
-
-    const handleCheckout = async () => {
-        if (session.status !== "authenticated") {
-            router.push("/login?redirect_after=bag");
-            return;
-        }
-
-        goToCheckout();
-    };
 
     return (
         <MainLayout subheaderText="My Bag">
@@ -115,7 +115,6 @@ export default function BagPageClient() {
                                     handleDelete={() =>
                                         removeFromBag(mergedItem.product.id, mergedItem.size)
                                     }
-                                    productSlug={mergedItem.product.slug}
                                 />
                             </li>
                         ))}

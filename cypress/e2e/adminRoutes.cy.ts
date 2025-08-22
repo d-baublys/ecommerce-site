@@ -1,19 +1,41 @@
-import { email, password } from "../support/credentials";
-
 describe("Admin route protection", () => {
-    beforeEach(() => {
+    it("redirects to log in page if accessing root admin path unauthenticated", () => {
         cy.visit("/admin");
-    });
-
-    it("redirects to admin log in page if accessing an admin path unauthenticated", () => {
         cy.location("pathname").should("eq", "/login");
     });
 
-    it("shows the correct UI on successful admin login", () => {
-        cy.get("input[name='username']").type(email);
-        cy.get("input[name='password']").type(password);
-        cy.get("button[type='submit']").click();
+    it("redirects to log in page if accessing an admin subpath unauthenticated", () => {
+        cy.visit("/admin/products");
+        cy.location("pathname").should("eq", "/login");
+    });
+
+    it("redirects to log in page if accessing root admin path when logged in as a standard user", () => {
+        cy.logInAsStandardUser();
+        cy.location("pathname").should("eq", "/");
+        cy.visit("/admin");
+        cy.location("pathname").should("eq", "/login");
+    });
+
+    it("redirects to log in page if accessing an admin subpath when logged in as a standard user", () => {
+        cy.logInAsStandardUser();
+        cy.location("pathname").should("eq", "/");
+        cy.visit("/admin/products");
+        cy.location("pathname").should("eq", "/login");
+    });
+
+    it("permits accessing root admin path when logged in as an admin", () => {
+        cy.logInAsAdmin();
+        cy.location("pathname").should("eq", "/");
+        cy.visit("/admin");
         cy.location("pathname").should("eq", "/admin");
         cy.contains("Admin Actions").should("be.visible");
+    });
+
+    it("permits accessing an admin subpath when logged in as an admin", () => {
+        cy.logInAsAdmin();
+        cy.location("pathname").should("eq", "/");
+        cy.visit("/admin/products");
+        cy.location("pathname").should("eq", "/admin/products");
+        cy.contains("Products").should("be.visible");
     });
 });

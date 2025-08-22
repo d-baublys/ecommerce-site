@@ -1,6 +1,7 @@
 import { createFakeProduct, getConsoleErrorSpy } from "@/lib/test-utils";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import ProductPage from "@/app/products/[slug]/page";
+import { useBagStore } from "@/stores/bagStore";
 
 const fakeProduct = createFakeProduct();
 const getLatestBag = () => useBagStore.getState().bag;
@@ -18,9 +19,13 @@ jest.mock("next/navigation", () => ({
 }));
 
 import { getProductData } from "@/lib/actions";
-import { useBagStore } from "@/stores/bagStore";
 
-const renderPage = async () => render(await ProductPage({ params: { slug: fakeProduct.slug } }));
+const renderPage = async () =>
+    render(
+        await ProductPage({
+            params: Promise.resolve({ slug: fakeProduct.slug }),
+        })
+    );
 
 describe("ProductPage", () => {
     beforeEach(() => {

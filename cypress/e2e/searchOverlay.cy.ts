@@ -105,9 +105,12 @@ describe("Search overlay base tests", () => {
     });
 
     it("locks scrolling when overlay is open", () => {
-        cy.get("body").should("have.css", "overflow", "hidden");
+        cy.assertScrollHookCssExist();
+        cy.performTestScroll();
+        cy.assertNoScroll();
         cy.get("#search-overlay-container [aria-label='Close search']").click();
-        cy.get("body").should("not.have.css", "overflow", "hidden");
+        cy.assertScrollHookCssNotExist();
+        cy.assertNoScroll();
     });
 });
 

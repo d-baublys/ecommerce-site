@@ -18,10 +18,14 @@ describe("Product grid page mobile viewport base tests", () => {
     });
 
     it("locks scrolling when the filtering menu is open", () => {
+        cy.assertNoScroll();
         cy.contains("button", "Filter").click();
-        cy.get("body").should("have.css", "overflow", "hidden");
+        cy.assertScrollHookCssExist();
+        cy.performTestScroll();
+        cy.assertNoScroll();
         cy.get("[aria-label='Close menu']").click();
-        cy.get("body").should("not.have.css", "overflow", "hidden");
+        cy.assertScrollHookCssNotExist();
+        cy.assertNoScroll();
     });
 });
 

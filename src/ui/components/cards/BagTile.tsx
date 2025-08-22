@@ -10,11 +10,9 @@ import ProductListTile from "@/ui/components/cards/ProductListTile";
 export default function BagTile({
     bagItem,
     handleDelete,
-    productSlug,
 }: {
     bagItem: MergedBagItem;
     handleDelete?: () => void;
-    productSlug: string;
 }) {
     const productData = bagItem.product;
     const updateQuantity = useBagStore((state) => state.updateQuantity);
@@ -72,6 +70,7 @@ export default function BagTile({
             wrapWithLink={true}
             showSize={true}
             endContent={buildEndContent()}
+            externalOverrides="bag-tile"
             internalOverrides="!h-40"
         />
     );

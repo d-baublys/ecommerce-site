@@ -20,8 +20,6 @@ export default function NavBarClient() {
     );
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
     const [isAccountOpen, setIsAccountOpen] = useState<boolean>(false);
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-    const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const elementRef = useRef<HTMLElement>(null);
 
     const session = useSession();
@@ -41,11 +39,6 @@ export default function NavBarClient() {
 
         return () => window.removeEventListener("scroll", scrollUpSticky);
     }, []);
-
-    useEffect(() => {
-        setIsLoggedIn(session.status === "authenticated");
-        setIsAdmin(session?.data?.user?.role === "admin");
-    }, [session]);
 
     const closeSearchAll = () => {
         setIsSearchLoaded(false);
@@ -76,9 +69,9 @@ export default function NavBarClient() {
     };
 
     const handleAccountClick = () => {
-        if (!isLoggedIn) {
+        if (session.status === "unauthenticated") {
             router.push("/login");
-        } else {
+        } else if (session.status === "authenticated") {
             setIsAccountOpen(true);
             handleMenuClose();
             if (!isAccountOpen) {
@@ -128,7 +121,7 @@ export default function NavBarClient() {
                         })}
                         {renderConditionalIcons({
                             isForMenu: false,
-                            isAdmin,
+                            isAdmin: session?.data?.user?.role === "admin",
                             hasMounted,
                             itemCount,
                             handleMenuClose,
@@ -157,7 +150,7 @@ export default function NavBarClient() {
                     <>
                         {renderConditionalIcons({
                             isForMenu: true,
-                            isAdmin,
+                            isAdmin: session?.data?.user?.role === "admin",
                             hasMounted,
                             itemCount,
                             handleMenuClose,

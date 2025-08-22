@@ -68,14 +68,18 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.wait(1000);
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
 
+        cy.assertNoScroll();
         cy.get("@test-tile").trigger("mouseover");
         cy.get("@test-tile").contains("button", "Quick Add").click();
         cy.get("@test-tile").find(".lower-hover-container li").first().click();
         cy.get(".bag-confirm-modal").should("be.visible");
-        cy.get("body").should("have.css", "overflow", "hidden");
+        cy.assertScrollHookCssExist();
+        cy.performTestScroll();
+        cy.assertNoScroll();
 
         cy.get("#close-modal-button").click();
-        cy.get("body").should("not.have.css", "overflow", "hidden");
+        cy.assertScrollHookCssNotExist();
+        cy.assertNoScroll();
     });
 
     it("removes a size option in quick add if it becomes unstocked", () => {

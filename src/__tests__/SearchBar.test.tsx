@@ -1,12 +1,11 @@
 import { createFakeProductList } from "@/lib/test-utils";
 import SearchBar from "@/ui/components/SearchBar";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-
-const pushMock = jest.fn();
+import { Product } from "@/lib/definitions";
 
 jest.mock("next/navigation", () => ({
     useRouter: () => ({
-        push: pushMock,
+        push: jest.fn(),
     }),
 }));
 
@@ -14,7 +13,6 @@ jest.mock("@/lib/actions", () => ({
     getProductData: jest.fn(),
 }));
 
-import { Product } from "@/lib/definitions";
 import { getProductData } from "@/lib/actions";
 
 const productList = { data: createFakeProductList() };

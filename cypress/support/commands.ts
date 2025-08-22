@@ -36,18 +36,23 @@
 //   }
 // }
 
-import { email, password } from "./credentials";
+import { adminEmail, adminPassword, standardEmail, standardPassword } from "./credentials";
 import "cypress-axe";
 
 declare global {
     namespace Cypress {
         interface Chainable {
             logInAsAdmin(): Chainable<void>;
+            logInAsStandardUser(): Chainable<void>;
             visitHome(): Chainable<void>;
             lessThanSmallBreakpoint(): Chainable<void>;
             smallBreakpoint(): Chainable<void>;
             lessThanLargeBreakpoint(): Chainable<void>;
             largeBreakpoint(): Chainable<void>;
+            performTestScroll(): Chainable<void>;
+            assertNoScroll(): Chainable<void>;
+            assertScrollHookCssExist(): Chainable<void>;
+            assertScrollHookCssNotExist(): Chainable<void>;
         }
     }
 }
@@ -58,12 +63,20 @@ Cypress.Commands.add("visitHome", () => {
 
 Cypress.Commands.add("logInAsAdmin", () => {
     cy.intercept("GET", "/api/auth/session").as("auth-check");
-    cy.visit("/admin");
-    cy.get("input[name='username']").type(email);
-    cy.get("input[name='password']").type(password);
+    cy.visit("/login");
+    cy.get("input[name='email']").type(adminEmail);
+    cy.get("input[name='password']").type(adminPassword);
     cy.get("button[type='submit']").click();
     cy.wait("@auth-check");
-    cy.location("pathname").should("eq", "/admin");
+});
+
+Cypress.Commands.add("logInAsStandardUser", () => {
+    cy.intercept("GET", "/api/auth/session").as("auth-check");
+    cy.visit("/login");
+    cy.get("input[name='email']").type(standardEmail);
+    cy.get("input[name='password']").type(standardPassword);
+    cy.get("button[type='submit']").click();
+    cy.wait("@auth-check");
 });
 
 Cypress.Commands.add("lessThanSmallBreakpoint", () => {
@@ -80,4 +93,24 @@ Cypress.Commands.add("largeBreakpoint", () => {
 
 Cypress.Commands.add("lessThanLargeBreakpoint", () => {
     cy.viewport(1023, 600);
+});
+
+Cypress.Commands.add("assertNoScroll", () => {
+    cy.window().then(($window) => {
+        expect($window.scrollY).to.equal(0);
+    });
+});
+
+Cypress.Commands.add("assertScrollHookCssExist", () => {
+    cy.get("body").should("have.css", "overflow", "hidden");
+    cy.get("body").should("have.css", "position", "fixed");
+});
+
+Cypress.Commands.add("assertScrollHookCssNotExist", () => {
+    cy.get("body").should("not.have.css", "overflow", "hidden");
+    cy.get("body").should("not.have.css", "position", "fixed");
+});
+
+Cypress.Commands.add("performTestScroll", () => {
+    cy.scrollTo("bottom", { ensureScrollable: false });
 });

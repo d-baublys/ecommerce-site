@@ -82,7 +82,7 @@ export default function LoginSignUpForm({ variant }: { variant: "login" | "signu
                 >
                     <div className="flex flex-col w-full gap-8 mt-8">
                         <LogInInput
-                            name="email-address"
+                            name="email"
                             labelText="Email address"
                             isPasswordInput={false}
                             value={email}

@@ -116,7 +116,12 @@ describe("Navbar base tests", () => {
         cy.get("[aria-label='Admin']").should("not.exist");
     });
 
-    it("renders admin button in the navbar when authenticated", () => {
+    it("doesn't render admin button in the navbar when logged in as a standard user", () => {
+        cy.logInAsStandardUser();
+        cy.get("[aria-label='Admin']").should("not.exist");
+    });
+
+    it("renders admin button in the navbar when logged in as an admin", () => {
         cy.logInAsAdmin();
         cy.get("[aria-label='Admin']").should("exist");
     });
@@ -128,10 +133,16 @@ describe("Navbar base tests", () => {
         cy.get("[aria-label='Admin']").should("not.exist");
     });
 
-    it("renders admin button in the mobile menu when authenticated", () => {
+    it("doesn't render admin button in the mobile menu when logged in as a standard user", () => {
+        cy.lessThanSmallBreakpoint();
+        cy.logInAsStandardUser();
+        cy.get("[aria-label='Menu']").click();
+        cy.get("[aria-label='Admin']").should("not.exist");
+    });
+
+    it("renders admin button in the mobile menu when logged in as an admin", () => {
         cy.lessThanSmallBreakpoint();
         cy.logInAsAdmin();
-        cy.visitHome();
         cy.get("[aria-label='Menu']").click();
         cy.get("[aria-label='Admin']").should("exist");
     });
@@ -158,18 +169,27 @@ describe("Navbar base tests", () => {
     it("locks scrolling when the mobile-only menu is open", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
+        cy.assertNoScroll();
         cy.get("[aria-label='Menu']").click();
-        cy.get("body").should("have.css", "overflow", "hidden");
+        cy.assertScrollHookCssExist();
+        cy.performTestScroll();
+        cy.assertNoScroll();
         cy.get("[aria-label='Close menu']").click();
-        cy.get("body").should("not.have.css", "overflow", "hidden");
+        cy.assertNoScroll();
+        cy.assertScrollHookCssNotExist();
     });
 
     it("locks scrolling when the account menu is open", () => {
         cy.logInAsAdmin();
+        cy.visitHome();
+        cy.assertNoScroll();
         cy.get("[aria-label='Account']").click();
-        cy.get("body").should("have.css", "overflow", "hidden");
+        cy.assertScrollHookCssExist();
+        cy.performTestScroll();
+        cy.assertNoScroll();
         cy.get("[aria-label='Close menu']").click();
-        cy.get("body").should("not.have.css", "overflow", "hidden");
+        cy.assertScrollHookCssNotExist();
+        cy.assertNoScroll();
     });
 });
 
@@ -193,6 +213,8 @@ describe("Navbar accessibility tests", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
         cy.get("[aria-label='Menu']").click();
+        cy.get("[aria-label='Menu']").should("be.focused");
+        cy.press(Cypress.Keyboard.Keys.TAB);
         cy.get("#mobile-entry").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
         cy.get("[aria-label='Wishlist']").should("be.focused");
@@ -209,12 +231,17 @@ describe("Navbar accessibility tests", () => {
     it("traps focus in the expected tabbing sequence when the account menu is open", () => {
         cy.logInAsAdmin();
         cy.visitHome();
+        cy.wait(1000);
         cy.get("[aria-label='Account']").click();
+        cy.get("[aria-label='Account']").should("be.focused");
+        cy.press(Cypress.Keyboard.Keys.TAB);
+        cy.get("a").contains("My Orders").should("be.focused");
+        cy.press(Cypress.Keyboard.Keys.TAB);
         cy.get("button").contains("Log Out").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
         cy.get("[aria-label='Close menu']").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
-        cy.get("button").contains("Log Out").should("be.focused");
+        cy.get("a").contains("My Orders").should("be.focused");
     });
 
     it("has no accessibility violations when the mobile-only menu is open", () => {

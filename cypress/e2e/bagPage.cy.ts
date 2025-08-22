@@ -115,12 +115,20 @@ describe("Bag page populated tests", () => {
         cy.get(".bag-count-badge").should("have.text", "1");
     });
 
-    it("navigates to Stripe on 'checkout' button click", () => {
+    it("navigates to log in page on 'checkout' button click when unauthenticated", () => {
+        cy.contains("button", "Checkout").click();
+        cy.url().should("contain", "/login");
+    });
+
+    it("navigates to Stripe on 'checkout' button click when authenticated", () => {
         cy.intercept("POST", "/api/create-checkout-session").as("createCheckoutSession");
         cy.intercept("GET", "https://checkout-cookies.stripe.com/api/get-cookie").as(
             "getStripeSessionCookie"
         );
 
+        cy.logInAsStandardUser();
+        cy.visit("/bag");
+        cy.wait(500);
         cy.contains("button", "Checkout").click();
         cy.wait("@createCheckoutSession").its("response.statusCode").should("eq", 200);
         cy.wait("@getStripeSessionCookie").its("response.statusCode").should("eq", 200);
