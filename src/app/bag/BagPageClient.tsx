@@ -108,7 +108,7 @@ export default function BagPageClient() {
                         {mergedItems.map((mergedItem) => (
                             <li
                                 key={`${mergedItem.product.id}-${mergedItem.size}`}
-                                className="w-full mb-8 lg:mb-0"
+                                className="bag-tile w-full mb-8 lg:mb-0"
                             >
                                 <BagTile
                                     bagItem={mergedItem}

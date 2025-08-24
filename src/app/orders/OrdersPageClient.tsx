@@ -19,7 +19,7 @@ export default function OrdersPageClient({ orderData }: { orderData: OrderData[]
                 className="flex flex-col w-full lg:gap-8"
             >
                 {orderData.map((order) => (
-                    <li key={`${order.id}`} className="w-full mb-8 lg:mb-0">
+                    <li key={`${order.id}`} className="order-tile w-full mb-8 lg:mb-0" data-testid="order-tile">
                         <OrderTile
                             orderData={order}
                             openSuccessModal={() => setIsSuccessModalOpen(true)}

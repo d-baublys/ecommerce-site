@@ -1,6 +1,7 @@
 import React from "react";
-import { BagItem, Categories, Product, Sizes, VALID_CATEGORIES } from "./definitions";
-import { processDateForClient, slugify } from "./utils";
+import { BagItem, Categories, OrderData, Product, Sizes, VALID_CATEGORIES } from "./definitions";
+import { convertClientProduct, processDateForClient, slugify } from "./utils";
+import { Product as PrismaProduct } from "@prisma/client";
 
 export function createFakeProduct({
     idx = 0,
@@ -105,6 +106,82 @@ export function getFakeUpdatedData(): Product[] {
     );
 
     return products;
+}
+
+type FakeOrderBase = {
+    idx?: number;
+    overrides?: Partial<Omit<OrderData, "items">>;
+};
+
+type FakeOrderNever = {
+    productList?: never;
+    sizesArr?: never;
+    quantitiesArr?: never;
+};
+
+type FakeOrderSimple = FakeOrderBase & FakeOrderNever;
+
+type FakeOrderFull = FakeOrderBase & {
+    idx: number;
+    productList: Product[];
+    sizesArr: Sizes[];
+    quantitiesArr: number[];
+};
+
+export function createFakeOrder({
+    idx = 0,
+    productList,
+    sizesArr,
+    quantitiesArr,
+    overrides,
+}: FakeOrderSimple | FakeOrderFull = {}): OrderData {
+    const products: Product[] = productList ? productList : [createFakeProduct()];
+    const items: OrderData["items"] = products.map((product, prodIdx) => ({
+        name: product.name,
+        price: product.price,
+        id: `order-${idx}-${prodIdx}`,
+        productId: product.id,
+        size: productList && sizesArr ? sizesArr[prodIdx] : "m",
+        quantity: productList && quantitiesArr ? quantitiesArr[prodIdx] : 2,
+        orderId: idx,
+        product: convertClientProduct(product),
+    }));
+
+    return {
+        id: idx,
+        subTotal: 5000,
+        shippingTotal: 500,
+        total: 5500,
+        status: "paid",
+        userId: 1,
+        email: "test@example.com",
+        createdAt: new Date("2025-08-01"),
+        returnRequestedAt: null,
+        refundedAt: null,
+        sessionId: `sessionId-${idx}`,
+        paymentIntentId: `paymentIntentId-${idx}`,
+        items,
+        ...overrides,
+    };
+}
+
+export function createFakeOrderList(): OrderData[] {
+    const productList = createFakeProductList();
+    const firstOrderList = productList.slice(0, 3);
+    const secondOrderList = productList.slice(3);
+
+    const productLists = [firstOrderList, secondOrderList];
+    const sizesArr: Sizes[][] = [["m", "l", "m"], ["l"]];
+    const quantitiesArr: number[][] = [[2, 1, 1], [1]];
+
+    return Array.from({ length: 2 }).map((_, orderIdx) =>
+        createFakeOrder({
+            idx: orderIdx,
+            productList: productLists[orderIdx],
+            sizesArr: sizesArr[orderIdx],
+            quantitiesArr: quantitiesArr[orderIdx],
+        })
+    );
 }
 
 class ErrorBoundary extends React.Component<

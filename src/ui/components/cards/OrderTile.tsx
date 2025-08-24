@@ -47,7 +47,7 @@ export default function OrderTile(props: OrderTileProps) {
             break;
     }
 
-    const handleConfirm = async (orderId: OrderData["id"]) => {
+    const handleReturnRequest = async (orderId: OrderData["id"]) => {
         const returnConfirm = await openModal();
 
         if (returnConfirm) {
@@ -110,7 +110,7 @@ export default function OrderTile(props: OrderTileProps) {
                     {orderStatus === "paid" && isOrderWithinReturnWindow && (
                         <div className="mt-2">
                             <PlainRoundedButton
-                                onClick={() => handleConfirm(orderData.id)}
+                                onClick={() => handleReturnRequest(orderData.id)}
                                 overrideClasses="!px-2"
                             >
                                 Request Return

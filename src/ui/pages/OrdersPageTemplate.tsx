@@ -3,7 +3,7 @@ import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLi
 import OrdersPageClient from "@/app/orders/OrdersPageClient";
 import ConstrainedLayout from "@/ui/layouts/ConstrainedLayout";
 
-export default async function OrdersPageTemplate({
+export default function OrdersPageTemplate({
     orderData,
     subheaderText,
 }: {

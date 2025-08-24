@@ -138,14 +138,11 @@ export async function createOrder({
     sessionId: string;
     email: string;
     paymentIntentId: string;
-    userId?: number;
+    userId: number | null;
 }) {
     try {
         const dataObj: Prisma.OrderCreateArgs = {
             data: {
-                subTotal,
-                shippingTotal,
-                total,
                 items: {
                     create: items.map((item) => ({
                         productId: item.productId,
@@ -155,16 +152,16 @@ export async function createOrder({
                         quantity: item.quantity,
                     })),
                 },
+                subTotal,
+                shippingTotal,
+                total,
                 sessionId,
                 email,
-                status: "paid",
                 paymentIntentId,
+                userId,
+                status: "paid",
             },
         };
-
-        if (userId) {
-            dataObj.data.userId = userId;
-        }
 
         await prisma.order.create(dataObj);
 
@@ -314,6 +311,7 @@ export async function createUser(email: string, password: string, role: UserRole
         });
     } catch (error) {
         console.error("Error checking for existing user: ", error);
+        throw new Error("Error checking for existing user.");
     }
 
     if (user) {
@@ -330,8 +328,10 @@ export async function createUser(email: string, password: string, role: UserRole
         await prisma.user.create({
             data: { email, password: hashedPassword, role },
         });
+        return { success: true };
     } catch (error) {
         console.error("Error creating user: ", error);
+        return { success: false };
     }
 }
 

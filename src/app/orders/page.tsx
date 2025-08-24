@@ -17,7 +17,7 @@ export default async function OrdersPage() {
         redirect("/login?redirect_after=orders");
     }
 
-    if (session.user.id === undefined) throw new Error("User ID not found");
+    if (session?.user?.id === undefined) throw new Error("User ID not found");
 
     const ordersFetch = await getUserOrders({ userId: Number(session.user.id) });
     const orderData: OrderData[] = ordersFetch.data;
@@ -25,7 +25,7 @@ export default async function OrdersPage() {
     return (
         <>
             <OrdersPageTemplate orderData={orderData} subheaderText="My Orders" />
-            <ConfirmModal promptText={"Are you sure you want to return this product?"} />
+            <ConfirmModal promptText={"Are you sure you want to return this order?"} />
         </>
     );
 }

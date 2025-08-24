@@ -2,17 +2,29 @@ import {
     clearFeaturedProducts,
     createFeaturedProducts,
     createOrder,
+    createUser,
     getFeaturedProducts,
     getOrder,
+    getOrders,
     getProductData,
+    getUser,
+    getUserOrders,
     productAdd,
     productDelete,
     productUpdate,
+    updateOrder,
     updateStockOnPurchase,
 } from "@/lib/actions";
+import { OrderData } from "@/lib/definitions";
 import { prisma } from "@/lib/prisma";
-import { createFakeProduct, createFakeProductList, getConsoleErrorSpy } from "@/lib/test-utils";
-import { FeaturedProduct, OrderItem, Sizes, Stock } from "@prisma/client";
+import {
+    createFakeOrder,
+    createFakeOrderList,
+    createFakeProduct,
+    createFakeProductList,
+    getConsoleErrorSpy,
+} from "@/lib/test-utils";
+import { FeaturedProduct, Sizes, Stock } from "@prisma/client";
 
 jest.mock("@/lib/prisma", () => ({
     prisma: {
@@ -31,11 +43,17 @@ jest.mock("@/lib/prisma", () => ({
         order: {
             create: jest.fn(),
             findFirst: jest.fn(),
+            findMany: jest.fn(),
+            update: jest.fn(),
         },
         featuredProduct: {
             createMany: jest.fn(),
             findMany: jest.fn(),
             deleteMany: jest.fn(),
+        },
+        user: {
+            create: jest.fn(),
+            findFirst: jest.fn(),
         },
         $transaction: jest.fn(),
     },
@@ -183,25 +201,7 @@ describe("createOrder", () => {
     it("creates order successfully", async () => {
         (prisma.order.create as jest.Mock).mockResolvedValue({});
 
-        const product = createFakeProduct();
-        const orderItem: OrderItem = {
-            id: "test-order-1",
-            productId: product.id,
-            name: product.name,
-            price: product.price,
-            size: "m",
-            quantity: 1,
-            orderId: 1,
-        };
-        const result = createOrder({
-            items: [orderItem],
-            subTotal: 3000,
-            shippingTotal: 500,
-            total: 3500,
-            sessionId: "123abc",
-            email: "test@example.com",
-            userId: 1,
-        });
+        const result = createOrder(createFakeOrder());
         await expect(result).resolves.toEqual({ success: true });
     });
 
@@ -209,14 +209,10 @@ describe("createOrder", () => {
         const errorSpy = getConsoleErrorSpy();
         (prisma.order.create as jest.Mock).mockRejectedValue(new Error("Database error"));
 
-        const result = createOrder({
-            items: [],
-            subTotal: 0,
-            shippingTotal: 0,
-            total: 0,
-            sessionId: "123abc",
-            email: "test@example.com",
-        });
+        const fakeOrder = createFakeOrder();
+        const fakeOrderNoItems: OrderData = { ...fakeOrder, items: [] };
+
+        const result = createOrder(fakeOrderNoItems);
         await expect(result).resolves.toEqual({ success: false });
 
         errorSpy.mockRestore();
@@ -225,29 +221,12 @@ describe("createOrder", () => {
 
 describe("getOrder", () => {
     it("returns order data successfully", async () => {
-        const product = createFakeProduct();
-        const orderItem: OrderItem = {
-            id: "test-order-1",
-            productId: product.id,
-            name: product.name,
-            price: product.price,
-            size: "m",
-            quantity: 1,
-            orderId: 1,
-        };
-        const order = {
-            items: [orderItem],
-            subTotal: 3000,
-            shippingTotal: 500,
-            total: 3500,
-            sessionId: "123abc",
-            email: "test@example.com",
-        };
+        const fakeOrder = createFakeOrder();
 
-        (prisma.order.findFirst as jest.Mock).mockResolvedValue(order);
+        (prisma.order.findFirst as jest.Mock).mockResolvedValue(fakeOrder);
 
         const result = getOrder({ orderId: 1 });
-        await expect(result).resolves.toEqual({ data: order });
+        await expect(result).resolves.toEqual({ data: fakeOrder });
     });
 
     it("throws an error if fetch fails", async () => {
@@ -256,6 +235,73 @@ describe("getOrder", () => {
 
         const result = getOrder({ orderId: 1 });
         await expect(result).rejects.toThrow("Error fetching order data. Please try again later.");
+
+        errorSpy.mockRestore();
+    });
+});
+
+describe("getUserOrders", () => {
+    it("returns order data successfully", async () => {
+        const fakeOrderList = createFakeOrderList();
+        (prisma.order.findMany as jest.Mock).mockResolvedValue(fakeOrderList);
+
+        const result = getUserOrders({ userId: 1 });
+        await expect(result).resolves.toEqual({ data: fakeOrderList });
+    });
+
+    it("throws an error if fetch fails", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.order.findMany as jest.Mock).mockRejectedValue(new Error("Product fetch failed"));
+
+        const result = getUserOrders({ userId: 1 });
+        await expect(result).rejects.toThrow("Error fetching order data. Please try again later.");
+
+        errorSpy.mockRestore();
+    });
+});
+
+describe("getOrders", () => {
+    it("returns order data successfully", async () => {
+        const fakeOrderList = createFakeOrderList();
+        (prisma.order.findMany as jest.Mock).mockResolvedValue(fakeOrderList);
+
+        const result = getOrders();
+        await expect(result).resolves.toEqual({ data: fakeOrderList });
+    });
+
+    it("throws an error if fetch fails", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.order.findMany as jest.Mock).mockRejectedValue(new Error("Product fetch failed"));
+
+        const result = getOrders();
+        await expect(result).rejects.toThrow("Error fetching order data. Please try again later.");
+
+        errorSpy.mockRestore();
+    });
+});
+
+describe("updateOrder", () => {
+    it("updates successfully with valid data", async () => {
+        (prisma.order.update as jest.Mock).mockResolvedValue({});
+
+        const result = updateOrder({
+            orderId: 1,
+            status: "pendingReturn",
+            returnRequestedAt: new Date(),
+        });
+        await expect(result).resolves.toEqual({ success: true });
+    });
+
+    it("resolves with expected value on database error", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.order.update as jest.Mock).mockRejectedValue(new Error("Database error"));
+
+        const result = updateOrder({
+            orderId: 1,
+            status: "pendingReturn",
+            returnRequestedAt: new Date(),
+        });
+        await expect(result).resolves.toEqual({ success: false });
 
         errorSpy.mockRestore();
     });
@@ -344,6 +390,97 @@ describe("clearFeaturedProducts", () => {
 
         const result = clearFeaturedProducts();
         await expect(result).resolves.toEqual({ success: false });
+
+        errorSpy.mockRestore();
+    });
+});
+
+describe("createUser", () => {
+    it("creates user account successfully", async () => {
+        (prisma.user.findFirst as jest.Mock).mockResolvedValue(null);
+        (prisma.user.create as jest.Mock).mockResolvedValue({});
+
+        const result = createUser("test@example.com", "testabc123", "user");
+        await expect(result).resolves.toEqual({ success: true });
+    });
+
+    it("rejects when provided email is invalid", async () => {
+        const errorSpy = getConsoleErrorSpy();
+
+        const result = createUser("testexample.com", "testabc123", "user");
+        await expect(result).rejects.toThrow("Invalid email address provided.");
+
+        errorSpy.mockRestore();
+    });
+
+    it("rejects when user existence data fetch fails", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.user.findFirst as jest.Mock).mockRejectedValue(
+            new Error("Error checking for existing user.")
+        );
+
+        const result = createUser("test@example.com", "testabc123", "user");
+        await expect(result).rejects.toThrow("Error checking for existing user.");
+
+        errorSpy.mockRestore();
+    });
+
+    it("rejects when a user with the same email already exists", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.user.findFirst as jest.Mock).mockResolvedValue({});
+
+        const result = createUser("test@example.com", "testabc123", "user");
+        await expect(result).rejects.toThrow("An account with this email address already exists.");
+
+        errorSpy.mockRestore();
+    });
+
+    it("rejects when a user with the same email already exists", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.user.findFirst as jest.Mock).mockResolvedValue(null);
+
+        const result = createUser("test@example.com", "testabc", "user");
+        await expect(result).rejects.toThrow("Your password must have a minimum of 8 characters.");
+
+        errorSpy.mockRestore();
+    });
+
+    it("rejects on database error", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.user.findFirst as jest.Mock).mockResolvedValue(null);
+        (prisma.user.create as jest.Mock).mockRejectedValue(new Error("Error creating user."));
+
+        const result = createUser("test@example.com", "testabc123", "user");
+        await expect(result).resolves.toEqual({ success: false });
+
+        errorSpy.mockRestore();
+    });
+});
+
+describe("getUser", () => {
+    it("returns user data successfully", async () => {
+        (prisma.user.findFirst as jest.Mock).mockResolvedValue({});
+        const email = "test@example.com";
+        const userData = {
+            id: undefined,
+            email: undefined,
+            password: undefined,
+            role: undefined,
+        };
+
+        const result = getUser(email);
+        await expect(result).resolves.toEqual(userData);
+    });
+
+    it("throws an error if fetch fails", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.user.findFirst as jest.Mock).mockRejectedValue(
+            new Error("Error fetching user data. Please try again later.")
+        );
+        const email = "test@example.com";
+
+        const result = getUser(email);
+        await expect(result).rejects.toThrow("Error fetching user data. Please try again later.");
 
         errorSpy.mockRestore();
     });

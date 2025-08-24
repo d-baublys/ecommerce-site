@@ -70,7 +70,6 @@ export default function BagTile({
             wrapWithLink={true}
             showSize={true}
             endContent={buildEndContent()}
-            externalOverrides="bag-tile"
             internalOverrides="!h-40"
         />
     );

@@ -29,7 +29,7 @@ export default async function IndividualOrderPage({ params }: AsyncParams) {
             <AdminWrapper>
                 <OrdersPageTemplate orderData={orderData} subheaderText="Orders" />
             </AdminWrapper>
-            <ConfirmModal promptText={"Are you sure you want to return this product?"} />
+            <ConfirmModal promptText={"Are you sure you want to return this order?"} />
         </>
     );
 }

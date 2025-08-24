@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         const shippingTotal = Number(session.metadata.shippingCost);
         const orderTotal = subTotal + shippingTotal;
 
-        const userId = Number(session.metadata.userId);
+        const userId = session.metadata.userId ? Number(session.metadata.userId) : null;
         const email = session.customer_details?.email;
         const paymentIntentId =
             typeof session.payment_intent === "string"
