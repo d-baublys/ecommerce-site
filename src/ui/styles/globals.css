@@ -16,9 +16,9 @@
     --gutter-sm: 0.5rem;
     --gutter: 2rem;
     --gutter-md: 4rem;
-    --carousel-img-w: min(50vw, 500px);
+    --carousel-img-w: min(45vw, 500px);
     --carousel-img-gap: calc(var(--carousel-img-w) / 4);
-    --carousel-width: min(100vw, 1000px);
+    --carousel-width: min(90vw, 1000px);
     --searchbar-height: 2.5rem;
 }
 
@@ -114,13 +114,13 @@
     }
 
     .global-constraints {
+        width: 100%;
         min-width: 20rem;
-        min-height: 100vh;
     }
 
     .overlay-constraints {
-        width: 100vw;
-        max-width: 100vw;
+        max-width: 100%;
+        min-height: 100%;
     }
 
     @media screen and (min-width: 48rem) {

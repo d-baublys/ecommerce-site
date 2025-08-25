@@ -1,7 +1,7 @@
 import { Sizes } from "@/lib/definitions";
 import { createFakeProductList } from "@/lib/test-utils";
 import { useBagStore } from "@/stores/bagStore";
-import NavBarClient from "@/ui/components/NavBarClient";
+import NavBar from "@/ui/components/NavBar";
 import { screen, waitFor } from "@testing-library/dom";
 import { act, render } from "@testing-library/react";
 import { axe, toHaveNoViolations } from "jest-axe";
@@ -17,13 +17,14 @@ jest.mock("next/navigation", () => ({
     useRouter: () => ({
         push: jest.fn(),
     }),
+    usePathname: () => "/",
 }));
 
 import { useSession } from "next-auth/react";
 
 const { addToBag, clearBag } = useBagStore.getState();
 const fakeProductList = createFakeProductList();
-const renderNavBar = () => render(<NavBarClient />);
+const renderNavBar = () => render(<NavBar />);
 
 const getSessionWithAuth = () => {
     (useSession as jest.Mock).mockReturnValue({

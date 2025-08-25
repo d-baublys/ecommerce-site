@@ -11,7 +11,7 @@ import ConstrainedLayout from "@/ui/layouts/ConstrainedLayout";
 import { createUser } from "@/lib/actions";
 import SignUpModal from "@/ui/components/overlays/SignUpModal";
 
-export default function LoginSignUpForm({ variant }: { variant: "login" | "signup" }) {
+export default function LoginSignUpPage({ variant }: { variant: "login" | "signup" }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmedPassword, setConfirmedPassword] = useState("");
@@ -36,7 +36,7 @@ export default function LoginSignUpForm({ variant }: { variant: "login" | "signu
         });
 
         if (!response?.error) {
-            redirectPath ? router.push(`/${redirectPath}?from_login=true`) : router.push("/");
+            router.push(redirectPath ? `/${redirectPath}?from_login=true` : "/");
         } else {
             if (response?.error === "CredentialsSignin") {
                 setError("Incorrect email address or password. Please try again.");

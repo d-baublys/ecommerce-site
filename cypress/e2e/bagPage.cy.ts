@@ -115,9 +115,10 @@ describe("Bag page populated tests", () => {
         cy.get(".bag-count-badge").should("have.text", "1");
     });
 
-    it("navigates to log in page on 'checkout' button click when unauthenticated", () => {
+    it("redirects to log in page on 'checkout' button click when unauthenticated", () => {
         cy.contains("button", "Checkout").click();
-        cy.url().should("contain", "/login");
+        cy.location("pathname").should("eq", "/login");
+        cy.location("search").should("eq", "?redirect_after=bag");
     });
 
     it("navigates to Stripe on 'checkout' button click when authenticated", () => {
@@ -132,6 +133,31 @@ describe("Bag page populated tests", () => {
         cy.contains("button", "Checkout").click();
         cy.wait("@createCheckoutSession").its("response.statusCode").should("eq", 200);
         cy.wait("@getStripeSessionCookie").its("response.statusCode").should("eq", 200);
+    });
+
+    it("automatically initiates checkout after logging in from redirect", () => {
+        cy.intercept("POST", "https://m.stripe.com/6").as("stripeEntryOnRedirect");
+
+        cy.contains("button", "Checkout").click();
+        cy.location("pathname").should("eq", "/login");
+        cy.location("search").should("eq", "?redirect_after=bag");
+        cy.logInFromCurrent();
+        cy.location("pathname").should("eq", "/bag");
+        cy.location("search").should("eq", "?from_login=true");
+        cy.wait("@stripeEntryOnRedirect").its("response.statusCode").should("eq", 200);
+    });
+
+    it("redirects to log in page on 'checkout' button click after logging out", () => {
+        cy.logInAsStandardUser();
+        cy.visit("/bag");
+        cy.location("pathname").should("eq", "/bag");
+        cy.wait(500);
+        cy.get("[aria-label='Account']").click();
+        cy.contains("button", "Log Out").click();
+        cy.wait(500);
+        cy.contains("button", "Checkout").click();
+        cy.location("pathname").should("eq", "/login");
+        cy.location("search").should("eq", "?redirect_after=bag");
     });
 
     it("has no accessibility violations", () => {

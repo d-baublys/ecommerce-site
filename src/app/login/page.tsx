@@ -1,4 +1,4 @@
-import LoginSignUpForm from "@/ui/components/forms/LoginSignUpForm";
+import LoginSignUpPage from "@/ui/pages/LoginSignUpPage";
 import { Metadata } from "next";
 import { Suspense } from "react";
 
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function LoginPage() {
     return (
         <Suspense>
-            <LoginSignUpForm variant="login" />
+            <LoginSignUpPage variant="login" />
         </Suspense>
     );
 }

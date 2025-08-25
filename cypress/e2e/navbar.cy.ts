@@ -24,6 +24,7 @@ describe("Navbar base tests", () => {
     it("shows the mobile-only menu & the expected menu items", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
+        cy.wait(500);
         cy.get("[aria-label='Menu']").click();
         cy.get("#nav-mobile-menu").should("be.visible");
         cy.get("#mobile-entry").should("be.visible");
@@ -35,6 +36,7 @@ describe("Navbar base tests", () => {
     it("stacks the mobile-only menu above the navbar", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
+        cy.wait(500);
         cy.get("[aria-label='Menu'").click();
         cy.get("#navbar").should("not.be.visible");
     });
@@ -42,6 +44,7 @@ describe("Navbar base tests", () => {
     it("closes the mobile-only menu as expected", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
+        cy.wait(500);
         cy.get("[aria-label='Menu']").click();
         cy.get("#nav-mobile-menu").should("be.visible");
         cy.get("[aria-label='Close menu']").click();
@@ -52,6 +55,7 @@ describe("Navbar base tests", () => {
     it("hides the mobile-only menu if window is resized to larger-than-mobile width", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
+        cy.wait(500);
         cy.get("[aria-label='Menu']").click();
         cy.get("#nav-mobile-menu").should("be.visible");
         cy.get("#mobile-entry").should("be.visible");
@@ -84,27 +88,31 @@ describe("Navbar base tests", () => {
         cy.location("pathname").should("eq", "/bag");
     });
 
-    it("doesn't open the account menu when not logged in as admin", () => {
+    it("redirects to login page when 'account' button is clicked unauthenticated", () => {
         cy.visitHome();
         cy.get("[aria-label='Account']").click();
+        cy.location("pathname").should("eq", "/login");
         cy.get("#account-menu").should("not.be.visible");
     });
 
-    it("shows the account menu & the expected menu items when logged in as admin", () => {
-        cy.logInAsAdmin();
+    it("opens the account menu & shows expected menu items when when 'account' button is clicked authenticated", () => {
+        cy.logInAsStandardUser();
+        cy.wait(500);
         cy.get("[aria-label='Account']").click();
         cy.get("#account-menu").should("be.visible");
         cy.contains("button", "Log Out").should("be.visible");
     });
 
     it("stacks the account menu above the navbar", () => {
-        cy.logInAsAdmin();
+        cy.logInAsStandardUser();
+        cy.wait(500);
         cy.get("[aria-label='Account']").click();
         cy.get("#navbar").should("not.be.visible");
     });
 
     it("closes the account menu as expected", () => {
-        cy.logInAsAdmin();
+        cy.logInAsStandardUser();
+        cy.wait(500);
         cy.get("[aria-label='Account']").click();
         cy.get("[aria-label='Close menu']").click();
         cy.get("#account-menu").should("not.be.visible");
@@ -126,9 +134,20 @@ describe("Navbar base tests", () => {
         cy.get("[aria-label='Admin']").should("exist");
     });
 
+    it("doesn't render admin button in the navbar after admin log out", () => {
+        cy.logInAsAdmin();
+        cy.get("[aria-label='Admin']").should("exist");
+        cy.wait(500);
+        cy.get("[aria-label='Account']").click();
+        cy.wait(500);
+        cy.contains("button", "Log Out").click();
+        cy.get("[aria-label='Admin']").should("not.exist");
+    });
+
     it("doesn't render admin button in the mobile menu when unauthenticated", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
+        cy.wait(500);
         cy.get("[aria-label='Menu']").click();
         cy.get("[aria-label='Admin']").should("not.exist");
     });
@@ -136,6 +155,7 @@ describe("Navbar base tests", () => {
     it("doesn't render admin button in the mobile menu when logged in as a standard user", () => {
         cy.lessThanSmallBreakpoint();
         cy.logInAsStandardUser();
+        cy.wait(500);
         cy.get("[aria-label='Menu']").click();
         cy.get("[aria-label='Admin']").should("not.exist");
     });
@@ -143,8 +163,23 @@ describe("Navbar base tests", () => {
     it("renders admin button in the mobile menu when logged in as an admin", () => {
         cy.lessThanSmallBreakpoint();
         cy.logInAsAdmin();
+        cy.wait(500);
         cy.get("[aria-label='Menu']").click();
         cy.get("[aria-label='Admin']").should("exist");
+    });
+
+    it("doesn't render admin button in the mobile menu after admin log out", () => {
+        cy.lessThanSmallBreakpoint();
+        cy.logInAsAdmin();
+        cy.wait(500);
+        cy.get("[aria-label='Menu']").click();
+        cy.get("[aria-label='Admin']").should("exist");
+        cy.get("#nav-mobile-menu [aria-label='Account']").click();
+        cy.wait(500);
+        cy.contains("button", "Log Out").click();
+        cy.get("[aria-label='Menu']").click();
+        cy.wait(500);
+        cy.get("[aria-label='Admin']").should("not.exist");
     });
 
     it("navigates correctly when clicking 'Admin' link button", () => {
@@ -169,6 +204,7 @@ describe("Navbar base tests", () => {
     it("locks scrolling when the mobile-only menu is open", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
+        cy.wait(500);
         cy.assertNoScroll();
         cy.get("[aria-label='Menu']").click();
         cy.assertScrollHookCssExist();
@@ -180,8 +216,9 @@ describe("Navbar base tests", () => {
     });
 
     it("locks scrolling when the account menu is open", () => {
-        cy.logInAsAdmin();
+        cy.logInAsStandardUser();
         cy.visitHome();
+        cy.wait(500);
         cy.assertNoScroll();
         cy.get("[aria-label='Account']").click();
         cy.assertScrollHookCssExist();
@@ -191,19 +228,45 @@ describe("Navbar base tests", () => {
         cy.assertScrollHookCssNotExist();
         cy.assertNoScroll();
     });
+
+    it("closes the mobile-only menu on pathname change", () => {
+        cy.lessThanSmallBreakpoint();
+        cy.visitHome();
+        cy.wait(500);
+        cy.visit("/login");
+        cy.get("[aria-label='Menu']").click();
+        cy.wait(500);
+        cy.get("#nav-mobile-menu").should("be.visible");
+        cy.go("back");
+        cy.get("#nav-mobile-menu").should("not.be.visible");
+    });
+
+    it("closes the account menu on pathname change", () => {
+        cy.logInAsStandardUser();
+        cy.visitHome();
+        cy.wait(500);
+        cy.visit("/login");
+        cy.get("[aria-label='Account']").click();
+        cy.wait(500);
+        cy.get("#account-menu").should("be.visible");
+        cy.go("back");
+        cy.get("#account-menu").should("not.be.visible");
+    });
 });
 
 describe("Navbar accessibility tests", () => {
     it("restores focus when mobile-only menu is closed", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
+        cy.wait(500);
         cy.get("[aria-label='Menu']").click();
         cy.get("[aria-label='Close menu']").click();
         cy.get("[aria-label='Menu']").should("have.focus");
     });
 
     it("restores focus when account menu is closed", () => {
-        cy.logInAsAdmin();
+        cy.logInAsStandardUser();
+        cy.wait(500);
         cy.get("[aria-label='Account']").click();
         cy.get("[aria-label='Close menu']").click();
         cy.get("[aria-label='Account']").should("have.focus");
@@ -212,6 +275,7 @@ describe("Navbar accessibility tests", () => {
     it("traps focus in the expected tabbing sequence when the mobile-only menu is open", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
+        cy.wait(500);
         cy.get("[aria-label='Menu']").click();
         cy.get("[aria-label='Menu']").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
@@ -229,9 +293,9 @@ describe("Navbar accessibility tests", () => {
     });
 
     it("traps focus in the expected tabbing sequence when the account menu is open", () => {
-        cy.logInAsAdmin();
+        cy.logInAsStandardUser();
         cy.visitHome();
-        cy.wait(1000);
+        cy.wait(500);
         cy.get("[aria-label='Account']").click();
         cy.get("[aria-label='Account']").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
@@ -246,8 +310,9 @@ describe("Navbar accessibility tests", () => {
 
     it("has no accessibility violations when the mobile-only menu is open", () => {
         cy.lessThanSmallBreakpoint();
-        cy.logInAsAdmin();
+        cy.logInAsStandardUser();
         cy.visitHome();
+        cy.wait(500);
         cy.get("[aria-label='Menu']").click();
         cy.wait(500);
         cy.injectAxe();
@@ -255,8 +320,9 @@ describe("Navbar accessibility tests", () => {
     });
 
     it("has no accessibility violations when the account menu is open", () => {
-        cy.logInAsAdmin();
+        cy.logInAsStandardUser();
         cy.visitHome();
+        cy.wait(500);
         cy.get("[aria-label='Account']").click();
         cy.wait(500);
         cy.injectAxe();

@@ -44,6 +44,7 @@ declare global {
         interface Chainable {
             logInAsAdmin(): Chainable<void>;
             logInAsStandardUser(): Chainable<void>;
+            logInFromCurrent(): Chainable<void>;
             visitHome(): Chainable<void>;
             lessThanSmallBreakpoint(): Chainable<void>;
             smallBreakpoint(): Chainable<void>;
@@ -73,6 +74,14 @@ Cypress.Commands.add("logInAsAdmin", () => {
 Cypress.Commands.add("logInAsStandardUser", () => {
     cy.intercept("GET", "/api/auth/session").as("auth-check");
     cy.visit("/login");
+    cy.get("input[name='email']").type(standardEmail);
+    cy.get("input[name='password']").type(standardPassword);
+    cy.get("button[type='submit']").click();
+    cy.wait("@auth-check");
+});
+
+Cypress.Commands.add("logInFromCurrent", () => {
+    cy.intercept("GET", "/api/auth/session").as("auth-check");
     cy.get("input[name='email']").type(standardEmail);
     cy.get("input[name='password']").type(standardPassword);
     cy.get("button[type='submit']").click();

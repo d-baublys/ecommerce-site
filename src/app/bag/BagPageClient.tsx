@@ -12,9 +12,11 @@ import MainLayout from "@/ui/layouts/MainLayout";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
+import LoadingIndicator from "@/ui/components/overlays/LoadingIndicator";
 
 export default function BagPageClient() {
     const [latestData, setLatestData] = useState<Product[]>();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<Error | null>(null);
 
     const { bag, removeFromBag, hasHydrated } = useBagStore((state) => state);
@@ -81,7 +83,10 @@ export default function BagPageClient() {
         const redirect = searchParams.get("from_login");
 
         if (redirect === "true" && session.status === "authenticated") {
-            goToCheckout();
+            setIsLoading(true);
+            setTimeout(() => {
+                goToCheckout();
+            }, 1000);
         }
     }, [session]);
 
@@ -97,78 +102,83 @@ export default function BagPageClient() {
     });
 
     return (
-        <MainLayout subheaderText="My Bag">
-            <div className="flex flex-col md:flex-row w-full h-full">
-                {!emptyBag ? (
-                    <ul
-                        id="bag-tile-container"
-                        data-testid="bag-tile-ul"
-                        className="flex flex-col w-full lg:gap-8"
-                    >
-                        {mergedItems.map((mergedItem) => (
-                            <li
-                                key={`${mergedItem.product.id}-${mergedItem.size}`}
-                                className="bag-tile w-full mb-8 lg:mb-0"
-                            >
-                                <BagTile
-                                    bagItem={mergedItem}
-                                    handleDelete={() =>
-                                        removeFromBag(mergedItem.product.id, mergedItem.size)
-                                    }
-                                />
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <div className="flex flex-col justify-center items-center w-full h-full p-8 md:p-0 gap-8">
-                        <p>{"Your bag is empty!"}</p>
-                        <div>
-                            <PlainRoundedButtonLink href={"/category/all"}>
-                                Shop
-                            </PlainRoundedButtonLink>
-                        </div>
-                    </div>
-                )}
-                <div className="flex flex-col px-8 py-6 w-full h-min md:w-2/5 md:ml-8 justify-evenly bg-background-lightest rounded-sm">
-                    <p className="pb-6 font-semibold text-sz-subheading lg:text-sz-subheading-lg whitespace-nowrap">
-                        Order Summary
-                    </p>
-                    <div>
-                        <div className="flex justify-between py-3">
-                            <p>Subtotal</p>
-                            <p aria-label="Bag subtotal">£{stringifyConvertPrice(orderSubtotal)}</p>
-                        </div>
-                        <div className="flex justify-between py-3 border-b-2">
-                            <p>Shipping</p>
-                            <p aria-label="Shipping cost">
-                                {shippingCost ? (
-                                    <>
-                                        <span>£</span>
-                                        <span>{stringifyConvertPrice(shippingCost)}</span>
-                                    </>
-                                ) : (
-                                    "-"
-                                )}
-                            </p>
-                        </div>
-                        <div className="flex justify-between py-3 font-semibold">
-                            <p>Total</p>
-                            <p aria-label="Bag total">£{stringifyConvertPrice(orderTotal)}</p>
-                        </div>
-                    </div>
-                    {!(emptyBag || noStock) && (
-                        <div className="flex pt-4 w-full justify-center">
-                            <GoButton
-                                onClick={handleCheckout}
-                                predicate={!(emptyBag || noStock)}
-                                disabled={emptyBag || noStock}
-                            >
-                                Checkout
-                            </GoButton>
+        <>
+            <MainLayout subheaderText="My Bag">
+                <div className="flex flex-col md:flex-row w-full h-full">
+                    {!emptyBag ? (
+                        <ul
+                            id="bag-tile-container"
+                            data-testid="bag-tile-ul"
+                            className="flex flex-col w-full lg:gap-8"
+                        >
+                            {mergedItems.map((mergedItem) => (
+                                <li
+                                    key={`${mergedItem.product.id}-${mergedItem.size}`}
+                                    className="bag-tile w-full mb-8 lg:mb-0"
+                                >
+                                    <BagTile
+                                        bagItem={mergedItem}
+                                        handleDelete={() =>
+                                            removeFromBag(mergedItem.product.id, mergedItem.size)
+                                        }
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <div className="flex flex-col justify-center items-center w-full h-full p-8 md:p-0 gap-8">
+                            <p>{"Your bag is empty!"}</p>
+                            <div>
+                                <PlainRoundedButtonLink href={"/category/all"}>
+                                    Shop
+                                </PlainRoundedButtonLink>
+                            </div>
                         </div>
                     )}
+                    <div className="flex flex-col px-8 py-6 w-full h-min md:w-2/5 md:ml-8 justify-evenly bg-background-lightest rounded-sm">
+                        <p className="pb-6 font-semibold text-sz-subheading lg:text-sz-subheading-lg whitespace-nowrap">
+                            Order Summary
+                        </p>
+                        <div>
+                            <div className="flex justify-between py-3">
+                                <p>Subtotal</p>
+                                <p aria-label="Bag subtotal">
+                                    £{stringifyConvertPrice(orderSubtotal)}
+                                </p>
+                            </div>
+                            <div className="flex justify-between py-3 border-b-2">
+                                <p>Shipping</p>
+                                <p aria-label="Shipping cost">
+                                    {shippingCost ? (
+                                        <>
+                                            <span>£</span>
+                                            <span>{stringifyConvertPrice(shippingCost)}</span>
+                                        </>
+                                    ) : (
+                                        "-"
+                                    )}
+                                </p>
+                            </div>
+                            <div className="flex justify-between py-3 font-semibold">
+                                <p>Total</p>
+                                <p aria-label="Bag total">£{stringifyConvertPrice(orderTotal)}</p>
+                            </div>
+                        </div>
+                        {!(emptyBag || noStock) && (
+                            <div className="flex pt-4 w-full justify-center">
+                                <GoButton
+                                    onClick={handleCheckout}
+                                    predicate={!(emptyBag || noStock)}
+                                    disabled={emptyBag || noStock}
+                                >
+                                    Checkout
+                                </GoButton>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </div>
-        </MainLayout>
+            </MainLayout>
+            {isLoading && <LoadingIndicator />}
+        </>
     );
 }

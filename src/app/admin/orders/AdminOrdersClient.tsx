@@ -208,9 +208,9 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderDat
 
     return (
         <>
-            <div className="flex justify-center items-center grow">
+            <div className="flex justify-center items-center grow w-full">
                 {ordersData.length ? (
-                    <div className="overflow-x-scroll max-w-[88vw]">
+                    <div className="overflow-x-scroll max-w-[85vw]">
                         <RoundedTable
                             tableHeadCells={buildHeadCells()}
                             tableBodyCells={buildBodyCells()}

@@ -104,6 +104,18 @@ describe("Search overlay base tests", () => {
         cy.get("#navbar").should("be.visible");
     });
 
+    it("closes on pathname change", () => {
+        cy.get("#search-overlay-container [aria-label='Close search']").click();
+        cy.visitHome();
+        cy.wait(500);
+        cy.visit("/login");
+        cy.get("[aria-label='Search']").click();
+        cy.wait(500);
+        cy.get("#search-overlay-container").should("exist");
+        cy.go("back");
+        cy.get("#search-overlay-container").should("not.exist");
+    });
+
     it("locks scrolling when overlay is open", () => {
         cy.assertScrollHookCssExist();
         cy.performTestScroll();
