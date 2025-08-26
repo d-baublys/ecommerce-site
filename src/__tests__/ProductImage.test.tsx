@@ -1,5 +1,5 @@
 import { Product } from "@/lib/definitions";
-import { createFakeProduct } from "@/lib/test-utils";
+import { createFakeProduct } from "@/lib/test-factories";
 import ProductImage from "@/ui/components/ProductImage";
 import { screen, waitFor } from "@testing-library/dom";
 import { act, render } from "@testing-library/react";

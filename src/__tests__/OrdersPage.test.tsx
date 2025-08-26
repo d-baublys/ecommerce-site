@@ -1,4 +1,5 @@
-import { createFakeOrderList, wrapWithErrorBoundary } from "@/lib/test-utils";
+import { createFakeOrderList } from "@/lib/test-factories";
+import { wrapWithErrorBoundary } from "@/lib/test-utils";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import OrdersPage from "@/app/orders/page";
 import { OrderData } from "@/lib/definitions";

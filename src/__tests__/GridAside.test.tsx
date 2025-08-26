@@ -1,5 +1,6 @@
 import { PriceFilterKey, Product, Sizes } from "@/lib/definitions";
-import { createFakeProductList, matchPriceRangeLabel, matchSizeLabel } from "@/lib/test-utils";
+import { createFakeProductList } from "@/lib/test-factories";
+import { matchPriceRangeLabel, matchSizeLabel } from "@/lib/test-utils";
 import GridAside from "@/ui/components/product-grid/GridAside";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { axe, toHaveNoViolations } from "jest-axe";

@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ProductGridTile from "@/ui/components/cards/ProductGridTile";
 import { Product } from "@/lib/definitions";
-import { createFakeProduct } from "@/lib/test-utils";
+import { createFakeProduct } from "@/lib/test-factories";
 import { act } from "react";
 import { axe, toHaveNoViolations } from "jest-axe";
 

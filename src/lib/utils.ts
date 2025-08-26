@@ -115,7 +115,8 @@ export function convertOrderProducts(data: OrderData): OrderItemWithClientProduc
 }
 
 export function convertClientProduct(product: Product): PrismaProduct {
-    return { ...product, dateAdded: new Date(product.dateAdded)}; 
+    const { stock, ...rest } = product;
+    return { ...rest, dateAdded: new Date(rest.dateAdded) };
 }
 
 export function containsClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: string) {

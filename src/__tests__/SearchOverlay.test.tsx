@@ -1,4 +1,4 @@
-import { getFilteredFakeProducts } from "@/lib/test-utils";
+import { getFilteredFakeProducts } from "@/lib/test-factories";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { axe, toHaveNoViolations } from "jest-axe";
 import SearchOverlay from "@/ui/components/overlays/SearchOverlay";

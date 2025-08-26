@@ -1,4 +1,4 @@
-import { createFakeProductList } from "@/lib/test-utils";
+import { createFakeProductList } from "@/lib/test-factories";
 import SearchBar from "@/ui/components/SearchBar";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { Product } from "@/lib/definitions";

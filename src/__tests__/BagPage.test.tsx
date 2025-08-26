@@ -1,11 +1,5 @@
 import BagPage from "@/app/bag/page";
-import {
-    createFakeBagItems,
-    createFakeProduct,
-    getConsoleErrorSpy,
-    getFakeUpdatedData,
-    wrapWithErrorBoundary,
-} from "@/lib/test-utils";
+import { createFakeBagItems, createFakeProduct, getFakeUpdatedData } from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { Product } from "@/lib/definitions";
@@ -40,6 +34,7 @@ jest.mock("@/auth", () => ({
 
 import { useSession } from "next-auth/react";
 import { getProductData } from "@/lib/actions";
+import { getConsoleErrorSpy, wrapWithErrorBoundary } from "@/lib/test-utils";
 
 const { addToBag, clearBag } = useBagStore.getState();
 const fakeBagItems = createFakeBagItems();

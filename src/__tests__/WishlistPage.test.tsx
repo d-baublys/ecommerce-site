@@ -1,4 +1,4 @@
-import { getFilteredFakeProducts } from "@/lib/test-utils";
+import { getFilteredFakeProducts } from "@/lib/test-factories";
 import { render, screen, waitFor } from "@testing-library/react";
 
 jest.mock("next/navigation", () => ({

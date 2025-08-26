@@ -22,8 +22,8 @@ import {
     createFakeOrderList,
     createFakeProduct,
     createFakeProductList,
-    getConsoleErrorSpy,
-} from "@/lib/test-utils";
+} from "@/lib/test-factories";
+import { getConsoleErrorSpy } from "@/lib/test-utils";
 import { FeaturedProduct, Sizes, Stock } from "@prisma/client";
 
 jest.mock("@/lib/prisma", () => ({

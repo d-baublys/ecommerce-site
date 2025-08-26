@@ -69,6 +69,7 @@ Cypress.Commands.add("logInAsAdmin", () => {
     cy.get("input[name='password']").type(adminPassword);
     cy.get("button[type='submit']").click();
     cy.wait("@auth-check");
+    cy.location("pathname").should("eq", "/");
 });
 
 Cypress.Commands.add("logInAsStandardUser", () => {
@@ -78,6 +79,7 @@ Cypress.Commands.add("logInAsStandardUser", () => {
     cy.get("input[name='password']").type(standardPassword);
     cy.get("button[type='submit']").click();
     cy.wait("@auth-check");
+    cy.location("pathname").should("eq", "/");
 });
 
 Cypress.Commands.add("logInFromCurrent", () => {

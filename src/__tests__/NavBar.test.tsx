@@ -1,5 +1,5 @@
 import { Sizes } from "@/lib/definitions";
-import { createFakeProductList } from "@/lib/test-utils";
+import { createFakeProductList } from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
 import NavBar from "@/ui/components/NavBar";
 import { screen, waitFor } from "@testing-library/dom";

@@ -111,3 +111,9 @@ export class CredentialsError extends Error {
         this.name = "CredentialsError";
     }
 }
+
+export type CypressSeedTestProduct = { id: number; name: string; price: number };
+export type CypressSeedTestDataDelete = {
+    orderIdArr: Order["id"][];
+    productIdArr: PrismaProduct["id"][];
+};

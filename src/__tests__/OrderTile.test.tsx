@@ -1,4 +1,4 @@
-import { createFakeOrder } from "@/lib/test-utils";
+import { createFakeOrder } from "@/lib/test-factories";
 import { checkIsWithinReturnWindow } from "@/lib/utils";
 import OrderTile from "@/ui/components/cards/OrderTile";
 import { render, screen, waitFor } from "@testing-library/react";

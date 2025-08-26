@@ -1,4 +1,5 @@
-import { createFakeProduct, getConsoleErrorSpy } from "@/lib/test-utils";
+import { createFakeProduct } from "@/lib/test-factories";
+import { getConsoleErrorSpy } from "@/lib/test-utils";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import ProductPage from "@/app/products/[slug]/page";
 import { useBagStore } from "@/stores/bagStore";

@@ -1,3 +1,5 @@
+import { CypressSeedTestProduct } from "../../src/lib/definitions";
+
 describe("Orders page base tests", () => {
     beforeEach(() => {
         cy.visit("/orders");
@@ -27,10 +29,28 @@ describe("Orders page base tests", () => {
         cy.visit("/orders");
         cy.location("pathname").should("eq", "/orders");
         cy.get("[aria-label='Account']").click();
-        cy.contains("button", "Log Out").should("be.visible");
+        cy.get("#account-menu").should("be.visible");
         cy.contains("button", "Log Out").click();
         cy.wait(500);
         cy.location("pathname").should("eq", "/login");
         cy.location("search").should("eq", "?redirect_after=orders");
+    });
+
+    it("renders correct number of order tiles", () => {
+        cy.task("seedTestProduct").then((firstTestProductData: CypressSeedTestProduct) => {
+            cy.task("seedTestOrder", { productsDataArr: [firstTestProductData] }).then(
+                (firstOrderId) => {
+                    cy.wait(500);
+                    cy.logInAsAdmin();
+                    cy.visit("/orders");
+                    cy.contains("You have no orders yet!").should("not.exist");
+                    cy.get("#order-tile-container .order-tile").should("have.length", 1);
+                    cy.task("deleteTestData", {
+                        orderIdArr: [firstOrderId],
+                        productIdArr: [firstTestProductData.id],
+                    });
+                }
+            );
+        });
     });
 });
