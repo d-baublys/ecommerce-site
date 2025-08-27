@@ -4,7 +4,7 @@ describe("Product grid page mobile viewport base tests", () => {
     beforeEach(() => {
         cy.lessThanLargeBreakpoint();
         cy.visit("/category/all");
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
     });
 
     it("displays the correct number of items", () => {
@@ -33,7 +33,7 @@ describe("Category grid page mobile viewport filtering tests", () => {
     beforeEach(() => {
         cy.lessThanLargeBreakpoint();
         cy.visit("/category/all");
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.contains("button", "Filter").click();
     });
 
@@ -86,7 +86,7 @@ describe("Category grid page mobile viewport filtering tests", () => {
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
         cy.get("[aria-label='Close menu']").click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 7);
         cy.contains(/7\s*Items/).should("be.visible");
     });
@@ -96,12 +96,12 @@ describe("Category grid page mobile viewport filtering tests", () => {
         cy.get(".mobile-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XS"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".mobile-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
         cy.get("[aria-label='Close menu']").click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 14);
         cy.contains(/14\s*Items/).should("be.visible");
     });
@@ -112,7 +112,7 @@ describe("Category grid page mobile viewport filtering tests", () => {
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
         cy.get("[aria-label='Close menu']").click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 1);
         cy.contains(/1\s*Item/).should("be.visible");
     });
@@ -122,12 +122,12 @@ describe("Category grid page mobile viewport filtering tests", () => {
         cy.get(".mobile-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(4, "0", "49"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".mobile-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
         cy.get("[aria-label='Close menu']").click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 5);
         cy.contains(/5\s*Items/).should("be.visible");
     });
@@ -138,12 +138,12 @@ describe("Category grid page mobile viewport filtering tests", () => {
         cy.get(".mobile-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".mobile-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
         cy.get("[aria-label='Close menu']").click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 0);
         cy.contains(/0\s*Items/).should("be.visible");
     });
@@ -154,12 +154,12 @@ describe("Category grid page mobile viewport filtering tests", () => {
         cy.get(".mobile-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".mobile-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
         cy.get("[aria-label='Close menu']").click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.contains("No products matching your filter").should("be.visible");
     });
 });
@@ -168,15 +168,15 @@ describe("Category grid page mobile viewport tile touch tests", () => {
     beforeEach(() => {
         cy.lessThanLargeBreakpoint();
         cy.visit("/category/all");
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
     });
 
-    it("displays conditional product tile elements when touch is held longer than prescribed period", () => {
+    it("displays conditional product tile elements when touch is held longer than timeout", () => {
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
         cy.get("@test-tile").find("[aria-label='Add or remove from wishlist']").should("not.exist");
         cy.get("@test-tile").find(".lower-hover-container").should("not.exist");
         cy.get("@test-tile").trigger("touchstart");
-        cy.wait(400);
+        cy.wait(400); // wait until after timeout trigger
         cy.get("@test-tile").trigger("touchend");
         cy.get("@test-tile")
             .find("[aria-label='Add or remove from wishlist']")
@@ -184,12 +184,12 @@ describe("Category grid page mobile viewport tile touch tests", () => {
         cy.get("@test-tile").find(".lower-hover-container").should("be.visible");
     });
 
-    it("prevents displaying conditional product tile elements when touch is held less than prescribed period", () => {
+    it("prevents displaying conditional product tile elements when touch is held shorter than timeout", () => {
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
         cy.get("@test-tile").find("[aria-label='Add or remove from wishlist']").should("not.exist");
         cy.get("@test-tile").find(".lower-hover-container").should("not.exist");
         cy.get("@test-tile").trigger("touchstart");
-        cy.wait(200);
+        cy.wait(200); // wait until before timeout trigger
         cy.get("@test-tile").trigger("touchend");
         cy.get("@test-tile").find("[aria-label='Add or remove from wishlist']").should("not.exist");
         cy.get("@test-tile").find(".lower-hover-container").should("not.exist");
@@ -198,7 +198,7 @@ describe("Category grid page mobile viewport tile touch tests", () => {
     it("removes conditional elements from tile when touch moves to another element", () => {
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
         cy.get("@test-tile").trigger("touchstart");
-        cy.wait(400);
+        cy.wait(400); // wait until after timeout trigger
         cy.get("@test-tile").trigger("touchend");
         cy.get("@test-tile")
             .find("[aria-label='Add or remove from wishlist']")

@@ -1,6 +1,6 @@
 describe("Product page", () => {
     beforeEach(() => {
-        cy.visit("/products/white-&-medium-dark-print");
+        cy.visitTestProduct();
     });
 
     it("disables 'add to bag' button by default", () => {
@@ -67,7 +67,7 @@ describe("Product page", () => {
         cy.visit("/wishlist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 1);
         cy.contains(/1\s*Item/).should("be.visible");
-        cy.visit("/products/white-&-medium-dark-print");
+        cy.visitTestProduct();
         cy.contains("button", "Remove from Wishlist").click();
         cy.go("back");
         cy.get(".grid-tile-container .product-tile").should("have.length", 0);
@@ -75,14 +75,13 @@ describe("Product page", () => {
     });
 
     it("has no accessibility violations in the base page state", () => {
-        cy.wait(500);
         cy.injectAxe();
         cy.checkA11y();
     });
 
     it("has no accessibility violations when a size is selected", () => {
         cy.get("[aria-label='Size selection']").select("L");
-        cy.wait(500);
+        cy.contains("button", "Add to Bag").should("be.enabled");
         cy.injectAxe();
         cy.checkA11y();
     });

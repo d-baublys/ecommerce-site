@@ -54,12 +54,17 @@ declare global {
             assertNoScroll(): Chainable<void>;
             assertScrollHookCssExist(): Chainable<void>;
             assertScrollHookCssNotExist(): Chainable<void>;
+            awaitPathnameSettle(): Chainable<void>;
+            visitHomeAwaitPathnameSettle(): Chainable<void>;
+            visitTestProduct(): Chainable<void>;
         }
     }
 }
 
 Cypress.Commands.add("visitHome", () => {
     cy.visit("/");
+    cy.location("pathname").should("eq", "/");
+    cy.contains("Shop >>>").should("be.visible");
 });
 
 Cypress.Commands.add("logInAsAdmin", () => {
@@ -70,6 +75,7 @@ Cypress.Commands.add("logInAsAdmin", () => {
     cy.get("button[type='submit']").click();
     cy.wait("@auth-check");
     cy.location("pathname").should("eq", "/");
+    cy.contains("Shop >>>").should("be.visible");
 });
 
 Cypress.Commands.add("logInAsStandardUser", () => {
@@ -80,6 +86,7 @@ Cypress.Commands.add("logInAsStandardUser", () => {
     cy.get("button[type='submit']").click();
     cy.wait("@auth-check");
     cy.location("pathname").should("eq", "/");
+    cy.contains("Shop >>>").should("be.visible");
 });
 
 Cypress.Commands.add("logInFromCurrent", () => {
@@ -124,4 +131,19 @@ Cypress.Commands.add("assertScrollHookCssNotExist", () => {
 
 Cypress.Commands.add("performTestScroll", () => {
     cy.scrollTo("bottom", { ensureScrollable: false });
+});
+
+Cypress.Commands.add("awaitPathnameSettle", () => {
+    cy.wait(100); // prevent modals from prematurely closing from preceding pathname change
+});
+
+Cypress.Commands.add("visitHomeAwaitPathnameSettle", () => {
+    cy.visitHome();
+    cy.awaitPathnameSettle();
+});
+
+Cypress.Commands.add("visitTestProduct", () => {
+    cy.visit("/products/white-&-medium-dark-print");
+    cy.location("pathname").should("eq", "/products/white-&-medium-dark-print");
+    cy.contains("White & medium dark print").should("be.visible");
 });

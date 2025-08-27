@@ -4,7 +4,7 @@ describe("Product grid page desktop viewport tests", () => {
     beforeEach(() => {
         cy.largeBreakpoint();
         cy.visit("/category/all");
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
     });
 
     it("displays the correct number of items", () => {
@@ -65,7 +65,7 @@ describe("Product grid page desktop viewport tests", () => {
         cy.get(".desktop-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 7);
         cy.contains(/7\s*Items/).should("be.visible");
     });
@@ -75,11 +75,11 @@ describe("Product grid page desktop viewport tests", () => {
         cy.get(".desktop-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XS"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".desktop-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 14);
         cy.contains(/14\s*Items/).should("be.visible");
     });
@@ -89,7 +89,7 @@ describe("Product grid page desktop viewport tests", () => {
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 1);
         cy.contains(/1\s*Item/).should("be.visible");
     });
@@ -99,11 +99,11 @@ describe("Product grid page desktop viewport tests", () => {
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(4, "0", "49"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 5);
         cy.contains(/5\s*Items/).should("be.visible");
     });
@@ -114,11 +114,11 @@ describe("Product grid page desktop viewport tests", () => {
         cy.get(".desktop-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 0);
         cy.contains(/0\s*Items/).should("be.visible");
     });
@@ -129,11 +129,11 @@ describe("Product grid page desktop viewport tests", () => {
         cy.get(".desktop-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.contains("No products matching your filter").should("be.visible");
     });
 

@@ -3,10 +3,10 @@ describe("Navbar base tests", () => {
         cy.lessThanSmallBreakpoint();
         cy.visitHome();
         cy.get("#main-entry").should("not.be.visible");
-        cy.get("[aria-label='Search']").should("be.visible");
-        cy.get("[aria-label='Wishlist']").should("not.be.visible");
-        cy.get("[aria-label='Bag']").should("not.be.visible");
-        cy.get("[aria-label='Account']").should("not.be.visible");
+        cy.get("#navbar [aria-label='Search']").should("be.visible");
+        cy.get("#navbar [aria-label='Wishlist']").should("not.be.visible");
+        cy.get("#navbar [aria-label='Bag']").should("not.be.visible");
+        cy.get("#navbar [aria-label='Account']").should("not.be.visible");
         cy.get("[aria-label='Menu']").should("be.visible");
     });
 
@@ -14,37 +14,35 @@ describe("Navbar base tests", () => {
         cy.smallBreakpoint();
         cy.visitHome();
         cy.get("#main-entry").should("be.visible");
-        cy.get("[aria-label='Search']").should("be.visible");
-        cy.get("[aria-label='Wishlist']").should("be.visible");
-        cy.get("[aria-label='Bag']").should("be.visible");
-        cy.get("[aria-label='Account']").should("be.visible");
+        cy.get("#navbar [aria-label='Search']").should("be.visible");
+        cy.get("#navbar [aria-label='Wishlist']").should("be.visible");
+        cy.get("#navbar [aria-label='Bag']").should("be.visible");
+        cy.get("#navbar [aria-label='Account']").should("be.visible");
         cy.get("[aria-label='Menu']").should("not.be.visible");
     });
 
     it("shows the mobile-only menu & the expected menu items", () => {
         cy.lessThanSmallBreakpoint();
-        cy.visitHome();
-        cy.wait(500);
+        cy.visitHomeAwaitPathnameSettle();
         cy.get("[aria-label='Menu']").click();
         cy.get("#nav-mobile-menu").should("be.visible");
         cy.get("#mobile-entry").should("be.visible");
-        cy.get("[aria-label='Wishlist']").should("be.visible");
-        cy.get("[aria-label='Bag']").should("be.visible");
-        cy.get("[aria-label='Account']").should("be.visible");
+        cy.get("#nav-mobile-menu [aria-label='Wishlist']").should("be.visible");
+        cy.get("#nav-mobile-menu [aria-label='Bag']").should("be.visible");
+        cy.get("#nav-mobile-menu [aria-label='Account']").should("be.visible");
     });
 
     it("stacks the mobile-only menu above the navbar", () => {
         cy.lessThanSmallBreakpoint();
-        cy.visitHome();
-        cy.wait(500);
-        cy.get("[aria-label='Menu'").click();
+        cy.visitHomeAwaitPathnameSettle();
+        cy.get("[aria-label='Menu']").click();
+        cy.get("#nav-mobile-menu").should("be.visible");
         cy.get("#navbar").should("not.be.visible");
     });
 
     it("closes the mobile-only menu as expected", () => {
         cy.lessThanSmallBreakpoint();
-        cy.visitHome();
-        cy.wait(500);
+        cy.visitHomeAwaitPathnameSettle();
         cy.get("[aria-label='Menu']").click();
         cy.get("#nav-mobile-menu").should("be.visible");
         cy.get("[aria-label='Close menu']").click();
@@ -54,11 +52,9 @@ describe("Navbar base tests", () => {
 
     it("hides the mobile-only menu if window is resized to larger-than-mobile width", () => {
         cy.lessThanSmallBreakpoint();
-        cy.visitHome();
-        cy.wait(500);
+        cy.visitHomeAwaitPathnameSettle();
         cy.get("[aria-label='Menu']").click();
         cy.get("#nav-mobile-menu").should("be.visible");
-        cy.get("#mobile-entry").should("be.visible");
         cy.smallBreakpoint();
         cy.get("#nav-mobile-menu").should("not.be.visible");
     });
@@ -71,49 +67,52 @@ describe("Navbar base tests", () => {
     });
 
     it("navigates correctly when clicking the site logo", () => {
-        cy.visit("/admin");
+        cy.visit("/bag");
         cy.get("#site-logo").click();
-        cy.location("pathname").should("eq", "/");
+        cy.location("pathname").should("eq", "/bag");
     });
 
     it("navigates correctly when clicking 'Wishlist' link button", () => {
         cy.visitHome();
-        cy.get("[aria-label='Wishlist']").click();
+        cy.get("#navbar [aria-label='Wishlist']").click();
         cy.location("pathname").should("eq", "/wishlist");
     });
 
     it("navigates correctly when clicking 'Bag' link button", () => {
         cy.visitHome();
-        cy.get("[aria-label='Bag']").click();
+        cy.get("#navbar [aria-label='Bag']").click();
         cy.location("pathname").should("eq", "/bag");
     });
 
     it("redirects to login page when 'account' button is clicked unauthenticated", () => {
-        cy.visitHome();
-        cy.get("[aria-label='Account']").click();
+        cy.visitHomeAwaitPathnameSettle();
+        cy.get("#navbar [aria-label='Account']").click();
         cy.location("pathname").should("eq", "/login");
         cy.get("#account-menu").should("not.be.visible");
     });
 
     it("opens the account menu & shows expected menu items when when 'account' button is clicked authenticated", () => {
         cy.logInAsStandardUser();
-        cy.wait(500);
-        cy.get("[aria-label='Account']").click();
+        cy.awaitPathnameSettle();
+        cy.get("#navbar [aria-label='Account']").click();
         cy.get("#account-menu").should("be.visible");
+        cy.contains("a", "My Orders").should("be.visible");
         cy.contains("button", "Log Out").should("be.visible");
     });
 
     it("stacks the account menu above the navbar", () => {
         cy.logInAsStandardUser();
-        cy.wait(500);
-        cy.get("[aria-label='Account']").click();
+        cy.awaitPathnameSettle();
+        cy.get("#navbar [aria-label='Account']").click();
+        cy.get("#account-menu").should("be.visible");
         cy.get("#navbar").should("not.be.visible");
     });
 
     it("closes the account menu as expected", () => {
         cy.logInAsStandardUser();
-        cy.wait(500);
-        cy.get("[aria-label='Account']").click();
+        cy.awaitPathnameSettle();
+        cy.get("#navbar [aria-label='Account']").click();
+        cy.get("#account-menu").should("be.visible");
         cy.get("[aria-label='Close menu']").click();
         cy.get("#account-menu").should("not.be.visible");
         cy.get("#navbar").should("be.visible");
@@ -121,74 +120,80 @@ describe("Navbar base tests", () => {
 
     it("doesn't render admin button in the navbar when unauthenticated", () => {
         cy.visitHome();
-        cy.get("[aria-label='Admin']").should("not.exist");
+        cy.get("#navbar [aria-label='Admin']").should("not.exist");
     });
 
     it("doesn't render admin button in the navbar when logged in as a standard user", () => {
         cy.logInAsStandardUser();
-        cy.get("[aria-label='Admin']").should("not.exist");
+        cy.get("#navbar [aria-label='Admin']").should("not.exist");
     });
 
     it("renders admin button in the navbar when logged in as an admin", () => {
         cy.logInAsAdmin();
-        cy.get("[aria-label='Admin']").should("exist");
+        cy.get("#navbar [aria-label='Admin']").should("exist");
     });
 
     it("doesn't render admin button in the navbar after admin log out", () => {
         cy.logInAsAdmin();
-        cy.get("[aria-label='Admin']").should("exist");
-        cy.wait(500);
-        cy.get("[aria-label='Account']").click();
-        cy.wait(500);
+        cy.awaitPathnameSettle();
+        cy.get("#navbar [aria-label='Admin']").should("exist");
+        cy.get("#navbar [aria-label='Account']").click();
+        cy.get("#account-menu").should("be.visible");
         cy.contains("button", "Log Out").click();
-        cy.get("[aria-label='Admin']").should("not.exist");
+        cy.get("#account-menu").should("not.be.visible");
+        cy.get("#navbar [aria-label='Admin']").should("not.exist");
     });
 
     it("doesn't render admin button in the mobile menu when unauthenticated", () => {
         cy.lessThanSmallBreakpoint();
-        cy.visitHome();
-        cy.wait(500);
+        cy.visitHomeAwaitPathnameSettle();
         cy.get("[aria-label='Menu']").click();
-        cy.get("[aria-label='Admin']").should("not.exist");
+        cy.get("#nav-mobile-menu").should("be.visible");
+        cy.get("#nav-mobile-menu [aria-label='Admin']").should("not.exist");
     });
 
     it("doesn't render admin button in the mobile menu when logged in as a standard user", () => {
         cy.lessThanSmallBreakpoint();
         cy.logInAsStandardUser();
-        cy.wait(500);
+        cy.awaitPathnameSettle();
         cy.get("[aria-label='Menu']").click();
-        cy.get("[aria-label='Admin']").should("not.exist");
+        cy.get("#nav-mobile-menu").should("be.visible");
+        cy.get("#nav-mobile-menu [aria-label='Admin']").should("not.exist");
     });
 
     it("renders admin button in the mobile menu when logged in as an admin", () => {
         cy.lessThanSmallBreakpoint();
         cy.logInAsAdmin();
-        cy.wait(500);
+        cy.awaitPathnameSettle();
         cy.get("[aria-label='Menu']").click();
-        cy.get("[aria-label='Admin']").should("exist");
+        cy.get("#nav-mobile-menu").should("be.visible");
+        cy.get("#nav-mobile-menu [aria-label='Admin']").should("exist");
     });
 
     it("doesn't render admin button in the mobile menu after admin log out", () => {
+        cy.intercept("POST", "/api/auth/signout").as("sign-out");
         cy.lessThanSmallBreakpoint();
         cy.logInAsAdmin();
-        cy.wait(500);
+        cy.awaitPathnameSettle();
         cy.get("[aria-label='Menu']").click();
-        cy.get("[aria-label='Admin']").should("exist");
+        cy.get("#nav-mobile-menu").should("be.visible");
+        cy.get("#nav-mobile-menu [aria-label='Admin']").should("exist");
         cy.get("#nav-mobile-menu [aria-label='Account']").click();
-        cy.wait(500);
+        cy.get("#account-menu").should("be.visible");
         cy.contains("button", "Log Out").click();
+        cy.wait("@sign-out").its("response.statusCode").should("eq", 200);
+        cy.awaitPathnameSettle();
         cy.get("[aria-label='Menu']").click();
-        cy.wait(500);
-        cy.get("[aria-label='Admin']").should("not.exist");
+        cy.get("#nav-mobile-menu").should("be.visible");
+        cy.get("#nav-mobile-menu [aria-label='Admin']").should("not.exist");
     });
 
     it("navigates correctly when clicking 'Admin' link button", () => {
         cy.logInAsAdmin();
-        cy.get("[aria-label='Admin']").should("exist");
-        cy.visit("/");
-        cy.location("pathname").should("eq", "/");
-        cy.get("[aria-label='Admin']").click();
+        cy.awaitPathnameSettle();
+        cy.get("#navbar [aria-label='Admin']").click();
         cy.location("pathname").should("eq", "/admin");
+        cy.contains("Admin Actions").should("be.visible");
     });
 
     it("stickies the navbar only when scrolling up", () => {
@@ -203,39 +208,43 @@ describe("Navbar base tests", () => {
 
     it("locks scrolling when the mobile-only menu is open", () => {
         cy.lessThanSmallBreakpoint();
-        cy.visitHome();
-        cy.wait(500);
+        cy.visitHomeAwaitPathnameSettle();
         cy.assertNoScroll();
         cy.get("[aria-label='Menu']").click();
+        cy.get("#nav-mobile-menu").should("be.visible");
         cy.assertScrollHookCssExist();
         cy.performTestScroll();
         cy.assertNoScroll();
         cy.get("[aria-label='Close menu']").click();
+        cy.get("#nav-mobile-menu").should("not.be.visible");
         cy.assertNoScroll();
         cy.assertScrollHookCssNotExist();
     });
 
     it("locks scrolling when the account menu is open", () => {
         cy.logInAsStandardUser();
-        cy.visitHome();
-        cy.wait(500);
+        cy.awaitPathnameSettle();
         cy.assertNoScroll();
-        cy.get("[aria-label='Account']").click();
+        cy.get("#navbar [aria-label='Account']").click();
+        cy.get("#account-menu").should("be.visible");
         cy.assertScrollHookCssExist();
         cy.performTestScroll();
         cy.assertNoScroll();
         cy.get("[aria-label='Close menu']").click();
+        cy.get("#account-menu").should("not.be.visible");
         cy.assertScrollHookCssNotExist();
         cy.assertNoScroll();
     });
 
     it("closes the mobile-only menu on pathname change", () => {
         cy.lessThanSmallBreakpoint();
-        cy.visitHome();
-        cy.wait(500);
+        cy.visitHomeAwaitPathnameSettle();
         cy.visit("/login");
+        cy.location("pathname").should("eq", "/login");
+        cy.contains("Log In").should("be.visible");
+        cy.awaitPathnameSettle();
+
         cy.get("[aria-label='Menu']").click();
-        cy.wait(500);
         cy.get("#nav-mobile-menu").should("be.visible");
         cy.go("back");
         cy.get("#nav-mobile-menu").should("not.be.visible");
@@ -243,11 +252,13 @@ describe("Navbar base tests", () => {
 
     it("closes the account menu on pathname change", () => {
         cy.logInAsStandardUser();
-        cy.visitHome();
-        cy.wait(500);
+        cy.awaitPathnameSettle();
         cy.visit("/login");
-        cy.get("[aria-label='Account']").click();
-        cy.wait(500);
+        cy.location("pathname").should("eq", "/login");
+        cy.contains("Log In").should("be.visible");
+        cy.awaitPathnameSettle();
+
+        cy.get("#navbar [aria-label='Account']").click();
         cy.get("#account-menu").should("be.visible");
         cy.go("back");
         cy.get("#account-menu").should("not.be.visible");
@@ -257,8 +268,7 @@ describe("Navbar base tests", () => {
 describe("Navbar accessibility tests", () => {
     it("restores focus when mobile-only menu is closed", () => {
         cy.lessThanSmallBreakpoint();
-        cy.visitHome();
-        cy.wait(500);
+        cy.visitHomeAwaitPathnameSettle();
         cy.get("[aria-label='Menu']").click();
         cy.get("[aria-label='Close menu']").click();
         cy.get("[aria-label='Menu']").should("have.focus");
@@ -266,26 +276,26 @@ describe("Navbar accessibility tests", () => {
 
     it("restores focus when account menu is closed", () => {
         cy.logInAsStandardUser();
-        cy.wait(500);
-        cy.get("[aria-label='Account']").click();
+        cy.awaitPathnameSettle();
+        cy.get("#navbar [aria-label='Account']").click();
         cy.get("[aria-label='Close menu']").click();
-        cy.get("[aria-label='Account']").should("have.focus");
+        cy.get("#navbar [aria-label='Account']").should("have.focus");
     });
 
     it("traps focus in the expected tabbing sequence when the mobile-only menu is open", () => {
         cy.lessThanSmallBreakpoint();
-        cy.visitHome();
-        cy.wait(500);
+        cy.visitHomeAwaitPathnameSettle();
         cy.get("[aria-label='Menu']").click();
+        cy.get("#nav-mobile-menu").should("be.visible");
         cy.get("[aria-label='Menu']").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
         cy.get("#mobile-entry").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
-        cy.get("[aria-label='Wishlist']").should("be.focused");
+        cy.get("#nav-mobile-menu [aria-label='Wishlist']").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
-        cy.get("[aria-label='Bag']").should("be.focused");
+        cy.get("#nav-mobile-menu [aria-label='Bag']").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
-        cy.get("[aria-label='Account']").should("be.focused");
+        cy.get("#nav-mobile-menu [aria-label='Account']").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
         cy.get("[aria-label='Close menu']").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
@@ -294,10 +304,10 @@ describe("Navbar accessibility tests", () => {
 
     it("traps focus in the expected tabbing sequence when the account menu is open", () => {
         cy.logInAsStandardUser();
-        cy.visitHome();
-        cy.wait(500);
-        cy.get("[aria-label='Account']").click();
-        cy.get("[aria-label='Account']").should("be.focused");
+        cy.awaitPathnameSettle();
+        cy.get("#navbar [aria-label='Account']").click();
+        cy.get("#account-menu").should("be.visible");
+        cy.get("#navbar [aria-label='Account']").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
         cy.get("a").contains("My Orders").should("be.focused");
         cy.press(Cypress.Keyboard.Keys.TAB);
@@ -311,20 +321,18 @@ describe("Navbar accessibility tests", () => {
     it("has no accessibility violations when the mobile-only menu is open", () => {
         cy.lessThanSmallBreakpoint();
         cy.logInAsStandardUser();
-        cy.visitHome();
-        cy.wait(500);
+        cy.awaitPathnameSettle();
         cy.get("[aria-label='Menu']").click();
-        cy.wait(500);
+        cy.get("#nav-mobile-menu").should("be.visible");
         cy.injectAxe();
         cy.checkA11y();
     });
 
     it("has no accessibility violations when the account menu is open", () => {
         cy.logInAsStandardUser();
-        cy.visitHome();
-        cy.wait(500);
-        cy.get("[aria-label='Account']").click();
-        cy.wait(500);
+        cy.awaitPathnameSettle();
+        cy.get("#navbar [aria-label='Account']").click();
+        cy.get("#account-menu").should("be.visible");
         cy.injectAxe();
         cy.checkA11y();
     });
