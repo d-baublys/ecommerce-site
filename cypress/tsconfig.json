@@ -2,6 +2,6 @@
     "compilerOptions": {
         "target": "ES2017",
         "jsx": "react-jsx",
-        "types": ["cypress", "cypress-axe"]
+        "types": ["cypress", "cypress-axe", "cypress-file-upload"]
     }
 }

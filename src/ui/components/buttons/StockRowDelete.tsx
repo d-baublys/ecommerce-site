@@ -24,7 +24,7 @@ export default function StockRowDelete({ stockObjSetter, size, ...props }: Stock
             title="Delete row"
             aria-label="Delete row"
             onClick={() => handleDelete()}
-            className="flex justify-center items-center cursor-pointer"
+            className="stock-row-delete flex justify-center items-center cursor-pointer"
             {...props}
         >
             <IoTrash size={20} />

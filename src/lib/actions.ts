@@ -19,11 +19,11 @@ import {
 
 export async function productAdd(productData: Product) {
     try {
-        await prisma.product.create({
+        const createdProduct = await prisma.product.create({
             data: extractProductFields(productData),
         });
         await prisma.stock.createMany({
-            data: mapStockForDb(productData),
+            data: mapStockForDb({ ...productData, id: createdProduct.id }),
         });
 
         return { success: true };

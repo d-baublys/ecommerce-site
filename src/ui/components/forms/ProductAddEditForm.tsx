@@ -25,7 +25,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
     const [savedDataObj, setSavedDataObj] = useState<Product>(dataObj);
     const [provisionalDataObj, setProvisionalDataObj] = useState<Product>(dataObj);
 
-    const mode = productData ? "edit" : "add";
+    const variant = productData ? "edit" : "add";
     const [tableMode, setTableMode] = useState<StockTableMode>("display");
 
     const [price, setPrice] = useState<string>(stringifyConvertPrice(dataObj.price));
@@ -82,12 +82,13 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                 ...provisionalDataObj,
                 slug: slugify(provisionalDataObj.name),
             };
-            const dbAction = mode === "add" ? await productAdd(dbObj) : await productUpdate(dbObj);
+            const dbAction =
+                variant === "add" ? await productAdd(dbObj) : await productUpdate(dbObj);
 
             if (dbAction.success) {
                 setSavedDataObj(provisionalDataObj);
                 setMessage(
-                    mode === "add" ? "Product added successfully" : "Changes saved succesfully"
+                    variant === "add" ? "Product added successfully" : "Changes saved succesfully"
                 );
             } else {
                 setMessage("Error updating database");
@@ -143,6 +144,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
         <>
             <form className="flex flex-col w-full p-4 gap-8 bg-background-lightest rounded-lg">
                 <FormInput
+                    name="product-name"
                     onChange={(e) => {
                         setProvisionalDataObj((prev) => ({ ...prev, name: e.target.value }));
                     }}
@@ -154,6 +156,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                         Category
                     </legend>
                     <select
+                        name="product-category"
                         onChange={(e) => {
                             setProvisionalDataObj((prev) => ({
                                 ...prev,
@@ -171,6 +174,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                     </select>
                 </fieldset>
                 <FormInput
+                    name="product-price"
                     type="number"
                     onChange={(e) => handlePriceChange(e)}
                     legend="Unit Price"
@@ -178,13 +182,14 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                 />
                 <div>
                     <FormInput
+                        name="image-path"
                         ref={fileBrowseRef}
                         type="file"
                         onChange={(e) => handleFileSelect(e)}
                         legend="Image Path"
                         overrideClasses="hidden"
                     />
-                    <div className="flex items-center gap-4">
+                    <div id="file-dialog-unit" className="flex items-center gap-4">
                         <div>
                             <PlainRoundedButton onClick={handleBrowse}>
                                 <IoFolder />
@@ -195,6 +200,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                     </div>
                 </div>
                 <FormInput
+                    name="image-description"
                     onChange={(e) =>
                         setProvisionalDataObj((prev) => ({ ...prev, alt: e.target.value }))
                     }
@@ -202,6 +208,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                     value={provisionalDataObj.alt}
                 />
                 <FormInput
+                    name="date-added"
                     type="date"
                     onChange={(e) =>
                         setProvisionalDataObj((prev) => ({ ...prev, dateAdded: e.target.value }))
@@ -216,20 +223,20 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                     tableMode={tableMode}
                     setTableMode={setTableMode}
                 />
-                <div className="flex justify-center p-2 h-8">
+                <div id="overall-message-container" className="flex justify-center p-2 h-8">
                     <p className="text-center">{message}</p>
                 </div>
-                <div className="flex justify-between gap-8">
+                <div id="overall-action-container" className="flex justify-between gap-8">
                     {productChanged && (
                         <PlainRoundedButton onClick={handleSubmit}>
-                            {mode === "add" ? "Add" : "Save"}
+                            {variant === "add" ? "Add" : "Save"}
                         </PlainRoundedButton>
                     )}
                     {productChanged && (
                         <PlainRoundedButton onClick={handleCancel}>Cancel</PlainRoundedButton>
                     )}
                 </div>
-                {mode === "edit" && (
+                {variant === "edit" && (
                     <div className="flex justify-center w-full pt-4 border-t">
                         <div>
                             <PlainRoundedButton

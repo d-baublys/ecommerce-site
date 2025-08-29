@@ -38,6 +38,7 @@
 
 import { adminEmail, adminPassword, standardEmail, standardPassword } from "./credentials";
 import "cypress-axe";
+import "cypress-file-upload";
 
 declare global {
     namespace Cypress {
@@ -57,6 +58,8 @@ declare global {
             awaitPathnameSettle(): Chainable<void>;
             visitHomeAwaitPathnameSettle(): Chainable<void>;
             visitTestProduct(): Chainable<void>;
+            awaitInputBlur(): Chainable<void>;
+            awaitTableSettle(): Chainable<void>;
         }
     }
 }
@@ -146,4 +149,12 @@ Cypress.Commands.add("visitTestProduct", () => {
     cy.visit("/products/white-&-medium-dark-print");
     cy.location("pathname").should("eq", "/products/white-&-medium-dark-print");
     cy.contains("White & medium dark print").should("be.visible");
+});
+
+Cypress.Commands.add("awaitInputBlur", () => {
+    cy.wait(200); // for fixed timeout on search bar blur
+});
+
+Cypress.Commands.add("awaitTableSettle", () => {
+    cy.wait(100); // table row addition is very flaky without this
 });

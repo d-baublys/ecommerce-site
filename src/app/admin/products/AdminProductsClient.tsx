@@ -14,9 +14,9 @@ export default function AdminProductsClient() {
     const pathname = usePathname();
     const [filter, setFilter] = useState<Categories | null>(null);
     const [unfilteredResults, setUnfilteredResults] = useState<Product[]>([]);
-    const [searchQuery, setSearchQuery] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState<string>("");
     const querySet = unfilteredResults.filter((item) => {
-        if (filter) return item.gender === filter;
+        if (filter || /\s+/.test(searchQuery)) return item.gender === filter;
         if (searchQuery) return true;
         return false;
     });
@@ -35,12 +35,13 @@ export default function AdminProductsClient() {
                     + Add Product
                 </PlainRoundedButtonLink>
             </div>
-            <div className="w-full h-10 mb-8">
+            <div id="admin-product-search-container" className="w-full h-10 mb-8">
                 <SearchBar
                     handleResultClick={handleResultClick}
                     options={{ isGlobalSearch: false, showSuggestions: false }}
                     parentSetter={setUnfilteredResults}
                     parentQuerySetter={setSearchQuery}
+                    parentFilter={filter}
                 />
             </div>
             <ul className="flex flex-row justify-evenly items-center w-full">
@@ -64,7 +65,7 @@ export default function AdminProductsClient() {
             </ul>
             <div className="flex justify-center w-full grow">
                 {(filter || searchQuery) && querySet.length > 0 ? (
-                    <ul className="flex flex-col w-full">
+                    <ul id="admin-products-container" className="flex flex-col w-full">
                         {querySet.map((item: Product) => (
                             <li key={item.id} className="mt-8">
                                 <Link href={`${pathname}/${encodeURIComponent(item.slug)}`}>
@@ -76,7 +77,7 @@ export default function AdminProductsClient() {
                 ) : (
                     <div className="flex items-center mt-8 h-full">
                         <p className="text-center">
-                            {filter || searchQuery
+                            {filter || /\S+/.test(searchQuery)
                                 ? "No products matching your search"
                                 : "Please select a filter or search by keyword"}
                         </p>

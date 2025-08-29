@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open",
+    "db:reset": "npx prisma migrate reset --force --skip-generate"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -40,6 +41,7 @@
     "@types/react-dom": "^19",
     "cypress": "^14.5.1",
     "cypress-axe": "^1.6.0",
+    "cypress-file-upload": "^5.0.8",
     "eslint": "^9",
     "eslint-config-next": "15.3.1",
     "eslint-plugin-jsx-a11y": "^6.10.2",

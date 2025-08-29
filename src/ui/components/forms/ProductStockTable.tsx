@@ -35,6 +35,10 @@ export default function ProductStockTable({
 
     useEffect(() => {
         setLocalStockObj(provisionalDataObj.stock);
+        setNewSize(undefined);
+        setNewStock(undefined);
+        setTableMode("display");
+        setMessage(undefined);
     }, [provisionalDataObj]);
 
     const handleAdd = async () => {
@@ -46,6 +50,7 @@ export default function ProductStockTable({
         ) {
             const updatedStockObj = { ...localStockObj, [newSize]: newStock };
 
+            setLocalStockObj(updatedStockObj);
             setProvisionalDataObj((prev) => ({ ...prev, stock: updatedStockObj }));
             setNewSize(undefined);
             setNewStock(undefined);
@@ -67,7 +72,7 @@ export default function ProductStockTable({
     };
 
     const handleCancel = () => {
-        setLocalStockObj(savedDataObj.stock);
+        setLocalStockObj(provisionalDataObj.stock);
         setNewSize(undefined);
         setNewStock(undefined);
         setTableMode("display");
@@ -89,7 +94,7 @@ export default function ProductStockTable({
     const buildBodyCells = () => (
         <>
             {tableArr.map((stockSize, idx) => (
-                <tr key={stockSize}>
+                <tr key={stockSize} data-cy="table-row">
                     <TableBodyCell
                         variant="leftEnd"
                         isLastRow={idx === tableArr.length - 1 && !(tableMode === "add")}
@@ -126,7 +131,7 @@ export default function ProductStockTable({
                 </tr>
             ))}
             {tableMode === "add" && (
-                <tr>
+                <tr data-cy="table-row">
                     <TableBodyCell variant="leftEnd" isLastRow={tableMode === "add"}>
                         <StockTableInput
                             type="text"
@@ -151,7 +156,7 @@ export default function ProductStockTable({
 
     return (
         <div className="flex flex-col py-4 bg-background-lighter rounded-md ">
-            <div className="flex justify-between h-12 px-8">
+            <div id="stock-table-button-container" className="flex justify-between h-12 px-8">
                 {tableMode === "display" && Object.keys(localStockObj)?.length > 0 && (
                     <div>
                         <PlainRoundedButton onClick={() => setTableMode("edit")}>
@@ -184,11 +189,12 @@ export default function ProductStockTable({
                     </div>
                 )}
             </div>
-            <div className="flex justify-center h-8 p-2">
+            <div id="stock-table-message-container" className="flex justify-center h-8 p-2">
                 <p className="text-center text-white">{message}</p>
             </div>
             <div className="pl-8 pt-2">
                 <RoundedTable
+                    id="stock-table"
                     tableHeadCells={buildHeadCells()}
                     tableBodyCells={buildBodyCells()}
                     overrideClasses="w-full text-center table-fixed"

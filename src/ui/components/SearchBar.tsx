@@ -1,7 +1,7 @@
 "use client";
 
 import { getProductData } from "@/lib/actions";
-import { Product } from "@/lib/definitions";
+import { Categories, Product } from "@/lib/definitions";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 import { debounce } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -20,7 +20,8 @@ interface SearchBarProps {
     options: SearchBarConfig;
     inputRef?: React.RefObject<HTMLInputElement | null>;
     parentSetter?: React.Dispatch<SetStateAction<Product[]>>;
-    parentQuerySetter?: React.Dispatch<SetStateAction<string | null>>;
+    parentQuerySetter?: React.Dispatch<SetStateAction<string>>;
+    parentFilter?: Categories | null;
 }
 
 export default function SearchBar(props: SearchBarProps) {
@@ -37,6 +38,7 @@ export default function SearchBar(props: SearchBarProps) {
         inputRef,
         parentSetter,
         parentQuerySetter,
+        parentFilter,
     } = props;
 
     const router = useRouter();
@@ -61,7 +63,7 @@ export default function SearchBar(props: SearchBarProps) {
             product.name.toLowerCase().includes((currQuery as string).toLowerCase())
         );
         setResults(results);
-        if (parentSetter) parentSetter(results);
+        parentSetter?.(results);
         setIsResultLoading(false);
     }, 100);
 
@@ -69,9 +71,9 @@ export default function SearchBar(props: SearchBarProps) {
         setResults([]);
         const query = e.currentTarget.value;
         setQuery(query);
-        parentQuerySetter && parentQuerySetter(query);
+        parentQuerySetter?.(query);
 
-        if (!query.trim()) return;
+        if (/\s+/.test(query)) return;
 
         if (productList) {
             debouncedResults(query);
@@ -82,20 +84,25 @@ export default function SearchBar(props: SearchBarProps) {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<SVGElement>) => {
         e.preventDefault();
         if (!query.trim() || !options?.isGlobalSearch) return;
-        handleSearchClose && handleSearchClose();
+        handleSearchClose?.();
         router.push(`/results?q=${encodeURIComponent(query)}`);
     };
 
     const clearAll = () => {
         setQuery("");
-        parentQuerySetter && parentQuerySetter(null);
+        parentQuerySetter?.("");
         setResults([]);
+
+        if (parentFilter) {
+            debouncedResults("");
+            setIsResultLoading(true);
+        }
     };
 
     const handleClick = (product: Product) => {
         handleResultClick(product);
         clearAll();
-        handleSearchClose && handleSearchClose();
+        handleSearchClose?.();
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {

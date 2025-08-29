@@ -116,4 +116,5 @@ export type CypressSeedTestProduct = { id: number; name: string; price: number }
 export type CypressSeedTestDataDelete = {
     orderIdArr: Order["id"][];
     productIdArr: PrismaProduct["id"][];
+    productNameArr: PrismaProduct["name"][];
 };

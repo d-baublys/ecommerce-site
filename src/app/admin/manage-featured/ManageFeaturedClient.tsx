@@ -51,14 +51,14 @@ export default function ManageFeaturedClient({ productData }: { productData: Pro
 
     return (
         <div className="flex flex-col justify-start items-center w-full h-full">
-            <div className="w-full h-10">
+            <div id="manage-featured-search-container" className="w-full h-10">
                 <SearchBar
                     handleResultClick={handleResultClick}
                     options={{ isGlobalSearch: false, showSuggestions: true }}
                 />
             </div>
             {provisionalFeaturedList.length > 0 ? (
-                <ul className="flex flex-col w-full">
+                <ul id="manage-featured-container" className="flex flex-col w-full">
                     {provisionalFeaturedList.map((featuredProd) => (
                         <li key={featuredProd.id} className="mt-8">
                             <DisplayTile

@@ -4,7 +4,7 @@ import path from "path";
 import { Prisma, PrismaClient, Product as PrismaProduct } from "@prisma/client";
 import { createFakeOrderCypress, createFakeProduct } from "./src/lib/test-factories";
 import { CypressSeedTestDataDelete, CypressSeedTestProduct } from "./src/lib/definitions";
-import { convertClientProduct } from "./src/lib/utils";
+import { convertClientProduct, hashPassword } from "./src/lib/utils";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 dotenv.config({ path: path.resolve(process.cwd(), ".env.test.local") });
@@ -33,12 +33,41 @@ export default defineConfig({
                     const res = await prisma.order.create(dataObj);
                     return res.id;
                 },
+                async seedTestUser() {
+                    const hashedPassword = await hashPassword("testpassword123");
+
+                    const res = await prisma.user.create({
+                        data: { email: "test@example.com", password: hashedPassword, role: "user" },
+                    });
+
+                    return res.id;
+                },
+                async getTestProductIds(productNameArr) {
+                    const res = await prisma.product.findMany({
+                        where: { name: { in: productNameArr } },
+                    });
+
+                    return res.map((product) => product.id);
+                },
                 async deleteTestData({ orderIdArr, productIdArr }: CypressSeedTestDataDelete) {
                     await prisma.$transaction([
                         prisma.orderItem.deleteMany({ where: { orderId: { in: orderIdArr } } }),
                         prisma.order.deleteMany({ where: { id: { in: orderIdArr } } }),
-                        prisma.product.deleteMany({ where: { id: { in: productIdArr } } }),
+                        prisma.stock.deleteMany({
+                            where: { productId: { in: productIdArr } },
+                        }),
+                        prisma.product.deleteMany({
+                            where: { id: { in: productIdArr } },
+                        }),
                     ]);
+                    return null;
+                },
+                async deleteTestUsers() {
+                    await prisma.user.deleteMany({ where: { id: { gt: 2 } } });
+                    return null;
+                },
+                async deleteTestManageFeaturedProducts() {
+                    await prisma.featuredProduct.deleteMany();
                     return null;
                 },
             });
