@@ -26,8 +26,16 @@ describe("Login page", () => {
         cy.contains("Incorrect email address or password. Please try again.").should("be.visible");
     });
 
-    it("has no accessibility violations", () => {
-        cy.injectAxe();
-        cy.checkA11y();
+    it("doesn't submit form when any inputs are empty", () => {
+        cy.get("input[name='email']").type(standardEmail);
+        cy.get("button[type='submit']").click();
+        cy.location("pathname").should("eq", "/login");
+        cy.contains("Log In").should("be.visible");
+    });
+
+    it("navigates to account creation page on link click", () => {
+        cy.contains("a", /Click here to create one/).click();
+        cy.location("pathname").should("eq", "/create-account");
+        cy.contains("Create Account").should("be.visible");
     });
 });

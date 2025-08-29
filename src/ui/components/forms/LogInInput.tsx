@@ -17,6 +17,7 @@ export default function LogInInput({
     showRedOverride,
     isPasswordInput,
     overrideClasses,
+    id,
     ...props
 }: LogInInputProps) {
     const [showRed, setShowRed] = useState<boolean>();
@@ -39,7 +40,7 @@ export default function LogInInput({
     }, [isPasswordVisible]);
 
     return (
-        <label className="relative block group">
+        <label id={id} className="relative block group">
             <span
                 className={`absolute left-0 translate-y-1/6 transition-all group-focus-within:-top-8 group-focus-within:text-sz-smallest pointer-events-none ${
                     showRed ? "text-red-500" : ""

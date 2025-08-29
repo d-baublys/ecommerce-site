@@ -82,6 +82,7 @@ export default function LoginSignUpPage({ variant }: { variant: "login" | "signu
                 >
                     <div className="flex flex-col w-full gap-8 mt-8">
                         <LogInInput
+                            id="email-input"
                             name="email"
                             labelText="Email address"
                             isPasswordInput={false}
@@ -90,6 +91,7 @@ export default function LoginSignUpPage({ variant }: { variant: "login" | "signu
                             onChange={(e) => setEmail(e.target.value)}
                         />
                         <LogInInput
+                            id="password-input"
                             name="password"
                             type="password"
                             labelText="Password"
@@ -100,6 +102,7 @@ export default function LoginSignUpPage({ variant }: { variant: "login" | "signu
                         />
                         {variant === "signup" && (
                             <LogInInput
+                                id="password-confirm-input"
                                 name="password-confirm"
                                 type="password"
                                 labelText="Confirm Password"
