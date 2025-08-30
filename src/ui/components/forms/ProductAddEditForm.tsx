@@ -12,6 +12,7 @@ import {
     isValidPrice,
     slugify,
     stringifyConvertPrice,
+    buildProductUrl,
 } from "@/lib/utils";
 import { IoFolder } from "react-icons/io5";
 import ProductStockTable from "./ProductStockTable";
@@ -19,6 +20,8 @@ import { useModalStore } from "@/stores/modalStore";
 import { productAdd, productDelete, productUpdate } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import DeleteConfirmModal from "@/ui/components/overlays/DeleteConfirmModal";
+import DisplayTile from "@/ui/components/cards/DisplayTile";
+import Link from "next/link";
 
 export default function ProductAddEditForm({ productData }: { productData?: Product }) {
     const dataObj = productData ? productData : createEmptyProduct();
@@ -142,6 +145,11 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
 
     return (
         <>
+            {variant === "edit" && (
+                <Link href={buildProductUrl(savedDataObj.id, savedDataObj.slug)}>
+                    <DisplayTile productData={savedDataObj} />
+                </Link>
+            )}
             <form className="flex flex-col w-full p-4 gap-8 bg-background-lightest rounded-lg">
                 <FormInput
                     name="product-name"

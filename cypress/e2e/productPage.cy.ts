@@ -1,21 +1,6 @@
-import {  buildProductUrl } from "../../src/lib/utils";
-
-let testProductLink: string;
-
 describe("Product page", () => {
-    before(() => {
-        cy.task("getTestProductSavedData", {
-            productName: "White & medium dark print",
-            src: "/tshirt16.jpg",
-        }).then((data: { id: string; slug: string }) => {
-            testProductLink = buildProductUrl(data.id, data.slug);
-        });
-    });
-
     beforeEach(() => {
-        cy.visit(testProductLink);
-        cy.location("pathname").should("eq", testProductLink);
-        cy.contains("White & medium dark print").should("be.visible");
+        cy.visitTestProduct();
     });
 
     it("disables 'add to bag' button by default", () => {
@@ -82,9 +67,7 @@ describe("Product page", () => {
         cy.visit("/wishlist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 1);
         cy.contains(/1\s*Item/).should("be.visible");
-        cy.visit(testProductLink);
-        cy.location("pathname").should("eq", testProductLink);
-        cy.contains("White & medium dark print").should("be.visible");
+        cy.visitTestProduct();
         cy.contains("button", "Remove from Wishlist").click();
         cy.go("back");
         cy.get(".grid-tile-container .product-tile").should("have.length", 0);

@@ -1,10 +1,10 @@
 import { defineConfig } from "cypress";
 import dotenv from "dotenv";
 import path from "path";
-import { Prisma, PrismaClient, Product as PrismaProduct } from "@prisma/client";
+import { Prisma, PrismaClient, Product as PrismaProduct, Sizes } from "@prisma/client";
 import { createFakeOrderCypress, createFakeProduct } from "./src/lib/test-factories";
 import { CypressSeedTestDataDelete, CypressSeedTestProduct } from "./src/lib/definitions";
-import { convertClientProduct, hashPassword } from "./src/lib/utils";
+import { convertClientProductWithStock, hashPassword } from "./src/lib/utils";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 dotenv.config({ path: path.resolve(process.cwd(), ".env.test.local") });
@@ -16,10 +16,23 @@ export default defineConfig({
         setupNodeEvents(on, config) {
             on("task", {
                 async seedTestProduct() {
-                    const fakeProduct: PrismaProduct = convertClientProduct(createFakeProduct());
+                    const fakeProduct = convertClientProductWithStock(createFakeProduct());
+                    const { stock, ...netProduct } = fakeProduct;
 
-                    const res = await prisma.product.create({ data: fakeProduct });
-                    return { id: res.id, name: res.name, price: res.price };
+                    const createdProduct = await prisma.product.create({ data: netProduct });
+                    await prisma.stock.createMany({
+                        data: Object.entries(fakeProduct.stock).map(([size, quantity]) => ({
+                            size: size as Sizes,
+                            quantity: quantity,
+                            productId: createdProduct.id,
+                        })),
+                    });
+
+                    return {
+                        id: createdProduct.id,
+                        name: createdProduct.name,
+                        price: createdProduct.price,
+                    };
                 },
                 async seedTestOrder({
                     productsDataArr,

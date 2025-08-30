@@ -1,8 +1,5 @@
-import { CypressSeedTestDataDelete } from "../../../../src/lib/definitions";
 import { createFakeProduct } from "../../../../src/lib/test-factories";
 import { stringifyConvertPrice } from "../../../../src/lib/utils";
-
-let productNameArr: CypressSeedTestDataDelete["productNameArr"] = [];
 
 describe("Product add/edit form base tests", () => {
     beforeEach(() => {
@@ -11,18 +8,6 @@ describe("Product add/edit form base tests", () => {
         cy.location("pathname").should("eq", "/admin/products/add-product");
         cy.contains("Add Product").should("be.visible");
         cy.awaitTableSettle();
-
-        productNameArr = [];
-    });
-
-    afterEach(() => {
-        if (productNameArr.length) {
-            cy.task("getTestProductMultipleId", productNameArr).then((productIdArr) => {
-                cy.task("deleteTestData", {
-                    productIdArr,
-                });
-            });
-        }
     });
 
     it("doesn't show 'pending add' state buttons by default", () => {

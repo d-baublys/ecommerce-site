@@ -1,7 +1,3 @@
-import { buildProductUrl } from "../../src/lib/utils";
-
-let testProductLink: string;
-
 describe("Bag page base tests", () => {
     beforeEach(() => {
         cy.visit("/bag");
@@ -31,17 +27,8 @@ describe("Bag page base tests", () => {
 });
 
 describe("Bag page populated tests", () => {
-    before(() => {
-        cy.task("getTestProductSavedData", {
-            productName: "White & medium dark print",
-            src: "/tshirt16.jpg",
-        }).then((data: { id: string; slug: string }) => {
-            testProductLink = buildProductUrl(data.id, data.slug);
-        });
-    });
-
     beforeEach(() => {
-        cy.visit(testProductLink);
+        cy.visitTestProduct();
         cy.get("[aria-label='Size selection']").select("L");
         cy.contains("button", "Add to Bag").click();
         cy.get("[aria-label='Size selection']").select("XL");

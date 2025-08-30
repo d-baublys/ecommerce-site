@@ -119,6 +119,12 @@ export function convertClientProduct(product: Product): PrismaProduct {
     return { ...rest, dateAdded: new Date(rest.dateAdded) };
 }
 
+export function convertClientProductWithStock(
+    product: Product
+): PrismaProduct & { stock: Product["stock"] } {
+    return { ...product, dateAdded: new Date(product.dateAdded) };
+}
+
 export function containsClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: string) {
     const element = document.getElementById(id);
     return element ? element.contains(e.target as Node) : false;

@@ -39,6 +39,7 @@
 import { adminEmail, adminPassword, standardEmail, standardPassword } from "./credentials";
 import "cypress-axe";
 import "cypress-file-upload";
+import { buildProductUrl } from "../../src/lib/utils";
 
 declare global {
     namespace Cypress {
@@ -59,6 +60,8 @@ declare global {
             visitHomeAwaitPathnameSettle(): Chainable<void>;
             awaitInputBlur(): Chainable<void>;
             awaitTableSettle(): Chainable<void>;
+            visitTestAdminProduct(testProductLink: string): Chainable<void>;
+            visitTestProduct(): Chainable<void>;
         }
     }
 }
@@ -150,4 +153,22 @@ Cypress.Commands.add("awaitInputBlur", () => {
 
 Cypress.Commands.add("awaitTableSettle", () => {
     cy.wait(100); // table row addition is very flaky without this
+});
+
+Cypress.Commands.add("visitTestAdminProduct", (testProductUrl) => {
+    cy.visit(testProductUrl);
+    cy.location("pathname").should("eq", testProductUrl);
+    cy.contains("Edit Product").should("be.visible");
+});
+
+Cypress.Commands.add("visitTestProduct", () => {
+    cy.task("getTestProductSavedData", {
+        productName: "White & medium dark print",
+        src: "/tshirt16.jpg",
+    }).then((data: { id: string; slug: string }) => {
+        const testProductLink = buildProductUrl(data.id, data.slug);
+        cy.visit(testProductLink);
+        cy.location("pathname").should("eq", testProductLink);
+        cy.contains("White & medium dark print").should("be.visible");
+    });
 });
