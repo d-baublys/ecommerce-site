@@ -11,7 +11,6 @@ import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLi
 import { buildAdminProductUrl } from "@/lib/utils";
 
 export default function AdminProductsClient() {
-    const router = useRouter();
     const pathname = usePathname();
     const [filter, setFilter] = useState<Categories | null>(null);
     const [unfilteredResults, setUnfilteredResults] = useState<Product[]>([]);
@@ -21,10 +20,6 @@ export default function AdminProductsClient() {
         if (searchQuery) return true;
         return false;
     });
-
-    const handleResultClick = (product: Product) => {
-        router.push(buildAdminProductUrl(product.id));
-    };
 
     return (
         <div className="flex flex-col grow w-full justify-center items-center">
@@ -38,7 +33,6 @@ export default function AdminProductsClient() {
             </div>
             <div id="admin-product-search-container" className="w-full h-10 mb-8">
                 <SearchBar
-                    handleResultClick={handleResultClick}
                     options={{ isGlobalSearch: false, showSuggestions: false }}
                     parentSetter={setUnfilteredResults}
                     parentQuerySetter={setSearchQuery}

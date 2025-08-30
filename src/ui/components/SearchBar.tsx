@@ -15,9 +15,9 @@ type SearchBarConfig = {
 };
 
 interface SearchBarProps {
-    handleResultClick: (product: Product) => void;
-    handleSearchClose?: () => void;
     options: SearchBarConfig;
+    handleResultClick?: (product: Product) => void;
+    handleSearchClose?: () => void;
     inputRef?: React.RefObject<HTMLInputElement | null>;
     parentSetter?: React.Dispatch<SetStateAction<Product[]>>;
     parentQuerySetter?: React.Dispatch<SetStateAction<string>>;
@@ -55,6 +55,12 @@ export default function SearchBar(props: SearchBarProps) {
 
         getData();
     }, []);
+
+    if (options.showSuggestions && !handleResultClick) {
+        throw new Error(
+            "Search bar config error: Result click handler must be provided when search suggestions are on."
+        );
+    }
 
     const debouncedResults = debounce((currQuery) => {
         if (!productList) return;
@@ -100,7 +106,7 @@ export default function SearchBar(props: SearchBarProps) {
     };
 
     const handleClick = (product: Product) => {
-        handleResultClick(product);
+        handleResultClick?.(product);
         clearAll();
         handleSearchClose?.();
     };

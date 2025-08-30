@@ -100,6 +100,13 @@ describe("Admin products page", () => {
         cy.get("#admin-products-container li").should("have.length", 8);
     });
 
+    it("triggers search correctly when search query contains whitespace", () => {
+        cy.get("#admin-product-search-container [aria-label='Search input']").type("white");
+        cy.get("#admin-products-container li").should("have.length.greaterThan", 1);
+        cy.get("#admin-product-search-container [aria-label='Search input']").type(" & medium");
+        cy.get("#admin-products-container li").should("have.length", 1);
+    });
+
     it("navigates to admin product edit page on product tile click", () => {
         cy.contains("button", "Men's").click();
         cy.get("#admin-products-container li").first().click();

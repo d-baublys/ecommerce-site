@@ -121,6 +121,23 @@ describe("Search overlay base tests", () => {
         );
     });
 
+    it("doesn't trigger search when search query is whitespace-only", () => {
+        cy.get("#search-overlay-container [aria-label='Search input']").type("  ");
+        cy.get("#search-overlay-container .suggestions-container li").as("suggestions-list");
+
+        cy.get("@suggestions-list").should("have.length", 1);
+        cy.get("@suggestions-list").first().should("have.text", "No results found");
+    });
+
+    it("triggers search correctly when search query contains whitespace", () => {
+        cy.get("#search-overlay-container [aria-label='Search input']").as("search-input");
+        cy.get("@search-input").type("white");
+        cy.get("#search-overlay-container .suggestions-container li").as("suggestions-list");
+        cy.get("@suggestions-list").should("have.length.greaterThan", 0);
+        cy.get("@search-input").type(" & medium");
+        cy.get("@suggestions-list").should("have.length", 1);
+    });
+
     it("locks scrolling when overlay is open", () => {
         cy.assertScrollHookCssExist();
         cy.performTestScroll();
