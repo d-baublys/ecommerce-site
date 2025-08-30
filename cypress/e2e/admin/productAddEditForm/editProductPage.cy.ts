@@ -1,8 +1,9 @@
 import { CypressSeedTestDataDelete } from "../../../../src/lib/definitions";
 import { createFakeProduct } from "../../../../src/lib/test-factories";
-import { stringifyConvertPrice } from "../../../../src/lib/utils";
+import { buildAdminProductUrl, stringifyConvertPrice } from "../../../../src/lib/utils";
 
 let productNameArr: CypressSeedTestDataDelete["productNameArr"] = [];
+let testProductLink: string;
 
 describe("Edit product page", () => {
     before(() => {
@@ -31,6 +32,13 @@ describe("Edit product page", () => {
         cy.get("#overall-message-container")
             .contains("Product added successfully")
             .should("be.visible");
+
+        cy.task("getTestProductSavedData", {
+            productName: testProduct.name,
+            src: testProduct.src,
+        }).then((data: { id: string; slug: string }) => {
+            testProductLink = buildAdminProductUrl(data.id);
+        });
     });
 
     beforeEach(() => {
@@ -40,7 +48,7 @@ describe("Edit product page", () => {
 
     after(() => {
         if (productNameArr.length) {
-            cy.task("getTestProductIds", productNameArr).then((productIdArr) => {
+            cy.task("getTestProductMultipleId", productNameArr).then((productIdArr) => {
                 cy.task("deleteTestData", {
                     productIdArr,
                 });
@@ -49,8 +57,8 @@ describe("Edit product page", () => {
     });
 
     it("shows 'delete' button", () => {
-        cy.visit(`/admin/products/test-product-1`);
-        cy.location("pathname").should("eq", "/admin/products/test-product-1");
+        cy.visit(testProductLink);
+        cy.location("pathname").should("eq", testProductLink);
         cy.contains("Edit Product").should("be.visible");
 
         cy.contains("button", "Delete").should("be.visible");
@@ -59,8 +67,8 @@ describe("Edit product page", () => {
     it("reverts form to saved state on 'cancel' click", () => {
         const testProduct = createFakeProduct();
 
-        cy.visit(`/admin/products/test-product-1`);
-        cy.location("pathname").should("eq", "/admin/products/test-product-1");
+        cy.visit(testProductLink);
+        cy.location("pathname").should("eq", testProductLink);
         cy.contains("Edit Product").should("be.visible");
 
         cy.get("input[name='product-name']").type("Replaced name");
@@ -84,8 +92,8 @@ describe("Edit product page", () => {
     });
 
     it("shows success message when all main form fields are valid & table is populated on main 'save' button click", () => {
-        cy.visit(`/admin/products/test-product-1`);
-        cy.location("pathname").should("eq", "/admin/products/test-product-1");
+        cy.visit(testProductLink);
+        cy.location("pathname").should("eq", testProductLink);
         cy.contains("Edit Product").should("be.visible");
 
         cy.get("input[name='product-name']").clear().type("Test Product 2");
@@ -100,8 +108,8 @@ describe("Edit product page", () => {
     });
 
     it("redirects to admin products page on product deletion", () => {
-        cy.visit(`/admin/products/test-product-2`);
-        cy.location("pathname").should("eq", "/admin/products/test-product-2");
+        cy.visit(testProductLink);
+        cy.location("pathname").should("eq", testProductLink);
         cy.contains("Edit Product").should("be.visible");
 
         cy.contains("button", "Delete").click();

@@ -8,6 +8,7 @@ import DisplayTile from "@/ui/components/cards/DisplayTile";
 import SearchBar from "@/ui/components/SearchBar";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
+import { buildAdminProductUrl } from "@/lib/utils";
 
 export default function AdminProductsClient() {
     const router = useRouter();
@@ -16,13 +17,13 @@ export default function AdminProductsClient() {
     const [unfilteredResults, setUnfilteredResults] = useState<Product[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const querySet = unfilteredResults.filter((item) => {
-        if (filter || /\s+/.test(searchQuery)) return item.gender === filter;
+        if (filter || /^\s+$/.test(searchQuery)) return item.gender === filter;
         if (searchQuery) return true;
         return false;
     });
 
     const handleResultClick = (product: Product) => {
-        router.push(`/admin/products/${encodeURIComponent(product.slug)}`);
+        router.push(buildAdminProductUrl(product.id));
     };
 
     return (
@@ -68,7 +69,7 @@ export default function AdminProductsClient() {
                     <ul id="admin-products-container" className="flex flex-col w-full">
                         {querySet.map((item: Product) => (
                             <li key={item.id} className="mt-8">
-                                <Link href={`${pathname}/${encodeURIComponent(item.slug)}`}>
+                                <Link href={buildAdminProductUrl(item.id)}>
                                     <DisplayTile productData={item} />
                                 </Link>
                             </li>
@@ -77,7 +78,7 @@ export default function AdminProductsClient() {
                 ) : (
                     <div className="flex items-center mt-8 h-full">
                         <p className="text-center">
-                            {filter || /\S+/.test(searchQuery)
+                            {filter || /^\S+$/.test(searchQuery)
                                 ? "No products matching your search"
                                 : "Please select a filter or search by keyword"}
                         </p>

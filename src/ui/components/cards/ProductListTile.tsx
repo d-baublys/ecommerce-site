@@ -68,7 +68,10 @@ export default function ProductListTile(props: ProductListTileProps) {
                             className="flex flex-row"
                         >
                             {wrapWithLink ? (
-                                <Link className="w-full" href={buildProductUrl(productData.slug)}>
+                                <Link
+                                    className="w-full"
+                                    href={buildProductUrl(productData.id, productData.slug)}
+                                >
                                     {renderCentralContent(
                                         productData,
                                         hasSize ? itemData.size : undefined

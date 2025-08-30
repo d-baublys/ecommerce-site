@@ -85,7 +85,7 @@ describe("SearchOverlay", () => {
         const firstSuggestion = within(getSuggestionsContainer()).getAllByRole("listitem")[0];
         fireEvent.click(firstSuggestion);
 
-        expect(pushMock).toHaveBeenCalledWith("/products/test-product-1");
+        expect(pushMock).toHaveBeenCalledWith("/products/test-id-1/test-product-1");
     });
 
     it("has no accessibility violations", async () => {

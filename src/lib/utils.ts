@@ -214,8 +214,12 @@ export function createBagItem(product: Product, size: Sizes): BagItem {
     return { product, size, quantity: 1 };
 }
 
-export function buildProductUrl(slug: string) {
-    return `/products/${encodeURIComponent(slug)}`;
+export function buildProductUrl(id: string, slug: string) {
+    return `/products/${id}/${encodeURIComponent(slug)}`;
+}
+
+export function buildAdminProductUrl(id: string) {
+    return `/admin/products/${id}`;
 }
 
 export function getAllTabbable(container: HTMLElement) {

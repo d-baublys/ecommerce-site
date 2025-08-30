@@ -42,7 +42,20 @@ export default defineConfig({
 
                     return res.id;
                 },
-                async getTestProductIds(productNameArr) {
+                async getTestProductSavedData({
+                    productName,
+                    imagePath,
+                }: {
+                    productName: PrismaProduct["name"];
+                    imagePath: PrismaProduct["src"];
+                }) {
+                    const res = await prisma.product.findFirst({
+                        where: { name: productName, src: imagePath },
+                    });
+
+                    return { id: res?.id, slug: res?.slug };
+                },
+                async getTestProductMultipleId(productNameArr: PrismaProduct["name"][]) {
                     const res = await prisma.product.findMany({
                         where: { name: { in: productNameArr } },
                     });

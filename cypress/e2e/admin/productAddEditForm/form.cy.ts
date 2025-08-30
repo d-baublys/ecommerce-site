@@ -17,7 +17,7 @@ describe("Product add/edit form base tests", () => {
 
     afterEach(() => {
         if (productNameArr.length) {
-            cy.task("getTestProductIds", productNameArr).then((productIdArr) => {
+            cy.task("getTestProductMultipleId", productNameArr).then((productIdArr) => {
                 cy.task("deleteTestData", {
                     productIdArr,
                 });

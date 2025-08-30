@@ -57,7 +57,6 @@ declare global {
             assertScrollHookCssNotExist(): Chainable<void>;
             awaitPathnameSettle(): Chainable<void>;
             visitHomeAwaitPathnameSettle(): Chainable<void>;
-            visitTestProduct(): Chainable<void>;
             awaitInputBlur(): Chainable<void>;
             awaitTableSettle(): Chainable<void>;
         }
@@ -143,12 +142,6 @@ Cypress.Commands.add("awaitPathnameSettle", () => {
 Cypress.Commands.add("visitHomeAwaitPathnameSettle", () => {
     cy.visitHome();
     cy.awaitPathnameSettle();
-});
-
-Cypress.Commands.add("visitTestProduct", () => {
-    cy.visit("/products/white-&-medium-dark-print");
-    cy.location("pathname").should("eq", "/products/white-&-medium-dark-print");
-    cy.contains("White & medium dark print").should("be.visible");
 });
 
 Cypress.Commands.add("awaitInputBlur", () => {

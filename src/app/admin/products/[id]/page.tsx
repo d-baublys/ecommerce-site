@@ -1,4 +1,5 @@
 import { getProductData } from "@/lib/actions";
+import { buildProductUrl } from "@/lib/utils";
 import DisplayTile from "@/ui/components/cards/DisplayTile";
 import ProductAddEditForm from "@/ui/components/forms/ProductAddEditForm";
 import AdminLayout from "@/ui/layouts/AdminLayout";
@@ -7,7 +8,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type AsyncParams = {
-    params: Promise<{ slug: string }>;
+    params: Promise<{ id: string }>;
 };
 
 export const metadata: Metadata = {
@@ -15,8 +16,8 @@ export const metadata: Metadata = {
 };
 
 export default async function ProductViewEditPage({ params }: AsyncParams) {
-    const { slug } = await params;
-    const productFetch = await getProductData({ slug: decodeURIComponent(slug) });
+    const { id } = await params;
+    const productFetch = await getProductData({ id });
 
     if (!productFetch.data.length) {
         notFound();
@@ -27,7 +28,7 @@ export default async function ProductViewEditPage({ params }: AsyncParams) {
     return (
         <AdminLayout subheaderText="Edit Product" lastCrumbText={productData.name}>
             <div className="flex flex-col w-full gap-8">
-                <Link href={`/products/${encodeURIComponent(productData.slug)}`}>
+                <Link href={buildProductUrl(productData.id, productData.slug)}>
                     <DisplayTile productData={productData} />
                 </Link>
                 <ProductAddEditForm productData={productData} />

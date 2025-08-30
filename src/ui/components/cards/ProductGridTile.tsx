@@ -94,7 +94,7 @@ export default function ProductGridTile({ product }: { product: Product }) {
                     onBlur={handleBlur}
                     className="relative w-full aspect-[4/5] outline-none"
                 >
-                    <Link tabIndex={-1} href={buildProductUrl(product.slug)}>
+                    <Link tabIndex={-1} href={buildProductUrl(product.id, product.slug)}>
                         <ProductImage product={product} />
                     </Link>
                     {isHovered && (
@@ -142,7 +142,7 @@ export default function ProductGridTile({ product }: { product: Product }) {
                     )}
                 </div>
 
-                <Link href={buildProductUrl(product.slug)}>
+                <Link href={buildProductUrl(product.id, product.slug)}>
                     <div className="flex flex-col grow gap-4">
                         <p className="tile-name">{product.name}</p>
                         <p className="tile-price font-semibold">

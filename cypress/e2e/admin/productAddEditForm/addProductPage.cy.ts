@@ -17,7 +17,7 @@ describe("Add product page", () => {
 
     afterEach(() => {
         if (productNameArr.length) {
-            cy.task("getTestProductIds", productNameArr).then((productIdArr) => {
+            cy.task("getTestProductMultipleId", productNameArr).then((productIdArr) => {
                 cy.task("deleteTestData", {
                     productIdArr,
                 });

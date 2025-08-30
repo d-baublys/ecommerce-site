@@ -73,7 +73,7 @@ export default function SearchBar(props: SearchBarProps) {
         setQuery(query);
         parentQuerySetter?.(query);
 
-        if (/\s+/.test(query)) return;
+        if (/^\s+$/.test(query)) return;
 
         if (productList) {
             debouncedResults(query);

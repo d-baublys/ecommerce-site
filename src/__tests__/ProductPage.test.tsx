@@ -1,7 +1,8 @@
 import { createFakeProduct } from "@/lib/test-factories";
 import { getConsoleErrorSpy } from "@/lib/test-utils";
+import { buildProductUrl } from "@/lib/utils";
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import ProductPage from "@/app/products/[slug]/page";
+import ProductPage from "@/app/products/[id]/[slug]/page";
 import { useBagStore } from "@/stores/bagStore";
 
 const fakeProduct = createFakeProduct();
@@ -13,7 +14,7 @@ jest.mock("@/lib/actions", () => ({
 }));
 
 jest.mock("next/navigation", () => ({
-    usePathname: () => `/products/${encodeURIComponent(fakeProduct.slug)}`,
+    usePathname: () => buildProductUrl(fakeProduct.id, fakeProduct.slug),
     notFound: jest.fn(() => {
         throw new Error("notFound called");
     }),
@@ -24,7 +25,7 @@ import { getProductData } from "@/lib/actions";
 const renderPage = async () =>
     render(
         await ProductPage({
-            params: Promise.resolve({ slug: fakeProduct.slug }),
+            params: Promise.resolve({ id: fakeProduct.id, slug: fakeProduct.slug }),
         })
     );
 
