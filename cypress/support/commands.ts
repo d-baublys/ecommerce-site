@@ -60,8 +60,8 @@ declare global {
             visitHomeAwaitPathnameSettle(): Chainable<void>;
             awaitInputBlur(): Chainable<void>;
             awaitTableSettle(): Chainable<void>;
-            visitTestAdminProduct(testProductLink: string): Chainable<void>;
-            visitTestProduct(): Chainable<void>;
+            visitTestAdminProduct(testProductUrl: string): Chainable<void>;
+            visitTestProduct(testProductUrl: string): Chainable<void>;
         }
     }
 }
@@ -161,14 +161,8 @@ Cypress.Commands.add("visitTestAdminProduct", (testProductUrl) => {
     cy.contains("Edit Product").should("be.visible");
 });
 
-Cypress.Commands.add("visitTestProduct", () => {
-    cy.task("getTestProductSavedData", {
-        productName: "White & medium dark print",
-        src: "/tshirt16.jpg",
-    }).then((data: { id: string; slug: string }) => {
-        const testProductLink = buildProductUrl(data.id, data.slug);
-        cy.visit(testProductLink);
-        cy.location("pathname").should("eq", testProductLink);
-        cy.contains("White & medium dark print").should("be.visible");
-    });
+Cypress.Commands.add("visitTestProduct", (testProductUrl) => {
+    cy.visit(testProductUrl);
+    cy.location("pathname").should("eq", testProductUrl);
+    cy.contains("White & medium dark print").should("be.visible");
 });

@@ -112,7 +112,7 @@ export class CredentialsError extends Error {
     }
 }
 
-export type CypressSeedTestProduct = Pick<Product, "id" | "name" | "price">;
+export type CypressSeedTestProduct = Pick<Product, "id" | "name" | "price" | "slug">;
 export type CypressSeedTestDataDelete = {
     orderIdArr: Order["id"][];
     productIdArr: PrismaProduct["id"][];

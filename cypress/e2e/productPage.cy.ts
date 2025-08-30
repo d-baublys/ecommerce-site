@@ -1,6 +1,17 @@
+import { CypressSeedTestProduct } from "../../src/lib/definitions";
+import { buildProductUrl } from "../../src/lib/utils";
+
+let testProductLink: string;
+
 describe("Product page", () => {
+    before(() => {
+        cy.task("getTestProductSavedData").then((data: CypressSeedTestProduct) => {
+            testProductLink = buildProductUrl(data.id, data.slug);
+        });
+    });
+
     beforeEach(() => {
-        cy.visitTestProduct();
+        cy.visitTestProduct(testProductLink);
     });
 
     it("disables 'add to bag' button by default", () => {
@@ -67,7 +78,7 @@ describe("Product page", () => {
         cy.visit("/wishlist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 1);
         cy.contains(/1\s*Item/).should("be.visible");
-        cy.visitTestProduct();
+        cy.visitTestProduct(testProductLink);
         cy.contains("button", "Remove from Wishlist").click();
         cy.go("back");
         cy.get(".grid-tile-container .product-tile").should("have.length", 0);

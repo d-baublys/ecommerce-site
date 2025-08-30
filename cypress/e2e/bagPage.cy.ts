@@ -1,3 +1,8 @@
+import { CypressSeedTestProduct } from "../../src/lib/definitions";
+import { buildProductUrl } from "../../src/lib/utils";
+
+let testProductLink: string;
+
 describe("Bag page base tests", () => {
     beforeEach(() => {
         cy.visit("/bag");
@@ -27,8 +32,14 @@ describe("Bag page base tests", () => {
 });
 
 describe("Bag page populated tests", () => {
+    before(() => {
+        cy.task("getTestProductSavedData").then((data: CypressSeedTestProduct) => {
+            testProductLink = buildProductUrl(data.id, data.slug);
+        });
+    });
+
     beforeEach(() => {
-        cy.visitTestProduct();
+        cy.visitTestProduct(testProductLink);
         cy.get("[aria-label='Size selection']").select("L");
         cy.contains("button", "Add to Bag").click();
         cy.get("[aria-label='Size selection']").select("XL");

@@ -32,6 +32,7 @@ export default defineConfig({
                         id: createdProduct.id,
                         name: createdProduct.name,
                         price: createdProduct.price,
+                        slug: createdProduct.slug,
                     };
                 },
                 async seedTestOrder({
@@ -55,15 +56,9 @@ export default defineConfig({
 
                     return res.id;
                 },
-                async getTestProductSavedData({
-                    productName,
-                    imagePath,
-                }: {
-                    productName: PrismaProduct["name"];
-                    imagePath: PrismaProduct["src"];
-                }) {
+                async getTestProductSavedData() {
                     const res = await prisma.product.findFirst({
-                        where: { name: productName, src: imagePath },
+                        where: { name: "White & medium dark print" },
                     });
 
                     return { id: res?.id, slug: res?.slug };
