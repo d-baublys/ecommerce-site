@@ -1,4 +1,4 @@
-import { CypressSeedTestProduct } from "../../src/lib/definitions";
+import { CypressTestProductData } from "../../src/lib/definitions";
 import { buildProductUrl } from "../../src/lib/utils";
 
 let testProductLink: string;
@@ -6,7 +6,7 @@ let testProductId: string;
 
 describe("Redirected routes", () => {
     before(() => {
-        cy.task("getTestProductSavedData").then((data: CypressSeedTestProduct) => {
+        cy.task("getTestProductSavedData").then((data: CypressTestProductData) => {
             testProductLink = buildProductUrl(data.id, data.slug);
             testProductId = data.id;
         });

@@ -4,6 +4,7 @@ import ConfirmModal from "@/ui/components/overlays/ConfirmModal";
 import AdminWrapper from "@/ui/layouts/AdminWrapper";
 import OrdersPageTemplate from "@/ui/pages/OrdersPageTemplate";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 type AsyncParams = {
     params: Promise<{ id: string }>;
@@ -19,10 +20,12 @@ export default async function IndividualOrderPage({ params }: AsyncParams) {
     const { id: orderId } = await params;
 
     const orderFetch = await getOrder({ orderId: Number(orderId) });
-    let orderData: OrderData[] = [];
-    if (orderFetch.data) {
-        orderData = [orderFetch.data];
+
+    if (!orderFetch.data) {
+        notFound();
     }
+
+    const orderData: OrderData[] = [orderFetch.data];
 
     return (
         <>

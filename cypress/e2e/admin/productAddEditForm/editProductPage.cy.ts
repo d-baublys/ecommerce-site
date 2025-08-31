@@ -1,18 +1,18 @@
 import {
-    CypressSeedTestDataDelete,
-    CypressSeedTestProduct,
+    CypressTestDataDeleteParams,
+    CypressTestProductData,
     Product,
 } from "../../../../src/lib/definitions";
 import { createFakeProduct } from "../../../../src/lib/test-factories";
 import { buildAdminProductUrl } from "../../../../src/lib/utils";
 
-let productIdArr: CypressSeedTestDataDelete["productIdArr"] = [];
+let productIdArr: CypressTestDataDeleteParams["productIdArr"] = [];
 const testProduct: Product = createFakeProduct();
 let testProductLink: string;
 
 describe("Edit product page", () => {
     before(() => {
-        cy.task("seedTestProduct").then((data: CypressSeedTestProduct) => {
+        cy.task("createCypressTestProduct").then((data: CypressTestProductData) => {
             testProductLink = buildAdminProductUrl(data.id);
             productIdArr.push(data.id);
         });

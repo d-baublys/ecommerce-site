@@ -1,7 +1,8 @@
-import { CypressSeedTestDataDelete, CypressSeedTestProduct } from "../../src/lib/definitions";
+import { Order } from "@prisma/client";
+import { CypressTestDataDeleteParams, CypressTestProductData } from "../../src/lib/definitions";
 
-let orderIdArr: CypressSeedTestDataDelete["orderIdArr"] = [];
-let productIdArr: CypressSeedTestDataDelete["productIdArr"] = [];
+let orderIdArr: CypressTestDataDeleteParams["orderIdArr"] = [];
+let productIdArr: CypressTestDataDeleteParams["productIdArr"] = [];
 
 describe("Orders page unauthenticated tests", () => {
     beforeEach(() => {
@@ -47,26 +48,25 @@ describe("Orders page authenticated tests", () => {
 });
 
 describe("Orders page authenticated & seeded tests", () => {
-    beforeEach(() => {
-        orderIdArr = [];
-        productIdArr = [];
-
-        cy.task("seedTestProduct").then((firstTestProductData: CypressSeedTestProduct) => {
-            cy.task("seedTestOrder", { productsDataArr: [firstTestProductData] }).then(
-                (firstOrderId) => {
-                    orderIdArr.push(firstOrderId);
-                    productIdArr.push(firstTestProductData.id);
+    before(() => {
+        cy.task("createCypressTestProduct").then((productData: CypressTestProductData) => {
+            cy.task("createCypressTestOrder", { productsDataArr: [productData] }).then(
+                (orderId: Order["id"]) => {
+                    orderIdArr.push(orderId);
+                    productIdArr.push(productData.id);
                 }
             );
         });
+    });
 
+    beforeEach(() => {
         cy.logInAsAdmin();
         cy.visit("/orders");
         cy.location("pathname").should("eq", "/orders");
         cy.contains("My Orders").should("be.visible");
     });
 
-    afterEach(() => {
+    after(() => {
         if (orderIdArr.length || productIdArr.length) {
             cy.task("deleteTestData", {
                 orderIdArr,

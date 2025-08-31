@@ -1,7 +1,7 @@
-import { OrderStatus, Sizes as PrismaSizes } from "@prisma/client";
+import { Order, OrderStatus, Prisma, Sizes as PrismaSizes } from "@prisma/client";
 import {
     OrderData,
-    CypressSeedTestProduct,
+    CypressTestProductData,
     Product,
     Sizes,
     VALID_CATEGORIES,
@@ -117,7 +117,7 @@ export function getFakeUpdatedData(): Product[] {
 
 type FakeOrderBase = {
     idx?: number;
-    overrides?: Partial<Omit<OrderData, "items">>;
+    overrides?: Partial<Order>;
 };
 
 type FakeOrderNever = {
@@ -154,12 +154,12 @@ export function createFakeOrder({
         product: convertClientProduct(product),
     }));
 
-    return {
+    const dataObj = {
         id: idx,
         subTotal: 5000,
         shippingTotal: 500,
         total: 5500,
-        status: "paid",
+        status: "paid" as OrderStatus,
         userId: 1,
         email: "test@example.com",
         createdAt: new Date("2025-08-01"),
@@ -170,6 +170,18 @@ export function createFakeOrder({
         items,
         ...overrides,
     };
+
+    if (dataObj.status === "pendingReturn" && !dataObj.returnRequestedAt) {
+        throw new Error("Missing 'return requested date' for 'pending return' status");
+    }
+
+    if (dataObj.status === "refunded" && !(dataObj.returnRequestedAt && dataObj.refundedAt)) {
+        throw new Error(
+            "Missing 'return requested date' and 'refunded date' for 'refunded' status"
+        );
+    }
+
+    return dataObj;
 }
 
 export function createFakeOrderList(): OrderData[] {
@@ -191,29 +203,41 @@ export function createFakeOrderList(): OrderData[] {
     );
 }
 
+export type FakeOrderCypressParams = {
+    productsDataArr: CypressTestProductData[];
+    idx?: number;
+    sizesArr?: PrismaSizes[];
+    quantitiesArr?: number[];
+    overrides?: Partial<Prisma.OrderUncheckedCreateInput>;
+};
+
 export function createFakeOrderCypress({
     idx = 0,
     productsDataArr,
     sizesArr,
     quantitiesArr,
-}: {
-    idx?: number;
-    productsDataArr: CypressSeedTestProduct[];
-    sizesArr?: PrismaSizes[];
-    quantitiesArr?: number[];
-}) {
-    const items = productsDataArr.map((product, prodIdx) => ({
-        productId: String(product.id),
-        name: product.name,
-        price: product.price,
-        size: sizesArr ? sizesArr[prodIdx] : ("m" as PrismaSizes),
-        quantity: quantitiesArr ? quantitiesArr[prodIdx] : 2,
-    }));
+    overrides,
+}: FakeOrderCypressParams): Prisma.OrderUncheckedCreateInput {
+    let subTotal = 0;
+    const shippingTotal = 500;
 
-    return {
-        subTotal: 5000,
-        shippingTotal: 500,
-        total: 5500,
+    const items = productsDataArr.map((product, prodIdx) => {
+        const price = product.price;
+        const quantity: number = quantitiesArr ? quantitiesArr[prodIdx] : 2;
+        subTotal += price * quantity;
+        return {
+            productId: String(product.id),
+            name: product.name,
+            price,
+            size: sizesArr ? sizesArr[prodIdx] : ("m" as PrismaSizes),
+            quantity,
+        };
+    });
+
+    const dataObj = {
+        subTotal,
+        shippingTotal,
+        total: subTotal + shippingTotal,
         status: "paid" as OrderStatus,
         userId: 1,
         email: "test@example.com",
@@ -221,5 +245,18 @@ export function createFakeOrderCypress({
         sessionId: `sessionId-${idx}`,
         paymentIntentId: `paymentIntentId-${idx}`,
         items: { create: items },
+        ...overrides,
     };
+
+    if (dataObj.status === "pendingReturn" && !dataObj.returnRequestedAt) {
+        throw new Error("Missing 'return requested date' for 'pending return' status");
+    }
+
+    if (dataObj.status === "refunded" && !(dataObj.returnRequestedAt && dataObj.refundedAt)) {
+        throw new Error(
+            "Missing 'return requested date' and 'refunded date' for 'refunded' status"
+        );
+    }
+
+    return dataObj;
 }

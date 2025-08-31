@@ -23,9 +23,15 @@ jest.mock("next/navigation", () => ({
     }),
 }));
 
+jest.mock("@/lib/utils", () => ({
+    ...jest.requireActual("@/lib/utils"),
+    checkIsWithinReturnWindow: jest.fn(),
+}));
+
 import { getUserOrders, updateOrder } from "@/lib/actions";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { checkIsWithinReturnWindow } from "@/lib/utils";
 
 const setUpExistingSession = () => {
     (auth as jest.Mock).mockResolvedValue({
@@ -40,6 +46,7 @@ const setUpResolvedFetch = (resolvedValue: OrderData[]) => {
     (getUserOrders as jest.Mock).mockResolvedValue({ data: resolvedValue });
 };
 const setUpPageComplete = async () => {
+    (checkIsWithinReturnWindow as jest.Mock).mockReturnValue(true);
     setUpExistingSession();
     setUpResolvedFetch(fakeOrdersList);
     await renderOrdersPage();

@@ -2,8 +2,12 @@ import { defineConfig } from "cypress";
 import dotenv from "dotenv";
 import path from "path";
 import { Prisma, PrismaClient, Product as PrismaProduct, Sizes } from "@prisma/client";
-import { createFakeOrderCypress, createFakeProduct } from "./src/lib/test-factories";
-import { CypressSeedTestDataDelete, CypressSeedTestProduct } from "./src/lib/definitions";
+import {
+    createFakeOrderCypress,
+    createFakeProduct,
+    FakeOrderCypressParams,
+} from "./src/lib/test-factories";
+import { CypressTestDataDeleteParams } from "./src/lib/definitions";
 import { convertClientProductWithStock, hashPassword } from "./src/lib/utils";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
@@ -15,7 +19,7 @@ export default defineConfig({
     e2e: {
         setupNodeEvents(on, config) {
             on("task", {
-                async seedTestProduct() {
+                async createCypressTestProduct() {
                     const fakeProduct = convertClientProductWithStock(createFakeProduct());
                     const { stock, ...netProduct } = fakeProduct;
 
@@ -35,19 +39,15 @@ export default defineConfig({
                         slug: createdProduct.slug,
                     };
                 },
-                async seedTestOrder({
-                    productsDataArr,
-                }: {
-                    productsDataArr: CypressSeedTestProduct[];
-                }) {
+                async createCypressTestOrder(params: FakeOrderCypressParams) {
                     const dataObj: Prisma.OrderCreateArgs = {
-                        data: createFakeOrderCypress({ productsDataArr }),
+                        data: createFakeOrderCypress(params),
                     };
 
                     const res = await prisma.order.create(dataObj);
                     return res.id;
                 },
-                async seedTestUser() {
+                async createCypressTestUser() {
                     const hashedPassword = await hashPassword("testpassword123");
 
                     const res = await prisma.user.create({
@@ -70,7 +70,7 @@ export default defineConfig({
 
                     return res.map((product) => product.id);
                 },
-                async deleteTestData({ orderIdArr, productIdArr }: CypressSeedTestDataDelete) {
+                async deleteTestData({ orderIdArr, productIdArr }: CypressTestDataDeleteParams) {
                     await prisma.$transaction([
                         prisma.orderItem.deleteMany({ where: { orderId: { in: orderIdArr } } }),
                         prisma.order.deleteMany({ where: { id: { in: orderIdArr } } }),

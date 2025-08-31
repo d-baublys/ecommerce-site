@@ -1,8 +1,8 @@
-import { CypressSeedTestDataDelete } from "../../../../src/lib/definitions";
+import { CypressTestDataDeleteParams } from "../../../../src/lib/definitions";
 import { createFakeProduct } from "../../../../src/lib/test-factories";
 import { processDateForClient, stringifyConvertPrice } from "../../../../src/lib/utils";
 
-let productNameArr: CypressSeedTestDataDelete["productNameArr"] = [];
+let productNameArr: CypressTestDataDeleteParams["productNameArr"] = [];
 const testProduct = createFakeProduct();
 
 describe("Add product page", () => {

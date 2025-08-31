@@ -152,7 +152,12 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderDat
             >
                 <div className="flex justify-center items-center gap-1">
                     <span>{column.label}</span>
-                    <button onClick={() => handleSortClick(column.key)} className="cursor-pointer">
+                    <button
+                        aria-label={`Sort by ${column.label.toLocaleLowerCase()}`}
+                        title={`Sort by ${column.label.toLocaleLowerCase()}`}
+                        onClick={() => handleSortClick(column.key)}
+                        className="cursor-pointer"
+                    >
                         <FaSort />
                     </button>
                 </div>
@@ -212,6 +217,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderDat
                 {ordersData.length ? (
                     <div className="overflow-x-scroll max-w-[85vw]">
                         <RoundedTable
+                            id="orders-table"
                             tableHeadCells={buildHeadCells()}
                             tableBodyCells={buildBodyCells()}
                             overrideClasses="p-2"
