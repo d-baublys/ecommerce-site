@@ -48,7 +48,7 @@ export default function AdminProductsClient() {
                                     curr === category ? null : (category as Categories)
                                 )
                             }
-                            overrideClasses={`${
+                            overrideClasses={`!bg-background-lightest ${
                                 filter === category &&
                                 "!bg-component-color !border-component-color !text-contrasted"
                             }`}

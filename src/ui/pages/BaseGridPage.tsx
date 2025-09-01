@@ -43,7 +43,10 @@ export default function BaseGridPage({
                                 <p className="text-center">{noProductMessage}</p>
                                 {linkWhenEmptyList && (
                                     <div>
-                                        <PlainRoundedButtonLink href={"/category/all"}>
+                                        <PlainRoundedButtonLink
+                                            href={"/category/all"}
+                                            overrideClasses="!bg-background-lightest"
+                                        >
                                             Shop
                                         </PlainRoundedButtonLink>
                                     </div>

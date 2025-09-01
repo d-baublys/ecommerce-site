@@ -129,7 +129,10 @@ export default function BagPageClient() {
                         <div className="flex flex-col justify-center items-center w-full h-full p-8 md:p-0 gap-8">
                             <p>{"Your bag is empty!"}</p>
                             <div>
-                                <PlainRoundedButtonLink href={"/category/all"}>
+                                <PlainRoundedButtonLink
+                                    href={"/category/all"}
+                                    overrideClasses="!bg-background-lightest"
+                                >
                                     Shop
                                 </PlainRoundedButtonLink>
                             </div>
