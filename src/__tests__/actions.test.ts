@@ -15,16 +15,21 @@ import {
     updateOrder,
     updateStockOnPurchase,
 } from "@/lib/actions";
-import { OrderData } from "@/lib/definitions";
+import { Order, Product } from "@/lib/definitions";
 import { prisma } from "@/lib/prisma";
 import {
-    createFakeOrder,
+    createFakeOrderPrisma,
     createFakeOrderList,
     createFakeProduct,
     createFakeProductList,
 } from "@/lib/test-factories";
 import { getConsoleErrorSpy } from "@/lib/test-utils";
-import { FeaturedProduct, Sizes, Stock } from "@prisma/client";
+import {
+    FeaturedProduct,
+    Sizes as PrismaSizes,
+    Stock as PrismaStock,
+    Product as PrismaProduct,
+} from "@prisma/client";
 
 jest.mock("@/lib/prisma", () => ({
     prisma: {
@@ -83,18 +88,21 @@ describe("productAdd", () => {
 
 describe("getProductData", () => {
     it("returns product data successfully", async () => {
-        const prismaProductList = createFakeProductList().map(({ dateAdded, ...rest }) => ({
-            dateAdded: new Date(dateAdded),
-            ...rest,
-        }));
+        const prismaProductList: (PrismaProduct & { stock: Product["stock"] })[] =
+            createFakeProductList().map(({ dateAdded, ...rest }) => ({
+                dateAdded: new Date(dateAdded),
+                ...rest,
+            }));
 
         prismaProductList.forEach((product) => {
-            (product.stock as Stock[]) = Object.entries(product.stock).map(([size, count]) => ({
-                size: size as Sizes,
-                quantity: count,
-                productId: product.id,
-                id: `${product.id}-${size}`,
-            }));
+            (product.stock as PrismaStock[]) = Object.entries(product.stock).map(
+                ([size, count]) => ({
+                    size: size as PrismaSizes,
+                    quantity: count,
+                    productId: product.id,
+                    id: `${product.id}-${size}`,
+                })
+            );
         });
 
         (prisma.product.findMany as jest.Mock).mockResolvedValue(prismaProductList);
@@ -201,7 +209,7 @@ describe("createOrder", () => {
     it("creates order successfully", async () => {
         (prisma.order.create as jest.Mock).mockResolvedValue({});
 
-        const result = createOrder(createFakeOrder());
+        const result = createOrder(createFakeOrderPrisma());
         await expect(result).resolves.toEqual({ success: true });
     });
 
@@ -209,8 +217,8 @@ describe("createOrder", () => {
         const errorSpy = getConsoleErrorSpy();
         (prisma.order.create as jest.Mock).mockRejectedValue(new Error("Database error"));
 
-        const fakeOrder = createFakeOrder();
-        const fakeOrderNoItems: OrderData = { ...fakeOrder, items: [] };
+        const fakeOrder = createFakeOrderPrisma();
+        const fakeOrderNoItems: Order = { ...fakeOrder, items: [] };
 
         const result = createOrder(fakeOrderNoItems);
         await expect(result).resolves.toEqual({ success: false });
@@ -221,7 +229,7 @@ describe("createOrder", () => {
 
 describe("getOrder", () => {
     it("returns order data successfully", async () => {
-        const fakeOrder = createFakeOrder();
+        const fakeOrder = createFakeOrderPrisma();
 
         (prisma.order.findFirst as jest.Mock).mockResolvedValue(fakeOrder);
 
@@ -242,7 +250,7 @@ describe("getOrder", () => {
 
 describe("getUserOrders", () => {
     it("returns order data successfully", async () => {
-        const fakeOrderList = createFakeOrderList();
+        const fakeOrderList = createFakeOrderList({ variant: "prisma" });
         (prisma.order.findMany as jest.Mock).mockResolvedValue(fakeOrderList);
 
         const result = getUserOrders({ userId: 1 });
@@ -262,7 +270,7 @@ describe("getUserOrders", () => {
 
 describe("getOrders", () => {
     it("returns order data successfully", async () => {
-        const fakeOrderList = createFakeOrderList();
+        const fakeOrderList = createFakeOrderList({ variant: "prisma" });
         (prisma.order.findMany as jest.Mock).mockResolvedValue(fakeOrderList);
 
         const result = getOrders();
@@ -332,18 +340,21 @@ describe("createFeaturedProducts", () => {
 
 describe("getFeaturedProducts", () => {
     it("returns featured product data successfully", async () => {
-        const prismaProductList = createFakeProductList().map(({ dateAdded, ...rest }) => ({
-            dateAdded: new Date(dateAdded),
-            ...rest,
-        }));
+        const prismaProductList: (PrismaProduct & { stock: Product["stock"] })[] =
+            createFakeProductList().map(({ dateAdded, ...rest }) => ({
+                dateAdded: new Date(dateAdded),
+                ...rest,
+            }));
 
         prismaProductList.forEach((product) => {
-            (product.stock as Stock[]) = Object.entries(product.stock).map(([size, count]) => ({
-                size: size as Sizes,
-                quantity: count,
-                productId: product.id,
-                id: `${product.id}-${size}`,
-            }));
+            (product.stock as PrismaStock[]) = Object.entries(product.stock).map(
+                ([size, count]) => ({
+                    size: size as PrismaSizes,
+                    quantity: count,
+                    productId: product.id,
+                    id: `${product.id}-${size}`,
+                })
+            );
         });
 
         const prismaFeaturedList: FeaturedProduct[] = prismaProductList.map((product, idx) => ({

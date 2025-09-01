@@ -1,4 +1,4 @@
-import { Order } from "@prisma/client";
+import { Order as PrismaOrder } from "@prisma/client";
 import { CypressTestDataDeleteParams, CypressTestProductData } from "../../src/lib/definitions";
 
 let orderIdArr: CypressTestDataDeleteParams["orderIdArr"] = [];
@@ -51,7 +51,7 @@ describe("Orders page authenticated & seeded tests", () => {
     before(() => {
         cy.task("createCypressTestProduct").then((productData: CypressTestProductData) => {
             cy.task("createCypressTestOrder", { productsDataArr: [productData] }).then(
-                (orderId: Order["id"]) => {
+                (orderId: PrismaOrder["id"]) => {
                     orderIdArr.push(orderId);
                     productIdArr.push(productData.id);
                 }

@@ -1,17 +1,15 @@
-import { Stock as PrismaStock, Product as PrismaProduct } from "@prisma/client";
+import { Stock as PrismaStock, Product as PrismaProduct, Prisma } from "@prisma/client";
 import {
     BagItem,
     Product,
-    PRODUCT_BASE_FIELDS,
-    ProductBase,
     Sizes,
     VALID_CATEGORIES,
     VALID_SIZES,
     ProductSortKey,
     SORT_OPTIONS,
-    OrderData,
-    OrderItemWithClientProductNoStock,
     REFUND_WINDOW,
+    PrismaOrderNoStock,
+    Order,
 } from "./definitions";
 import bcrypt from "bcryptjs";
 
@@ -25,7 +23,7 @@ export function debounce<T extends (...args: unknown[]) => void>(func: T, delay:
     };
 }
 
-export function checkStock(productData: Product, productSize: Sizes, bag: BagItem[]) {
+export function checkStock(productData: Product, productSize: Sizes, bag: BagItem[]): boolean {
     const stock = productData.stock[productSize as keyof typeof productData.stock] ?? 0;
 
     const existing = bag.find(
@@ -48,31 +46,31 @@ export function isUnique(value: string, stockObj: Product["stock"]) {
     return !Object.entries(stockObj).find(([size]) => size === value);
 }
 
-export function isValidStock(value: number) {
+export function isValidStock(value: number): boolean {
     return value >= 0;
 }
 
-export function capitalize(str: string) {
+export function capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 
-export function isValidPrice(value: string) {
+export function isValidPrice(value: string): boolean {
     return /^\d+(\.\d{1,2})?$/.test(value) && !isNaN(Number(value));
 }
 
-export function convertValidPrice(price: string) {
+export function convertValidPrice(price: string): number {
     return Math.round(Number(price) * 100);
 }
 
-export function stringifyConvertPrice(price: number) {
+export function stringifyConvertPrice(price: number): string {
     return (price / 100).toFixed(2).toString();
 }
 
-export function slugify(name: string) {
+export function slugify(name: string): string {
     return name.toLowerCase().split(" ").join("-");
 }
 
-export function formatImagePath(filePath: string) {
+export function formatImagePath(filePath: string): string {
     return `/${filePath}`;
 }
 
@@ -94,7 +92,7 @@ export function convertPrismaProduct(product: PrismaProduct & { stock: PrismaSto
     return {
         ...product,
         dateAdded: processDateForClient(product.dateAdded),
-        stock: buildStockObj(product.stock),
+        stock: buildStockObjForClient(product.stock),
     };
 }
 
@@ -107,10 +105,16 @@ export function convertMultiplePrismaProducts(
     );
 }
 
-export function convertOrderProducts(data: OrderData): OrderItemWithClientProductNoStock[] {
-    return data.items.map((item) => ({
-        ...item,
-        product: { ...item.product, dateAdded: processDateForClient(item.product.dateAdded) },
+export function convertPrismaOrders(data: PrismaOrderNoStock[]): Order[] {
+    return data.map((order) => ({
+        ...order,
+        items: order.items.map((item) => ({
+            ...item,
+            product: {
+                ...item.product,
+                dateAdded: processDateForClient(item.product.dateAdded),
+            },
+        })),
     }));
 }
 
@@ -119,23 +123,20 @@ export function convertClientProduct(product: Product): PrismaProduct {
     return { ...rest, dateAdded: new Date(rest.dateAdded) };
 }
 
-export function convertClientProductWithStock(
-    product: Product
-): PrismaProduct & { stock: Product["stock"] } {
-    return { ...product, dateAdded: new Date(product.dateAdded) };
-}
-
-export function containsClick(e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: string) {
+export function containsClick(
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    id: string
+): boolean {
     const element = document.getElementById(id);
     return element ? element.contains(e.target as Node) : false;
 }
 
-export function areProductListsEqual(listA: Product[], listB: Product[]) {
+export function areProductListsEqual(listA: Product[], listB: Product[]): boolean {
     if (listA.length !== listB.length) return false;
     return listA.every((productA, idx) => productA.id === listB[idx].id);
 }
 
-function areStocksEqual(stockA: Product["stock"], stockB: Product["stock"]) {
+function areStocksEqual(stockA: Product["stock"], stockB: Product["stock"]): boolean {
     const keysA = Object.keys(stockA) as Sizes[];
     const keysB = Object.keys(stockB) as Sizes[];
 
@@ -143,7 +144,7 @@ function areStocksEqual(stockA: Product["stock"], stockB: Product["stock"]) {
     return keysA.every((key) => stockA[key] === stockB[key]);
 }
 
-export function areProductsEqual(productA: Product, productB: Product) {
+export function areProductsEqual(productA: Product, productB: Product): boolean {
     for (const key of Object.keys(productA) as (keyof Product)[]) {
         if (key === "stock") continue;
 
@@ -155,7 +156,7 @@ export function areProductsEqual(productA: Product, productB: Product) {
     return areStocksEqual(productA.stock, productB.stock);
 }
 
-export function mapStockForDb(productData: Product) {
+export function mapStockForPrisma(productData: Product): Prisma.StockCreateManyArgs["data"] {
     return Object.entries(productData.stock).map(([size, quantity]) => ({
         productId: productData.id,
         size: size as Sizes,
@@ -163,26 +164,18 @@ export function mapStockForDb(productData: Product) {
     }));
 }
 
-export function buildStockObj(stock: PrismaStock[]) {
+export function buildStockObjForClient(stock: PrismaStock[]): Product["stock"] {
     return stock.reduce((acc, stockItem) => {
         acc[stockItem.size] = stockItem.quantity;
         return acc;
     }, {} as Product["stock"]);
 }
 
-export function extractProductFields(product: Product) {
-    const keys = Object.keys(PRODUCT_BASE_FIELDS) as (keyof ProductBase)[];
-    const resultInitial = Object.fromEntries(keys.map((key) => [key, product[key]])) as ProductBase;
-    const result = { ...resultInitial, dateAdded: new Date(resultInitial.dateAdded) };
-
-    return result;
-}
-
-export function processDateForClient(date?: Date) {
+export function processDateForClient(date?: Date): string {
     return (date ? date : new Date()).toISOString().split("T")[0];
 }
 
-export function processDateForClientDate(date?: Date) {
+export function processDateForClientDate(date?: Date): string {
     return (date ? date : new Date())
         .toLocaleDateString("en-us", {
             day: "numeric",
@@ -192,23 +185,25 @@ export function processDateForClientDate(date?: Date) {
         .replace(/,/g, "");
 }
 
-export function pluralise(word: string, count: number) {
+export function pluralise(word: string, count: number): string {
     return count === 1 ? word : word + "s";
 }
 
 export function extractFilters<T extends string>(
     param: string | null,
     validValues: readonly T[] | T[]
-) {
+): T[] {
     if (!param) return [];
     return param.split("|").filter((val): val is T => validValues.includes(val as T));
 }
 
-export function extractSort(param: string | null) {
+export function extractSort(param: string | null): ProductSortKey | "placeholder" {
     return param && param in SORT_OPTIONS ? (param as ProductSortKey) : "placeholder";
 }
 
-export function isolateInteraction(e: React.TouchEvent | React.MouseEvent | React.KeyboardEvent) {
+export function isolateInteraction(
+    e: React.TouchEvent | React.MouseEvent | React.KeyboardEvent
+): void {
     e.preventDefault();
 }
 
@@ -220,32 +215,32 @@ export function createBagItem(product: Product, size: Sizes): BagItem {
     return { product, size, quantity: 1 };
 }
 
-export function buildProductUrl(id: string, slug: string) {
+export function buildProductUrl(id: string, slug: string): string {
     return `/products/${id}/${encodeURIComponent(slug)}`;
 }
 
-export function buildAdminProductUrl(id: string) {
+export function buildAdminProductUrl(id: string): string {
     return `/admin/products/${id}`;
 }
 
-export function getAllTabbable(container: HTMLElement) {
+export function getAllTabbable(container: HTMLElement): NodeListOf<HTMLElement> {
     return container.querySelectorAll<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
 }
 
-export async function hashPassword(password: string) {
+export async function hashPassword(password: string): Promise<string> {
     return await bcrypt.hash(password, 12);
 }
 
-export async function comparePasswords(password: string, hash: string) {
+export async function comparePasswords(password: string, hash: string): Promise<boolean> {
     return await bcrypt.compare(password, hash);
 }
 
-export function checkIsWithinReturnWindow(date: Date) {
+export function checkIsWithinReturnWindow(date: Date): boolean {
     return Date.now() - date.getTime() <= REFUND_WINDOW;
 }
 
-export function addReturnWindowDelta(date: Date) {
+export function addReturnWindowDelta(date: Date): Date {
     return new Date(date.getTime() + REFUND_WINDOW);
 }

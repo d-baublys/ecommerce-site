@@ -2,7 +2,7 @@ import { createFakeOrderList } from "@/lib/test-factories";
 import { wrapWithErrorBoundary } from "@/lib/test-utils";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import OrdersPage from "@/app/orders/page";
-import { OrderData } from "@/lib/definitions";
+import { Order, PrismaOrderNoStock } from "@/lib/definitions";
 import { act } from "react";
 
 jest.mock("@/auth", () => ({
@@ -42,7 +42,7 @@ const setUpExistingSession = () => {
         },
     });
 };
-const setUpResolvedFetch = (resolvedValue: OrderData[]) => {
+const setUpResolvedFetch = (resolvedValue: (Order | PrismaOrderNoStock)[]) => {
     (getUserOrders as jest.Mock).mockResolvedValue({ data: resolvedValue });
 };
 const setUpPageComplete = async () => {
@@ -52,7 +52,7 @@ const setUpPageComplete = async () => {
     await renderOrdersPage();
 };
 
-const fakeOrdersList = createFakeOrderList();
+const fakeOrdersList = createFakeOrderList({ variant: "prisma" });
 const renderOrdersPage = async () => await act(async () => render(await OrdersPage()));
 const getAllTiles = () => screen.getAllByTestId("order-tile");
 

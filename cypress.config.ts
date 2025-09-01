@@ -1,14 +1,19 @@
 import { defineConfig } from "cypress";
 import dotenv from "dotenv";
 import path from "path";
-import { Prisma, PrismaClient, Product as PrismaProduct, Sizes } from "@prisma/client";
+import {
+    Prisma,
+    PrismaClient,
+    Product as PrismaProduct,
+    Sizes as PrismaSizes,
+} from "@prisma/client";
 import {
     createFakeOrderCypress,
     createFakeProduct,
     FakeOrderCypressParams,
 } from "./src/lib/test-factories";
-import { CypressTestDataDeleteParams } from "./src/lib/definitions";
-import { convertClientProductWithStock, hashPassword } from "./src/lib/utils";
+import { CypressTestDataDeleteParams, Product } from "./src/lib/definitions";
+import { convertClientProduct, hashPassword } from "./src/lib/utils";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 dotenv.config({ path: path.resolve(process.cwd(), ".env.test.local") });
@@ -20,13 +25,13 @@ export default defineConfig({
         setupNodeEvents(on, config) {
             on("task", {
                 async createCypressTestProduct() {
-                    const fakeProduct = convertClientProductWithStock(createFakeProduct());
-                    const { stock, ...netProduct } = fakeProduct;
+                    const fakeProduct: Product = createFakeProduct();
+                    const convertedProduct: PrismaProduct = convertClientProduct(fakeProduct);
 
-                    const createdProduct = await prisma.product.create({ data: netProduct });
+                    const createdProduct = await prisma.product.create({ data: convertedProduct });
                     await prisma.stock.createMany({
                         data: Object.entries(fakeProduct.stock).map(([size, quantity]) => ({
-                            size: size as Sizes,
+                            size: size as PrismaSizes,
                             quantity: quantity,
                             productId: createdProduct.id,
                         })),
@@ -40,11 +45,11 @@ export default defineConfig({
                     };
                 },
                 async createCypressTestOrder(params: FakeOrderCypressParams) {
-                    const dataObj: Prisma.OrderCreateArgs = {
+                    const createObj: Prisma.OrderCreateArgs = {
                         data: createFakeOrderCypress(params),
                     };
 
-                    const res = await prisma.order.create(dataObj);
+                    const res = await prisma.order.create(createObj);
                     return res.id;
                 },
                 async createCypressTestUser() {

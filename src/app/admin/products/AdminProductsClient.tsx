@@ -3,7 +3,7 @@
 import { Categories, Product, VALID_CATEGORIES } from "@/lib/definitions";
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import DisplayTile from "@/ui/components/cards/DisplayTile";
 import SearchBar from "@/ui/components/SearchBar";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";

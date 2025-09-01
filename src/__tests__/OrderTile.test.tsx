@@ -1,5 +1,4 @@
-import { createFakeOrder } from "@/lib/test-factories";
-import { checkIsWithinReturnWindow } from "@/lib/utils";
+import { createFakeOrderClient } from "@/lib/test-factories";
 import OrderTile from "@/ui/components/cards/OrderTile";
 import { render, screen, waitFor } from "@testing-library/react";
 
@@ -12,11 +11,13 @@ jest.mock("@/lib/utils", () => ({
     checkIsWithinReturnWindow: jest.fn(),
 }));
 
-const fakePaidOrder = createFakeOrder();
-const fakePendingOrder = createFakeOrder({
+import { checkIsWithinReturnWindow } from "@/lib/utils";
+
+const fakePaidOrder = createFakeOrderClient();
+const fakePendingOrder = createFakeOrderClient({
     overrides: { status: "pendingReturn", returnRequestedAt: new Date("2025-08-02") },
 });
-const fakeRefundedOrder = createFakeOrder({
+const fakeRefundedOrder = createFakeOrderClient({
     overrides: {
         status: "refunded",
         returnRequestedAt: new Date("2025-08-02"),

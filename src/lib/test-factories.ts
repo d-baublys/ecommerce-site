@@ -1,12 +1,13 @@
-import { Order, OrderStatus, Prisma, Sizes as PrismaSizes } from "@prisma/client";
+import { OrderStatus, Prisma, Sizes as PrismaSizes } from "@prisma/client";
 import {
-    OrderData,
     CypressTestProductData,
-    Product,
     Sizes,
     VALID_CATEGORIES,
     Categories,
     BagItem,
+    Order,
+    PrismaOrderNoStock,
+    Product,
 } from "./definitions";
 import { convertClientProduct, processDateForClient, slugify } from "./utils";
 
@@ -34,7 +35,7 @@ export function createFakeProduct({
     };
 }
 
-export function createFakeProductList() {
+export function createFakeProductList(): Product[] {
     const prices = [5500, 9900, 20100, 15000];
     const stocks = [
         { s: 1, m: 0, l: 0 },
@@ -135,15 +136,24 @@ type FakeOrderFull = FakeOrderBase & {
     quantitiesArr: number[];
 };
 
-export function createFakeOrder({
-    idx = 0,
-    productList,
-    sizesArr,
-    quantitiesArr,
-    overrides,
-}: FakeOrderSimple | FakeOrderFull = {}): OrderData {
-    const products: Product[] = productList ? productList : [createFakeProduct()];
-    const items: OrderData["items"] = products.map((product, prodIdx) => ({
+type FakeOrderParams = FakeOrderFull | FakeOrderSimple;
+
+type FakeOrderObjBaseParams = FakeOrderBase & {
+    idx?: number;
+    productList?: Product[];
+    sizesArr?: Sizes[];
+    quantitiesArr?: number[];
+};
+
+type FakeOrderObjClientParams = FakeOrderObjBaseParams & { variant: "client" };
+type FakeOrderObjPrismaParams = FakeOrderObjBaseParams & { variant: "prisma" };
+
+function getFakeOrderObj(inputs: FakeOrderObjClientParams): Order;
+function getFakeOrderObj(inputs: FakeOrderObjPrismaParams): PrismaOrderNoStock;
+function getFakeOrderObj(inputs: FakeOrderObjClientParams | FakeOrderObjPrismaParams) {
+    const { variant, idx = 0, productList, sizesArr, quantitiesArr, overrides } = inputs;
+    const products: Product[] | undefined = productList ? productList : [createFakeProduct()];
+    const items = products.map((product, prodIdx) => ({
         name: product.name,
         price: product.price,
         id: `order-${idx}-${prodIdx}`,
@@ -151,7 +161,7 @@ export function createFakeOrder({
         size: productList && sizesArr ? sizesArr[prodIdx] : "m",
         quantity: productList && quantitiesArr ? quantitiesArr[prodIdx] : 2,
         orderId: idx,
-        product: convertClientProduct(product),
+        product: variant === "prisma" ? convertClientProduct(product) : product,
     }));
 
     const dataObj = {
@@ -184,7 +194,46 @@ export function createFakeOrder({
     return dataObj;
 }
 
-export function createFakeOrderList(): OrderData[] {
+export function createFakeOrderClient({
+    idx = 0,
+    productList,
+    sizesArr,
+    quantitiesArr,
+    overrides,
+}: FakeOrderParams = {}): Order {
+    return getFakeOrderObj({
+        variant: "client",
+        idx,
+        productList,
+        sizesArr,
+        quantitiesArr,
+        overrides,
+    });
+}
+
+export function createFakeOrderPrisma({
+    idx = 0,
+    productList,
+    sizesArr,
+    quantitiesArr,
+    overrides,
+}: FakeOrderParams = {}): PrismaOrderNoStock {
+    return getFakeOrderObj({
+        variant: "prisma",
+        idx,
+        productList,
+        sizesArr,
+        quantitiesArr,
+        overrides,
+    });
+}
+export function createFakeOrderList({ variant }: { variant: "client" }): Order[];
+export function createFakeOrderList({ variant }: { variant: "prisma" }): PrismaOrderNoStock[];
+export function createFakeOrderList({
+    variant,
+}: {
+    variant: "prisma" | "client";
+}): (Order | PrismaOrderNoStock)[] {
     const productList = createFakeProductList();
     const firstOrderList = productList.slice(0, 3);
     const secondOrderList = productList.slice(3);
@@ -194,12 +243,19 @@ export function createFakeOrderList(): OrderData[] {
     const quantitiesArr: number[][] = [[2, 1, 1], [1]];
 
     return Array.from({ length: 2 }).map((_, orderIdx) =>
-        createFakeOrder({
-            idx: orderIdx,
-            productList: productLists[orderIdx],
-            sizesArr: sizesArr[orderIdx],
-            quantitiesArr: quantitiesArr[orderIdx],
-        })
+        variant === "client"
+            ? createFakeOrderClient({
+                  idx: orderIdx,
+                  productList: productLists[orderIdx],
+                  sizesArr: sizesArr[orderIdx],
+                  quantitiesArr: quantitiesArr[orderIdx],
+              })
+            : createFakeOrderPrisma({
+                  idx: orderIdx,
+                  productList: productLists[orderIdx],
+                  sizesArr: sizesArr[orderIdx],
+                  quantitiesArr: quantitiesArr[orderIdx],
+              })
     );
 }
 

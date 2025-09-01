@@ -1,4 +1,4 @@
-import { Order, OrderItem, Prisma, Product as PrismaProduct } from "@prisma/client";
+import { Prisma, Product as PrismaProduct, Order as PrismaOrder } from "@prisma/client";
 
 export const PRODUCT_BASE_FIELDS = {
     name: "",
@@ -45,11 +45,29 @@ export type ItemMetadata = {
     quantity: number;
 };
 
-export type OrderItemWithPrismaProduct = OrderItem & { product: PrismaProduct };
+export type PrismaOrderNoStock = Prisma.OrderGetPayload<{
+    include: { items: { include: { product: true } } };
+}>;
 
-export type OrderItemWithClientProductNoStock = OrderItem & { product: ProductNoStock };
+export type ClientOrderItemWithProductNoStock = ItemMetadata & { product: ProductNoStock };
 
-export type OrderData = Order & { items: OrderItemWithPrismaProduct[] };
+export type Order = {
+    id: number;
+    subTotal: number;
+    shippingTotal: number;
+    total: number;
+    status: OrderStatus;
+    userId: number | null;
+    email: string;
+    createdAt: Date;
+    returnRequestedAt: Date | null;
+    refundedAt: Date | null;
+    sessionId: string;
+    paymentIntentId: string;
+    items: ClientOrderItemWithProductNoStock[];
+};
+
+export type OrderNoItems = Omit<Order, "items">;
 
 export const ORDER_STATUS_OPTIONS = {
     paid: "Paid",
@@ -58,7 +76,7 @@ export const ORDER_STATUS_OPTIONS = {
 };
 
 export const ORDER_TABLE_COLUMNS: {
-    key: keyof Omit<Order, "paymentIntentId" | "sessionId">;
+    key: keyof Omit<Order, "paymentIntentId" | "sessionId" | "items">;
     label: string;
 }[] = [
     { key: "id", label: "Order #" },
@@ -112,9 +130,9 @@ export class CredentialsError extends Error {
     }
 }
 
-export type CypressTestProductData = Pick<PrismaProduct, "id" | "name" | "price" | "slug">;
+export type CypressTestProductData = Pick<Product, "id" | "name" | "price" | "slug">;
 export type CypressTestDataDeleteParams = {
-    orderIdArr: Order["id"][];
+    orderIdArr: PrismaOrder["id"][];
     productIdArr: PrismaProduct["id"][];
     productNameArr: PrismaProduct["name"][];
 };

@@ -1,5 +1,6 @@
 import { getOrder } from "@/lib/actions";
-import { OrderData } from "@/lib/definitions";
+import { Order } from "@/lib/definitions";
+import { convertPrismaOrders } from "@/lib/utils";
 import ConfirmModal from "@/ui/components/overlays/ConfirmModal";
 import AdminWrapper from "@/ui/layouts/AdminWrapper";
 import OrdersPageTemplate from "@/ui/pages/OrdersPageTemplate";
@@ -25,7 +26,7 @@ export default async function IndividualOrderPage({ params }: AsyncParams) {
         notFound();
     }
 
-    const orderData: OrderData[] = [orderFetch.data];
+    const orderData: Order[] = convertPrismaOrders([orderFetch.data]);
 
     return (
         <>

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminProductsPage() {
-    const orders = await getOrders();
+    const orders = await getOrders({ items: false });
     const ordersData = orders.data;
 
     return (

@@ -1,4 +1,4 @@
-import { OrderData } from "@/lib/definitions";
+import { Order } from "@/lib/definitions";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 import OrdersPageClient from "@/app/orders/OrdersPageClient";
 import ConstrainedLayout from "@/ui/layouts/ConstrainedLayout";
@@ -7,7 +7,7 @@ export default function OrdersPageTemplate({
     orderData,
     subheaderText,
 }: {
-    orderData: OrderData[];
+    orderData: Order[];
     subheaderText: string;
 }) {
     return (

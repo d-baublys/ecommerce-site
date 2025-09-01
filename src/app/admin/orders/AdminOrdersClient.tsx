@@ -4,7 +4,7 @@ import { updateOrder } from "@/lib/actions";
 import {
     ORDER_STATUS_OPTIONS,
     ORDER_TABLE_COLUMNS,
-    OrderData,
+    OrderNoItems,
     OrderStatus,
 } from "@/lib/definitions";
 import { processDateForClient, stringifyConvertPrice } from "@/lib/utils";
@@ -21,11 +21,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaSort } from "react-icons/fa";
 
-export default function AdminOrdersClient({ ordersData }: { ordersData: OrderData[] }) {
+export default function AdminOrdersClient({ ordersData }: { ordersData: OrderNoItems[] }) {
     const columns = ORDER_TABLE_COLUMNS.map((columnData) => columnData.key);
     type TableColumns = (typeof columns)[number];
     type OrderOptions = "asc" | "desc";
-    const [sortedData, setSortedData] = useState<OrderData[]>(ordersData);
+    const [sortedData, setSortedData] = useState<OrderNoItems[]>(ordersData);
     const [sortColumn, setSortColumn] = useState<TableColumns>("returnRequestedAt");
     const [sortOrder, setSortOrder] = useState<OrderOptions>("desc");
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState<boolean>(false);
@@ -34,7 +34,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderDat
     const { openModal } = useModalStore((state) => state);
     const router = useRouter();
 
-    const requestRefund = async (orderId: OrderData["id"]) => {
+    const requestRefund = async (orderId: OrderNoItems["id"]) => {
         const res = await fetch("/api/refund", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -49,8 +49,8 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderDat
     };
 
     function compareValues<K extends TableColumns>(
-        a: OrderData[K],
-        b: OrderData[K],
+        a: OrderNoItems[K],
+        b: OrderNoItems[K],
         order: OrderOptions
     ): number {
         let result: number = 0;
@@ -90,7 +90,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderDat
         });
     }, [sortOrder, sortColumn]);
 
-    const handleApproval = async (orderId: OrderData["id"]) => {
+    const handleApproval = async (orderId: OrderNoItems["id"]) => {
         const returnConfirm = await openModal();
 
         if (returnConfirm) {
@@ -168,7 +168,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderDat
         sortedData.map((order, rowIdx) => (
             <tr key={`order-${order.id}`}>
                 {ORDER_TABLE_COLUMNS.map((column, colIdx) => {
-                    const cellData: string | number | null = processCellData(
+                    const cellData: string | number | Date | null = processCellData(
                         order[column.key],
                         column
                     );

@@ -7,15 +7,16 @@ import {
     stringifyConvertPrice,
 } from "@/lib/utils";
 import ProductListTile from "@/ui/components/cards/ProductListTile";
-import { OrderData } from "@/lib/definitions";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import { useModalStore } from "@/stores/modalStore";
 import { updateOrder } from "@/lib/actions";
 import { SetStateAction } from "react";
 import { useRouter } from "next/navigation";
+import { Order as PrismaOrder } from "@prisma/client";
+import { Order } from "@/lib/definitions";
 
 interface OrderTileProps {
-    orderData: OrderData;
+    orderData: Order;
     messageSetter: React.Dispatch<SetStateAction<string>>;
     openSuccessModal: () => void;
     openFailureModal: () => void;
@@ -47,7 +48,7 @@ export default function OrderTile(props: OrderTileProps) {
             break;
     }
 
-    const handleReturnRequest = async (orderId: OrderData["id"]) => {
+    const handleReturnRequest = async (orderId: PrismaOrder["id"]) => {
         const returnConfirm = await openModal();
 
         if (returnConfirm) {

@@ -1,4 +1,4 @@
-import { Order } from "@prisma/client";
+import { Order as PrismaOrder } from "@prisma/client";
 import { CypressTestDataDeleteParams, CypressTestProductData } from "../../../src/lib/definitions";
 import { FakeOrderCypressParams } from "../../../src/lib/test-factories";
 
@@ -54,7 +54,7 @@ describe("Admin orders page seeded tests", () => {
                         refundedAt: refundedAtArr[idx],
                     },
                 };
-                cy.task("createCypressTestOrder", params).then((orderId: Order["id"]) => {
+                cy.task("createCypressTestOrder", params).then((orderId: PrismaOrder["id"]) => {
                     orderIdArr.push(orderId);
                 });
             });
@@ -172,7 +172,7 @@ describe("Admin orders page seeded tests", () => {
     });
 
     it("navigates to individual admin order page on anchor link click", () => {
-        cy.awaitTableSettle()
+        cy.awaitTableSettle();
         cy.get("tbody a").first().click();
         cy.location("pathname").should("eq", `/admin/orders/${orderIdArr[1]}`);
         cy.contains("p", "TEST PRODUCT 1").should("be.visible");

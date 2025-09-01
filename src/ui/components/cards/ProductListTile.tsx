@@ -2,18 +2,18 @@
 
 import {
     BagItem,
-    OrderData,
-    OrderItemWithClientProductNoStock,
+    Order,
+    ClientOrderItemWithProductNoStock,
     Product,
     ProductNoStock,
     Sizes,
 } from "@/lib/definitions";
 import Link from "next/link";
-import { buildProductUrl, convertOrderProducts } from "@/lib/utils";
+import { buildProductUrl } from "@/lib/utils";
 import ProductImage from "@/ui/components/ProductImage";
 
 interface ProductListTileProps {
-    data: Product | Product[] | BagItem | OrderData;
+    data: Product | Product[] | BagItem | Order;
     wrapWithLink: boolean;
     showSize: boolean;
     endContent?: React.ReactNode | ((idx: number) => React.ReactNode);
@@ -25,10 +25,10 @@ export default function ProductListTile(props: ProductListTileProps) {
     const { data, wrapWithLink, showSize, endContent, externalOverrides, internalOverrides } =
         props;
 
-    let dataArr: (Product | BagItem | OrderItemWithClientProductNoStock)[];
+    let dataArr: (Product | BagItem | ClientOrderItemWithProductNoStock)[];
 
     if ("items" in data) {
-        dataArr = convertOrderProducts(data);
+        dataArr = data.items;
     } else if (data instanceof Array) {
         dataArr = data;
     } else {

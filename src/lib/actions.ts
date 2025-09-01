@@ -1,29 +1,29 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
 import {
-    CredentialsError,
-    ItemMetadata,
-    OrderStatus,
-    Product,
-    Sizes,
-    UserRoleOptions,
-} from "./definitions";
+    Prisma,
+    OrderStatus as PrismaOrderStatus,
+    Stock as PrismaStock,
+    Product as PrismaProduct,
+    Order as PrismaOrder,
+    User,
+} from "@prisma/client";
+import { CredentialsError, ItemMetadata, Product } from "./definitions";
 import { prisma } from "./prisma";
 import {
+    convertClientProduct,
     convertMultiplePrismaProducts,
-    extractProductFields,
     hashPassword,
-    mapStockForDb,
+    mapStockForPrisma,
 } from "./utils";
 
 export async function productAdd(productData: Product) {
     try {
         const createdProduct = await prisma.product.create({
-            data: extractProductFields(productData),
+            data: convertClientProduct(productData),
         });
         await prisma.stock.createMany({
-            data: mapStockForDb({ ...productData, id: createdProduct.id }),
+            data: mapStockForPrisma({ ...productData, id: createdProduct.id }),
         });
 
         return { success: true };
@@ -60,11 +60,11 @@ export async function productUpdate(productData: Product) {
                 where: { productId: productData.id },
             }),
             prisma.stock.createMany({
-                data: mapStockForDb(productData),
+                data: mapStockForPrisma(productData),
             }),
             prisma.product.update({
                 where: { id: productData.id },
-                data: extractProductFields(productData),
+                data: convertClientProduct(productData),
             }),
         ]);
 
@@ -75,7 +75,11 @@ export async function productUpdate(productData: Product) {
     }
 }
 
-export async function updateStockOnPurchase(productId: string, size: Sizes, quantity: number) {
+export async function updateStockOnPurchase(
+    productId: PrismaStock["productId"],
+    size: PrismaStock["size"],
+    quantity: PrismaStock["quantity"]
+) {
     const stockItem = await prisma.stock.findFirst({
         where: { productId, size },
         select: { id: true, quantity: true },
@@ -105,7 +109,7 @@ export async function updateStockOnPurchase(productId: string, size: Sizes, quan
     }
 }
 
-export async function productDelete(id: string) {
+export async function productDelete(id: PrismaProduct["id"]) {
     try {
         await prisma.$transaction([
             prisma.stock.deleteMany({
@@ -121,6 +125,8 @@ export async function productDelete(id: string) {
     }
 }
 
+type CreateOrderParams = Prisma.OrderCreateArgs["data"] & { items: ItemMetadata[] };
+
 export async function createOrder({
     items,
     subTotal,
@@ -130,18 +136,9 @@ export async function createOrder({
     email,
     paymentIntentId,
     userId,
-}: {
-    items: ItemMetadata[];
-    subTotal: number;
-    shippingTotal: number;
-    total: number;
-    sessionId: string;
-    email: string;
-    paymentIntentId: string;
-    userId: number | null;
-}) {
+}: CreateOrderParams) {
     try {
-        const dataObj: Prisma.OrderCreateArgs = {
+        const createObj: Prisma.OrderCreateArgs = {
             data: {
                 items: {
                     create: items.map((item) => ({
@@ -159,11 +156,10 @@ export async function createOrder({
                 email,
                 paymentIntentId,
                 userId,
-                status: "paid",
             },
         };
 
-        await prisma.order.create(dataObj);
+        await prisma.order.create(createObj);
 
         return { success: true };
     } catch (error) {
@@ -173,8 +169,8 @@ export async function createOrder({
 }
 
 type GetOrderParams = {
-    sessionId?: string;
-    orderId?: number;
+    sessionId?: PrismaOrder["sessionId"];
+    orderId?: PrismaOrder["id"];
 };
 
 export async function getOrder({ sessionId, orderId }: GetOrderParams) {
@@ -196,7 +192,7 @@ export async function getOrder({ sessionId, orderId }: GetOrderParams) {
     }
 }
 
-export async function getUserOrders({ userId }: { userId: number }) {
+export async function getUserOrders({ userId }: { userId: PrismaOrder["userId"] }) {
     try {
         const orders = await prisma.order.findMany({
             where: { userId: Number(userId) },
@@ -211,10 +207,10 @@ export async function getUserOrders({ userId }: { userId: number }) {
     }
 }
 
-export async function getOrders() {
+export async function getOrders(includeObj?: Prisma.OrderInclude) {
     try {
         const orders = await prisma.order.findMany({
-            include: { items: { include: { product: true } } },
+            include: includeObj ?? { items: { include: { product: true } } },
             orderBy: { createdAt: "desc" },
         });
 
@@ -226,10 +222,10 @@ export async function getOrders() {
 }
 
 interface updateOrderParams {
-    orderId: number;
-    status: OrderStatus;
-    returnRequestedAt?: Date;
-    refundedAt?: Date;
+    orderId: PrismaOrder["id"];
+    status: PrismaOrderStatus;
+    returnRequestedAt?: PrismaOrder["returnRequestedAt"];
+    refundedAt?: PrismaOrder["refundedAt"];
 }
 
 export async function updateOrder(params: updateOrderParams) {
@@ -247,10 +243,10 @@ export async function updateOrder(params: updateOrderParams) {
     }
 }
 
-export async function createFeaturedProducts(dataObj: Product[]) {
+export async function createFeaturedProducts(productData: Product[]) {
     try {
         await prisma.featuredProduct.createMany({
-            data: dataObj.map((product) => ({
+            data: productData.map((product) => ({
                 productId: product.id,
             })),
             skipDuplicates: true,
@@ -295,7 +291,11 @@ export async function clearFeaturedProducts() {
     }
 }
 
-export async function createUser(email: string, password: string, role: UserRoleOptions = "user") {
+export async function createUser(
+    email: User["email"],
+    password: User["password"],
+    role: User["role"] = "user"
+) {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const validEmail = emailPattern.test(email);
 
@@ -335,7 +335,7 @@ export async function createUser(email: string, password: string, role: UserRole
     }
 }
 
-export async function getUser(email: string) {
+export async function getUser(email: User["email"]) {
     try {
         const result = await prisma.user.findFirst({
             where: { email },
