@@ -221,14 +221,14 @@ export async function getOrders(includeObj?: Prisma.OrderInclude) {
     }
 }
 
-interface updateOrderParams {
+interface UpdateOrderParams {
     orderId: PrismaOrder["id"];
     status: PrismaOrderStatus;
     returnRequestedAt?: PrismaOrder["returnRequestedAt"];
     refundedAt?: PrismaOrder["refundedAt"];
 }
 
-export async function updateOrder(params: updateOrderParams) {
+export async function updateOrder(params: UpdateOrderParams) {
     const { orderId, status, returnRequestedAt, refundedAt } = params;
 
     try {

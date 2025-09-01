@@ -152,7 +152,6 @@ export default function ProductGridTile({ product }: { product: Product }) {
                     </div>
                 </Link>
             </div>
-
             {isModalOpen && (
                 <AddSuccessModal
                     handleClose={() => setIsModalOpen(false)}

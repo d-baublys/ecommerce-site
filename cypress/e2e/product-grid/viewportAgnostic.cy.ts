@@ -41,7 +41,7 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.get("@test-tile").find(".lower-hover-container li").should("have.length", 2);
     });
 
-    it("adds product to the bag on quick add size icon click and updates navbar UI", () => {
+    it("adds product to the bag on quick add size icon click, shows modal, & updates navbar UI", () => {
         cy.get(".bag-count-badge").should("not.exist");
         cy.get(".desktop-filtering").contains("button", "Price").click();
         cy.get(".desktop-filtering .price-btn-container")

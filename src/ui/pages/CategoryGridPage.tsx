@@ -24,7 +24,7 @@ import { useRouter } from "next/navigation";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 import LoadingIndicator from "@/ui/components/overlays/LoadingIndicator";
 
-type pageOptions = {
+type PageOptions = {
     noAside?: boolean;
     noCategoryTabs?: boolean;
     noOverlays?: boolean;
@@ -37,7 +37,7 @@ export default function CategoryGridPage({
     query,
 }: {
     category: Categories | "all";
-    options?: pageOptions;
+    options?: PageOptions;
     query?: string;
 }) {
     const paramsGetter = useSearchParams();

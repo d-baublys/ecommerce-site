@@ -42,9 +42,15 @@ describe("Bag page populated tests", () => {
         cy.visitTestProduct(testProductLink);
         cy.get("[aria-label='Size selection']").select("L");
         cy.contains("button", "Add to Bag").click();
+        cy.get(".bag-confirm-modal").should("be.visible");
+        cy.get("#close-modal-button").click();
         cy.get("[aria-label='Size selection']").select("XL");
         cy.contains("button", "Add to Bag").click();
+        cy.get(".bag-confirm-modal").should("be.visible");
+        cy.get("#close-modal-button").click();
         cy.contains("button", "Add to Bag").click();
+        cy.get(".bag-confirm-modal").should("be.visible");
+        cy.get("#close-modal-button").click();
         cy.visit("/bag");
         cy.location("pathname").should("eq", "/bag");
         cy.contains("My Bag").should("be.visible");
