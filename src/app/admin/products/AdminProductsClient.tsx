@@ -15,6 +15,7 @@ export default function AdminProductsClient() {
     const [filter, setFilter] = useState<Categories | null>(null);
     const [unfilteredResults, setUnfilteredResults] = useState<Product[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [isResultLoading, setIsResultLoading] = useState<boolean>(false);
     const querySet = unfilteredResults.filter((item) => {
         if (filter || /^\s+$/.test(searchQuery)) return item.gender === filter;
         if (searchQuery) return true;
@@ -37,6 +38,7 @@ export default function AdminProductsClient() {
                     parentSetter={setUnfilteredResults}
                     parentQuerySetter={setSearchQuery}
                     parentFilter={filter}
+                    parentLoadingStateSetter={setIsResultLoading}
                 />
             </div>
             <ul className="flex flex-row justify-evenly items-center w-full">
@@ -59,25 +61,28 @@ export default function AdminProductsClient() {
                 ))}
             </ul>
             <div className="flex justify-center w-full grow">
-                {(filter || searchQuery) && querySet.length > 0 ? (
-                    <ul id="admin-products-container" className="flex flex-col w-full">
-                        {querySet.map((item: Product) => (
-                            <li key={item.id} className="mt-8">
-                                <Link href={buildAdminProductUrl(item.id)}>
-                                    <DisplayTile productData={item} />
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <div className="flex items-center mt-8 h-full">
-                        <p className="text-center">
-                            {filter || /^\S+$/.test(searchQuery)
-                                ? "No products matching your search"
-                                : "Please select a filter or search by keyword"}
-                        </p>
-                    </div>
-                )}
+                {!isResultLoading ? (
+                    (filter || searchQuery) && querySet.length > 0 ? (
+                        <ul id="admin-products-container" className="flex flex-col w-full">
+                            {querySet.map((item: Product) => (
+                                <li key={item.id} className="mt-8">
+                                    <Link href={buildAdminProductUrl(item.id)}>
+                                        <DisplayTile productData={item} />
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <div className="flex items-center mt-8 h-full">
+                            <p className="text-center">
+                                {!(filter || searchQuery) ||
+                                (searchQuery && /^\s+$/.test(searchQuery))
+                                    ? "Please select a filter or search by keyword"
+                                    : "No products matching your search"}
+                            </p>
+                        </div>
+                    )
+                ) : null}
             </div>
         </div>
     );

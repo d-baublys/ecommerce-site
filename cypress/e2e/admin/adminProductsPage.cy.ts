@@ -82,7 +82,7 @@ describe("Admin products page", () => {
         cy.get("#admin-products-container li").should("have.length", 8);
     });
 
-    it("doesn't trigger search when search query is whitespace-only without any filters", () => {
+    it("shows fallback message when search query is whitespace-only without any filters", () => {
         cy.get("#admin-product-search-container [aria-label='Search input']").type(" ");
         cy.get("#admin-products-container").should("not.exist");
         cy.contains("Please select a filter or search by keyword");
@@ -100,11 +100,19 @@ describe("Admin products page", () => {
         cy.get("#admin-products-container li").should("have.length", 8);
     });
 
-    it("triggers search correctly when search query contains whitespace", () => {
+    it("triggers search correctly when search query contains whitespace and returns results", () => {
         cy.get("#admin-product-search-container [aria-label='Search input']").type("white");
         cy.get("#admin-products-container li").should("have.length.greaterThan", 1);
         cy.get("#admin-product-search-container [aria-label='Search input']").type(" & medium");
         cy.get("#admin-products-container li").should("have.length", 1);
+    });
+
+    it("shows fallback message when search query contains whitespace but returns no results", () => {
+        cy.get("#admin-product-search-container [aria-label='Search input']").type("t ");
+        cy.get("#admin-products-container li").should("have.length.greaterThan", 1);
+        cy.get("#admin-product-search-container [aria-label='Search input']").type("t");
+        cy.get("#admin-products-container li").should("have.length", 0);
+        cy.contains("No products matching your search");
     });
 
     it("navigates to admin product edit page on product tile click", () => {

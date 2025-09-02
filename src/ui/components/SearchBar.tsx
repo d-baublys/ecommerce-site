@@ -22,6 +22,7 @@ interface SearchBarProps {
     parentSetter?: React.Dispatch<SetStateAction<Product[]>>;
     parentQuerySetter?: React.Dispatch<SetStateAction<string>>;
     parentFilter?: Categories | null;
+    parentLoadingStateSetter?: React.Dispatch<SetStateAction<boolean>>;
 }
 
 export default function SearchBar(props: SearchBarProps) {
@@ -39,6 +40,7 @@ export default function SearchBar(props: SearchBarProps) {
         parentSetter,
         parentQuerySetter,
         parentFilter,
+        parentLoadingStateSetter,
     } = props;
 
     const router = useRouter();
@@ -71,6 +73,7 @@ export default function SearchBar(props: SearchBarProps) {
         setResults(results);
         parentSetter?.(results);
         setIsResultLoading(false);
+        parentLoadingStateSetter?.(false);
     }, 100);
 
     const handleSearch = (e: React.FormEvent<HTMLInputElement>) => {
@@ -84,6 +87,7 @@ export default function SearchBar(props: SearchBarProps) {
         if (productList) {
             debouncedResults(query);
             setIsResultLoading(true);
+            parentLoadingStateSetter?.(true);
         }
     };
 
@@ -101,7 +105,8 @@ export default function SearchBar(props: SearchBarProps) {
 
         if (parentFilter) {
             debouncedResults("");
-            setIsResultLoading(true);
+            setIsResultLoading(false);
+            parentLoadingStateSetter?.(false);
         }
     };
 
@@ -193,30 +198,32 @@ export default function SearchBar(props: SearchBarProps) {
                         className="suggestions-container suggestions-height-cap overflow-scroll no-scrollbar"
                         data-testid="suggestions-ul"
                     >
-                        {results?.length > 0 &&
-                            results.map((product, idx) => (
-                                <li
-                                    key={product.id}
-                                    className={`flex items-center p-1 cursor-pointer bg-background-lightest hover:brightness-90 active:brightness-90 ${
-                                        activeIdx === idx ? "brightness-90" : ""
-                                    }`}
-                                    onClick={() => handleClick(product)}
-                                >
-                                    <div className="flex shrink-0 mr-2">
-                                        <IoSearch size={14} />
-                                    </div>
+                        {!isResultLoading ? (
+                            results?.length > 0 ? (
+                                results.map((product, idx) => (
+                                    <li
+                                        key={product.id}
+                                        className={`flex items-center p-1 cursor-pointer bg-background-lightest hover:brightness-90 active:brightness-90 ${
+                                            activeIdx === idx ? "brightness-90" : ""
+                                        }`}
+                                        onClick={() => handleClick(product)}
+                                    >
+                                        <div className="flex shrink-0 mr-2">
+                                            <IoSearch size={14} />
+                                        </div>
+                                        <span className="whitespace-nowrap overflow-ellipsis overflow-hidden">
+                                            {product.name}
+                                        </span>
+                                    </li>
+                                ))
+                            ) : (
+                                <li className="p-1">
                                     <span className="whitespace-nowrap overflow-ellipsis overflow-hidden">
-                                        {product.name}
+                                        No results found
                                     </span>
                                 </li>
-                            ))}
-                        {!results?.length && !isResultLoading && (
-                            <li className="p-1">
-                                <span className="whitespace-nowrap overflow-ellipsis overflow-hidden">
-                                    No results found
-                                </span>
-                            </li>
-                        )}
+                            )
+                        ) : null}
                     </ul>
                 </div>
             )}
