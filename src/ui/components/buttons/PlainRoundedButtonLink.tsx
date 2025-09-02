@@ -13,7 +13,7 @@ export default function PlainRoundedButtonLink({
     return (
         <RoundedButtonLink
             href={href}
-            overrideClasses={`${plainClasses} ${overrideClasses}`}
+            overrideClasses={`${plainClasses} ${overrideClasses ?? ""}`}
             {...restProps}
         >
             {restProps.children}

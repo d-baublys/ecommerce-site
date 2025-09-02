@@ -1,17 +1,29 @@
 "use server";
 
-import { Prisma } from "@prisma/client";
-import { ItemMetadata, OrderStatus, Product, Sizes } from "./definitions";
+import {
+    Prisma,
+    OrderStatus as PrismaOrderStatus,
+    Stock as PrismaStock,
+    Product as PrismaProduct,
+    Order as PrismaOrder,
+    User,
+} from "@prisma/client";
+import { CredentialsError, ItemMetadata, Product } from "./definitions";
 import { prisma } from "./prisma";
-import { buildStockObj, extractProductFields, mapStockForDb, processDateForClient } from "./utils";
+import {
+    convertClientProduct,
+    convertMultiplePrismaProducts,
+    hashPassword,
+    mapStockForPrisma,
+} from "./utils";
 
 export async function productAdd(productData: Product) {
     try {
-        await prisma.product.create({
-            data: extractProductFields(productData),
+        const createdProduct = await prisma.product.create({
+            data: convertClientProduct(productData),
         });
         await prisma.stock.createMany({
-            data: mapStockForDb(productData),
+            data: mapStockForPrisma({ ...productData, id: createdProduct.id }),
         });
 
         return { success: true };
@@ -32,11 +44,7 @@ export async function getProductData(
             orderBy: orderBy ? orderBy : { name: "asc" },
         });
 
-        const products: Product[] = rawProducts.map((product) => ({
-            ...product,
-            dateAdded: processDateForClient(product.dateAdded),
-            stock: buildStockObj(product.stock),
-        }));
+        const products: Product[] = convertMultiplePrismaProducts(rawProducts);
 
         return { data: products };
     } catch (error) {
@@ -52,11 +60,11 @@ export async function productUpdate(productData: Product) {
                 where: { productId: productData.id },
             }),
             prisma.stock.createMany({
-                data: mapStockForDb(productData),
+                data: mapStockForPrisma(productData),
             }),
             prisma.product.update({
                 where: { id: productData.id },
-                data: extractProductFields(productData),
+                data: convertClientProduct(productData),
             }),
         ]);
 
@@ -67,7 +75,11 @@ export async function productUpdate(productData: Product) {
     }
 }
 
-export async function updateStockOnPurchase(productId: string, size: Sizes, quantity: number) {
+export async function updateStockOnPurchase(
+    productId: PrismaStock["productId"],
+    size: PrismaStock["size"],
+    quantity: PrismaStock["quantity"]
+) {
     const stockItem = await prisma.stock.findFirst({
         where: { productId, size },
         select: { id: true, quantity: true },
@@ -97,7 +109,7 @@ export async function updateStockOnPurchase(productId: string, size: Sizes, quan
     }
 }
 
-export async function productDelete(id: string) {
+export async function productDelete(id: PrismaProduct["id"]) {
     try {
         await prisma.$transaction([
             prisma.stock.deleteMany({
@@ -113,6 +125,8 @@ export async function productDelete(id: string) {
     }
 }
 
+type CreateOrderParams = Prisma.OrderCreateArgs["data"] & { items: ItemMetadata[] };
+
 export async function createOrder({
     items,
     subTotal,
@@ -120,22 +134,12 @@ export async function createOrder({
     total,
     sessionId,
     email,
+    paymentIntentId,
     userId,
-}: {
-    items: ItemMetadata[];
-    subTotal: number;
-    shippingTotal: number;
-    total: number;
-    sessionId: string;
-    email: string;
-    userId?: number;
-}) {
+}: CreateOrderParams) {
     try {
-        const dataObj: Prisma.OrderCreateArgs = {
+        const createObj: Prisma.OrderCreateArgs = {
             data: {
-                subTotal,
-                shippingTotal,
-                total,
                 items: {
                     create: items.map((item) => ({
                         productId: item.productId,
@@ -145,16 +149,17 @@ export async function createOrder({
                         quantity: item.quantity,
                     })),
                 },
+                subTotal,
+                shippingTotal,
+                total,
                 sessionId,
                 email,
+                paymentIntentId,
+                userId,
             },
         };
 
-        if (userId) {
-            dataObj.data.userId = userId;
-        }
-
-        await prisma.order.create(dataObj);
+        await prisma.order.create(createObj);
 
         return { success: true };
     } catch (error) {
@@ -164,8 +169,8 @@ export async function createOrder({
 }
 
 type GetOrderParams = {
-    sessionId?: string;
-    orderId?: number;
+    sessionId?: PrismaOrder["sessionId"];
+    orderId?: PrismaOrder["id"];
 };
 
 export async function getOrder({ sessionId, orderId }: GetOrderParams) {
@@ -177,6 +182,7 @@ export async function getOrder({ sessionId, orderId }: GetOrderParams) {
     try {
         const order = await prisma.order.findFirst({
             where: whereQuery,
+            include: { items: { include: { product: true } } },
         });
 
         return { data: order };
@@ -186,10 +192,61 @@ export async function getOrder({ sessionId, orderId }: GetOrderParams) {
     }
 }
 
-export async function createFeaturedProducts(dataObj: Product[]) {
+export async function getUserOrders({ userId }: { userId: PrismaOrder["userId"] }) {
+    try {
+        const orders = await prisma.order.findMany({
+            where: { userId: Number(userId) },
+            include: { items: { include: { product: true } } },
+            orderBy: { createdAt: "desc" },
+        });
+
+        return { data: orders };
+    } catch (error) {
+        console.error("Error fetching order data: ", error);
+        throw new Error("Error fetching order data. Please try again later.");
+    }
+}
+
+export async function getOrders(includeObj?: Prisma.OrderInclude) {
+    try {
+        const orders = await prisma.order.findMany({
+            include: includeObj ?? { items: { include: { product: true } } },
+            orderBy: { createdAt: "desc" },
+        });
+
+        return { data: orders };
+    } catch (error) {
+        console.error("Error fetching order data: ", error);
+        throw new Error("Error fetching order data. Please try again later.");
+    }
+}
+
+interface UpdateOrderParams {
+    orderId: PrismaOrder["id"];
+    status: PrismaOrderStatus;
+    returnRequestedAt?: PrismaOrder["returnRequestedAt"];
+    refundedAt?: PrismaOrder["refundedAt"];
+}
+
+export async function updateOrder(params: UpdateOrderParams) {
+    const { orderId, status, returnRequestedAt, refundedAt } = params;
+
+    try {
+        await prisma.order.update({
+            where: { id: orderId },
+            data: { status, returnRequestedAt, refundedAt },
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating order: ", error);
+        return { success: false };
+    }
+}
+
+export async function createFeaturedProducts(productData: Product[]) {
     try {
         await prisma.featuredProduct.createMany({
-            data: dataObj.map((product) => ({
+            data: productData.map((product) => ({
                 productId: product.id,
             })),
             skipDuplicates: true,
@@ -213,11 +270,9 @@ export async function getFeaturedProducts() {
             },
         });
 
-        const products: Product[] = rawProducts.map((item) => ({
-            ...item.product,
-            dateAdded: processDateForClient(item.product.dateAdded),
-            stock: buildStockObj(item.product.stock),
-        }));
+        const products: Product[] = convertMultiplePrismaProducts(
+            rawProducts.map((item) => item.product)
+        );
 
         return { data: products };
     } catch (error) {
@@ -236,46 +291,60 @@ export async function clearFeaturedProducts() {
     }
 }
 
-// !!!TO-DO!!!
-// export async function updateOrder(orderId: number, status: OrderStatus) {
-//     try {
-//         await prisma.order.update({
-//             where: { id: orderId },
-//             data: { status },
-//         });
-//         return { success: true };
-//     } catch (error) {
-//         console.error("Error updating order: ", error);
-//         return { success: false };
-//     }
-// }
+export async function createUser(
+    email: User["email"],
+    password: User["password"],
+    role: User["role"] = "user"
+) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const validEmail = emailPattern.test(email);
 
-// !!!TO-DO!!!
-// export async function getUser(identifier: string, password: string) {
-//     try {
-//         const result = await prisma.user.findFirst({
-//             where: { OR: [{ username: identifier }, { email: identifier }], password },
-//         });
-//         return result ? { user: result.username, password: result.password } : null;
-//     } catch (error) {
-//         console.error("Error fetching user data: ", error);
-//         throw new Error("Error fetching user data. Please try again later.");
-//     }
-// }
+    if (!validEmail) {
+        throw new CredentialsError("Invalid email address provided.");
+    }
 
-// !!!TO-DO!!!
-// export async function authenticate(formData: FormData, prevState?: string) {
-//     try {
-//         await signInServer("credentials", formData);
-//     } catch (error) {
-//         if (error instanceof AuthError) {
-//             switch (error.type) {
-//                 case "CredentialsSignin":
-//                     return "Invalid credentials";
-//                 default:
-//                     return "Something went wrong";
-//             }
-//         }
-//         throw error;
-//     }
-// }
+    let user;
+
+    try {
+        user = await prisma.user.findFirst({
+            where: { email },
+        });
+    } catch (error) {
+        console.error("Error checking for existing user: ", error);
+        throw new Error("Error checking for existing user.");
+    }
+
+    if (user) {
+        throw new CredentialsError("An account with this email address already exists.");
+    }
+
+    if (password.length < 8) {
+        throw new CredentialsError("Your password must have a minimum of 8 characters.");
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    try {
+        await prisma.user.create({
+            data: { email, password: hashedPassword, role },
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error creating user: ", error);
+        return { success: false };
+    }
+}
+
+export async function getUser(email: User["email"]) {
+    try {
+        const result = await prisma.user.findFirst({
+            where: { email },
+        });
+        return result
+            ? { id: result.id, email: result.email, password: result.password, role: result.role }
+            : null;
+    } catch (error) {
+        console.error("Error fetching user data: ", error);
+        throw new Error("Error fetching user data. Please try again later.");
+    }
+}

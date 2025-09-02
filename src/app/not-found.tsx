@@ -11,7 +11,9 @@ export default function NotFound() {
         <BareLayout>
             <p>{"Oops! It seems the page you're looking for doesn't exist."}</p>
             <div>
-                <PlainRoundedButtonLink href={"/"}>Home</PlainRoundedButtonLink>
+                <PlainRoundedButtonLink href={"/"} overrideClasses="!bg-background-lightest">
+                    Home
+                </PlainRoundedButtonLink>
             </div>
         </BareLayout>
     );

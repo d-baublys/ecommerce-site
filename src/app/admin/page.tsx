@@ -20,6 +20,11 @@ export default function AdminPage() {
                         Manage featured products
                     </ListButton>
                 </li>
+                <li>
+                    <ListButton link="/orders" relativeLink>
+                        View orders and approve refunds
+                    </ListButton>
+                </li>
             </ul>
         </AdminLayout>
     );

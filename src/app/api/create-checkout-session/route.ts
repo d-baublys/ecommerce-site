@@ -3,7 +3,7 @@ import stripe from "@/lib/stripe";
 import { BagItem } from "@/lib/definitions";
 
 export async function POST(req: Request) {
-    const { bagItems, shippingCost } = await req.json();
+    const { bagItems, shippingCost, userId } = await req.json();
 
     const lineItems = [
         ...bagItems.map((bagItem: BagItem) => ({
@@ -46,6 +46,7 @@ export async function POST(req: Request) {
                     }))
                 ),
                 shippingCost,
+                userId,
             },
             success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/bag`,

@@ -7,7 +7,7 @@ jest.mock("@/lib/actions", () => ({
 import { getProductData } from "@/lib/actions";
 import { Categories } from "@/lib/definitions";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
-import { createFakeProductList } from "@/lib/test-utils";
+import { createFakeProductList } from "@/lib/test-factories";
 
 describe("fetchFilteredProducts", () => {
     beforeEach(() => {

@@ -17,6 +17,8 @@ export default function Breadcrumbs({ lastCrumbText }: { lastCrumbText?: string 
 
     const buildCrumbs = (segmentArr: string[]) => {
         const crumbs = segmentArr.map((segment, idx) => {
+            if (segmentArr[idx - 1] === "products" && segmentArr[idx - 2] !== "admin") return;
+
             const link = "/" + segmentArr.slice(0, idx + 1).join("/");
             const label =
                 lastCrumbText && idx === segmentArr.length - 1

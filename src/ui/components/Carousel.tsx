@@ -81,7 +81,7 @@ export default function Carousel({ featuredList }: { featuredList: Product[] }) 
                             />
                             <div className="absolute left-[50%] bottom-1/6 translate-x-[-50%] z-50">
                                 <PlainRoundedButtonLink
-                                    href={buildProductUrl(featuredProd.slug)}
+                                    href={buildProductUrl(featuredProd.id, featuredProd.slug)}
                                     tabIndex={activeFeatured === idx ? 0 : -1}
                                 >
                                     View

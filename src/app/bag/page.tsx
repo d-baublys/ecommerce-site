@@ -5,6 +5,6 @@ export const metadata: Metadata = {
     title: "My Bag",
 };
 
-export default function BagPage() {
+export default async function BagPage() {
     return <BagPageClient />;
 }

@@ -1,50 +1,88 @@
 import BagPage from "@/app/bag/page";
-import {
-    createFakeBagItems,
-    createFakeProduct,
-    getConsoleErrorSpy,
-    getFakeUpdatedData,
-    wrapWithErrorBoundary,
-} from "@/lib/test-utils";
+import { createFakeBagItems, createFakeProduct, getFakeUpdatedData } from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { Product } from "@/lib/definitions";
+import { createBagItem } from "@/lib/utils";
+import { act } from "react";
 
 jest.mock("next/navigation", () => ({
     usePathname: () => "/bag",
+    useRouter: () => ({
+        push: jest.fn(),
+    }),
+    useSearchParams: () => {
+        const params = new URLSearchParams("sort=c");
+        return {
+            get: (key: string) => params.get(key),
+        };
+    },
 }));
 
 jest.mock("@/lib/actions", () => ({
     getProductData: jest.fn(),
 }));
 
+jest.mock("next-auth/react", () => ({
+    useSession: jest.fn(),
+    SessionProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
+jest.mock("@/auth", () => ({
+    auth: jest.fn(),
+}));
+
+import { useSession } from "next-auth/react";
 import { getProductData } from "@/lib/actions";
-import { Product } from "@/lib/definitions";
-import { createBagItem } from "@/lib/utils";
+import { getConsoleErrorSpy, wrapWithErrorBoundary } from "@/lib/test-utils";
 
 const { addToBag, clearBag } = useBagStore.getState();
 const fakeBagItems = createFakeBagItems();
 const bagUnchangedData = fakeBagItems.map((bagItem) => bagItem.product);
 const bagUpdatedData = getFakeUpdatedData();
 
-const renderBagPage = () => render(<BagPage />);
+const renderBagPage = async () => render(await BagPage());
 const setUpFakeBag = () =>
     fakeBagItems.forEach((item) => {
         addToBag(item);
     });
+
+const getSessionWithAuth = () => {
+    (useSession as jest.Mock).mockReturnValue({
+        data: {
+            user: {
+                id: "1",
+                email: "test@email.com",
+                role: "admin",
+            },
+        },
+        status: "authenticated",
+    });
+};
+const getSessionWithoutAuth = () => {
+    (useSession as jest.Mock).mockReturnValue({
+        data: null,
+        status: "unauthenticated",
+    });
+};
+
 const setUpResolvedFetch = (resolvedValue: Product[]) => {
     (getProductData as jest.Mock).mockResolvedValue({ data: resolvedValue });
 };
 const getAllTiles = () => within(screen.getByTestId("bag-tile-ul")).getAllByRole("listitem");
 
-describe("BagPage", () => {
+describe("BagPage auth-agnostic tests", () => {
     beforeEach(() => {
         clearBag();
+        getSessionWithoutAuth();
     });
 
     it("shows correct bag subtotal", async () => {
         setUpFakeBag();
         setUpResolvedFetch(bagUnchangedData);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         await waitFor(() => {
             expect(screen.getByLabelText("Bag subtotal")).toHaveTextContent("£253.00");
@@ -53,7 +91,9 @@ describe("BagPage", () => {
 
     it("shows fallback text when bag is empty", async () => {
         setUpResolvedFetch([]);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         await waitFor(() => {
             expect(screen.getByText("Your bag is empty!")).toBeInTheDocument();
@@ -63,7 +103,7 @@ describe("BagPage", () => {
     it("throws an error when fetch fails", async () => {
         const errorSpy = getConsoleErrorSpy();
         (getProductData as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
-        render(wrapWithErrorBoundary(<BagPage />));
+        render(wrapWithErrorBoundary(await BagPage()));
 
         await waitFor(() => {
             expect(screen.getByText(/Error caught by boundary/)).toBeInTheDocument();
@@ -75,7 +115,9 @@ describe("BagPage", () => {
     it("updates subtotal if latest size stock has decreased to below bag quantity", async () => {
         setUpFakeBag();
         setUpResolvedFetch(bagUpdatedData);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         await waitFor(() => {
             expect(screen.getByLabelText("Bag subtotal")).toHaveTextContent("£154.00");
@@ -85,7 +127,9 @@ describe("BagPage", () => {
     it("preselects correct quantities", async () => {
         setUpFakeBag();
         setUpResolvedFetch(bagUnchangedData);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         await waitFor(() => {
             const bagTiles = getAllTiles();
@@ -98,7 +142,9 @@ describe("BagPage", () => {
     it("updates preselected quantities if latest size stock has decreased to below bag quantity", async () => {
         setUpFakeBag();
         setUpResolvedFetch(bagUpdatedData);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         await waitFor(() => {
             const bagTiles = getAllTiles();
@@ -115,7 +161,9 @@ describe("BagPage", () => {
 
         addToBag(mockBagItem);
         setUpResolvedFetch([latestFakeProduct]);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         await waitFor(() => {
             const bagTiles = getAllTiles();
@@ -130,7 +178,9 @@ describe("BagPage", () => {
 
         addToBag(createBagItem(fakeProduct, "m"));
         setUpResolvedFetch([fakeProduct]);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         await waitFor(() => {
             const bagTiles = getAllTiles();
@@ -149,7 +199,9 @@ describe("BagPage", () => {
         addToBag(createBagItem(fakeProduct, "s"));
         addToBag(createBagItem(fakeProduct, "s"));
         setUpResolvedFetch([fakeProduct]);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         await waitFor(() => {
             const bagTiles = getAllTiles();
@@ -172,7 +224,9 @@ describe("BagPage", () => {
 
         addToBag(createBagItem(fakeProduct, "s"));
         setUpResolvedFetch([fakeProduct]);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         await waitFor(() => {
             const bagTiles = getAllTiles();
@@ -185,7 +239,9 @@ describe("BagPage", () => {
     it("removes items from bag as expected", async () => {
         setUpFakeBag();
         setUpResolvedFetch(bagUnchangedData);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         await waitFor(() => {
             const bagTiles = getAllTiles();
@@ -208,7 +264,9 @@ describe("BagPage", () => {
         addToBag(createBagItem(fakeProduct, "s"));
         addToBag(createBagItem(fakeProduct, "m"));
         setUpResolvedFetch([fakeProduct]);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         expect(await screen.findByRole("button", { name: "Checkout" })).toBeInTheDocument();
         expect(screen.getByLabelText("Shipping cost")).not.toHaveTextContent("-");
@@ -220,7 +278,9 @@ describe("BagPage", () => {
         addToBag(createBagItem(fakeProduct, "s"));
         addToBag(createBagItem(fakeProduct, "m"));
         setUpResolvedFetch([fakeProduct]);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         await waitFor(() => {
             expect(screen.getByLabelText("Bag subtotal")).toBeInTheDocument();
@@ -231,7 +291,9 @@ describe("BagPage", () => {
 
     it("doesn't render checkout button & shows correct shipping when bag is empty", async () => {
         setUpResolvedFetch([]);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         await waitFor(() => {
             expect(screen.getByLabelText("Bag subtotal")).toBeInTheDocument();
@@ -239,8 +301,15 @@ describe("BagPage", () => {
         expect(screen.queryByRole("button", { name: "Checkout" })).not.toBeInTheDocument();
         expect(screen.getByLabelText("Shipping cost")).toHaveTextContent("-");
     });
+});
 
-    it("initiates Stripe checkout session correctly", async () => {
+describe("BagPage authenticated tests", () => {
+    beforeEach(() => {
+        clearBag();
+        getSessionWithAuth();
+    });
+
+    it("initiates Stripe checkout session correctly when authenticated", async () => {
         const mockFetch = jest.spyOn(global, "fetch").mockResolvedValue({
             json: async () => ({
                 url: "https://stripe.com/checkout",
@@ -249,7 +318,9 @@ describe("BagPage", () => {
 
         setUpFakeBag();
         setUpResolvedFetch(bagUnchangedData);
-        renderBagPage();
+        act(() => {
+            renderBagPage();
+        });
 
         const checkoutBtn = await screen.findByRole("button", { name: "Checkout" });
 

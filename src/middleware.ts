@@ -8,12 +8,12 @@ export const config = {
 export default auth((req) => {
     const { pathname } = req.nextUrl;
 
-    if (pathname === "/admin/login") {
+    if (pathname === "/login") {
         return NextResponse.next();
     }
 
-    if (!req.auth) {
-        return NextResponse.redirect(new URL("/admin/login", req.url));
+    if (req.auth?.user?.role !== "admin") {
+        return NextResponse.redirect(new URL("/login", req.url));
     }
 
     return NextResponse.next();

@@ -1,20 +1,28 @@
 "use client";
 
 import { getProductData } from "@/lib/actions";
-import { Product, SearchBarConfig } from "@/lib/definitions";
+import { Categories, Product } from "@/lib/definitions";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 import { debounce } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { SetStateAction, useEffect, useState } from "react";
 import { IoCloseCircle, IoSearch } from "react-icons/io5";
 
+type SearchBarConfig = {
+    isGlobalSearch: boolean;
+    showSuggestions: boolean;
+    placeholderText?: string;
+};
+
 interface SearchBarProps {
-    handleResultClick: (product: Product) => void;
-    handleSearchClose?: () => void;
     options: SearchBarConfig;
+    handleResultClick?: (product: Product) => void;
+    handleSearchClose?: () => void;
     inputRef?: React.RefObject<HTMLInputElement | null>;
     parentSetter?: React.Dispatch<SetStateAction<Product[]>>;
-    parentQuerySetter?: React.Dispatch<SetStateAction<string | null>>;
+    parentQuerySetter?: React.Dispatch<SetStateAction<string>>;
+    parentFilter?: Categories | null;
+    parentLoadingStateSetter?: React.Dispatch<SetStateAction<boolean>>;
 }
 
 export default function SearchBar(props: SearchBarProps) {
@@ -31,6 +39,8 @@ export default function SearchBar(props: SearchBarProps) {
         inputRef,
         parentSetter,
         parentQuerySetter,
+        parentFilter,
+        parentLoadingStateSetter,
     } = props;
 
     const router = useRouter();
@@ -48,6 +58,12 @@ export default function SearchBar(props: SearchBarProps) {
         getData();
     }, []);
 
+    if (options.showSuggestions && !handleResultClick) {
+        throw new Error(
+            "Search bar config error: Result click handler must be provided when search suggestions are on."
+        );
+    }
+
     const debouncedResults = debounce((currQuery) => {
         if (!productList) return;
 
@@ -55,41 +71,49 @@ export default function SearchBar(props: SearchBarProps) {
             product.name.toLowerCase().includes((currQuery as string).toLowerCase())
         );
         setResults(results);
-        if (parentSetter) parentSetter(results);
+        parentSetter?.(results);
         setIsResultLoading(false);
+        parentLoadingStateSetter?.(false);
     }, 100);
 
     const handleSearch = (e: React.FormEvent<HTMLInputElement>) => {
         setResults([]);
         const query = e.currentTarget.value;
         setQuery(query);
-        parentQuerySetter && parentQuerySetter(query);
+        parentQuerySetter?.(query);
 
-        if (!query.trim()) return;
+        if (/^\s+$/.test(query)) return;
 
         if (productList) {
             debouncedResults(query);
             setIsResultLoading(true);
+            parentLoadingStateSetter?.(true);
         }
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<SVGElement>) => {
         e.preventDefault();
         if (!query.trim() || !options?.isGlobalSearch) return;
-        handleSearchClose && handleSearchClose();
+        handleSearchClose?.();
         router.push(`/results?q=${encodeURIComponent(query)}`);
     };
 
     const clearAll = () => {
         setQuery("");
-        parentQuerySetter && parentQuerySetter(null);
+        parentQuerySetter?.("");
         setResults([]);
+
+        if (parentFilter) {
+            debouncedResults("");
+            setIsResultLoading(false);
+            parentLoadingStateSetter?.(false);
+        }
     };
 
     const handleClick = (product: Product) => {
-        handleResultClick(product);
+        handleResultClick?.(product);
         clearAll();
-        handleSearchClose && handleSearchClose();
+        handleSearchClose?.();
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -174,30 +198,32 @@ export default function SearchBar(props: SearchBarProps) {
                         className="suggestions-container suggestions-height-cap overflow-scroll no-scrollbar"
                         data-testid="suggestions-ul"
                     >
-                        {results?.length > 0 &&
-                            results.map((product, idx) => (
-                                <li
-                                    key={product.id}
-                                    className={`flex items-center p-1 cursor-pointer bg-background-lightest hover:brightness-90 active:brightness-90 ${
-                                        activeIdx === idx ? "brightness-90" : ""
-                                    }`}
-                                    onClick={() => handleClick(product)}
-                                >
-                                    <div className="flex shrink-0 mr-2">
-                                        <IoSearch size={14} />
-                                    </div>
+                        {!isResultLoading ? (
+                            results?.length > 0 ? (
+                                results.map((product, idx) => (
+                                    <li
+                                        key={product.id}
+                                        className={`flex items-center p-1 cursor-pointer bg-background-lightest hover:brightness-90 active:brightness-90 ${
+                                            activeIdx === idx ? "brightness-90" : ""
+                                        }`}
+                                        onClick={() => handleClick(product)}
+                                    >
+                                        <div className="flex shrink-0 mr-2">
+                                            <IoSearch size={14} />
+                                        </div>
+                                        <span className="whitespace-nowrap overflow-ellipsis overflow-hidden">
+                                            {product.name}
+                                        </span>
+                                    </li>
+                                ))
+                            ) : (
+                                <li className="p-1">
                                     <span className="whitespace-nowrap overflow-ellipsis overflow-hidden">
-                                        {product.name}
+                                        No results found
                                     </span>
                                 </li>
-                            ))}
-                        {!results?.length && !isResultLoading && (
-                            <li className="p-1">
-                                <span className="whitespace-nowrap overflow-ellipsis overflow-hidden">
-                                    No results found
-                                </span>
-                            </li>
-                        )}
+                            )
+                        ) : null}
                     </ul>
                 </div>
             )}

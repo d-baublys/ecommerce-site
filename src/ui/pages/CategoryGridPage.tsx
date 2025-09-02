@@ -22,8 +22,9 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
+import LoadingIndicator from "@/ui/components/overlays/LoadingIndicator";
 
-type pageOptions = {
+type PageOptions = {
     noAside?: boolean;
     noCategoryTabs?: boolean;
     noOverlays?: boolean;
@@ -36,7 +37,7 @@ export default function CategoryGridPage({
     query,
 }: {
     category: Categories | "all";
-    options?: pageOptions;
+    options?: PageOptions;
     query?: string;
 }) {
     const paramsGetter = useSearchParams();
@@ -152,24 +153,6 @@ export default function CategoryGridPage({
         );
     };
 
-    const loadingIndicator = () => {
-        return (
-            <div
-                aria-label="Loading indicator"
-                className="fixed inset-0 flex justify-center items-center min-h-screen w-full"
-            >
-                <div className="flex justify-center items-center h-20 gap-[10px] p-4 bg-white rounded-2xl drop-shadow-(--button-shadow)">
-                    {Array.from({ length: 5 }).map((_, idx) => (
-                        <div
-                            key={idx}
-                            className={`loading-circle w-auto h-3 aspect-square rounded-full border-2 border-component-color animate-loading-sequence`}
-                        ></div>
-                    ))}
-                </div>
-            </div>
-        );
-    };
-
     const sortingUnit = () => {
         return (
             <div id="product-sort-input" className="relative flex items-center gap-1.5 xs:gap-3">
@@ -197,7 +180,7 @@ export default function CategoryGridPage({
                     </option>
                     {Object.entries(SORT_OPTIONS).map(([key, sortData]) => (
                         <option key={key} value={key} className="font-normal">
-                            {sortData.displayName}
+                            {sortData.label}
                         </option>
                     ))}
                 </select>
@@ -211,7 +194,7 @@ export default function CategoryGridPage({
 
     if (error) throw error;
 
-    if (!(allCategoryProducts && filteredProducts)) return loadingIndicator();
+    if (!(allCategoryProducts && filteredProducts)) return <LoadingIndicator />;
 
     const shouldRenderTabs = !options?.noCategoryTabs && category === "all";
     const shouldRenderAside = !options?.noAside && (filteredProducts.length > 0 || !query);
@@ -240,7 +223,7 @@ export default function CategoryGridPage({
     const fixedOverlays = () => {
         return (
             <div data-testid="fixed-overlays">
-                {isQueryLoading && loadingIndicator()}
+                {isQueryLoading && <LoadingIndicator />}
                 {shouldRenderFilterBtn && (
                     <div className="fixed bottom-[5%] left-1/2 translate-x-[-50%] lg:hidden">
                         <PlainRoundedButton
@@ -281,6 +264,7 @@ export default function CategoryGridPage({
                     ? "No products matching your search"
                     : "No products to display"
             }
+            linkWhenEmptyList={false}
             categoryTabs={shouldRenderTabs && categoryTabs()}
             asideContent={shouldRenderAside && asideContent()}
             fixedOverlays={!options?.noOverlays && fixedOverlays()}

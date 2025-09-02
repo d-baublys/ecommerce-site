@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, Product as PrismaProduct, Order as PrismaOrder } from "@prisma/client";
 
 export const PRODUCT_BASE_FIELDS = {
     name: "",
@@ -15,6 +15,10 @@ export const VALID_SIZES = ["xs", "s", "m", "l", "xl", "xxl"] as const;
 export const VALID_CATEGORIES = { mens: "Men's", womens: "Women's" } as const;
 
 export type ProductBase = typeof PRODUCT_BASE_FIELDS;
+
+export type ProductNoStock = ProductBase & {
+    id: string;
+};
 
 export type Product = ProductBase & {
     id: string;
@@ -41,7 +45,53 @@ export type ItemMetadata = {
     quantity: number;
 };
 
-export type OrderStatus = "paid" | "refunded";
+export type PrismaOrderNoStock = Prisma.OrderGetPayload<{
+    include: { items: { include: { product: true } } };
+}>;
+
+export type ClientOrderItemWithProductNoStock = ItemMetadata & { product: ProductNoStock };
+
+export type Order = {
+    id: number;
+    subTotal: number;
+    shippingTotal: number;
+    total: number;
+    status: OrderStatus;
+    userId: number | null;
+    email: string;
+    createdAt: Date;
+    returnRequestedAt: Date | null;
+    refundedAt: Date | null;
+    sessionId: string;
+    paymentIntentId: string;
+    items: ClientOrderItemWithProductNoStock[];
+};
+
+export type OrderNoItems = Omit<Order, "items">;
+
+export const ORDER_STATUS_OPTIONS = {
+    paid: "Paid",
+    pendingReturn: "Pending Return",
+    refunded: "Refunded",
+};
+
+export const ORDER_TABLE_COLUMNS: {
+    key: keyof Omit<Order, "paymentIntentId" | "sessionId" | "items">;
+    label: string;
+}[] = [
+    { key: "id", label: "Order #" },
+    { key: "userId", label: "Customer Id" },
+    { key: "email", label: "Customer Email" },
+    { key: "subTotal", label: "Subtotal" },
+    { key: "shippingTotal", label: "Shipping" },
+    { key: "total", label: "Total" },
+    { key: "createdAt", label: "Date Created" },
+    { key: "returnRequestedAt", label: "Date Return Requested" },
+    { key: "refundedAt", label: "Date Refunded" },
+    { key: "status", label: "Status" },
+];
+
+export type OrderStatus = keyof typeof ORDER_STATUS_OPTIONS;
 
 export type ProductFormMode = "add" | "edit";
 
@@ -58,21 +108,31 @@ export const PRICE_FILTER_OPTIONS = {
 export type PriceFilterKey = keyof typeof PRICE_FILTER_OPTIONS;
 
 export const SORT_OPTIONS = {
-    a: { sort: { price: "asc" as Prisma.SortOrder }, displayName: "Price (Low to High)" },
-    b: { sort: { price: "desc" as Prisma.SortOrder }, displayName: "Price (High to Low)" },
-    c: { sort: { dateAdded: "desc" as Prisma.SortOrder }, displayName: "Newest" },
+    a: { sort: { price: "asc" as Prisma.SortOrder }, label: "Price (Low to High)" },
+    b: { sort: { price: "desc" as Prisma.SortOrder }, label: "Price (High to Low)" },
+    c: { sort: { dateAdded: "desc" as Prisma.SortOrder }, label: "Newest" },
 };
 
 export type ProductSortKey = keyof typeof SORT_OPTIONS;
 
 export const FEATURED_COUNT = 5;
 
+export const REFUND_WINDOW = 1000 * 60 * 60 * 24 * 30; // 30 days in ms
+
 export const USER_ROLES = ["admin", "user"] as const;
 
 export type UserRoleOptions = (typeof USER_ROLES)[number];
 
-export type SearchBarConfig = {
-    isGlobalSearch: boolean;
-    showSuggestions: boolean;
-    placeholderText?: string;
+export class CredentialsError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "CredentialsError";
+    }
+}
+
+export type CypressTestProductData = Pick<Product, "id" | "name" | "price" | "slug">;
+export type CypressTestDataDeleteParams = {
+    orderIdArr: PrismaOrder["id"][];
+    productIdArr: PrismaProduct["id"][];
+    productNameArr: PrismaProduct["name"][];
 };

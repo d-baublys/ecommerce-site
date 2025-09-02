@@ -7,7 +7,10 @@ export default function PlainRoundedButton({ overrideClasses, ...restProps }: Ro
     const plainClasses = getPlainButtonClasses();
 
     return (
-        <RoundedButtonMain overrideClasses={`${plainClasses} ${overrideClasses}`} {...restProps}>
+        <RoundedButtonMain
+            overrideClasses={`${plainClasses} ${overrideClasses ?? ""}`}
+            {...restProps}
+        >
             {restProps.children}
         </RoundedButtonMain>
     );

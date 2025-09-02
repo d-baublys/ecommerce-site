@@ -1,7 +1,7 @@
 import { Sizes } from "@/lib/definitions";
-import { createFakeProductList } from "@/lib/test-utils";
+import { createFakeProductList } from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
-import NavBarClient from "@/ui/components/NavBarClient";
+import NavBar from "@/ui/components/NavBar";
 import { screen, waitFor } from "@testing-library/dom";
 import { act, render } from "@testing-library/react";
 import { axe, toHaveNoViolations } from "jest-axe";
@@ -10,24 +10,39 @@ expect.extend(toHaveNoViolations);
 
 jest.mock("next-auth/react", () => ({
     useSession: jest.fn(),
+    signOut: jest.fn(),
+}));
+
+jest.mock("next/navigation", () => ({
+    useRouter: () => ({
+        push: jest.fn(),
+    }),
+    usePathname: () => "/",
 }));
 
 import { useSession } from "next-auth/react";
 
 const { addToBag, clearBag } = useBagStore.getState();
 const fakeProductList = createFakeProductList();
-const renderNavBar = () => render(<NavBarClient />);
+const renderNavBar = () => render(<NavBar />);
 
 const getSessionWithAuth = () => {
     (useSession as jest.Mock).mockReturnValue({
         data: {
-            user: "test-user",
-            email: "test@email.com",
+            user: {
+                id: "1",
+                email: "test@email.com",
+                role: "admin",
+            },
         },
+        status: "authenticated",
     });
 };
 const getSessionWithoutAuth = () => {
-    (useSession as jest.Mock).mockReturnValue(null);
+    (useSession as jest.Mock).mockReturnValue({
+        data: null,
+        status: "unauthenticated",
+    });
 };
 
 describe("NavBar", () => {

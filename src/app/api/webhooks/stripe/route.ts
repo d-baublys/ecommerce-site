@@ -42,10 +42,18 @@ export async function POST(req: NextRequest) {
         const shippingTotal = Number(session.metadata.shippingCost);
         const orderTotal = subTotal + shippingTotal;
 
-        let userId; // to-do?
+        const userId = session.metadata.userId ? Number(session.metadata.userId) : null;
         const email = session.customer_details?.email;
+        const paymentIntentId =
+            typeof session.payment_intent === "string"
+                ? session.payment_intent
+                : session.payment_intent === null
+                ? null
+                : session.payment_intent.id;
 
         if (!email) return new Response("Customer email address not found", { status: 400 });
+        if (paymentIntentId === null)
+            return new Response("Payment intent data not found", { status: 400 });
 
         const newOrder = await createOrder({
             items,
@@ -55,6 +63,7 @@ export async function POST(req: NextRequest) {
             sessionId: session.id,
             email,
             userId,
+            paymentIntentId,
         });
 
         if (!newOrder.success) {

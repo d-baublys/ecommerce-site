@@ -96,7 +96,7 @@ export default function GridAside({
         );
     };
 
-    type generateButtonListParams<T extends string> = {
+    type GenerateButtonListParams<T extends string> = {
         dataObj: Record<T, number>;
         filterArr: T[];
         handleClick: (key: T) => void;
@@ -104,7 +104,7 @@ export default function GridAside({
         className: string;
     };
 
-    const generateButtonList = <T extends string>(params: generateButtonListParams<T>) => {
+    const generateButtonList = <T extends string>(params: GenerateButtonListParams<T>) => {
         const { dataObj, filterArr, handleClick, labelCreator, className } = params;
 
         return Object.entries(dataObj).length > 0 ? (

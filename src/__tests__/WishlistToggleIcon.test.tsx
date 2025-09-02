@@ -1,4 +1,4 @@
-import { createFakeProduct } from "@/lib/test-utils";
+import { createFakeProduct } from "@/lib/test-factories";
 import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
 import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import { render } from "@testing-library/react";

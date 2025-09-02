@@ -49,6 +49,7 @@ export default function StockTableInput({
             }`}
             onChange={(e) => handleChange(e)}
             {...props}
+            data-cy={`${type === "text" ? "size-input" : "quantity-input"}`}
         ></input>
     );
 }

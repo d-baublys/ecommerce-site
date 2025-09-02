@@ -1,6 +1,12 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import {
+    Gender,
+    Prisma,
+    PrismaClient,
+    Product as PrismaProduct,
+    Sizes as PrismaSizes,
+} from "@prisma/client";
 import { slugify } from "../src/lib/utils";
-import { Categories, Product, Sizes } from "@/lib/definitions";
+import { createUser } from "../src/lib/actions";
 
 const prisma = new PrismaClient();
 
@@ -35,7 +41,7 @@ const dates: string[] = [
 ];
 dates.push(...dates); // mirror for each category
 
-const productStubs: Omit<Product, "id" | "dateAdded" | "slug" | "price" | "stock">[] = [
+const productStubs: Omit<PrismaProduct, "id" | "dateAdded" | "slug" | "price" | "stock">[] = [
     {
         name: "Black & large white graphic",
         gender: "womens",
@@ -135,8 +141,8 @@ const productStubs: Omit<Product, "id" | "dateAdded" | "slug" | "price" | "stock
 ];
 
 async function main() {
-    const mensSizes: Sizes[] = ["s", "m", "l", "xl", "xxl"];
-    const womensSizes: Sizes[] = ["xs", "s", "m", "l", "xl"];
+    const mensSizes: PrismaSizes[] = ["s", "m", "l", "xl", "xxl"];
+    const womensSizes: PrismaSizes[] = ["xs", "s", "m", "l", "xl"];
 
     for (let i in productStubs) {
         const product = productStubs[i];
@@ -145,7 +151,7 @@ async function main() {
         const createdProduct = await prisma.product.create({
             data: {
                 name: product.name,
-                gender: product.gender as Categories,
+                gender: product.gender as Gender,
                 price: prices[i],
                 slug: slugify(product.name),
                 src: product.src,
@@ -155,7 +161,7 @@ async function main() {
         });
 
         const stockEntries: Prisma.StockCreateManyInput[] = productSizes.map((size, idx) => ({
-            size: size as Sizes,
+            size: size as PrismaSizes,
             quantity: stockCounts[i][idx],
             productId: createdProduct.id,
         }));
@@ -164,6 +170,22 @@ async function main() {
             data: stockEntries,
         });
     }
+
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const standardEmail = process.env.STANDARD_EMAIL;
+    const standardPassword = process.env.STANDARD_PASSWORD;
+
+    if (!adminEmail || !adminPassword) {
+        throw new Error("Missing admin user email or password env variables.");
+    }
+
+    if (!standardEmail || !standardPassword) {
+        throw new Error("Missing standard user email or password env variables.");
+    }
+
+    await createUser(adminEmail, adminPassword, "admin");
+    await createUser(standardEmail, standardPassword, "user");
 }
 
 main()

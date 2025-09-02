@@ -6,6 +6,17 @@ import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import StockTableInput from "@/ui/components/forms/StockTableInput";
 import StockRowDelete from "@/ui/components/buttons/StockRowDelete";
 import { useEffect, useState } from "react";
+import RoundedTable from "@/ui/components/forms/RoundedTable";
+import TableHeadCell from "@/ui/components/forms/TableHeadCell";
+import TableBodyCell from "@/ui/components/forms/TableBodyCell";
+
+interface ProductStockTableProps {
+    savedDataObj: Product;
+    provisionalDataObj: Product;
+    setProvisionalDataObj: React.Dispatch<React.SetStateAction<Product>>;
+    tableMode: StockTableMode;
+    setTableMode: React.Dispatch<React.SetStateAction<StockTableMode>>;
+}
 
 export default function ProductStockTable({
     savedDataObj,
@@ -13,13 +24,7 @@ export default function ProductStockTable({
     setProvisionalDataObj,
     tableMode,
     setTableMode,
-}: {
-    savedDataObj: Product;
-    provisionalDataObj: Product;
-    setProvisionalDataObj: React.Dispatch<React.SetStateAction<Product>>;
-    tableMode: StockTableMode;
-    setTableMode: React.Dispatch<React.SetStateAction<StockTableMode>>;
-}) {
+}: ProductStockTableProps) {
     const [localStockObj, setLocalStockObj] = useState<Product["stock"]>(savedDataObj.stock);
 
     const [message, setMessage] = useState<string>();
@@ -30,6 +35,10 @@ export default function ProductStockTable({
 
     useEffect(() => {
         setLocalStockObj(provisionalDataObj.stock);
+        setNewSize(undefined);
+        setNewStock(undefined);
+        setTableMode("display");
+        setMessage(undefined);
     }, [provisionalDataObj]);
 
     const handleAdd = async () => {
@@ -41,6 +50,7 @@ export default function ProductStockTable({
         ) {
             const updatedStockObj = { ...localStockObj, [newSize]: newStock };
 
+            setLocalStockObj(updatedStockObj);
             setProvisionalDataObj((prev) => ({ ...prev, stock: updatedStockObj }));
             setNewSize(undefined);
             setNewStock(undefined);
@@ -62,16 +72,91 @@ export default function ProductStockTable({
     };
 
     const handleCancel = () => {
-        setLocalStockObj(savedDataObj.stock);
+        setLocalStockObj(provisionalDataObj.stock);
         setNewSize(undefined);
         setNewStock(undefined);
         setTableMode("display");
         setMessage(undefined);
     };
 
+    const buildHeadCells = () => (
+        <>
+            <TableHeadCell variant="leftEnd" overrideClasses="w-1/2">
+                Size
+            </TableHeadCell>
+            <TableHeadCell variant="rightEnd" overrideClasses="w-1/2">
+                Stock
+            </TableHeadCell>
+            <th className="w-8"></th>
+        </>
+    );
+
+    const buildBodyCells = () => (
+        <>
+            {tableArr.map((stockSize, idx) => (
+                <tr key={stockSize} data-cy="table-row">
+                    <TableBodyCell
+                        variant="leftEnd"
+                        isLastRow={idx === tableArr.length - 1 && !(tableMode === "add")}
+                    >
+                        <StockTableInput
+                            type="text"
+                            mode={tableMode}
+                            value={stockSize.toUpperCase()}
+                        />
+                    </TableBodyCell>
+                    <TableBodyCell
+                        variant="rightEnd"
+                        isLastRow={idx === tableArr.length - 1 && !(tableMode === "add")}
+                    >
+                        <StockTableInput
+                            type="number"
+                            mode={tableMode}
+                            pairKey={stockSize}
+                            value={localStockObj[stockSize]}
+                            stockObjSetter={setLocalStockObj}
+                            setNewStock={setNewStock}
+                        />
+                    </TableBodyCell>
+                    <td>
+                        {tableMode === "edit" && (
+                            <div className="flex grow w-full justify-center items-center">
+                                <StockRowDelete
+                                    stockObjSetter={setLocalStockObj}
+                                    size={stockSize as Sizes}
+                                />
+                            </div>
+                        )}
+                    </td>
+                </tr>
+            ))}
+            {tableMode === "add" && (
+                <tr data-cy="table-row">
+                    <TableBodyCell variant="leftEnd" isLastRow={tableMode === "add"}>
+                        <StockTableInput
+                            type="text"
+                            mode={tableMode}
+                            isNew
+                            setNewSize={setNewSize}
+                        />
+                    </TableBodyCell>
+                    <TableBodyCell variant="rightEnd" isLastRow={tableMode === "add"}>
+                        <StockTableInput
+                            type="number"
+                            mode={tableMode}
+                            stockObjSetter={setLocalStockObj}
+                            isNew
+                            setNewStock={setNewStock}
+                        />
+                    </TableBodyCell>
+                </tr>
+            )}
+        </>
+    );
+
     return (
         <div className="flex flex-col py-4 bg-background-lighter rounded-md ">
-            <div className="flex justify-between h-12 px-8">
+            <div id="stock-table-button-container" className="flex justify-between h-12 px-8">
                 {tableMode === "display" && Object.keys(localStockObj)?.length > 0 && (
                     <div>
                         <PlainRoundedButton onClick={() => setTableMode("edit")}>
@@ -104,88 +189,17 @@ export default function ProductStockTable({
                     </div>
                 )}
             </div>
-            <div className="flex justify-center h-8 p-2">
+            <div id="stock-table-message-container" className="flex justify-center h-8 p-2">
                 <p className="text-center text-white">{message}</p>
             </div>
-            <table className="text-center ml-8 border-separate border-spacing-0 mt-2">
-                <thead>
-                    <tr className="p-2">
-                        <th className="w-1/2 bg-background-lightest border-2 border-r-1 py-2 rounded-tl-md">
-                            Size
-                        </th>
-                        <th className="w-1/2 bg-background-lightest border-2 border-l-2 py-2 rounded-tr-md">
-                            Stock
-                        </th>
-                        <th className="min-w-8"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {tableArr.map((stockSize, idx) => (
-                        <tr key={stockSize}>
-                            <td
-                                className={`border border-l-2 bg-white ${
-                                    idx === tableArr.length - 1 && !(tableMode === "add")
-                                        ? "rounded-bl-lg border-b-2"
-                                        : ""
-                                } `}
-                            >
-                                <StockTableInput
-                                    type="text"
-                                    mode={tableMode}
-                                    value={stockSize.toUpperCase()}
-                                />
-                            </td>
-                            <td
-                                className={`border border-r-2 bg-white ${
-                                    idx === tableArr.length - 1 && !(tableMode === "add")
-                                        ? "rounded-br-lg border-b-2"
-                                        : ""
-                                } `}
-                            >
-                                <StockTableInput
-                                    type="number"
-                                    mode={tableMode}
-                                    pairKey={stockSize}
-                                    value={localStockObj[stockSize]}
-                                    stockObjSetter={setLocalStockObj}
-                                    setNewStock={setNewStock}
-                                />
-                            </td>
-                            <td>
-                                {tableMode === "edit" && (
-                                    <div className="flex grow justify-center items-center">
-                                        <StockRowDelete
-                                            stockObjSetter={setLocalStockObj}
-                                            size={stockSize as Sizes}
-                                        />
-                                    </div>
-                                )}
-                            </td>
-                        </tr>
-                    ))}
-                    {tableMode === "add" && (
-                        <tr>
-                            <td className="border border-l-2 border-b-2 rounded-bl-lg bg-white">
-                                <StockTableInput
-                                    type="text"
-                                    mode={tableMode}
-                                    isNew
-                                    setNewSize={setNewSize}
-                                />
-                            </td>
-                            <td className="border border-r-2 border-b-2 rounded-br-lg bg-white">
-                                <StockTableInput
-                                    type="number"
-                                    mode={tableMode}
-                                    stockObjSetter={setLocalStockObj}
-                                    isNew
-                                    setNewStock={setNewStock}
-                                />
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+            <div className="pl-8 pt-2">
+                <RoundedTable
+                    id="stock-table"
+                    tableHeadCells={buildHeadCells()}
+                    tableBodyCells={buildBodyCells()}
+                    overrideClasses="w-full text-center table-fixed"
+                />
+            </div>
         </div>
     );
 }

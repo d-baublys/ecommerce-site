@@ -22,7 +22,7 @@ describe("Home page", () => {
             });
         });
         cy.get("#carousel-nav-forward").click();
-        cy.wait(500);
+        cy.wait(500); // await animation
         cy.get("#carousel-slider").then(($slider) => {
             const sliderBounds = $slider[0].getBoundingClientRect();
 
@@ -36,7 +36,6 @@ describe("Home page", () => {
     });
 
     it("has no accessibility violations", () => {
-        cy.wait(500);
         cy.injectAxe();
         cy.checkA11y();
     });

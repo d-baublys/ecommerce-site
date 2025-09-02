@@ -16,23 +16,30 @@ Simulated checkout details:
 ## Stack
 - **Frontend:** Next.js with App Router
 - **Backend:** Next.js with API routes
-- **Database:** PostgreSQL
+- **Database:** PostgreSQL with Prisma
 - **Hosting:** Vercel
 
 ## Lessons
 - Extend existing React knowledge into client/server component distinction
 - Working with and around component hydration
 - Using Prisma to abstract database interactions
-- Building Prisma schema to mirror frontend data structures
-- Building interactive elements with complex logic, such as zoomable images
-- Using Jest and Cypress for extensive unit and end-to-end test coverage
-- How to assure the app is accessible through manual and automated means
+- Building Prisma schema for ecommerce needs
+- Using Prisma generated types to integrate with frontend structures
+- Building interactive elements with complex logic, such as zoomable images, for both mouse and touch inputs
+- Animating element hovers by manipulating their before/after pseudoelements
+- Using Jest for unit testing and exploring edge cases
+- Translating manual testing into tangible sequences with Cypress end-to-end testing
+- Optimising end-to-end tests and reducing flakiness
+- Distinguishing the reponsibilities of unit and end-to-end testing
+- Ensuring the app is accessible through manual and automated means
 - Using local PostgreSQL databases for development and test data
+- Using Auth.js to guard routes and UI with both authentication and authorisation
 
 ## Demonstrates
-- Accommodating both desktop and mobile devices and various screen sizes
-- Attention to detail in creating an accessible shopping experience
-- Consideration about overall user experience and interaction edge cases
+- Understanding of ecommerce user flows, including purchase, auth, and simple order management
+- Attention to detail in creating an accessible experience, such as with tab press focus "trapping" and "restore"
+- Create responsive layouts across many routes in a modular fashion
+- Ability to build a usable admin suite to visually interface with the database for product and order management
+- Visualisation and understanding of edge cases through Jest and Cypress tests
 - Consistent iteration for organisation and maintaining DRY principles
-- Ability to integrate 3rd-party solutions (Stripe)
-
+- Ability to integrate 3rd-party solutions (Stripe sandbox mode) for illustrative purchases and refunds

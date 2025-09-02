@@ -3,27 +3,24 @@
 import { Categories, Product, VALID_CATEGORIES } from "@/lib/definitions";
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import DisplayTile from "@/ui/components/cards/DisplayTile";
 import SearchBar from "@/ui/components/SearchBar";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
+import { buildAdminProductUrl } from "@/lib/utils";
 
 export default function AdminProductsClient() {
-    const router = useRouter();
     const pathname = usePathname();
     const [filter, setFilter] = useState<Categories | null>(null);
     const [unfilteredResults, setUnfilteredResults] = useState<Product[]>([]);
-    const [searchQuery, setSearchQuery] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [isResultLoading, setIsResultLoading] = useState<boolean>(false);
     const querySet = unfilteredResults.filter((item) => {
-        if (filter) return item.gender === filter;
+        if (filter || /^\s+$/.test(searchQuery)) return item.gender === filter;
         if (searchQuery) return true;
         return false;
     });
-
-    const handleResultClick = (product: Product) => {
-        router.push(`/admin/products/${encodeURIComponent(product.slug)}`);
-    };
 
     return (
         <div className="flex flex-col grow w-full justify-center items-center">
@@ -35,12 +32,13 @@ export default function AdminProductsClient() {
                     + Add Product
                 </PlainRoundedButtonLink>
             </div>
-            <div className="w-full h-10 mb-8">
+            <div id="admin-product-search-container" className="w-full h-10 mb-8">
                 <SearchBar
-                    handleResultClick={handleResultClick}
                     options={{ isGlobalSearch: false, showSuggestions: false }}
                     parentSetter={setUnfilteredResults}
                     parentQuerySetter={setSearchQuery}
+                    parentFilter={filter}
+                    parentLoadingStateSetter={setIsResultLoading}
                 />
             </div>
             <ul className="flex flex-row justify-evenly items-center w-full">
@@ -52,7 +50,7 @@ export default function AdminProductsClient() {
                                     curr === category ? null : (category as Categories)
                                 )
                             }
-                            overrideClasses={`${
+                            overrideClasses={`!bg-background-lightest ${
                                 filter === category &&
                                 "!bg-component-color !border-component-color !text-contrasted"
                             }`}
@@ -63,25 +61,28 @@ export default function AdminProductsClient() {
                 ))}
             </ul>
             <div className="flex justify-center w-full grow">
-                {(filter || searchQuery) && querySet.length > 0 ? (
-                    <ul className="flex flex-col w-full">
-                        {querySet.map((item: Product) => (
-                            <li key={item.id} className="mt-8">
-                                <Link href={`${pathname}/${encodeURIComponent(item.slug)}`}>
-                                    <DisplayTile productData={item} />
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <div className="flex items-center mt-8 h-full">
-                        <p className="text-center">
-                            {filter || searchQuery
-                                ? "No products matching your search"
-                                : "Please select a filter or search by keyword"}
-                        </p>
-                    </div>
-                )}
+                {!isResultLoading ? (
+                    (filter || searchQuery) && querySet.length > 0 ? (
+                        <ul id="admin-products-container" className="flex flex-col w-full">
+                            {querySet.map((item: Product) => (
+                                <li key={item.id} className="mt-8">
+                                    <Link href={buildAdminProductUrl(item.id)}>
+                                        <DisplayTile productData={item} />
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <div className="flex items-center mt-8 h-full">
+                            <p className="text-center">
+                                {!(filter || searchQuery) ||
+                                (searchQuery && /^\s+$/.test(searchQuery))
+                                    ? "Please select a filter or search by keyword"
+                                    : "No products matching your search"}
+                            </p>
+                        </div>
+                    )
+                ) : null}
             </div>
         </div>
     );

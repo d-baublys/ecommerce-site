@@ -14,7 +14,12 @@ export default function Error({
         <BareLayout>
             <p>{error ? `${error.message}` : "Something went wrong!"}</p>
             <div>
-                <PlainRoundedButton onClick={() => reset()}>Try Again</PlainRoundedButton>
+                <PlainRoundedButton
+                    onClick={() => reset()}
+                    overrideClasses="!bg-background-lightest"
+                >
+                    Try Again
+                </PlainRoundedButton>
             </div>
         </BareLayout>
     );

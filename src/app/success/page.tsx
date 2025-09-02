@@ -51,7 +51,9 @@ export default async function PurchaseSuccessPage({ searchParams }: AsyncParams)
                     </div>
                 </div>
                 <div>
-                    <PlainRoundedButtonLink href={"/"}>Home</PlainRoundedButtonLink>
+                    <PlainRoundedButtonLink href={"/"} overrideClasses="!bg-background-lightest">
+                        Home
+                    </PlainRoundedButtonLink>
                 </div>
             </div>
         </BareLayout>

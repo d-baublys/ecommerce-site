@@ -1,6 +1,17 @@
+import { CypressTestProductData } from "../../src/lib/definitions";
+import { buildProductUrl } from "../../src/lib/utils";
+
+let testProductLink: string;
+
 describe("Product page", () => {
+    before(() => {
+        cy.task("getTestProductSavedData").then((data: CypressTestProductData) => {
+            testProductLink = buildProductUrl(data.id, data.slug);
+        });
+    });
+
     beforeEach(() => {
-        cy.visit("/products/white-&-medium-dark-print");
+        cy.visitTestProduct(testProductLink);
     });
 
     it("disables 'add to bag' button by default", () => {
@@ -39,12 +50,18 @@ describe("Product page", () => {
         cy.contains("button", "Add to Bag").should("be.enabled");
     });
 
-    it("adds product to the bag on 'add to bag' button click and updates navbar UI", () => {
+    it("adds product to the bag on 'add to bag' button click, shows modal, & updates navbar UI", () => {
         cy.get("[aria-label='Size selection']").select("L");
         cy.contains("button", "Add to Bag").click();
+        cy.get(".bag-confirm-modal").should("be.visible");
+        cy.get("#close-modal-button").click();
         cy.get("[aria-label='Size selection']").select("XL");
         cy.contains("button", "Add to Bag").click();
+        cy.get(".bag-confirm-modal").should("be.visible");
+        cy.get("#close-modal-button").click();
         cy.contains("button", "Add to Bag").click();
+        cy.get(".bag-confirm-modal").should("be.visible");
+        cy.get("#close-modal-button").click();
         cy.visit("/bag");
         cy.get("[data-testid='bag-tile-ul'] .bag-tile").should("have.length", 2); // 2 sizes, 3 total quantity
         cy.get(".bag-count-badge").should("have.text", "3");
@@ -56,6 +73,8 @@ describe("Product page", () => {
             "enabled-options"
         );
         cy.contains("button", "Add to Bag").click();
+        cy.get(".bag-confirm-modal").should("be.visible");
+        cy.get("#close-modal-button").click();
         cy.get("@enabled-options").should("have.length", 1);
         cy.get("@enabled-options").eq(0).should("have.text", "XL");
         cy.get("[aria-label='Size selection'] option").should("contain.text", "L - out of stock");
@@ -67,7 +86,7 @@ describe("Product page", () => {
         cy.visit("/wishlist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 1);
         cy.contains(/1\s*Item/).should("be.visible");
-        cy.visit("/products/white-&-medium-dark-print");
+        cy.visitTestProduct(testProductLink);
         cy.contains("button", "Remove from Wishlist").click();
         cy.go("back");
         cy.get(".grid-tile-container .product-tile").should("have.length", 0);
@@ -75,14 +94,13 @@ describe("Product page", () => {
     });
 
     it("has no accessibility violations in the base page state", () => {
-        cy.wait(500);
         cy.injectAxe();
         cy.checkA11y();
     });
 
     it("has no accessibility violations when a size is selected", () => {
         cy.get("[aria-label='Size selection']").select("L");
-        cy.wait(500);
+        cy.contains("button", "Add to Bag").should("be.enabled");
         cy.injectAxe();
         cy.checkA11y();
     });

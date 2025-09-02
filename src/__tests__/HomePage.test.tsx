@@ -1,4 +1,4 @@
-import { createLongProductList, getFilteredFakeProducts } from "@/lib/test-utils";
+import { createLongProductList, getFilteredFakeProducts } from "@/lib/test-factories";
 import { render, screen, waitFor, within } from "@testing-library/react";
 
 jest.mock("@/lib/actions", () => ({

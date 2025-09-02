@@ -1,12 +1,12 @@
 import {
     getConsoleErrorSpy,
-    getFilteredFakeProducts,
     matchPriceRangeLabel,
     matchSizeLabel,
     wrapWithErrorBoundary,
 } from "@/lib/test-utils";
 import CategoryGridPage from "@/ui/pages/CategoryGridPage";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { getFilteredFakeProducts } from "@/lib/test-factories";
 
 jest.mock("@/lib/fetching-utils", () => ({
     fetchFilteredProducts: jest.fn(),

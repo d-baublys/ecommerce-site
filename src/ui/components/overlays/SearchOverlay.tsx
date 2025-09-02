@@ -9,6 +9,7 @@ import DarkBackdrop from "@/ui/components/overlays/DarkBackdrop";
 import CloseButton from "@/ui/components/buttons/CloseButton";
 import { useEffect, useRef } from "react";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
+import { buildProductUrl } from "@/lib/utils";
 
 export default function SearchOverlay() {
     const { isSearchOpen, setIsSearchOpen, isSearchLoaded, setIsSearchLoaded } = useSearchStore(
@@ -28,7 +29,7 @@ export default function SearchOverlay() {
 
     const handleResultClick = (product: Product) => {
         closeOverlay();
-        router.push(`/products/${encodeURIComponent(product.slug)}`);
+        router.push(buildProductUrl(product.id, product.slug));
     };
 
     useEffect(() => {
@@ -59,7 +60,7 @@ export default function SearchOverlay() {
             <div
                 id="search-overlay-container"
                 data-testid="search-overlay-container"
-                className={`absolute top-0 left-0 flex justify-center w-full min-h-screen md:min-h-[400px] bg-white drop-shadow-xl z-[9999] [transition:all_0.2s_ease-out] ${
+                className={`absolute top-0 left-0 flex justify-center global-constraints overlay-constraints search-overlay-constraints bg-white drop-shadow-xl z-[9999] [transition:all_0.2s_ease-out] ${
                     isSearchLoaded ? "opacity-100" : "opacity-0"
                 }`}
                 ref={trapRef}

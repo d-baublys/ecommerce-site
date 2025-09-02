@@ -1,16 +1,17 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getProductData } from "@/lib/actions";
 import ProductPageClient from "./ProductPageClient";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { Metadata } from "next";
+import { buildProductUrl } from "@/lib/utils";
 
 type AsyncParams = {
-    params: Promise<{ slug: string }>;
+    params: Promise<{ id: string; slug: string }>;
 };
 
 export async function generateMetadata({ params }: AsyncParams): Promise<Metadata> {
-    const { slug } = await params;
-    const productFetch = await getProductData({ slug: decodeURIComponent(slug) });
+    const { id } = await params;
+    const productFetch = await getProductData({ id });
 
     const [productData] = productFetch.data;
     const title = productData.name;
@@ -19,14 +20,18 @@ export async function generateMetadata({ params }: AsyncParams): Promise<Metadat
 }
 
 export default async function ProductPage({ params }: AsyncParams) {
-    const { slug } = await params;
-    const productFetch = await getProductData({ slug: decodeURIComponent(slug) });
+    const { id, slug } = await params;
+    const productFetch = await getProductData({ id });
 
     if (!productFetch.data.length) {
         notFound();
     }
 
     const [productData] = productFetch.data;
+
+    if (productData.slug !== decodeURIComponent(slug)) {
+        redirect(buildProductUrl(productData.id, productData.slug));
+    }
 
     return (
         <MainLayout lastCrumbText={productData.name}>

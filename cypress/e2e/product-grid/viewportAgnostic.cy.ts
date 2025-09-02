@@ -4,7 +4,7 @@ describe("Product grid page viewport-agnostic tests", () => {
     beforeEach(() => {
         cy.largeBreakpoint();
         cy.visit("/category/all");
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
     });
 
     it("toggles item wishlisting on heart icon click", () => {
@@ -30,7 +30,7 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
 
         cy.get("@test-tile").trigger("mouseover");
@@ -41,13 +41,13 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.get("@test-tile").find(".lower-hover-container li").should("have.length", 2);
     });
 
-    it("adds product to the bag on quick add size icon click and updates navbar UI", () => {
+    it("adds product to the bag on quick add size icon click, shows modal, & updates navbar UI", () => {
         cy.get(".bag-count-badge").should("not.exist");
         cy.get(".desktop-filtering").contains("button", "Price").click();
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
 
         cy.get("@test-tile").trigger("mouseover");
@@ -65,17 +65,21 @@ describe("Product grid page viewport-agnostic tests", () => {
     it("locks scrolling when bag confirm modal is open", () => {
         cy.get(".desktop-filtering").contains("button", "Price").click();
         cy.get(".desktop-filtering .price-btn-container button").first().click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
 
+        cy.assertNoScroll();
         cy.get("@test-tile").trigger("mouseover");
         cy.get("@test-tile").contains("button", "Quick Add").click();
         cy.get("@test-tile").find(".lower-hover-container li").first().click();
         cy.get(".bag-confirm-modal").should("be.visible");
-        cy.get("body").should("have.css", "overflow", "hidden");
+        cy.assertScrollHookCssExist();
+        cy.performTestScroll();
+        cy.assertNoScroll();
 
         cy.get("#close-modal-button").click();
-        cy.get("body").should("not.have.css", "overflow", "hidden");
+        cy.assertScrollHookCssNotExist();
+        cy.assertNoScroll();
     });
 
     it("removes a size option in quick add if it becomes unstocked", () => {
@@ -83,7 +87,7 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
 
         cy.get("@test-tile").trigger("mouseover");
@@ -104,7 +108,7 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
 
         cy.get("@test-tile").trigger("mouseover");
@@ -141,7 +145,7 @@ describe("Product grid page viewport-agnostic tests", () => {
             expect(prices).to.not.deep.equal(sortedAsc);
         });
         cy.get("#sort-select").select("Price (Low to High)");
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".tile-price").then((tilePrices) => {
             const prices = [...tilePrices].map((price) =>
                 parseFloat(price.innerText.replace("£", ""))
@@ -162,7 +166,7 @@ describe("Product grid page viewport-agnostic tests", () => {
             expect(prices).to.not.deep.equal(sortedDesc);
         });
         cy.get("#sort-select").select("Price (High to Low)");
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".tile-price").then((tilePrices) => {
             const prices = [...tilePrices].map((price) =>
                 parseFloat(price.innerText.replace("£", ""))
@@ -181,7 +185,7 @@ describe("Product grid page viewport-agnostic tests", () => {
             expect(dates).to.not.deep.equal(sortedDates);
         });
         cy.get("#sort-select").select("Newest");
-        cy.wait(1000);
+        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".tile-price").then(($tiles) => {
             const dates = [...$tiles].map((tile) => new Date(tile.getAttribute("data-date-added")));
             const sortedDates = [...dates].sort((a, b) => a.getTime() - b.getTime());

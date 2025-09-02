@@ -10,13 +10,13 @@ import {
 } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { useBagStore } from "@/stores/bagStore";
-import BagConfirmModal from "@/ui/components/overlays/BagConfirmModal";
+import AddSuccessModal from "@/ui/components/overlays/AddSuccessModal";
 import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
 import ProductImage from "@/ui/components/ProductImage";
 import Link from "next/link";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 
-export default function ProductTile({ product }: { product: Product }) {
+export default function ProductGridTile({ product }: { product: Product }) {
     const { bag, addToBag } = useBagStore((state) => state);
 
     const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -94,7 +94,7 @@ export default function ProductTile({ product }: { product: Product }) {
                     onBlur={handleBlur}
                     className="relative w-full aspect-[4/5] outline-none"
                 >
-                    <Link tabIndex={-1} href={buildProductUrl(product.slug)}>
+                    <Link tabIndex={-1} href={buildProductUrl(product.id, product.slug)}>
                         <ProductImage product={product} />
                     </Link>
                     {isHovered && (
@@ -142,7 +142,7 @@ export default function ProductTile({ product }: { product: Product }) {
                     )}
                 </div>
 
-                <Link href={buildProductUrl(product.slug)}>
+                <Link href={buildProductUrl(product.id, product.slug)}>
                     <div className="flex flex-col grow gap-4">
                         <p className="tile-name">{product.name}</p>
                         <p className="tile-price font-semibold">
@@ -152,12 +152,10 @@ export default function ProductTile({ product }: { product: Product }) {
                     </div>
                 </Link>
             </div>
-
             {isModalOpen && (
-                <BagConfirmModal
+                <AddSuccessModal
                     handleClose={() => setIsModalOpen(false)}
                     isOpenState={isModalOpen}
-                    hasCloseButton={true}
                     overrideClasses="bag-confirm-modal"
                 />
             )}
