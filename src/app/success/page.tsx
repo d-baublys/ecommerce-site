@@ -43,12 +43,6 @@ export default async function PurchaseSuccessPage({ searchParams }: AsyncParams)
                             </p>
                         </div>
                     </div>
-                    <div className="mt-8">
-                        <p>
-                            You will receive an order confirmation by email shortly. If not, please
-                            check your spam folder.
-                        </p>
-                    </div>
                 </div>
                 <div>
                     <PlainRoundedButtonLink href={"/"} overrideClasses="!bg-background-lightest">
