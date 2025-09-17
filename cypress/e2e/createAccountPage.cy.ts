@@ -31,7 +31,7 @@ describe("Create account page base tests", () => {
         cy.contains("An account with this email address already exists.").should("be.visible");
     });
 
-    it("shows error message when provided email is invalid", () => {
+    it("shows error message when provided password is too short", () => {
         cy.get("input[name='email']").type("test@example.com");
         cy.get("input[name='password']").type("123");
         cy.get("input[name='password-confirm']").type("123");
