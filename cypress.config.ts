@@ -15,8 +15,13 @@ import {
 import { CypressTestDataDeleteParams, Product } from "./src/lib/definitions";
 import { convertClientProduct, hashPassword } from "./src/lib/utils";
 
-dotenv.config({ path: path.resolve(process.cwd(), ".env") });
-dotenv.config({ path: path.resolve(process.cwd(), ".env.test.local") });
+dotenv.config({
+    path: [
+        path.resolve(process.cwd(), ".env.test.local"),
+        path.resolve(process.cwd(), ".env.local"),
+        path.resolve(process.cwd(), ".env"),
+    ],
+});
 
 const prisma = new PrismaClient();
 

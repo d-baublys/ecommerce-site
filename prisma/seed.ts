@@ -8,27 +8,19 @@ import {
 import { slugify } from "../src/lib/utils";
 import { createUser } from "../src/lib/actions";
 
-const prisma = new PrismaClient();
+const nodeEnv = process.env.NODE_ENV || "development";
+const allowProdSeed = process.env.ALLOW_PROD_SEED?.toLowerCase() === "true";
+
+if (nodeEnv === "production" && !allowProdSeed) {
+    console.error(
+        "Seeding aborted - cannot seed in production environment without an 'ALLOW_PROD_SEED' variable set to 'true'."
+    );
+    process.exit(1);
+}
 
 const prices: number[] = [2500, 3300, 5100, 7200, 10500, 13500, 18300, 21000]; // 2/2/2/1/1
 prices.push(...prices); // mirror for each category
 
-const createAlternatingStock = (rows: number) => {
-    const result: number[][] = [];
-
-    for (let i = 0; i < rows; i++) {
-        if (i === rows - 1) {
-            result.push([0, 0, 0, 0, 0]);
-        } else if (i === Math.floor(rows / 2) - 1) {
-            result.push([0, 0, 0, 1, 2]);
-        } else {
-            result.push([20, 20, 20, 20, 20]);
-        }
-    }
-    return result;
-};
-
-const stockCounts: number[][] = createAlternatingStock(16);
 const dates: string[] = [
     "2025-07-01",
     "2025-07-02",
@@ -140,9 +132,32 @@ const productStubs: Omit<PrismaProduct, "id" | "dateAdded" | "slug" | "price" | 
     },
 ];
 
-async function main() {
-    const mensSizes: PrismaSizes[] = ["s", "m", "l", "xl", "xxl"];
-    const womensSizes: PrismaSizes[] = ["xs", "s", "m", "l", "xl"];
+const mensSizes: PrismaSizes[] = ["s", "m", "l", "xl", "xxl"];
+const womensSizes: PrismaSizes[] = ["xs", "s", "m", "l", "xl"];
+
+const createStockArr = (productCount: number): number[][] => {
+    if (nodeEnv === "test") {
+        return Array.from({ length: productCount }, (_, i) => {
+            switch (i) {
+                case productCount - 1:
+                    return [0, 0, 0, 0, 0];
+
+                case Math.floor(productCount / 2) - 1:
+                    return [0, 0, 0, 1, 2];
+
+                default:
+                    return [20, 20, 20, 20, 20];
+            }
+        });
+    } else {
+        return Array.from({ length: productCount }, () => [20, 20, 20, 20, 20]);
+    }
+};
+
+const prisma = new PrismaClient();
+
+async function seedProducts() {
+    const stock = createStockArr(16);
 
     for (let i in productStubs) {
         const product = productStubs[i];
@@ -162,7 +177,7 @@ async function main() {
 
         const stockEntries: Prisma.StockCreateManyInput[] = productSizes.map((size, idx) => ({
             size: size as PrismaSizes,
-            quantity: stockCounts[i][idx],
+            quantity: stock[i][idx],
             productId: createdProduct.id,
         }));
 
@@ -170,7 +185,9 @@ async function main() {
             data: stockEntries,
         });
     }
+}
 
+async function seedUsers() {
     const adminEmail = process.env.ADMIN_EMAIL;
     const adminPassword = process.env.ADMIN_PASSWORD;
     const standardEmail = process.env.STANDARD_EMAIL;
@@ -186,6 +203,11 @@ async function main() {
 
     await createUser(adminEmail, adminPassword, "admin");
     await createUser(standardEmail, standardPassword, "user");
+}
+
+async function main() {
+    await seedProducts();
+    await seedUsers();
 }
 
 main()
