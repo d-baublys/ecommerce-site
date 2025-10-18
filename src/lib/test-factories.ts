@@ -24,7 +24,7 @@ export function createFakeProduct({
     return {
         id: `test-id-${idx}`,
         name,
-        gender: Object.keys(VALID_CATEGORIES)[0] as keyof typeof VALID_CATEGORIES,
+        gender: VALID_CATEGORIES[0].key,
         price: 2500,
         slug: slugify(name),
         src: `/nonexistent-img-${idx}.jpg`,

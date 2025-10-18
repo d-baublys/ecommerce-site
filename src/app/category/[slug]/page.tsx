@@ -11,7 +11,8 @@ type AsyncParams = {
 export async function generateMetadata({ params }: AsyncParams): Promise<Metadata> {
     const { slug } = await params;
 
-    const title = slug === "all" ? "All Products" : VALID_CATEGORIES[slug as Categories];
+    const title =
+        slug === "all" ? "All Products" : VALID_CATEGORIES.find((c) => c.key === slug)!.label;
 
     return { title };
 }
@@ -19,11 +20,17 @@ export async function generateMetadata({ params }: AsyncParams): Promise<Metadat
 export default async function CategoryPage({ params }: AsyncParams) {
     const { slug } = await params;
 
-    if (!(slug in VALID_CATEGORIES || slug === "all")) {
+    if (
+        !(
+            VALID_CATEGORIES.some((c) => Object.values(c).includes(slug as Categories)) ||
+            slug === "all"
+        )
+    ) {
         notFound();
     }
 
-    const subheaderText = slug === "all" ? "All Products" : VALID_CATEGORIES[slug as Categories];
+    const subheaderText =
+        slug === "all" ? "All Products" : VALID_CATEGORIES.find((c) => c.key === slug)!.label;
 
     return (
         <MainLayout

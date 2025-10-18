@@ -42,20 +42,16 @@ export default function AdminProductsClient() {
                 />
             </div>
             <ul className="flex flex-row justify-evenly items-center w-full">
-                {Object.keys(VALID_CATEGORIES).map((category) => (
-                    <li key={category}>
+                {VALID_CATEGORIES.map((c) => (
+                    <li key={c.key}>
                         <PlainRoundedButton
-                            onClick={() =>
-                                setFilter((curr) =>
-                                    curr === category ? null : (category as Categories)
-                                )
-                            }
+                            onClick={() => setFilter((curr) => (curr === c.key ? null : c.key))}
                             overrideClasses={`!bg-background-lightest ${
-                                filter === category &&
+                                filter === c.key &&
                                 "!bg-component-color !border-component-color !text-contrasted"
                             }`}
                         >
-                            {VALID_CATEGORIES[category as Categories]}
+                            {c.label}
                         </PlainRoundedButton>
                     </li>
                 ))}

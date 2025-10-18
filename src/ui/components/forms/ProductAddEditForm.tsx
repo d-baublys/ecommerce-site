@@ -174,9 +174,9 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                         className="p-1.5 rounded-lg bg-white"
                         value={provisionalDataObj.gender}
                     >
-                        {Object.keys(VALID_CATEGORIES).map((category, idx) => (
-                            <option key={idx} value={category}>
-                                {VALID_CATEGORIES[category as Categories]}
+                        {VALID_CATEGORIES.map((c, idx) => (
+                            <option key={idx} value={c.key}>
+                                {c.label}
                             </option>
                         ))}
                     </select>

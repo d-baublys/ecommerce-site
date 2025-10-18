@@ -1,80 +1,36 @@
 import { Prisma, Product as PrismaProduct, Order as PrismaOrder } from "@prisma/client";
-
-export const PRODUCT_BASE_FIELDS = {
-    name: "",
-    gender: "" as Categories,
-    price: 0,
-    slug: "",
-    src: "",
-    alt: "",
-    dateAdded: "",
-};
+import { z } from "zod";
+import {
+    bagItemSchema,
+    categorySchema,
+    clientOrderItemWithProductNoStockSchema,
+    itemMetadataSchema,
+    mergedBagItemSchema,
+    orderSchema,
+    productNoStockSchema,
+    productSchema,
+    sizeSchema,
+} from "./schemas";
 
 export const VALID_SIZES = ["xs", "s", "m", "l", "xl", "xxl"] as const;
-
-export const VALID_CATEGORIES = { mens: "Men's", womens: "Women's" } as const;
-
-export type ProductBase = typeof PRODUCT_BASE_FIELDS;
-
-export type ProductNoStock = ProductBase & {
-    id: string;
-};
-
-export type Product = ProductBase & {
-    id: string;
-    stock: Partial<Record<Sizes, number>>;
-};
-
-export type Sizes = (typeof VALID_SIZES)[number];
-
-export type Categories = keyof typeof VALID_CATEGORIES;
-
-export type BagItem = {
-    product: Product;
-    size: Sizes;
-    quantity: number;
-};
-
-export type MergedBagItem = BagItem & { latestSizeStock: number };
-
-export type ItemMetadata = {
-    productId: string;
-    name: string;
-    price: number;
-    size: Sizes;
-    quantity: number;
-};
-
-export type PrismaOrderNoStock = Prisma.OrderGetPayload<{
-    include: { items: { include: { product: true } } };
-}>;
-
-export type ClientOrderItemWithProductNoStock = ItemMetadata & { product: ProductNoStock };
-
-export type Order = {
-    id: number;
-    subTotal: number;
-    shippingTotal: number;
-    total: number;
-    status: OrderStatus;
-    userId: number | null;
-    email: string;
-    createdAt: Date;
-    returnRequestedAt: Date | null;
-    refundedAt: Date | null;
-    sessionId: string;
-    paymentIntentId: string;
-    items: ClientOrderItemWithProductNoStock[];
-};
-
-export type OrderNoItems = Omit<Order, "items">;
-
-export const ORDER_STATUS_OPTIONS = {
-    paid: "Paid",
-    pendingReturn: "Pending Return",
-    refunded: "Refunded",
-};
-
+export const VALID_CATEGORIES = [
+    { key: "mens", label: "Men's" },
+    { key: "womens", label: "Women's" },
+] as const;
+export const ORDER_STATUS_OPTIONS = [
+    {
+        key: "paid",
+        label: "Paid",
+    },
+    {
+        key: "pendingReturn",
+        label: "Pending Return",
+    },
+    {
+        key: "refunded",
+        label: "Refunded",
+    },
+] as const;
 export const ORDER_TABLE_COLUMNS: {
     key: keyof Omit<Order, "paymentIntentId" | "sessionId" | "items">;
     label: string;
@@ -90,13 +46,6 @@ export const ORDER_TABLE_COLUMNS: {
     { key: "refundedAt", label: "Date Refunded" },
     { key: "status", label: "Status" },
 ];
-
-export type OrderStatus = keyof typeof ORDER_STATUS_OPTIONS;
-
-export type ProductFormMode = "add" | "edit";
-
-export type StockTableMode = ProductFormMode | "display";
-
 export const PRICE_FILTER_OPTIONS = {
     a: { min: 0, max: 5000 },
     b: { min: 5000, max: 10000 },
@@ -104,24 +53,37 @@ export const PRICE_FILTER_OPTIONS = {
     d: { min: 15000, max: 20000 },
     e: { min: 20000, max: Infinity },
 };
-
-export type PriceFilterKey = keyof typeof PRICE_FILTER_OPTIONS;
-
 export const SORT_OPTIONS = {
     a: { sort: { price: "asc" as Prisma.SortOrder }, label: "Price (Low to High)" },
     b: { sort: { price: "desc" as Prisma.SortOrder }, label: "Price (High to Low)" },
     c: { sort: { dateAdded: "desc" as Prisma.SortOrder }, label: "Newest" },
 };
-
-export type ProductSortKey = keyof typeof SORT_OPTIONS;
-
 export const FEATURED_COUNT = 5;
-
 export const REFUND_WINDOW = 1000 * 60 * 60 * 24 * 30; // 30 days in ms
-
 export const USER_ROLES = ["admin", "user"] as const;
 
+export type Product = z.infer<typeof productSchema>;
+export type Sizes = z.infer<typeof sizeSchema>;
+export type Categories = z.infer<typeof categorySchema>;
+export type ProductNoStock = z.infer<typeof productNoStockSchema>;
+export type BagItem = z.infer<typeof bagItemSchema>;
+export type MergedBagItem = z.infer<typeof mergedBagItemSchema>;
+export type ItemMetadata = z.infer<typeof itemMetadataSchema>;
+export type Order = z.infer<typeof orderSchema>;
+export type ClientOrderItemWithProductNoStock = z.infer<
+    typeof clientOrderItemWithProductNoStockSchema
+>;
+
+export type ProductFormMode = "add" | "edit";
+export type StockTableMode = ProductFormMode | "display";
+export type OrderStatus = keyof typeof ORDER_STATUS_OPTIONS;
+export type PriceFilterKey = keyof typeof PRICE_FILTER_OPTIONS;
+export type ProductSortKey = keyof typeof SORT_OPTIONS;
 export type UserRoleOptions = (typeof USER_ROLES)[number];
+
+export type PrismaOrderNoStock = Prisma.OrderGetPayload<{
+    include: { items: { include: { product: true } } };
+}>;
 
 export class CredentialsError extends Error {
     constructor(message: string) {

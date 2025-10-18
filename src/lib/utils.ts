@@ -78,7 +78,7 @@ export function createEmptyProduct(): Product {
     return {
         id: "",
         name: "",
-        gender: Object.keys(VALID_CATEGORIES)[0] as keyof typeof VALID_CATEGORIES,
+        gender: VALID_CATEGORIES[0].key,
         price: 0,
         slug: "",
         src: "",

@@ -1,12 +1,7 @@
 "use client";
 
 import { updateOrder } from "@/lib/actions";
-import {
-    ORDER_STATUS_OPTIONS,
-    ORDER_TABLE_COLUMNS,
-    OrderNoItems,
-    OrderStatus,
-} from "@/lib/definitions";
+import { Order, ORDER_STATUS_OPTIONS, ORDER_TABLE_COLUMNS } from "@/lib/definitions";
 import { processDateForClient, stringifyConvertPrice } from "@/lib/utils";
 import { useModalStore } from "@/stores/modalStore";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
@@ -20,6 +15,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaSort } from "react-icons/fa";
+
+type OrderNoItems = Omit<Order, "items">;
 
 export default function AdminOrdersClient({ ordersData }: { ordersData: OrderNoItems[] }) {
     const columns = ORDER_TABLE_COLUMNS.map((columnData) => columnData.key);
@@ -120,20 +117,20 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderNoI
     };
 
     const processCellData = (
-        cellData: string | number | Date | null,
+        inputData: string | number | Date | null,
         column: (typeof ORDER_TABLE_COLUMNS)[number]
     ) => {
-        if (cellData instanceof Date) {
-            return processDateForClient(cellData);
+        if (inputData instanceof Date) {
+            return processDateForClient(inputData);
         } else if (column.key === "status") {
-            return ORDER_STATUS_OPTIONS[cellData as OrderStatus];
+            return ORDER_STATUS_OPTIONS.find((s) => s.key === inputData)!.label;
         } else if (
-            typeof cellData === "number" &&
+            typeof inputData === "number" &&
             (column.key === "subTotal" || column.key === "shippingTotal" || column.key === "total")
         ) {
-            return `£${stringifyConvertPrice(cellData)}`;
+            return `£${stringifyConvertPrice(inputData)}`;
         } else {
-            return cellData;
+            return inputData;
         }
     };
 

@@ -142,10 +142,10 @@ export default function CategoryGridPage({
     const categoryTabs = () => {
         return (
             <ul aria-label="Category tabs" className="flex w-full border-b-2 gap-8 mb-8 py-2">
-                {Object.entries(VALID_CATEGORIES).map(([key, displayName]) => (
-                    <li key={key}>
-                        <Link href={`/category/${key}`}>
-                            <div>{displayName}</div>
+                {VALID_CATEGORIES.map((c) => (
+                    <li key={c.key}>
+                        <Link href={`/category/${c.key}`}>
+                            <div>{c.label}</div>
                         </Link>
                     </li>
                 ))}
