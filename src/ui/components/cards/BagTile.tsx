@@ -1,6 +1,6 @@
 "use client";
 
-import { MergedBagItem } from "@/lib/definitions";
+import { MergedBagItem } from "@/lib/types";
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect } from "react";
 import { stringifyConvertPrice } from "@/lib/utils";

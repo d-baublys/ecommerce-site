@@ -1,5 +1,5 @@
 import { getOrder } from "@/lib/actions";
-import { Order } from "@/lib/definitions";
+import { Order } from "@/lib/types";
 import { convertPrismaOrders } from "@/lib/utils";
 import ConfirmModal from "@/ui/components/overlays/ConfirmModal";
 import AdminWrapper from "@/ui/layouts/AdminWrapper";

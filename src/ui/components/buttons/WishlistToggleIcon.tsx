@@ -1,7 +1,7 @@
 "use client";
 
 import { useWishlistToggle } from "@/hooks/useWishlistToggle";
-import { Product } from "@/lib/definitions";
+import { Product } from "@/lib/types";
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
 
 export default function WishlistToggleIcon({

@@ -1,8 +1,9 @@
-import { Categories, VALID_CATEGORIES } from "@/lib/definitions";
+import { Categories } from "@/lib/types";
 import CategoryGridPage from "@/ui/pages/CategoryGridPage";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import { VALID_CATEGORIES } from "@/lib/constants";
 
 type AsyncParams = {
     params: Promise<{ slug: string }>;

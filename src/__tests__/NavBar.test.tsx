@@ -1,4 +1,4 @@
-import { Sizes } from "@/lib/definitions";
+import { Sizes } from "@/lib/types";
 import { createFakeProductList } from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
 import NavBar from "@/ui/components/NavBar";

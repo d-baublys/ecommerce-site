@@ -1,6 +1,6 @@
 "use client";
 
-import { Product, Sizes, VALID_SIZES } from "@/lib/definitions";
+import { Product, Sizes } from "@/lib/types";
 import {
     buildProductUrl,
     checkStock,
@@ -15,6 +15,7 @@ import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
 import ProductImage from "@/ui/components/ProductImage";
 import Link from "next/link";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
+import { VALID_SIZES } from "@/lib/constants";
 
 export default function ProductGridTile({ product }: { product: Product }) {
     const { bag, addToBag } = useBagStore((state) => state);

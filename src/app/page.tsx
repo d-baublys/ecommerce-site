@@ -1,10 +1,10 @@
 import Carousel from "@/ui/components/Carousel";
 import { getFeaturedProducts, getProductData } from "@/lib/actions";
 import Link from "next/link";
-import { FEATURED_COUNT } from "@/lib/definitions";
 import BareLayout from "@/ui/layouts/BareLayout";
 import ProductImage from "@/ui/components/ProductImage";
 import { Metadata } from "next";
+import { FEATURED_COUNT } from "@/lib/constants";
 
 export const metadata: Metadata = {
     title: "Home | DB-Wear",

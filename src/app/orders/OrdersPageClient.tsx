@@ -1,6 +1,6 @@
 "use client";
 
-import { Order } from "@/lib/definitions";
+import { Order } from "@/lib/types";
 import OrderTile from "@/ui/components/cards/OrderTile";
 import FailureModal from "@/ui/components/overlays/FailureModal";
 import Modal from "@/ui/components/overlays/Modal";

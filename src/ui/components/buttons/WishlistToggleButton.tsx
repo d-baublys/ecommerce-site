@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/lib/definitions";
+import { Product } from "@/lib/types";
 import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
 import { useWishlistToggle } from "@/hooks/useWishlistToggle";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";

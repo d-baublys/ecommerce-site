@@ -1,4 +1,4 @@
-import { Product } from "@/lib/definitions";
+import { Product } from "@/lib/types";
 import { isolateInteraction } from "@/lib/utils";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { useEffect, useState } from "react";

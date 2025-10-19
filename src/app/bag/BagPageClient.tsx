@@ -5,7 +5,7 @@ import BagTile from "@/ui/components/cards/BagTile";
 import { useBagStore } from "@/stores/bagStore";
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
-import { MergedBagItem, Product } from "@/lib/definitions";
+import { MergedBagItem, Product } from "@/lib/types";
 import { getProductData } from "@/lib/actions";
 import { stringifyConvertPrice } from "@/lib/utils";
 import MainLayout from "@/ui/layouts/MainLayout";

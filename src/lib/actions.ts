@@ -8,7 +8,7 @@ import {
     Order as PrismaOrder,
     User,
 } from "@prisma/client";
-import { CredentialsError, ItemMetadata, Product } from "./definitions";
+import { ItemMetadata, Product } from "./types";
 import { prisma } from "./prisma";
 import {
     convertClientProduct,
@@ -16,6 +16,7 @@ import {
     hashPassword,
     mapStockForPrisma,
 } from "./utils";
+import { CredentialsError } from "./classes";
 
 export async function productAdd(productData: Product) {
     try {

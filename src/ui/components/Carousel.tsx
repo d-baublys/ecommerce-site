@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { IoChevronBackSharp, IoChevronForwardSharp } from "react-icons/io5";
 import { buildProductUrl, debounce } from "@/lib/utils";
-import { Product } from "@/lib/definitions";
+import { Product } from "@/lib/types";
 import ProductImage from "@/ui/components/ProductImage";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 

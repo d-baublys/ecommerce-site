@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserOrders } from "@/lib/actions";
-import { Order } from "@/lib/definitions";
+import { Order } from "@/lib/types";
 import ConfirmModal from "@/ui/components/overlays/ConfirmModal";
 import OrdersPageTemplate from "@/ui/pages/OrdersPageTemplate";
 import { convertPrismaOrders } from "@/lib/utils";

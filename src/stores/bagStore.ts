@@ -1,5 +1,5 @@
-import { BagItem, Sizes } from "@/lib/definitions";
-import { STORAGE_KEYS } from "@/lib/storageKeys";
+import { BagItem, Sizes } from "@/lib/types";
+import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

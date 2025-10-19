@@ -1,10 +1,10 @@
 "use client";
 
-import { PriceFilterKey, PRICE_FILTER_OPTIONS, Product, VALID_SIZES } from "@/lib/definitions";
+import { PriceFilterKey, Product, Sizes } from "@/lib/types";
 import AccordionSection from "./AccordionSection";
-import { Sizes } from "@/lib/definitions";
 import React, { useMemo } from "react";
 import FilterButton from "@/ui/components/buttons/FilterButton";
+import { PRICE_FILTER_OPTIONS, VALID_SIZES } from "@/lib/constants";
 
 export default function GridAside({
     allCategoryProducts,

@@ -2,7 +2,7 @@ import BagPage from "@/app/bag/page";
 import { createFakeBagItems, createFakeProduct, getFakeUpdatedData } from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { Product } from "@/lib/definitions";
+import { Product } from "@/lib/types";
 import { createBagItem } from "@/lib/utils";
 import { act } from "react";
 

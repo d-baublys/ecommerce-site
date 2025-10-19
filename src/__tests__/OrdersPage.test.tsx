@@ -2,7 +2,7 @@ import { createFakeOrderList } from "@/lib/test-factories";
 import { wrapWithErrorBoundary } from "@/lib/test-utils";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import OrdersPage from "@/app/orders/page";
-import { Order, PrismaOrderNoStock } from "@/lib/definitions";
+import { Order, PrismaOrderNoStock } from "@/lib/types";
 import { act } from "react";
 
 jest.mock("@/auth", () => ({

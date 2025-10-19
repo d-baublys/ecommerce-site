@@ -1,7 +1,8 @@
 "use client";
 
 import { updateOrder } from "@/lib/actions";
-import { Order, ORDER_STATUS_OPTIONS, ORDER_TABLE_COLUMNS } from "@/lib/definitions";
+import { ORDER_STATUS_OPTIONS, ORDER_TABLE_COLUMNS } from "@/lib/constants";
+import { Order } from "@/lib/types";
 import { processDateForClient, stringifyConvertPrice } from "@/lib/utils";
 import { useModalStore } from "@/stores/modalStore";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";

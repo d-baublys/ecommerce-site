@@ -1,6 +1,6 @@
 "use client";
 
-import { Product, Sizes, StockTableMode, VALID_SIZES } from "@/lib/definitions";
+import { Product, Sizes, StockTableMode } from "@/lib/types";
 import { isUnique, isValidSize } from "@/lib/utils";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import StockTableInput from "@/ui/components/forms/StockTableInput";
@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import RoundedTable from "@/ui/components/forms/RoundedTable";
 import TableHeadCell from "@/ui/components/forms/TableHeadCell";
 import TableBodyCell from "@/ui/components/forms/TableBodyCell";
+import { VALID_SIZES } from "@/lib/constants";
 
 interface ProductStockTableProps {
     savedDataObj: Product;

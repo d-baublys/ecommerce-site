@@ -1,7 +1,7 @@
 "use client";
 
 import { getProductData } from "@/lib/actions";
-import { Categories, Product } from "@/lib/definitions";
+import { Categories, Product } from "@/lib/types";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 import { debounce } from "@/lib/utils";
 import { useRouter } from "next/navigation";

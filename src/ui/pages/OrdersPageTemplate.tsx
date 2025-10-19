@@ -1,4 +1,4 @@
-import { Order } from "@/lib/definitions";
+import { Order } from "@/lib/types";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 import OrdersPageClient from "@/app/orders/OrdersPageClient";
 import ConstrainedLayout from "@/ui/layouts/ConstrainedLayout";

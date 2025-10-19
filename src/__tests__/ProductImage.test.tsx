@@ -1,4 +1,4 @@
-import { Product } from "@/lib/definitions";
+import { Product } from "@/lib/types";
 import { createFakeProduct } from "@/lib/test-factories";
 import ProductImage from "@/ui/components/ProductImage";
 import { screen, waitFor } from "@testing-library/dom";

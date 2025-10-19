@@ -1,16 +1,6 @@
 "use client";
 
-import {
-    Categories,
-    PRICE_FILTER_OPTIONS,
-    PriceFilterKey,
-    Product,
-    ProductSortKey,
-    Sizes,
-    SORT_OPTIONS,
-    VALID_CATEGORIES,
-    VALID_SIZES,
-} from "@/lib/definitions";
+import { Categories, PriceFilterKey, Product, ProductSortKey, Sizes } from "@/lib/types";
 import GridAside from "@/ui/components/product-grid/GridAside";
 import { useEffect, useRef, useState } from "react";
 import { extractFilters, extractSort } from "@/lib/utils";
@@ -23,6 +13,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 import LoadingIndicator from "@/ui/components/overlays/LoadingIndicator";
+import { PRICE_FILTER_OPTIONS, SORT_OPTIONS, VALID_CATEGORIES, VALID_SIZES } from "@/lib/constants";
 
 type PageOptions = {
     noAside?: boolean;

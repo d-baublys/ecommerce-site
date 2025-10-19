@@ -1,12 +1,13 @@
 "use client";
 
 import { clearFeaturedProducts, createFeaturedProducts } from "@/lib/actions";
-import { FEATURED_COUNT, Product } from "@/lib/definitions";
+import { Product } from "@/lib/types";
 import { areProductListsEqual } from "@/lib/utils";
 import SearchBar from "@/ui/components/SearchBar";
 import { useEffect, useState } from "react";
 import DisplayTile from "@/ui/components/cards/DisplayTile";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
+import { FEATURED_COUNT } from "@/lib/constants";
 
 export default function ManageFeaturedClient({ productData }: { productData: Product[] }) {
     const [savedFeaturedList, setSavedFeaturedList] = useState<Product[]>(productData);

@@ -1,17 +1,7 @@
 import { Stock as PrismaStock, Product as PrismaProduct, Prisma } from "@prisma/client";
-import {
-    BagItem,
-    Product,
-    Sizes,
-    VALID_CATEGORIES,
-    VALID_SIZES,
-    ProductSortKey,
-    SORT_OPTIONS,
-    REFUND_WINDOW,
-    PrismaOrderNoStock,
-    Order,
-} from "./definitions";
+import { BagItem, Product, Sizes, ProductSortKey, PrismaOrderNoStock, Order } from "./types";
 import bcrypt from "bcryptjs";
+import { REFUND_WINDOW, SORT_OPTIONS, VALID_CATEGORIES, VALID_SIZES } from "./constants";
 
 export function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number) {
     let timer: ReturnType<typeof setTimeout>;

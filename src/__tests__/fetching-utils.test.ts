@@ -1,11 +1,10 @@
-import { PriceFilterKey, ProductSortKey, Sizes } from "@/lib/definitions";
+import { Categories, PriceFilterKey, ProductSortKey, Sizes } from "@/lib/types";
 
 jest.mock("@/lib/actions", () => ({
     getProductData: jest.fn(),
 }));
 
 import { getProductData } from "@/lib/actions";
-import { Categories } from "@/lib/definitions";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 import { createFakeProductList } from "@/lib/test-factories";
 

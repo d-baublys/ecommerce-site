@@ -1,4 +1,4 @@
-import { Product } from "@/lib/definitions";
+import { Product } from "@/lib/types";
 import { pluralise } from "@/lib/utils";
 import ProductGrid from "@/ui/components/product-grid/ProductGrid";
 import PlainRoundedButtonLink from "../components/buttons/PlainRoundedButtonLink";

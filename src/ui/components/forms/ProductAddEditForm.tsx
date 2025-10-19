@@ -1,6 +1,6 @@
 "use client";
 
-import { Categories, Product, StockTableMode, VALID_CATEGORIES } from "@/lib/definitions";
+import { Categories, Product, StockTableMode } from "@/lib/types";
 import FormInput from "@/ui/components/forms/FormInput";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import { useEffect, useRef, useState } from "react";
@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import DeleteConfirmModal from "@/ui/components/overlays/DeleteConfirmModal";
 import DisplayTile from "@/ui/components/cards/DisplayTile";
 import Link from "next/link";
+import { VALID_CATEGORIES } from "@/lib/constants";
 
 export default function ProductAddEditForm({ productData }: { productData?: Product }) {
     const dataObj = productData ? productData : createEmptyProduct();

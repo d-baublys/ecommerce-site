@@ -15,7 +15,7 @@ import {
     updateOrder,
     updateStockOnPurchase,
 } from "@/lib/actions";
-import { Order, Product } from "@/lib/definitions";
+import { Order, Product } from "@/lib/types";
 import { prisma } from "@/lib/prisma";
 import {
     createFakeOrderPrisma,

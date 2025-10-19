@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/lib/definitions";
+import { Product } from "@/lib/types";
 import CloseButton from "@/ui/components/buttons/CloseButton";
 import ProductListTile from "@/ui/components/cards/ProductListTile";
 

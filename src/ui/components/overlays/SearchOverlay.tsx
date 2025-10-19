@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import SearchBar from "@/ui/components/SearchBar";
-import { Product } from "@/lib/definitions";
+import { Product } from "@/lib/types";
 import { useSearchStore } from "@/stores/searchStore";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import DarkBackdrop from "@/ui/components/overlays/DarkBackdrop";

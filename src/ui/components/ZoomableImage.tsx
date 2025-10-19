@@ -1,7 +1,7 @@
 "use client";
 
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
-import { Product } from "@/lib/definitions";
+import { Product } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
 import ProductImage from "@/ui/components/ProductImage";
 

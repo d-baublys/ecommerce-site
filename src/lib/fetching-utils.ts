@@ -1,13 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { getProductData } from "./actions";
-import {
-    Categories,
-    PRICE_FILTER_OPTIONS,
-    PriceFilterKey,
-    ProductSortKey,
-    Sizes,
-    SORT_OPTIONS,
-} from "./definitions";
+import { Categories, PriceFilterKey, ProductSortKey, Sizes } from "./types";
+import { PRICE_FILTER_OPTIONS, SORT_OPTIONS } from "./constants";
 
 export async function fetchFilteredProducts({
     category,

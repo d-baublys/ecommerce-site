@@ -2,14 +2,14 @@ import { OrderStatus, Prisma, Sizes as PrismaSizes } from "@prisma/client";
 import {
     CypressTestProductData,
     Sizes,
-    VALID_CATEGORIES,
     Categories,
     BagItem,
     Order,
     PrismaOrderNoStock,
     Product,
-} from "./definitions";
+} from "./types";
 import { convertClientProduct, processDateForClient, slugify } from "./utils";
+import { VALID_CATEGORIES } from "./constants";
 
 export function createFakeProduct({
     idx = 0,

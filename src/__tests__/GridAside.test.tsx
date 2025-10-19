@@ -1,4 +1,4 @@
-import { PriceFilterKey, Product, Sizes } from "@/lib/definitions";
+import { PriceFilterKey, Product, Sizes } from "@/lib/types";
 import { createFakeProductList } from "@/lib/test-factories";
 import { matchPriceRangeLabel, matchSizeLabel } from "@/lib/test-utils";
 import GridAside from "@/ui/components/product-grid/GridAside";

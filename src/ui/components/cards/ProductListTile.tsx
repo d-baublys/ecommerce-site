@@ -7,7 +7,7 @@ import {
     Product,
     ProductNoStock,
     Sizes,
-} from "@/lib/definitions";
+} from "@/lib/types";
 import Link from "next/link";
 import { buildProductUrl } from "@/lib/utils";
 import ProductImage from "@/ui/components/ProductImage";

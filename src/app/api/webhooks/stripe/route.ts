@@ -1,6 +1,6 @@
 import stripe from "@/lib/stripe";
 import { createOrder, updateStockOnPurchase } from "@/lib/actions";
-import { ItemMetadata } from "@/lib/definitions";
+import { ItemMetadata } from "@/lib/types";
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
 

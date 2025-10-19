@@ -13,7 +13,7 @@ import { updateOrder } from "@/lib/actions";
 import { SetStateAction } from "react";
 import { useRouter } from "next/navigation";
 import { Order as PrismaOrder } from "@prisma/client";
-import { Order } from "@/lib/definitions";
+import { Order } from "@/lib/types";
 
 interface OrderTileProps {
     orderData: Order;

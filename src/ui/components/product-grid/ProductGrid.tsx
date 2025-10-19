@@ -1,4 +1,4 @@
-import { Product } from "@/lib/definitions";
+import { Product } from "@/lib/types";
 import ProductGridTile from "@/ui/components/cards/ProductGridTile";
 
 export default function ProductGrid({ productList }: { productList: Product[] }) {

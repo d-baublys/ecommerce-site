@@ -1,6 +1,6 @@
 "use client";
 
-import { Categories, Product, VALID_CATEGORIES } from "@/lib/definitions";
+import { Categories, Product } from "@/lib/types";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -9,6 +9,7 @@ import SearchBar from "@/ui/components/SearchBar";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 import { buildAdminProductUrl } from "@/lib/utils";
+import { VALID_CATEGORIES } from "@/lib/constants";
 
 export default function AdminProductsClient() {
     const pathname = usePathname();
