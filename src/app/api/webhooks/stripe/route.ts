@@ -1,6 +1,6 @@
 import stripe from "@/lib/stripe";
-import { createOrder, updateStockOnPurchase } from "@/lib/actions";
-import { ItemMetadata } from "@/lib/types";
+import { createOrder, updateStock } from "@/lib/actions";
+import { OrderCreateInput, OrderItemCreateInput } from "@/lib/types";
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
 
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
             return new Response("Missing items metadata", { status: 400 });
         }
 
-        let items: ItemMetadata[];
+        let items: OrderItemCreateInput;
 
         try {
             items = JSON.parse(session.metadata.items);
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         if (paymentIntentId === null)
             return new Response("Payment intent data not found", { status: 400 });
 
-        const newOrder = await createOrder({
+        const orderObj: OrderCreateInput = {
             items,
             subTotal,
             shippingTotal,
@@ -64,14 +64,20 @@ export async function POST(req: NextRequest) {
             email,
             userId,
             paymentIntentId,
-        });
+        };
+
+        const newOrder = await createOrder(orderObj);
 
         if (!newOrder.success) {
             return new Response("Error creating new order", { status: 400 });
         }
 
         for (const item of items) {
-            const result = await updateStockOnPurchase(item.productId, item.size, item.quantity);
+            const result = await updateStock({
+                productId: item.productId,
+                size: item.size,
+                quantity: item.quantity,
+            });
             if (!result.success) {
                 return new Response("Error updating stock", { status: 400 });
             }

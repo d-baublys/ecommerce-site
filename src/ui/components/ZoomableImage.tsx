@@ -1,11 +1,11 @@
 "use client";
 
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
-import { Product } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
 import ProductImage from "@/ui/components/ProductImage";
+import { ClientProduct } from "@/lib/types";
 
-export default function ZoomableImage({ productData }: { productData: Product }) {
+export default function ZoomableImage({ productData }: { productData: ClientProduct }) {
     const [isScrollLocked, setIsScrollLocked] = useState<boolean>(false);
     const [isZoomActive, setIsZoomActive] = useState<boolean>(false);
     const parentRef = useRef<HTMLElement | null>(null);

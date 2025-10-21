@@ -1,6 +1,5 @@
-import { Order as PrismaOrder } from "@prisma/client";
-import { CypressTestDataDeleteParams, CypressTestProductData } from "../../../src/lib/definitions";
-import { FakeOrderCypressParams } from "../../../src/lib/test-factories";
+import { TestOrderCypressParams } from "../../../src/lib/test-factories";
+import { CypressTestDataDeleteParams, CypressTestProductData, Order } from "../../../src/lib/types";
 
 let orderIdArr: CypressTestDataDeleteParams["orderIdArr"] = [];
 let productIdArr: CypressTestDataDeleteParams["productIdArr"] = [];
@@ -23,27 +22,27 @@ describe("Admin orders page seeded tests", () => {
         cy.task("createCypressTestProduct").then((productData: CypressTestProductData) => {
             productIdArr.push(productData.id);
 
-            const quantities: FakeOrderCypressParams["quantitiesArr"][] = [[1], [2], [3]];
-            const statusArr: NonNullable<FakeOrderCypressParams["overrides"]>["status"][] = [
+            const quantities: TestOrderCypressParams["quantitiesArr"][] = [[1], [2], [3]];
+            const statusArr: NonNullable<TestOrderCypressParams["overrides"]>["status"][] = [
                 "paid",
                 "refunded",
                 "pendingReturn",
             ];
-            const createdAtArr: NonNullable<FakeOrderCypressParams["overrides"]>["createdAt"][] = [
+            const createdAtArr: NonNullable<TestOrderCypressParams["overrides"]>["createdAt"][] = [
                 new Date("2025-08-03"),
                 new Date("2025-08-01"),
                 new Date("2025-08-02"),
             ];
 
             const returnRequestedAtArr: NonNullable<
-                FakeOrderCypressParams["overrides"]
+                TestOrderCypressParams["overrides"]
             >["returnRequestedAt"][] = [null, new Date("2025-08-15"), new Date("2025-08-10")];
 
-            const refundedAtArr: NonNullable<FakeOrderCypressParams["overrides"]>["refundedAt"][] =
+            const refundedAtArr: NonNullable<TestOrderCypressParams["overrides"]>["refundedAt"][] =
                 [null, new Date("2025-08-20"), null];
 
             Array.from({ length: 3 }).forEach((_, idx) => {
-                const params: FakeOrderCypressParams = {
+                const params: TestOrderCypressParams = {
                     idx,
                     productsDataArr: [productData],
                     quantitiesArr: quantities[idx],
@@ -54,7 +53,7 @@ describe("Admin orders page seeded tests", () => {
                         refundedAt: refundedAtArr[idx],
                     },
                 };
-                cy.task("createCypressTestOrder", params).then((orderId: PrismaOrder["id"]) => {
+                cy.task("createCypressTestOrder", params).then((orderId: Order["id"]) => {
                     orderIdArr.push(orderId);
                 });
             });

@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { categorySchema, priceSchema, productNameSchema, quantitySchema, sizeSchema } from "./base";
+import { categorySchema, priceSchema, productIdSchema, productNameSchema } from "./base";
+import { clientStockSchema } from "./stock";
 
 export const productSchema = z.object({
     id: z.uuid(),
@@ -9,8 +10,9 @@ export const productSchema = z.object({
     slug: productNameSchema,
     src: z.string(),
     alt: z.string(),
-    dateAdded: z.iso.date(),
-    stock: z.partialRecord(sizeSchema, quantitySchema),
+    dateAdded: z.date(),
 });
-
-export const productNoStockSchema = productSchema.omit({ stock: true });
+export const productCreateSchema = productSchema.omit({ id: true });
+export const clientProductSchema = productSchema.extend({ stock: clientStockSchema });
+export const productCreateInputSchema = z.intersection(productCreateSchema, clientProductSchema);
+export const featuredProductSchema = z.object({ id: z.uuid(), productId: productIdSchema });

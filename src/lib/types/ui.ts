@@ -4,4 +4,4 @@ export type ProductFormMode = "add" | "edit";
 export type StockTableMode = ProductFormMode | "display";
 export type PriceFilterKey = keyof typeof PRICE_FILTER_OPTIONS;
 export type ProductSortKey = keyof typeof SORT_OPTIONS;
-export type OrderStatus = keyof typeof ORDER_STATUS_OPTIONS;
+export type OrderStatus = (typeof ORDER_STATUS_OPTIONS)[number]["key"];

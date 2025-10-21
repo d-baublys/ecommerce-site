@@ -1,13 +1,13 @@
 "use client";
 
-import { Product, Sizes, StockTableMode } from "@/lib/types";
+import { ClientStock, Product, Sizes, StockTableMode } from "@/lib/types";
 import { isValidStock } from "@/lib/utils";
 
 interface StockTableInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     type: "text" | "number";
     mode: StockTableMode;
     pairKey?: string | number;
-    stockObjSetter?: React.Dispatch<React.SetStateAction<Product["stock"]>>;
+    stockObjSetter?: React.Dispatch<React.SetStateAction<ClientStock>>;
     setNewSize?: React.Dispatch<React.SetStateAction<Sizes | undefined>>;
     setNewStock?: React.Dispatch<React.SetStateAction<number | undefined>>;
     isNew?: boolean;

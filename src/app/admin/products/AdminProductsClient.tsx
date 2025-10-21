@@ -1,6 +1,5 @@
 "use client";
 
-import { Categories, Product } from "@/lib/types";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -10,11 +9,12 @@ import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 import { buildAdminProductUrl } from "@/lib/utils";
 import { VALID_CATEGORIES } from "@/lib/constants";
+import { Categories, ClientProduct } from "@/lib/types";
 
 export default function AdminProductsClient() {
     const pathname = usePathname();
     const [filter, setFilter] = useState<Categories | null>(null);
-    const [unfilteredResults, setUnfilteredResults] = useState<Product[]>([]);
+    const [unfilteredResults, setUnfilteredResults] = useState<ClientProduct[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [isResultLoading, setIsResultLoading] = useState<boolean>(false);
     const querySet = unfilteredResults.filter((item) => {
@@ -61,7 +61,7 @@ export default function AdminProductsClient() {
                 {!isResultLoading ? (
                     (filter || searchQuery) && querySet.length > 0 ? (
                         <ul id="admin-products-container" className="flex flex-col w-full">
-                            {querySet.map((item: Product) => (
+                            {querySet.map((item: ClientProduct) => (
                                 <li key={item.id} className="mt-8">
                                     <Link href={buildAdminProductUrl(item.id)}>
                                         <DisplayTile productData={item} />

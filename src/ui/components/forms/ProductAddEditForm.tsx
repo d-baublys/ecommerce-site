@@ -1,6 +1,6 @@
 "use client";
 
-import { Categories, Product, StockTableMode } from "@/lib/types";
+import { Categories, ClientProduct, StockTableMode } from "@/lib/types";
 import FormInput from "@/ui/components/forms/FormInput";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import { useEffect, useRef, useState } from "react";
@@ -13,21 +13,22 @@ import {
     slugify,
     stringifyConvertPrice,
     buildProductUrl,
+    processDateForClient,
 } from "@/lib/utils";
 import { IoFolder } from "react-icons/io5";
 import ProductStockTable from "./ProductStockTable";
 import { useModalStore } from "@/stores/modalStore";
-import { productAdd, productDelete, productUpdate } from "@/lib/actions";
+import { createProduct, deleteProduct, updateProduct } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import DeleteConfirmModal from "@/ui/components/overlays/DeleteConfirmModal";
 import DisplayTile from "@/ui/components/cards/DisplayTile";
 import Link from "next/link";
 import { VALID_CATEGORIES } from "@/lib/constants";
 
-export default function ProductAddEditForm({ productData }: { productData?: Product }) {
-    const dataObj = productData ? productData : createEmptyProduct();
-    const [savedDataObj, setSavedDataObj] = useState<Product>(dataObj);
-    const [provisionalDataObj, setProvisionalDataObj] = useState<Product>(dataObj);
+export default function ProductAddEditForm({ productData }: { productData?: ClientProduct }) {
+    const dataObj: ClientProduct = productData ? productData : createEmptyProduct();
+    const [savedDataObj, setSavedDataObj] = useState<ClientProduct>(dataObj);
+    const [provisionalDataObj, setProvisionalDataObj] = useState<ClientProduct>(dataObj);
 
     const variant = productData ? "edit" : "add";
     const [tableMode, setTableMode] = useState<StockTableMode>("display");
@@ -87,7 +88,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                 slug: slugify(provisionalDataObj.name),
             };
             const dbAction =
-                variant === "add" ? await productAdd(dbObj) : await productUpdate(dbObj);
+                variant === "add" ? await createProduct(dbObj) : await updateProduct(dbObj);
 
             if (dbAction.success) {
                 setSavedDataObj(provisionalDataObj);
@@ -115,7 +116,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
 
         if (deleteConfirm) {
             try {
-                await productDelete(id);
+                await deleteProduct(id);
                 router.push(`./`);
             } catch {
                 setMessage("Error deleting product");
@@ -220,10 +221,13 @@ export default function ProductAddEditForm({ productData }: { productData?: Prod
                     name="date-added"
                     type="date"
                     onChange={(e) =>
-                        setProvisionalDataObj((prev) => ({ ...prev, dateAdded: e.target.value }))
+                        setProvisionalDataObj((prev) => ({
+                            ...prev,
+                            dateAdded: new Date(e.target.value),
+                        }))
                     }
                     legend="Date Added"
-                    value={provisionalDataObj.dateAdded}
+                    value={processDateForClient(provisionalDataObj.dateAdded)}
                 />
                 <ProductStockTable
                     savedDataObj={savedDataObj}

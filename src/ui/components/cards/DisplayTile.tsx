@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/lib/types";
+import { ClientProduct } from "@/lib/types";
 import CloseButton from "@/ui/components/buttons/CloseButton";
 import ProductListTile from "@/ui/components/cards/ProductListTile";
 
@@ -8,7 +8,7 @@ export default function DisplayTile({
     productData,
     handleDelete,
 }: {
-    productData: Product;
+    productData: ClientProduct;
     handleDelete?: () => void;
 }) {
     const buildEndContent = () => (

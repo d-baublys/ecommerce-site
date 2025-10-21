@@ -1,4 +1,4 @@
-import { createFakeOrderClient } from "@/lib/test-factories";
+import { createTestOrder } from "@/lib/test-factories";
 import OrderTile from "@/ui/components/cards/OrderTile";
 import { render, screen, waitFor } from "@testing-library/react";
 
@@ -13,11 +13,11 @@ jest.mock("@/lib/utils", () => ({
 
 import { checkIsWithinReturnWindow } from "@/lib/utils";
 
-const fakePaidOrder = createFakeOrderClient();
-const fakePendingOrder = createFakeOrderClient({
+const testPaidOrder = createTestOrder();
+const testPendingOrder = createTestOrder({
     overrides: { status: "pendingReturn", returnRequestedAt: new Date("2025-08-02") },
 });
-const fakeRefundedOrder = createFakeOrderClient({
+const testRefundedOrder = createTestOrder({
     overrides: {
         status: "refunded",
         returnRequestedAt: new Date("2025-08-02"),
@@ -28,7 +28,7 @@ const fakeRefundedOrder = createFakeOrderClient({
 const renderPaidOrderTile = () =>
     render(
         <OrderTile
-            orderData={fakePaidOrder}
+            orderData={testPaidOrder}
             messageSetter={messageSetterMock}
             openSuccessModal={openSuccessModalMock}
             openFailureModal={openFailureModalMock}
@@ -37,7 +37,7 @@ const renderPaidOrderTile = () =>
 const renderPendingOrderTile = () =>
     render(
         <OrderTile
-            orderData={fakePendingOrder}
+            orderData={testPendingOrder}
             messageSetter={messageSetterMock}
             openSuccessModal={openSuccessModalMock}
             openFailureModal={openFailureModalMock}
@@ -46,7 +46,7 @@ const renderPendingOrderTile = () =>
 const renderRefundedOrderTile = () =>
     render(
         <OrderTile
-            orderData={fakeRefundedOrder}
+            orderData={testRefundedOrder}
             messageSetter={messageSetterMock}
             openSuccessModal={openSuccessModalMock}
             openFailureModal={openFailureModalMock}

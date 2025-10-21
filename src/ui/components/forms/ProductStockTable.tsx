@@ -1,6 +1,6 @@
 "use client";
 
-import { Product, Sizes, StockTableMode } from "@/lib/types";
+import { ClientProduct, ClientStock, Sizes, StockTableMode } from "@/lib/types";
 import { isUnique, isValidSize } from "@/lib/utils";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import StockTableInput from "@/ui/components/forms/StockTableInput";
@@ -12,9 +12,9 @@ import TableBodyCell from "@/ui/components/forms/TableBodyCell";
 import { VALID_SIZES } from "@/lib/constants";
 
 interface ProductStockTableProps {
-    savedDataObj: Product;
-    provisionalDataObj: Product;
-    setProvisionalDataObj: React.Dispatch<React.SetStateAction<Product>>;
+    savedDataObj: ClientProduct;
+    provisionalDataObj: ClientProduct;
+    setProvisionalDataObj: React.Dispatch<React.SetStateAction<ClientProduct>>;
     tableMode: StockTableMode;
     setTableMode: React.Dispatch<React.SetStateAction<StockTableMode>>;
 }
@@ -26,7 +26,7 @@ export default function ProductStockTable({
     tableMode,
     setTableMode,
 }: ProductStockTableProps) {
-    const [localStockObj, setLocalStockObj] = useState<Product["stock"]>(savedDataObj.stock);
+    const [localStockObj, setLocalStockObj] = useState<ClientStock>(savedDataObj.stock);
 
     const [message, setMessage] = useState<string>();
     const [newSize, setNewSize] = useState<Sizes>();

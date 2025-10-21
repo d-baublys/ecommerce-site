@@ -1,5 +1,13 @@
-import { Stock as PrismaStock, Product as PrismaProduct, Prisma } from "@prisma/client";
-import { BagItem, Product, Sizes, ProductSortKey, PrismaOrderNoStock, Order } from "./types";
+import {
+    BagItem,
+    Product,
+    Sizes,
+    ProductSortKey,
+    ClientProduct,
+    Stock,
+    ClientStock,
+    StockCreateInput,
+} from "./types";
 import bcrypt from "bcryptjs";
 import { REFUND_WINDOW, SORT_OPTIONS, VALID_CATEGORIES, VALID_SIZES } from "./constants";
 
@@ -13,7 +21,11 @@ export function debounce<T extends (...args: unknown[]) => void>(func: T, delay:
     };
 }
 
-export function checkStock(productData: Product, productSize: Sizes, bag: BagItem[]): boolean {
+export function checkStock(
+    productData: ClientProduct,
+    productSize: Sizes,
+    bag: BagItem[]
+): boolean {
     const stock = productData.stock[productSize as keyof typeof productData.stock] ?? 0;
 
     const existing = bag.find(
@@ -32,7 +44,7 @@ export function isValidSize(value: string): value is Sizes {
     return VALID_SIZES.includes(value as Sizes);
 }
 
-export function isUnique(value: string, stockObj: Product["stock"]) {
+export function isUnique(value: string, stockObj: ClientStock) {
     return !Object.entries(stockObj).find(([size]) => size === value);
 }
 
@@ -64,7 +76,7 @@ export function formatImagePath(filePath: string): string {
     return `/${filePath}`;
 }
 
-export function createEmptyProduct(): Product {
+export function createEmptyProduct(): ClientProduct {
     return {
         id: "",
         name: "",
@@ -73,44 +85,25 @@ export function createEmptyProduct(): Product {
         slug: "",
         src: "",
         alt: "",
-        dateAdded: processDateForClient(),
+        dateAdded: new Date(),
         stock: {},
     };
 }
 
-export function convertPrismaProduct(product: PrismaProduct & { stock: PrismaStock[] }): Product {
+export function convertPrismaProduct(product: Product & { stock: Stock[] }): ClientProduct {
     return {
         ...product,
-        dateAdded: processDateForClient(product.dateAdded),
         stock: buildStockObjForClient(product.stock),
     };
 }
 
 export function convertMultiplePrismaProducts(
-    products: (PrismaProduct & { stock: PrismaStock[] })[]
-): Product[] {
+    products: (Product & { stock: Stock[] })[]
+): ClientProduct[] {
     return products.reduce(
         (arr, current) => [...arr, convertPrismaProduct(current)],
-        [] as Product[]
+        [] as ClientProduct[]
     );
-}
-
-export function convertPrismaOrders(data: PrismaOrderNoStock[]): Order[] {
-    return data.map((order) => ({
-        ...order,
-        items: order.items.map((item) => ({
-            ...item,
-            product: {
-                ...item.product,
-                dateAdded: processDateForClient(item.product.dateAdded),
-            },
-        })),
-    }));
-}
-
-export function convertClientProduct(product: Product): PrismaProduct {
-    const { stock, ...rest } = product;
-    return { ...rest, dateAdded: new Date(rest.dateAdded) };
 }
 
 export function containsClick(
@@ -126,7 +119,7 @@ export function areProductListsEqual(listA: Product[], listB: Product[]): boolea
     return listA.every((productA, idx) => productA.id === listB[idx].id);
 }
 
-function areStocksEqual(stockA: Product["stock"], stockB: Product["stock"]): boolean {
+function areStocksEqual(stockA: ClientStock, stockB: ClientStock): boolean {
     const keysA = Object.keys(stockA) as Sizes[];
     const keysB = Object.keys(stockB) as Sizes[];
 
@@ -134,8 +127,8 @@ function areStocksEqual(stockA: Product["stock"], stockB: Product["stock"]): boo
     return keysA.every((key) => stockA[key] === stockB[key]);
 }
 
-export function areProductsEqual(productA: Product, productB: Product): boolean {
-    for (const key of Object.keys(productA) as (keyof Product)[]) {
+export function areProductsEqual(productA: ClientProduct, productB: ClientProduct): boolean {
+    for (const key of Object.keys(productA) as (keyof ClientProduct)[]) {
         if (key === "stock") continue;
 
         if (productA[key] !== productB[key]) {
@@ -146,7 +139,7 @@ export function areProductsEqual(productA: Product, productB: Product): boolean 
     return areStocksEqual(productA.stock, productB.stock);
 }
 
-export function mapStockForPrisma(productData: Product): Prisma.StockCreateManyArgs["data"] {
+export function mapStockForPrisma(productData: ClientProduct): StockCreateInput[] {
     return Object.entries(productData.stock).map(([size, quantity]) => ({
         productId: productData.id,
         size: size as Sizes,
@@ -154,15 +147,16 @@ export function mapStockForPrisma(productData: Product): Prisma.StockCreateManyA
     }));
 }
 
-export function buildStockObjForClient(stock: PrismaStock[]): Product["stock"] {
+export function buildStockObjForClient(stock: Stock[]): ClientStock {
     return stock.reduce((acc, stockItem) => {
         acc[stockItem.size] = stockItem.quantity;
         return acc;
-    }, {} as Product["stock"]);
+    }, {} as ClientStock);
 }
 
 export function processDateForClient(date?: Date): string {
-    return (date ? date : new Date()).toISOString().split("T")[0];
+    const validDate = date instanceof Date && !isNaN(date.getTime()) ? date : new Date();
+    return validDate.toISOString().split("T")[0];
 }
 
 export function processDateForClientDate(date?: Date): string {
@@ -201,7 +195,7 @@ export function escapeRegExp(string: string): string {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export function createBagItem(product: Product, size: Sizes): BagItem {
+export function createBagItem(product: ClientProduct, size: Sizes): BagItem {
     return { product, size, quantity: 1 };
 }
 

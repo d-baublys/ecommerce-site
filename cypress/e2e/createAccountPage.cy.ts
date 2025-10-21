@@ -20,7 +20,7 @@ describe("Create account page base tests", () => {
         cy.get("input[name='password']").type("password123");
         cy.get("input[name='password-confirm']").type("password123");
         cy.get("button[type='submit']").click();
-        cy.contains("Invalid email address provided.").should("be.visible");
+        cy.contains("Invalid email address.").should("be.visible");
     });
 
     it("shows error message when provided email is already used", () => {

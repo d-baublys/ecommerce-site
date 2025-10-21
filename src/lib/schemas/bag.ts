@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { productSchema } from "./product";
+import { clientProductSchema } from "./product";
 import { quantitySchema, sizeSchema } from "./base";
 
 export const bagItemSchema = z.object({
-    product: productSchema,
+    product: clientProductSchema,
     size: sizeSchema,
     quantity: quantitySchema,
 });

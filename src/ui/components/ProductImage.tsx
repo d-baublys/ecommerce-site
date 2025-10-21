@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/lib/types";
+import { ClientProduct } from "@/lib/types";
 import { getSkeletonSweep } from "@/lib/ui-class-repo";
 import Image from "next/image";
 import { useState } from "react";
@@ -9,7 +9,7 @@ export default function ProductImage({
     product,
     overrideClasses,
 }: {
-    product: Product | { src: string; alt: string };
+    product: ClientProduct | { src: string; alt: string };
     overrideClasses?: string;
 }) {
     const [isImgLoaded, setIsImgLoaded] = useState<boolean>(false);

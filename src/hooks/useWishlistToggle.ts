@@ -1,9 +1,9 @@
-import { Product } from "@/lib/types";
+import { ClientProduct } from "@/lib/types";
 import { isolateInteraction } from "@/lib/utils";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { useEffect, useState } from "react";
 
-export function useWishlistToggle(product: Product) {
+export function useWishlistToggle(product: ClientProduct) {
     const [isAnimated, setIsAnimated] = useState<boolean>(false);
 
     const { wishlist, addToWishlist, removeFromWishlist } = useWishlistStore((state) => state);

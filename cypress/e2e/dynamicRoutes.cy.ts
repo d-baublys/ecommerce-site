@@ -1,4 +1,4 @@
-import { CypressTestProductData } from "../../src/lib/definitions";
+import { CypressTestProductData } from "../../src/lib/types";
 import { buildProductUrl } from "../../src/lib/utils";
 
 let testProductLink: string;
@@ -23,7 +23,7 @@ describe("Dynamic route redirects", () => {
     });
 
     it("redirects 'products' routes without a slug segment", () => {
-        cy.visit("/products/test-id-1");
+        cy.visit("/products/aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1");
         cy.location("pathname").should("eq", "/category/all");
     });
 

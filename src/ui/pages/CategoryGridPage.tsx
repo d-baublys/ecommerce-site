@@ -1,6 +1,6 @@
 "use client";
 
-import { Categories, PriceFilterKey, Product, ProductSortKey, Sizes } from "@/lib/types";
+import { Categories, ClientProduct, PriceFilterKey, ProductSortKey, Sizes } from "@/lib/types";
 import GridAside from "@/ui/components/product-grid/GridAside";
 import { useEffect, useRef, useState } from "react";
 import { extractFilters, extractSort } from "@/lib/utils";
@@ -41,8 +41,8 @@ export default function CategoryGridPage({
         paramsGetter.get("sort"),
     ];
 
-    const [allCategoryProducts, setAllCategoryProducts] = useState<Product[]>();
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>();
+    const [allCategoryProducts, setAllCategoryProducts] = useState<ClientProduct[]>();
+    const [filteredProducts, setFilteredProducts] = useState<ClientProduct[]>();
 
     const [sizeFilters, setSizeFilters] = useState<Sizes[]>(
         extractFilters<Sizes>(currSizeFilters, VALID_SIZES)

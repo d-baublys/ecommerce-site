@@ -1,5 +1,5 @@
 import Carousel from "@/ui/components/Carousel";
-import { getFeaturedProducts, getProductData } from "@/lib/actions";
+import { getFeaturedProducts, getProducts } from "@/lib/actions";
 import Link from "next/link";
 import BareLayout from "@/ui/layouts/BareLayout";
 import ProductImage from "@/ui/components/ProductImage";
@@ -15,7 +15,7 @@ export default async function HomePage() {
     let featuredList = featuredFetch.data;
 
     if (!featuredList.length) {
-        const fallbackFetch = await getProductData();
+        const fallbackFetch = await getProducts();
 
         const fallbackData = fallbackFetch.data;
 

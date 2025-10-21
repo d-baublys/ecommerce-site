@@ -1,4 +1,4 @@
-import { createLongProductList, getFilteredFakeProducts } from "@/lib/test-factories";
+import { createLongProductList, getFilteredTestProducts } from "@/lib/test-factories";
 import { render, screen, waitFor, within } from "@testing-library/react";
 
 jest.mock("@/lib/actions", () => ({
@@ -6,19 +6,19 @@ jest.mock("@/lib/actions", () => ({
     getFeaturedProducts: jest.fn(),
 }));
 
-import { getFeaturedProducts, getProductData } from "@/lib/actions";
+import { getFeaturedProducts, getProducts } from "@/lib/actions";
 import HomePage from "@/app/page";
 
 const renderHomePage = async () => render(await HomePage());
-const fakeFeaturedList = getFilteredFakeProducts();
-const fakeProductList = createLongProductList();
+const testFeaturedList = getFilteredTestProducts();
+const testProductList = createLongProductList();
 
 Element.prototype.scrollIntoView = jest.fn();
 window.scrollTo = jest.fn();
 
 describe("HomePage", () => {
     it("displays an extant featured product list", async () => {
-        (getFeaturedProducts as jest.Mock).mockResolvedValue({ data: fakeFeaturedList });
+        (getFeaturedProducts as jest.Mock).mockResolvedValue({ data: testFeaturedList });
         renderHomePage();
 
         await waitFor(() => {
@@ -30,7 +30,7 @@ describe("HomePage", () => {
 
     it("displays a fallback slice of all products if featured product list doesn't exist", async () => {
         (getFeaturedProducts as jest.Mock).mockResolvedValue({ data: [] });
-        (getProductData as jest.Mock).mockResolvedValue({ data: fakeProductList });
+        (getProducts as jest.Mock).mockResolvedValue({ data: testProductList });
         renderHomePage();
 
         await waitFor(() => {
@@ -42,14 +42,14 @@ describe("HomePage", () => {
 
     it("throws an error when first fetch fails", async () => {
         (getFeaturedProducts as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
-        (getProductData as jest.Mock).mockResolvedValue({ data: fakeProductList });
+        (getProducts as jest.Mock).mockResolvedValue({ data: testProductList });
 
         expect(renderHomePage()).rejects.toThrow("Fetch failed");
     });
 
     it("displays fallback when both featured and product lists are empty", async () => {
         (getFeaturedProducts as jest.Mock).mockResolvedValue({ data: [] });
-        (getProductData as jest.Mock).mockResolvedValue({ data: [] });
+        (getProducts as jest.Mock).mockResolvedValue({ data: [] });
         renderHomePage();
 
         await waitFor(() => {

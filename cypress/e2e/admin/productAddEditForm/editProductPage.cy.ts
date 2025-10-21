@@ -1,13 +1,13 @@
+import { createTestProduct } from "../../../../src/lib/test-factories";
 import {
     CypressTestDataDeleteParams,
     CypressTestProductData,
     Product,
-} from "../../../../src/lib/definitions";
-import { createFakeProduct } from "../../../../src/lib/test-factories";
-import { buildAdminProductUrl } from "../../../../src/lib/utils";
+} from "../../../../src/lib/types";
+import { buildAdminProductUrl, processDateForClient } from "../../../../src/lib/utils";
 
 let productIdArr: CypressTestDataDeleteParams["productIdArr"] = [];
-const testProduct: Product = createFakeProduct();
+const testProduct: Product = createTestProduct();
 let testProductLink: string;
 
 describe("Edit product page", () => {
@@ -52,7 +52,10 @@ describe("Edit product page", () => {
         cy.get("input[name='product-price']").should("have.value", "25.00");
         cy.get("#file-dialog-unit p").should("have.text", "nonexistent-img-1.jpg");
         cy.get("input[name='image-description']").should("have.value", testProduct.alt);
-        cy.get("input[name='date-added']").should("have.value", testProduct.dateAdded);
+        cy.get("input[name='date-added']").should(
+            "have.value",
+            processDateForClient(testProduct.dateAdded)
+        );
         cy.get("[data-cy='quantity-input']").last().should("have.value", "12");
     });
 

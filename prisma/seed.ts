@@ -201,8 +201,8 @@ async function seedUsers() {
         throw new Error("Missing standard user email or password env variables.");
     }
 
-    await createUser(adminEmail, adminPassword, "admin");
-    await createUser(standardEmail, standardPassword, "user");
+    await createUser({ email: adminEmail, password: adminPassword, role: "admin" });
+    await createUser({ email: standardEmail, password: standardPassword, role: "user" });
 }
 
 async function main() {

@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { productNoStockSchema, productSchema } from "./product";
+import { productSchema } from "./product";
 import {
+    incrementedIdSchema,
     orderStatusSchema,
     priceSchema,
     productNameSchema,
@@ -16,23 +17,41 @@ export const itemMetadataSchema = z.object({
     quantity: quantitySchema,
 });
 
-export const clientOrderItemWithProductNoStockSchema = z.intersection(
-    itemMetadataSchema,
-    z.object({ product: productNoStockSchema })
-);
+export const orderItemSchema = itemMetadataSchema.extend({
+    id: z.uuid(),
+});
+
+export const orderItemClientSchema = orderItemSchema.extend({ product: productSchema });
+
+export const orderItemCreateSchema = z.array(orderItemSchema.omit({ id: true }));
 
 export const orderSchema = z.object({
-    id: z.int().positive(),
+    id: incrementedIdSchema,
     subTotal: priceSchema,
     shippingTotal: priceSchema,
     total: priceSchema,
     status: orderStatusSchema,
-    userId: z.int().positive().nullable(),
+    userId: incrementedIdSchema.nullable(),
     email: z.email(),
     createdAt: z.date(),
     returnRequestedAt: z.date().nullable(),
     refundedAt: z.date().nullable(),
     sessionId: z.string(),
     paymentIntentId: z.string(),
-    items: z.array(clientOrderItemWithProductNoStockSchema),
+    items: z.array(orderItemSchema),
 });
+
+export const clientOrderSchema = orderSchema.extend({ items: z.array(orderItemClientSchema) });
+
+export const orderCreateSchema = orderSchema
+    .omit({
+        id: true,
+    })
+    .extend({
+        userId: orderSchema.shape.userId.optional(),
+        status: orderSchema.shape.status.optional(),
+        createdAt: orderSchema.shape.createdAt.optional(),
+        returnRequestedAt: orderSchema.shape.returnRequestedAt.optional(),
+        refundedAt: orderSchema.shape.refundedAt.optional(),
+        items: orderItemCreateSchema,
+    });

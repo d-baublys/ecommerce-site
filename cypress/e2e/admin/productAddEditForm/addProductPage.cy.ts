@@ -1,9 +1,9 @@
-import { CypressTestDataDeleteParams } from "../../../../src/lib/definitions";
-import { createFakeProduct } from "../../../../src/lib/test-factories";
+import { createTestProduct } from "../../../../src/lib/test-factories";
+import { CypressTestDataDeleteParams } from "../../../../src/lib/types";
 import { processDateForClient, stringifyConvertPrice } from "../../../../src/lib/utils";
 
 let productNameArr: CypressTestDataDeleteParams["productNameArr"] = [];
-const testProduct = createFakeProduct();
+const testProduct = createTestProduct();
 
 describe("Add product page", () => {
     beforeEach(() => {
@@ -20,7 +20,7 @@ describe("Add product page", () => {
             .type(`${stringifyConvertPrice(testProduct.price)}`);
         cy.get("input[name='image-path']").attachFile("test-image.png");
         cy.get("input[name='image-description']").type(testProduct.alt);
-        cy.get("input[name='date-added']").type(testProduct.dateAdded);
+        cy.get("input[name='date-added']").type(processDateForClient(testProduct.dateAdded));
         cy.get("#stock-table-button-container").contains("button", "+ Add Size").click();
         cy.get("[data-cy='size-input']").last().type("s");
         cy.get("[data-cy='quantity-input']").last().type("10");

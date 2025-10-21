@@ -1,5 +1,5 @@
-import { createFakeProduct } from "../../../../src/lib/test-factories";
-import { stringifyConvertPrice } from "../../../../src/lib/utils";
+import { createTestProduct } from "../../../../src/lib/test-factories";
+import { processDateForClient, stringifyConvertPrice } from "../../../../src/lib/utils";
 
 describe("Product add/edit form base tests", () => {
     beforeEach(() => {
@@ -44,7 +44,7 @@ describe("Product add/edit form base tests", () => {
     });
 
     it("shows error message if stock table is left empty", () => {
-        const testProduct = createFakeProduct();
+        const testProduct = createTestProduct();
 
         cy.get("input[name='product-name']").type(testProduct.name);
         cy.get("select[name='product-category']").select(testProduct.gender);
@@ -53,7 +53,7 @@ describe("Product add/edit form base tests", () => {
             .type(`${stringifyConvertPrice(testProduct.price)}`);
         cy.get("input[name='image-path']").attachFile("test-image.png");
         cy.get("input[name='image-description']").type(testProduct.alt);
-        cy.get("input[name='date-added']").type(testProduct.dateAdded);
+        cy.get("input[name='date-added']").type(processDateForClient(testProduct.dateAdded));
         cy.get("#overall-action-container").contains("button", "Add").click();
         cy.get("#overall-message-container")
             .contains("Invalid data values. Please check and try again.")

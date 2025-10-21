@@ -59,7 +59,7 @@ export default function LoginSignUpPage({ variant }: { variant: "login" | "signu
         }
 
         try {
-            await createUser(email, password);
+            await createUser({ email, password });
             setIsModalOpen(true);
         } catch (error) {
             if (error instanceof Error && error.name === "CredentialsError") {

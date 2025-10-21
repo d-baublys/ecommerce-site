@@ -1,4 +1,4 @@
-import { getFilteredFakeProducts } from "@/lib/test-factories";
+import { getFilteredTestProducts } from "@/lib/test-factories";
 import { render, screen, waitFor } from "@testing-library/react";
 
 jest.mock("next/navigation", () => ({
@@ -9,11 +9,11 @@ import { useWishlistStore } from "@/stores/wishlistStore";
 import WishlistPage from "@/app/wishlist/page";
 
 const { addToWishlist, clearWishlist } = useWishlistStore.getState();
-const fakeProductList = getFilteredFakeProducts();
+const testProductList = getFilteredTestProducts();
 
 const renderWishlistPage = () => render(<WishlistPage />);
-const setUpFakeWishlist = () =>
-    fakeProductList.forEach((item) => {
+const setUpTestWishlist = () =>
+    testProductList.forEach((item) => {
         addToWishlist(item);
     });
 const getAllTiles = () => screen.getAllByTestId("product-tile");
@@ -24,7 +24,7 @@ describe("WishlistPage", () => {
     });
 
     it("shows correct number of items", async () => {
-        setUpFakeWishlist();
+        setUpTestWishlist();
         renderWishlistPage();
 
         await waitFor(() => {

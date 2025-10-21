@@ -1,6 +1,6 @@
 "use client";
 
-import { PriceFilterKey, Product, Sizes } from "@/lib/types";
+import { ClientProduct, PriceFilterKey, Sizes } from "@/lib/types";
 import AccordionSection from "./AccordionSection";
 import React, { useMemo } from "react";
 import FilterButton from "@/ui/components/buttons/FilterButton";
@@ -13,7 +13,7 @@ export default function GridAside({
     priceFilters,
     setPriceFilters,
 }: {
-    allCategoryProducts: Product[];
+    allCategoryProducts: ClientProduct[];
     sizeFilters: Sizes[];
     setSizeFilters: React.Dispatch<React.SetStateAction<Sizes[]>>;
     priceFilters: PriceFilterKey[];

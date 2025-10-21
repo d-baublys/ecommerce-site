@@ -1,4 +1,4 @@
-import { createFakeProduct } from "@/lib/test-factories";
+import { createTestProduct } from "@/lib/test-factories";
 import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
 import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import { render } from "@testing-library/react";
@@ -8,11 +8,11 @@ import { axe, toHaveNoViolations } from "jest-axe";
 
 expect.extend(toHaveNoViolations);
 
-const fakeProduct = createFakeProduct();
+const testProduct = createTestProduct();
 const getLatestWishlist = () => useWishlistStore.getState().wishlist;
 const { clearWishlist, addToWishlist } = useWishlistStore.getState();
 
-const renderIcon = () => render(<WishlistToggleIcon product={fakeProduct} iconSize={24} />);
+const renderIcon = () => render(<WishlistToggleIcon product={testProduct} iconSize={24} />);
 
 describe("WishlistToggleIcon", () => {
     beforeEach(() => {
@@ -57,14 +57,14 @@ describe("WishlistToggleIcon", () => {
         await waitFor(() => {
             const wishlist = getLatestWishlist();
 
-            expect(wishlist.some((item) => item.id === fakeProduct.id)).toBe(true);
+            expect(wishlist.some((item) => item.id === testProduct.id)).toBe(true);
             expect(screen.getByTestId("outline-heart")).toBeInTheDocument();
             expect(screen.getByTestId("filled-heart")).toHaveClass("show-filled");
         });
     });
 
     it("removes item from store & hides filled heart when clicking wishlisted item", async () => {
-        addToWishlist(fakeProduct);
+        addToWishlist(testProduct);
 
         renderIcon();
         const icon = screen.getByLabelText("Add or remove from wishlist");
@@ -79,7 +79,7 @@ describe("WishlistToggleIcon", () => {
         await waitFor(() => {
             const wishlist = getLatestWishlist();
 
-            expect(wishlist.some((item) => item.id === fakeProduct.id)).toBe(false);
+            expect(wishlist.some((item) => item.id === testProduct.id)).toBe(false);
             expect(screen.getByTestId("outline-heart")).toBeInTheDocument();
             expect(screen.getByTestId("filled-heart")).not.toHaveClass("show-filled");
         });
@@ -97,7 +97,7 @@ describe("WishlistToggleIcon", () => {
         });
 
         const wishlist = getLatestWishlist();
-        const occurrences = wishlist.filter((item) => item.id === fakeProduct.id).length;
+        const occurrences = wishlist.filter((item) => item.id === testProduct.id).length;
 
         expect(occurrences).toBe(0);
     });

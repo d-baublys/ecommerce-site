@@ -1,4 +1,5 @@
-import { Order, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { Order } from "./types";
 
 export const VALID_SIZES = ["xs", "s", "m", "l", "xl", "xxl"] as const;
 export const VALID_CATEGORIES = [
