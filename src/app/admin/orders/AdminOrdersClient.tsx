@@ -1,12 +1,8 @@
 "use client";
 
 import { updateOrder } from "@/lib/actions";
-import {
-    ORDER_STATUS_OPTIONS,
-    ORDER_TABLE_COLUMNS,
-    OrderNoItems,
-    OrderStatus,
-} from "@/lib/definitions";
+import { ORDER_STATUS_OPTIONS, ORDER_TABLE_COLUMNS } from "@/lib/constants";
+import { Order } from "@/lib/types";
 import { processDateForClient, stringifyConvertPrice } from "@/lib/utils";
 import { useModalStore } from "@/stores/modalStore";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
@@ -21,11 +17,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaSort } from "react-icons/fa";
 
-export default function AdminOrdersClient({ ordersData }: { ordersData: OrderNoItems[] }) {
+export default function AdminOrdersClient({ ordersData }: { ordersData: Order[] }) {
     const columns = ORDER_TABLE_COLUMNS.map((columnData) => columnData.key);
     type TableColumns = (typeof columns)[number];
     type OrderOptions = "asc" | "desc";
-    const [sortedData, setSortedData] = useState<OrderNoItems[]>(ordersData);
+    const [sortedData, setSortedData] = useState<Order[]>(ordersData);
     const [sortColumn, setSortColumn] = useState<TableColumns>("returnRequestedAt");
     const [sortOrder, setSortOrder] = useState<OrderOptions>("desc");
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState<boolean>(false);
@@ -34,7 +30,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderNoI
     const { openModal } = useModalStore((state) => state);
     const router = useRouter();
 
-    const requestRefund = async (orderId: OrderNoItems["id"]) => {
+    const requestRefund = async (orderId: Order["id"]) => {
         const res = await fetch("/api/refund", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -49,8 +45,8 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderNoI
     };
 
     function compareValues<K extends TableColumns>(
-        a: OrderNoItems[K],
-        b: OrderNoItems[K],
+        a: Order[K],
+        b: Order[K],
         order: OrderOptions
     ): number {
         let result: number = 0;
@@ -90,7 +86,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderNoI
         });
     }, [sortOrder, sortColumn]);
 
-    const handleApproval = async (orderId: OrderNoItems["id"]) => {
+    const handleApproval = async (orderId: Order["id"]) => {
         const returnConfirm = await openModal();
 
         if (returnConfirm) {
@@ -120,20 +116,20 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: OrderNoI
     };
 
     const processCellData = (
-        cellData: string | number | Date | null,
+        inputData: string | number | Date | null,
         column: (typeof ORDER_TABLE_COLUMNS)[number]
     ) => {
-        if (cellData instanceof Date) {
-            return processDateForClient(cellData);
+        if (inputData instanceof Date) {
+            return processDateForClient(inputData);
         } else if (column.key === "status") {
-            return ORDER_STATUS_OPTIONS[cellData as OrderStatus];
+            return ORDER_STATUS_OPTIONS.find((s) => s.key === inputData)!.label;
         } else if (
-            typeof cellData === "number" &&
+            typeof inputData === "number" &&
             (column.key === "subTotal" || column.key === "shippingTotal" || column.key === "total")
         ) {
-            return `£${stringifyConvertPrice(cellData)}`;
+            return `£${stringifyConvertPrice(inputData)}`;
         } else {
-            return cellData;
+            return inputData;
         }
     };
 

@@ -1,4 +1,4 @@
-import { CypressTestProductData } from "../../src/lib/definitions";
+import { CypressTestProductData } from "../../src/lib/types";
 import { buildProductUrl } from "../../src/lib/utils";
 
 let testProductLink: string;

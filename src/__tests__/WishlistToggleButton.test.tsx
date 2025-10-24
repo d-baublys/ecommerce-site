@@ -1,4 +1,4 @@
-import { createFakeProduct } from "@/lib/test-factories";
+import { createTestProduct } from "@/lib/test-factories";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import WishlistToggleButton from "@/ui/components/buttons/WishlistToggleButton";
 import { fireEvent, render, waitFor } from "@testing-library/react";
@@ -7,7 +7,7 @@ import { axe, toHaveNoViolations } from "jest-axe";
 
 expect.extend(toHaveNoViolations);
 
-const fakeProduct = createFakeProduct();
+const testProduct = createTestProduct();
 const getLatestWishlist = () => useWishlistStore.getState().wishlist;
 const { clearWishlist, addToWishlist } = useWishlistStore.getState();
 
@@ -17,7 +17,7 @@ describe("WishlistToggleButton", () => {
     });
 
     it("adds product to the wishlist when clicked & shows correct text", async () => {
-        const { container } = render(<WishlistToggleButton product={fakeProduct} />);
+        const { container } = render(<WishlistToggleButton product={testProduct} />);
         const firstChild = container.firstChild;
         if (!(firstChild instanceof Element)) throw new Error();
 
@@ -28,15 +28,15 @@ describe("WishlistToggleButton", () => {
         await waitFor(() => {
             const wishlist = getLatestWishlist();
 
-            expect(wishlist.some((item) => item.id === fakeProduct.id)).toBe(true);
+            expect(wishlist.some((item) => item.id === testProduct.id)).toBe(true);
             expect(firstChild).toHaveTextContent("Remove from Wishlist");
         });
     });
 
     it("removes wishlist item clicked & shows correct text", async () => {
-        addToWishlist(fakeProduct);
+        addToWishlist(testProduct);
 
-        const { container } = render(<WishlistToggleButton product={fakeProduct} />);
+        const { container } = render(<WishlistToggleButton product={testProduct} />);
         const firstChild = container.firstChild;
         if (!(firstChild instanceof Element)) throw new Error();
 
@@ -49,13 +49,13 @@ describe("WishlistToggleButton", () => {
         await waitFor(() => {
             const wishlist = getLatestWishlist();
 
-            expect(wishlist.some((item) => item.id === fakeProduct.id)).toBe(false);
+            expect(wishlist.some((item) => item.id === testProduct.id)).toBe(false);
             expect(firstChild).toHaveTextContent("Add to Wishlist");
         });
     });
 
     it("doesn't add duplicate items", async () => {
-        const { container } = render(<WishlistToggleButton product={fakeProduct} />);
+        const { container } = render(<WishlistToggleButton product={testProduct} />);
         const firstChild = container.firstChild;
         if (!(firstChild instanceof Element)) throw new Error();
 
@@ -67,13 +67,13 @@ describe("WishlistToggleButton", () => {
         });
 
         const wishlist = getLatestWishlist();
-        const occurrences = wishlist.filter((item) => item.id === fakeProduct.id).length;
+        const occurrences = wishlist.filter((item) => item.id === testProduct.id).length;
 
         expect(occurrences).toBe(0);
     });
 
     it("has no accessibility violations", async () => {
-        const { container } = render(<WishlistToggleButton product={fakeProduct} />);
+        const { container } = render(<WishlistToggleButton product={testProduct} />);
 
         await waitFor(async () => {
             const results = await axe(container);

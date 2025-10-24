@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { getOrders } from "@/lib/actions";
+import { getAllOrders } from "@/lib/actions";
 import AdminOrdersClient from "./AdminOrdersClient";
 import MainWrapperWithSubheader from "@/ui/layouts/MainWrapperWithSubheader";
 import AdminWrapper from "@/ui/layouts/AdminWrapper";
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminProductsPage() {
-    const orders = await getOrders({ items: false });
+    const orders = await getAllOrders();
     const ordersData = orders.data;
 
     return (

@@ -1,15 +1,14 @@
 import { getOrder } from "@/lib/actions";
-import { Order } from "@/lib/definitions";
-import { convertPrismaOrders } from "@/lib/utils";
+import { ClientOrder } from "@/lib/types";
 import ConfirmModal from "@/ui/components/overlays/ConfirmModal";
 import AdminWrapper from "@/ui/layouts/AdminWrapper";
 import OrdersPageTemplate from "@/ui/pages/OrdersPageTemplate";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-type AsyncParams = {
+interface AsyncParams {
     params: Promise<{ id: string }>;
-};
+}
 
 export async function generateMetadata({ params }: AsyncParams): Promise<Metadata> {
     const { id: orderId } = await params;
@@ -26,7 +25,7 @@ export default async function IndividualOrderPage({ params }: AsyncParams) {
         notFound();
     }
 
-    const orderData: Order[] = convertPrismaOrders([orderFetch.data]);
+    const orderData: ClientOrder[] = [orderFetch.data];
 
     return (
         <>

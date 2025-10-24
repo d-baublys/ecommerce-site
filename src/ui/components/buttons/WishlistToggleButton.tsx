@@ -1,11 +1,11 @@
 "use client";
 
-import { Product } from "@/lib/definitions";
+import { ClientProduct } from "@/lib/types";
 import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
 import { useWishlistToggle } from "@/hooks/useWishlistToggle";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 
-export default function WishlistToggleButton({ product }: { product: Product }) {
+export default function WishlistToggleButton({ product }: { product: ClientProduct }) {
     const parentHook = useWishlistToggle(product);
     const { isAnimated, toggleWishlist, inWishlist } = parentHook;
 

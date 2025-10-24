@@ -59,14 +59,18 @@ export default function LoginSignUpPage({ variant }: { variant: "login" | "signu
         }
 
         try {
-            await createUser(email, password);
-            setIsModalOpen(true);
-        } catch (error) {
-            if (error instanceof Error && error.name === "CredentialsError") {
-                setError(error.message as string);
+            const result = await createUser({ email, password });
+
+            if (result.success) {
+                setIsModalOpen(true);
+            } else if (result.error) {
+                setError(result.error);
             } else {
                 setError("Something went wrong. Please try again later.");
             }
+        } catch (error) {
+            console.error(error);
+            setError("Something went wrong. Please try again later.");
         }
     };
 

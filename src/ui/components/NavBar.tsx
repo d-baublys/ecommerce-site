@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import SlideDownColumnsMenu from "@/ui/components/overlays/SlideDownColumnsMenu";
-import { renderConditionalIcons, renderFixedIcons } from "@/lib/navIcons";
+import { renderConditionalIcons, renderFixedIcons } from "@/lib/nav-icons-helper";
 import { useRestoreFocus } from "@/hooks/useRestoreFocus";
 import { usePathname, useRouter } from "next/navigation";
 

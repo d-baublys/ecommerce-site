@@ -1,11 +1,12 @@
 "use client";
 
-import { Product, Sizes, VALID_SIZES } from "@/lib/definitions";
+import { ClientProduct, Sizes } from "@/lib/types";
 import {
     buildProductUrl,
     checkStock,
     createBagItem,
     isolateInteraction,
+    processDateForClient,
     stringifyConvertPrice,
 } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
@@ -15,8 +16,9 @@ import WishlistToggleIcon from "@/ui/components/buttons/WishlistToggleIcon";
 import ProductImage from "@/ui/components/ProductImage";
 import Link from "next/link";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
+import { VALID_SIZES } from "@/lib/constants";
 
-export default function ProductGridTile({ product }: { product: Product }) {
+export default function ProductGridTile({ product }: { product: ClientProduct }) {
     const { bag, addToBag } = useBagStore((state) => state);
 
     const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -85,7 +87,7 @@ export default function ProductGridTile({ product }: { product: Product }) {
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
                 onTouchCancel={handleTouchEnd}
-                data-date-added={product.dateAdded}
+                data-date-added={processDateForClient(product.dateAdded)}
                 data-testid="product-tile"
             >
                 <div

@@ -1,19 +1,20 @@
 import { defineConfig } from "cypress";
 import dotenv from "dotenv";
 import path from "path";
+import { PrismaClient } from "@prisma/client";
 import {
-    Prisma,
-    PrismaClient,
-    Product as PrismaProduct,
-    Sizes as PrismaSizes,
-} from "@prisma/client";
-import {
-    createFakeOrderCypress,
-    createFakeProduct,
-    FakeOrderCypressParams,
+    createTestOrderCypress,
+    createTestProduct,
+    TestOrderCypressParams,
 } from "./src/lib/test-factories";
-import { CypressTestDataDeleteParams, Product } from "./src/lib/definitions";
-import { convertClientProduct, hashPassword } from "./src/lib/utils";
+import { hashPassword, mapStockForProductCreate } from "./src/lib/utils";
+import {
+    ClientProduct,
+    CypressTestDataDeleteParams,
+    OrderCreateInput,
+    Product,
+    Sizes,
+} from "./src/lib/types";
 
 dotenv.config({
     path: [
@@ -30,16 +31,14 @@ export default defineConfig({
         setupNodeEvents(on, config) {
             on("task", {
                 async createCypressTestProduct() {
-                    const fakeProduct: Product = createFakeProduct();
-                    const convertedProduct: PrismaProduct = convertClientProduct(fakeProduct);
+                    const testProduct: ClientProduct = createTestProduct();
+                    const { stock, ...netProduct } = testProduct;
 
-                    const createdProduct = await prisma.product.create({ data: convertedProduct });
-                    await prisma.stock.createMany({
-                        data: Object.entries(fakeProduct.stock).map(([size, quantity]) => ({
-                            size: size as PrismaSizes,
-                            quantity: quantity,
-                            productId: createdProduct.id,
-                        })),
+                    const createdProduct = await prisma.product.create({
+                        data: {
+                            ...netProduct,
+                            stock: { createMany: { data: mapStockForProductCreate(stock) } },
+                        },
                     });
 
                     return {
@@ -49,12 +48,12 @@ export default defineConfig({
                         slug: createdProduct.slug,
                     };
                 },
-                async createCypressTestOrder(params: FakeOrderCypressParams) {
-                    const createObj: Prisma.OrderCreateArgs = {
-                        data: createFakeOrderCypress(params),
-                    };
+                async createCypressTestOrder(params: TestOrderCypressParams) {
+                    const createObj: OrderCreateInput = createTestOrderCypress(params);
 
-                    const res = await prisma.order.create(createObj);
+                    const res = await prisma.order.create({
+                        data: { ...createObj, items: { createMany: { data: createObj.items } } },
+                    });
                     return res.id;
                 },
                 async createCypressTestUser() {
@@ -73,7 +72,7 @@ export default defineConfig({
 
                     return { id: res?.id, slug: res?.slug };
                 },
-                async getTestProductMultipleId(productNameArr: PrismaProduct["name"][]) {
+                async getTestProductMultipleId(productNameArr: Product["name"][]) {
                     const res = await prisma.product.findMany({
                         where: { name: { in: productNameArr } },
                     });

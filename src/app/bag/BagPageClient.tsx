@@ -5,17 +5,17 @@ import BagTile from "@/ui/components/cards/BagTile";
 import { useBagStore } from "@/stores/bagStore";
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
-import { MergedBagItem, Product } from "@/lib/definitions";
-import { getProductData } from "@/lib/actions";
+import { getProducts } from "@/lib/actions";
 import { stringifyConvertPrice } from "@/lib/utils";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 import LoadingIndicator from "@/ui/components/overlays/LoadingIndicator";
+import { ClientProduct, MergedBagItem } from "@/lib/types";
 
 export default function BagPageClient() {
-    const [latestData, setLatestData] = useState<Product[]>();
+    const [latestData, setLatestData] = useState<ClientProduct[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<Error | null>(null);
 
@@ -41,7 +41,7 @@ export default function BagPageClient() {
 
         const getData = async () => {
             try {
-                const dataFetch = await getProductData({ id: { in: bagProductIds } });
+                const dataFetch = await getProducts({ id: { in: bagProductIds } });
                 setLatestData(dataFetch.data);
             } catch {
                 setError(new Error("Error fetching product data. Please try again later."));

@@ -1,12 +1,12 @@
-import { getProductData } from "@/lib/actions";
+import { getProducts } from "@/lib/actions";
 import ProductAddEditForm from "@/ui/components/forms/ProductAddEditForm";
 import AdminLayout from "@/ui/layouts/AdminLayout";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-type AsyncParams = {
+interface AsyncParams {
     params: Promise<{ id: string }>;
-};
+}
 
 export const metadata: Metadata = {
     title: "Edit product | Admin",
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default async function ProductViewEditPage({ params }: AsyncParams) {
     const { id } = await params;
-    const productFetch = await getProductData({ id });
+    const productFetch = await getProducts({ id });
 
     if (!productFetch.data.length) {
         notFound();

@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { IoChevronBackSharp, IoChevronForwardSharp } from "react-icons/io5";
 import { buildProductUrl, debounce } from "@/lib/utils";
-import { Product } from "@/lib/definitions";
 import ProductImage from "@/ui/components/ProductImage";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
+import { ClientProduct } from "@/lib/types";
 
-export default function Carousel({ featuredList }: { featuredList: Product[] }) {
+export default function Carousel({ featuredList }: { featuredList: ClientProduct[] }) {
     const [activeFeatured, setActiveFeatured] = useState(0);
     const activeFeaturedRef = useRef(0);
     const [isScrolling, setIsScrolling] = useState(false);

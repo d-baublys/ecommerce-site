@@ -1,7 +1,7 @@
-import { Product } from "@/lib/definitions";
+import { ClientProduct } from "@/lib/types";
 import ProductGridTile from "@/ui/components/cards/ProductGridTile";
 
-export default function ProductGrid({ productList }: { productList: Product[] }) {
+export default function ProductGrid({ productList }: { productList: ClientProduct[] }) {
     return (
         <div
             data-testid="product-grid"

@@ -1,17 +1,17 @@
-import { Stock as PrismaStock, Product as PrismaProduct, Prisma } from "@prisma/client";
 import {
     BagItem,
     Product,
     Sizes,
-    VALID_CATEGORIES,
-    VALID_SIZES,
     ProductSortKey,
-    SORT_OPTIONS,
-    REFUND_WINDOW,
-    PrismaOrderNoStock,
-    Order,
-} from "./definitions";
+    ClientProduct,
+    Stock,
+    ClientStock,
+    StockCreateInput,
+    StockUpdateInput,
+} from "./types";
 import bcrypt from "bcryptjs";
+import { REFUND_WINDOW, SORT_OPTIONS, VALID_CATEGORIES } from "./constants";
+import { ZodSafeParseError } from "zod";
 
 export function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number) {
     let timer: ReturnType<typeof setTimeout>;
@@ -23,7 +23,11 @@ export function debounce<T extends (...args: unknown[]) => void>(func: T, delay:
     };
 }
 
-export function checkStock(productData: Product, productSize: Sizes, bag: BagItem[]): boolean {
+export function checkStock(
+    productData: ClientProduct,
+    productSize: Sizes,
+    bag: BagItem[]
+): boolean {
     const stock = productData.stock[productSize as keyof typeof productData.stock] ?? 0;
 
     const existing = bag.find(
@@ -38,16 +42,8 @@ export function checkStock(productData: Product, productSize: Sizes, bag: BagIte
     );
 }
 
-export function isValidSize(value: string): value is Sizes {
-    return VALID_SIZES.includes(value as Sizes);
-}
-
-export function isUnique(value: string, stockObj: Product["stock"]) {
-    return !Object.entries(stockObj).find(([size]) => size === value);
-}
-
-export function isValidStock(value: number): boolean {
-    return value >= 0;
+export function isUnique(sizeKey: Sizes, stockObj: ClientStock) {
+    return !Object.keys(stockObj).includes(sizeKey);
 }
 
 export function capitalize(str: string): string {
@@ -70,57 +66,42 @@ export function slugify(name: string): string {
     return name.toLowerCase().split(" ").join("-");
 }
 
-export function formatImagePath(filePath: string): string {
-    return `/${filePath}`;
+export function formatImageName(fileName: string): string {
+    return `/${fileName}`;
 }
 
-export function createEmptyProduct(): Product {
+export function stripImagePath(filePath: string): string {
+    return filePath.split("/").slice(-1)[0];
+}
+
+export function createEmptyProduct(): ClientProduct {
     return {
         id: "",
         name: "",
-        gender: Object.keys(VALID_CATEGORIES)[0] as keyof typeof VALID_CATEGORIES,
+        gender: VALID_CATEGORIES[0].key,
         price: 0,
         slug: "",
         src: "",
         alt: "",
-        dateAdded: processDateForClient(),
+        dateAdded: new Date(),
         stock: {},
     };
 }
 
-export function convertPrismaProduct(product: PrismaProduct & { stock: PrismaStock[] }): Product {
+export function convertPrismaProduct(product: Product & { stock: Stock[] }): ClientProduct {
     return {
         ...product,
-        dateAdded: processDateForClient(product.dateAdded),
         stock: buildStockObjForClient(product.stock),
     };
 }
 
 export function convertMultiplePrismaProducts(
-    products: (PrismaProduct & { stock: PrismaStock[] })[]
-): Product[] {
+    products: (Product & { stock: Stock[] })[]
+): ClientProduct[] {
     return products.reduce(
         (arr, current) => [...arr, convertPrismaProduct(current)],
-        [] as Product[]
+        [] as ClientProduct[]
     );
-}
-
-export function convertPrismaOrders(data: PrismaOrderNoStock[]): Order[] {
-    return data.map((order) => ({
-        ...order,
-        items: order.items.map((item) => ({
-            ...item,
-            product: {
-                ...item.product,
-                dateAdded: processDateForClient(item.product.dateAdded),
-            },
-        })),
-    }));
-}
-
-export function convertClientProduct(product: Product): PrismaProduct {
-    const { stock, ...rest } = product;
-    return { ...rest, dateAdded: new Date(rest.dateAdded) };
 }
 
 export function containsClick(
@@ -136,7 +117,7 @@ export function areProductListsEqual(listA: Product[], listB: Product[]): boolea
     return listA.every((productA, idx) => productA.id === listB[idx].id);
 }
 
-function areStocksEqual(stockA: Product["stock"], stockB: Product["stock"]): boolean {
+function areStocksEqual(stockA: ClientStock, stockB: ClientStock): boolean {
     const keysA = Object.keys(stockA) as Sizes[];
     const keysB = Object.keys(stockB) as Sizes[];
 
@@ -144,8 +125,8 @@ function areStocksEqual(stockA: Product["stock"], stockB: Product["stock"]): boo
     return keysA.every((key) => stockA[key] === stockB[key]);
 }
 
-export function areProductsEqual(productA: Product, productB: Product): boolean {
-    for (const key of Object.keys(productA) as (keyof Product)[]) {
+export function areProductsEqual(productA: ClientProduct, productB: ClientProduct): boolean {
+    for (const key of Object.keys(productA) as (keyof ClientProduct)[]) {
         if (key === "stock") continue;
 
         if (productA[key] !== productB[key]) {
@@ -156,23 +137,31 @@ export function areProductsEqual(productA: Product, productB: Product): boolean 
     return areStocksEqual(productA.stock, productB.stock);
 }
 
-export function mapStockForPrisma(productData: Product): Prisma.StockCreateManyArgs["data"] {
-    return Object.entries(productData.stock).map(([size, quantity]) => ({
-        productId: productData.id,
+export function mapStockForProductCreate(stock: ClientStock): StockCreateInput[] {
+    return Object.entries(stock).map(([size, quantity]) => ({
         size: size as Sizes,
         quantity,
     }));
 }
 
-export function buildStockObjForClient(stock: PrismaStock[]): Product["stock"] {
+export function mapStockForProductUpdate(product: ClientProduct): StockUpdateInput[] {
+    return Object.entries(product.stock).map(([size, quantity]) => ({
+        size: size as Sizes,
+        quantity,
+        productId: product.id,
+    }));
+}
+
+export function buildStockObjForClient(stock: Stock[]): ClientStock {
     return stock.reduce((acc, stockItem) => {
         acc[stockItem.size] = stockItem.quantity;
         return acc;
-    }, {} as Product["stock"]);
+    }, {} as ClientStock);
 }
 
 export function processDateForClient(date?: Date): string {
-    return (date ? date : new Date()).toISOString().split("T")[0];
+    const validDate = date instanceof Date && !isNaN(date.getTime()) ? date : new Date();
+    return validDate.toISOString().split("T")[0];
 }
 
 export function processDateForClientDate(date?: Date): string {
@@ -211,7 +200,7 @@ export function escapeRegExp(string: string): string {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export function createBagItem(product: Product, size: Sizes): BagItem {
+export function createBagItem(product: ClientProduct, size: Sizes): BagItem {
     return { product, size, quantity: 1 };
 }
 
@@ -243,4 +232,15 @@ export function checkIsWithinReturnWindow(date: Date): boolean {
 
 export function addReturnWindowDelta(date: Date): Date {
     return new Date(date.getTime() + REFUND_WINDOW);
+}
+
+export function extractZodMessage(safeParseError: ZodSafeParseError<unknown>): string {
+    return safeParseError.error.issues[0].message;
+}
+
+export function zodErrorResponse(safeParseError: ZodSafeParseError<unknown>): {
+    success: false;
+    error: string;
+} {
+    return { success: false, error: extractZodMessage(safeParseError) };
 }

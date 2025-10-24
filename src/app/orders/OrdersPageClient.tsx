@@ -1,12 +1,12 @@
 "use client";
 
-import { Order } from "@/lib/definitions";
+import { ClientOrder } from "@/lib/types";
 import OrderTile from "@/ui/components/cards/OrderTile";
 import FailureModal from "@/ui/components/overlays/FailureModal";
 import Modal from "@/ui/components/overlays/Modal";
 import { useState } from "react";
 
-export default function OrdersPageClient({ orderData }: { orderData: Order[] }) {
+export default function OrdersPageClient({ orderData }: { orderData: ClientOrder[] }) {
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState<boolean>(false);
     const [isFailureModalOpen, setIsFailureModalOpen] = useState<boolean>(false);
     const [modalMessage, setModalMessage] = useState<string>("");

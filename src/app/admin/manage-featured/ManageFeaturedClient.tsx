@@ -1,18 +1,19 @@
 "use client";
 
-import { clearFeaturedProducts, createFeaturedProducts } from "@/lib/actions";
-import { FEATURED_COUNT, Product } from "@/lib/definitions";
+import { deleteFeaturedProducts, createFeaturedProducts } from "@/lib/actions";
 import { areProductListsEqual } from "@/lib/utils";
 import SearchBar from "@/ui/components/SearchBar";
 import { useEffect, useState } from "react";
 import DisplayTile from "@/ui/components/cards/DisplayTile";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
+import { FEATURED_COUNT } from "@/lib/constants";
+import { ClientProduct } from "@/lib/types";
 
-export default function ManageFeaturedClient({ productData }: { productData: Product[] }) {
-    const [savedFeaturedList, setSavedFeaturedList] = useState<Product[]>(productData);
-    const [provisionalFeaturedList, setProvisionalFeaturedList] = useState<Product[]>(productData);
+export default function ManageFeaturedClient({ productData }: { productData: ClientProduct[] }) {
+    const [savedFeaturedList, setSavedFeaturedList] = useState<ClientProduct[]>(productData);
+    const [provisionalFeaturedList, setProvisionalFeaturedList] = useState<ClientProduct[]>(productData);
 
-    const handleResultClick = (product: Product) => {
+    const handleResultClick = (product: ClientProduct) => {
         const isNew = !provisionalFeaturedList.find(
             (existingProd) => existingProd.id === product.id
         );
@@ -23,7 +24,7 @@ export default function ManageFeaturedClient({ productData }: { productData: Pro
     };
 
     const handleSave = async () => {
-        await clearFeaturedProducts();
+        await deleteFeaturedProducts();
         await createFeaturedProducts(provisionalFeaturedList);
         setSavedFeaturedList(provisionalFeaturedList);
     };

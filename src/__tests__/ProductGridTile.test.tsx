@@ -1,18 +1,18 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ProductGridTile from "@/ui/components/cards/ProductGridTile";
-import { Product } from "@/lib/definitions";
-import { createFakeProduct } from "@/lib/test-factories";
+import { ClientProduct } from "@/lib/types";
+import { createTestProduct } from "@/lib/test-factories";
 import { act } from "react";
 import { axe, toHaveNoViolations } from "jest-axe";
 
 expect.extend(toHaveNoViolations);
 
-const fakeStockedProduct: Product = createFakeProduct({
+const testStockedProduct: ClientProduct = createTestProduct({
     overrides: { stock: { s: 3, m: 0, l: 8 } },
 });
-const fakeUnstockedProduct: Product = createFakeProduct({ overrides: { stock: { s: 0 } } });
+const testUnstockedProduct: ClientProduct = createTestProduct({ overrides: { stock: { s: 0 } } });
 
-const renderAndGetTile = (product: Product = fakeStockedProduct) => {
+const renderAndGetTile = (product: ClientProduct = testStockedProduct) => {
     render(<ProductGridTile product={product} />);
     const tile = screen.getByText("Test Product 1").closest("div");
     if (!tile) throw new Error("No tile found");
@@ -67,7 +67,7 @@ describe("ProductGridTile", () => {
     });
 
     it("shows out of stock instead of quick add for unstocked products", () => {
-        const tile = renderAndGetTile(fakeUnstockedProduct);
+        const tile = renderAndGetTile(testUnstockedProduct);
         fireEvent.mouseEnter(tile);
 
         expect(screen.queryByRole("button", { name: "Quick Add" })).not.toBeInTheDocument();
@@ -87,7 +87,7 @@ describe("ProductGridTile", () => {
     });
 
     it("has no accessibility violations", async () => {
-        const { container } = render(<ProductGridTile product={fakeStockedProduct} />);
+        const { container } = render(<ProductGridTile product={testStockedProduct} />);
 
         await waitFor(async () => {
             const results = await axe(container);

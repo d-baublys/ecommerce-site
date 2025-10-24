@@ -2,10 +2,9 @@ import { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getUserOrders } from "@/lib/actions";
-import { Order } from "@/lib/definitions";
+import { ClientOrder } from "@/lib/types";
 import ConfirmModal from "@/ui/components/overlays/ConfirmModal";
 import OrdersPageTemplate from "@/ui/pages/OrdersPageTemplate";
-import { convertPrismaOrders } from "@/lib/utils";
 
 export const metadata: Metadata = {
     title: "My Orders",
@@ -20,9 +19,11 @@ export default async function OrdersPage() {
 
     if (session?.user?.id === undefined) throw new Error("User ID not found");
 
+    if (isNaN(Number(session.user.id))) throw new Error("Invalid User ID");
+
     const ordersFetch = await getUserOrders({ userId: Number(session.user.id) });
 
-    const orderData: Order[] = convertPrismaOrders(ordersFetch.data);
+    const orderData: ClientOrder[] = ordersFetch.data;
 
     return (
         <>

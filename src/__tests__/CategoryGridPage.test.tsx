@@ -6,7 +6,7 @@ import {
 } from "@/lib/test-utils";
 import CategoryGridPage from "@/ui/pages/CategoryGridPage";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { getFilteredFakeProducts } from "@/lib/test-factories";
+import { getFilteredTestProducts } from "@/lib/test-factories";
 
 jest.mock("@/lib/fetching-utils", () => ({
     fetchFilteredProducts: jest.fn(),
@@ -29,7 +29,7 @@ jest.mock("next/navigation", () => ({
 
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 
-const filteredFakeProducts = getFilteredFakeProducts();
+const filteredTestProducts = getFilteredTestProducts();
 
 const testComponent = <CategoryGridPage category="all" />;
 const testComponentWithQuery = <CategoryGridPage category="all" query="testing-test" />;
@@ -41,10 +41,10 @@ const mockBothQuerysetsEmpty = () => {
     (fetchFilteredProducts as jest.Mock).mockResolvedValue([]);
 };
 const mockBothQuerysetsFull = () => {
-    (fetchFilteredProducts as jest.Mock).mockResolvedValue(filteredFakeProducts);
+    (fetchFilteredProducts as jest.Mock).mockResolvedValue(filteredTestProducts);
 };
 const mockFilterQuerysetEmpty = () => {
-    (fetchFilteredProducts as jest.Mock).mockResolvedValueOnce(filteredFakeProducts); // for allCategoryProducts
+    (fetchFilteredProducts as jest.Mock).mockResolvedValueOnce(filteredTestProducts); // for allCategoryProducts
     (fetchFilteredProducts as jest.Mock).mockResolvedValueOnce([]); // for filteredProducts
 };
 

@@ -2,16 +2,16 @@
 
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect, useState } from "react";
-import { Sizes, VALID_SIZES } from "@/lib/definitions";
-import { Product } from "@/lib/definitions";
+import { ClientProduct, Sizes } from "@/lib/types";
 import GoButton from "@/ui/components/buttons/GoButton";
 import { IoBag } from "react-icons/io5";
 import { checkStock, createBagItem } from "@/lib/utils";
 import ZoomableImage from "@/ui/components/ZoomableImage";
 import WishlistToggleButton from "@/ui/components/buttons/WishlistToggleButton";
 import AddSuccessModal from "@/ui/components/overlays/AddSuccessModal";
+import { VALID_SIZES } from "@/lib/constants";
 
-export default function ProductPageClient({ productData }: { productData: Product }) {
+export default function ProductPageClient({ productData }: { productData: ClientProduct }) {
     const [selectedSize, setSelectedSize] = useState<Sizes | "placeholder">("placeholder");
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);

@@ -1,8 +1,8 @@
 import BagPage from "@/app/bag/page";
-import { createFakeBagItems, createFakeProduct, getFakeUpdatedData } from "@/lib/test-factories";
+import { createTestBagItems, createTestProduct, getTestUpdatedData } from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { Product } from "@/lib/definitions";
+import { Product } from "@/lib/types";
 import { createBagItem } from "@/lib/utils";
 import { act } from "react";
 
@@ -20,7 +20,7 @@ jest.mock("next/navigation", () => ({
 }));
 
 jest.mock("@/lib/actions", () => ({
-    getProductData: jest.fn(),
+    getProducts: jest.fn(),
 }));
 
 jest.mock("next-auth/react", () => ({
@@ -33,17 +33,17 @@ jest.mock("@/auth", () => ({
 }));
 
 import { useSession } from "next-auth/react";
-import { getProductData } from "@/lib/actions";
+import { getProducts } from "@/lib/actions";
 import { getConsoleErrorSpy, wrapWithErrorBoundary } from "@/lib/test-utils";
 
 const { addToBag, clearBag } = useBagStore.getState();
-const fakeBagItems = createFakeBagItems();
-const bagUnchangedData = fakeBagItems.map((bagItem) => bagItem.product);
-const bagUpdatedData = getFakeUpdatedData();
+const testBagItems = createTestBagItems();
+const bagUnchangedData = testBagItems.map((bagItem) => bagItem.product);
+const bagUpdatedData = getTestUpdatedData();
 
 const renderBagPage = async () => render(await BagPage());
-const setUpFakeBag = () =>
-    fakeBagItems.forEach((item) => {
+const setUpTestBag = () =>
+    testBagItems.forEach((item) => {
         addToBag(item);
     });
 
@@ -67,7 +67,7 @@ const getSessionWithoutAuth = () => {
 };
 
 const setUpResolvedFetch = (resolvedValue: Product[]) => {
-    (getProductData as jest.Mock).mockResolvedValue({ data: resolvedValue });
+    (getProducts as jest.Mock).mockResolvedValue({ data: resolvedValue });
 };
 const getAllTiles = () => within(screen.getByTestId("bag-tile-ul")).getAllByRole("listitem");
 
@@ -78,7 +78,7 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("shows correct bag subtotal", async () => {
-        setUpFakeBag();
+        setUpTestBag();
         setUpResolvedFetch(bagUnchangedData);
         act(() => {
             renderBagPage();
@@ -102,7 +102,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("throws an error when fetch fails", async () => {
         const errorSpy = getConsoleErrorSpy();
-        (getProductData as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
+        (getProducts as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
         render(wrapWithErrorBoundary(await BagPage()));
 
         await waitFor(() => {
@@ -113,7 +113,7 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("updates subtotal if latest size stock has decreased to below bag quantity", async () => {
-        setUpFakeBag();
+        setUpTestBag();
         setUpResolvedFetch(bagUpdatedData);
         act(() => {
             renderBagPage();
@@ -125,7 +125,7 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("preselects correct quantities", async () => {
-        setUpFakeBag();
+        setUpTestBag();
         setUpResolvedFetch(bagUnchangedData);
         act(() => {
             renderBagPage();
@@ -140,7 +140,7 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("updates preselected quantities if latest size stock has decreased to below bag quantity", async () => {
-        setUpFakeBag();
+        setUpTestBag();
         setUpResolvedFetch(bagUpdatedData);
         act(() => {
             renderBagPage();
@@ -155,12 +155,12 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("shows 'out of stock' in place of combobox when latest size stock is nil", async () => {
-        const fakeProduct = createFakeProduct({ overrides: { stock: { s: 1 } } });
-        const latestFakeProduct = createFakeProduct({ overrides: { stock: { s: 0 } } });
-        const mockBagItem = createBagItem(fakeProduct, "s");
+        const testProduct = createTestProduct({ overrides: { stock: { s: 1 } } });
+        const latestTestProduct = createTestProduct({ overrides: { stock: { s: 0 } } });
+        const mockBagItem = createBagItem(testProduct, "s");
 
         addToBag(mockBagItem);
-        setUpResolvedFetch([latestFakeProduct]);
+        setUpResolvedFetch([latestTestProduct]);
         act(() => {
             renderBagPage();
         });
@@ -174,10 +174,10 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("shows all quantity options", async () => {
-        const fakeProduct = createFakeProduct();
+        const testProduct = createTestProduct();
 
-        addToBag(createBagItem(fakeProduct, "m"));
-        setUpResolvedFetch([fakeProduct]);
+        addToBag(createBagItem(testProduct, "m"));
+        setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
         });
@@ -194,11 +194,11 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("updates subtotal when quantity selection changes", async () => {
-        const fakeProduct = createFakeProduct();
+        const testProduct = createTestProduct();
 
-        addToBag(createBagItem(fakeProduct, "s"));
-        addToBag(createBagItem(fakeProduct, "s"));
-        setUpResolvedFetch([fakeProduct]);
+        addToBag(createBagItem(testProduct, "s"));
+        addToBag(createBagItem(testProduct, "s"));
+        setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
         });
@@ -220,10 +220,10 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("caps quantity options per the prescribed limit", async () => {
         const itemLimit = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
-        const fakeProduct = createFakeProduct({ overrides: { stock: { s: itemLimit + 5 } } });
+        const testProduct = createTestProduct({ overrides: { stock: { s: itemLimit + 5 } } });
 
-        addToBag(createBagItem(fakeProduct, "s"));
-        setUpResolvedFetch([fakeProduct]);
+        addToBag(createBagItem(testProduct, "s"));
+        setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
         });
@@ -237,7 +237,7 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("removes items from bag as expected", async () => {
-        setUpFakeBag();
+        setUpTestBag();
         setUpResolvedFetch(bagUnchangedData);
         act(() => {
             renderBagPage();
@@ -259,11 +259,11 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("renders checkout button & shows correct shipping when at least some bag item sizes are stocked", async () => {
-        const fakeProduct = createFakeProduct({ overrides: { stock: { s: 0, m: 1 } } });
+        const testProduct = createTestProduct({ overrides: { stock: { s: 0, m: 1 } } });
 
-        addToBag(createBagItem(fakeProduct, "s"));
-        addToBag(createBagItem(fakeProduct, "m"));
-        setUpResolvedFetch([fakeProduct]);
+        addToBag(createBagItem(testProduct, "s"));
+        addToBag(createBagItem(testProduct, "m"));
+        setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
         });
@@ -273,11 +273,11 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("doesn't render checkout button & shows correct shipping when all bag item sizes are unstocked", async () => {
-        const fakeProduct = createFakeProduct({ overrides: { stock: { s: 0, m: 0 } } });
+        const testProduct = createTestProduct({ overrides: { stock: { s: 0, m: 0 } } });
 
-        addToBag(createBagItem(fakeProduct, "s"));
-        addToBag(createBagItem(fakeProduct, "m"));
-        setUpResolvedFetch([fakeProduct]);
+        addToBag(createBagItem(testProduct, "s"));
+        addToBag(createBagItem(testProduct, "m"));
+        setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
         });
@@ -316,7 +316,7 @@ describe("BagPage authenticated tests", () => {
             }),
         } as Response);
 
-        setUpFakeBag();
+        setUpTestBag();
         setUpResolvedFetch(bagUnchangedData);
         act(() => {
             renderBagPage();

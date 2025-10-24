@@ -163,7 +163,7 @@ async function seedProducts() {
         const product = productStubs[i];
         const productSizes = product.gender === "mens" ? mensSizes : womensSizes;
 
-        const createdProduct = await prisma.product.create({
+        await prisma.product.create({
             data: {
                 name: product.name,
                 gender: product.gender as Gender,
@@ -172,17 +172,15 @@ async function seedProducts() {
                 src: product.src,
                 alt: product.alt,
                 dateAdded: new Date(dates[i]),
+                stock: {
+                    createMany: {
+                        data: productSizes.map((size, idx) => ({
+                            size: size as PrismaSizes,
+                            quantity: stock[i][idx],
+                        })),
+                    },
+                },
             },
-        });
-
-        const stockEntries: Prisma.StockCreateManyInput[] = productSizes.map((size, idx) => ({
-            size: size as PrismaSizes,
-            quantity: stock[i][idx],
-            productId: createdProduct.id,
-        }));
-
-        await prisma.stock.createMany({
-            data: stockEntries,
         });
     }
 }
@@ -201,8 +199,8 @@ async function seedUsers() {
         throw new Error("Missing standard user email or password env variables.");
     }
 
-    await createUser(adminEmail, adminPassword, "admin");
-    await createUser(standardEmail, standardPassword, "user");
+    await createUser({ email: adminEmail, password: adminPassword, role: "admin" });
+    await createUser({ email: standardEmail, password: standardPassword, role: "user" });
 }
 
 async function main() {

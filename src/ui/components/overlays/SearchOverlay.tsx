@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import SearchBar from "@/ui/components/SearchBar";
-import { Product } from "@/lib/definitions";
+import { ClientProduct } from "@/lib/types";
 import { useSearchStore } from "@/stores/searchStore";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import DarkBackdrop from "@/ui/components/overlays/DarkBackdrop";
@@ -27,7 +27,7 @@ export default function SearchOverlay() {
         setTimeout(() => setIsSearchOpen(false), 200);
     };
 
-    const handleResultClick = (product: Product) => {
+    const handleResultClick = (product: ClientProduct) => {
         closeOverlay();
         router.push(buildProductUrl(product.id, product.slug));
     };

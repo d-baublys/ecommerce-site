@@ -2,9 +2,9 @@ import MainLayout from "@/ui/layouts/MainLayout";
 import CategoryGridPage from "@/ui/pages/CategoryGridPage";
 import { Metadata } from "next";
 
-type AsyncParams = {
+interface AsyncParams {
     searchParams: Promise<{ q: string }>;
-};
+}
 
 export const metadata: Metadata = {
     title: "Search",

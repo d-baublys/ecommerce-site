@@ -1,11 +1,11 @@
-import { Product } from "@/lib/definitions";
-import { STORAGE_KEYS } from "@/lib/storageKeys";
+import { ClientProduct } from "@/lib/types";
+import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 type WishlistStore = {
-    wishlist: Product[];
-    addToWishlist: (product: Product) => void;
+    wishlist: ClientProduct[];
+    addToWishlist: (product: ClientProduct) => void;
     removeFromWishlist: (id: string) => void;
     clearWishlist: () => void;
 };

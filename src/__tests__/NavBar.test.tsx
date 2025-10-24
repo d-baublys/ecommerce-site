@@ -1,5 +1,5 @@
-import { Sizes } from "@/lib/definitions";
-import { createFakeProductList } from "@/lib/test-factories";
+import { Sizes } from "@/lib/types";
+import { createTestProductList } from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
 import NavBar from "@/ui/components/NavBar";
 import { screen, waitFor } from "@testing-library/dom";
@@ -23,7 +23,7 @@ jest.mock("next/navigation", () => ({
 import { useSession } from "next-auth/react";
 
 const { addToBag, clearBag } = useBagStore.getState();
-const fakeProductList = createFakeProductList();
+const testProductList = createTestProductList();
 const renderNavBar = () => render(<NavBar />);
 
 const getSessionWithAuth = () => {
@@ -56,24 +56,24 @@ describe("NavBar", () => {
 
         act(() => {
             addToBag({
-                product: fakeProductList[0],
-                size: Object.keys(fakeProductList[0])[0] as Sizes,
+                product: testProductList[0],
+                size: Object.keys(testProductList[0])[0] as Sizes,
                 quantity: 1,
             });
             addToBag({
-                product: fakeProductList[1],
-                size: Object.keys(fakeProductList[1])[0] as Sizes,
+                product: testProductList[1],
+                size: Object.keys(testProductList[1])[0] as Sizes,
                 quantity: 1,
             });
             addToBag({
-                product: fakeProductList[2],
-                size: Object.keys(fakeProductList[2])[0] as Sizes,
+                product: testProductList[2],
+                size: Object.keys(testProductList[2])[0] as Sizes,
                 quantity: 1,
             });
 
             addToBag({
-                product: fakeProductList[2],
-                size: Object.keys(fakeProductList[2])[0] as Sizes,
+                product: testProductList[2],
+                size: Object.keys(testProductList[2])[0] as Sizes,
                 quantity: 1,
             });
         });

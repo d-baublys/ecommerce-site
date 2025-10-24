@@ -1,4 +1,4 @@
-import { getFilteredFakeProducts } from "@/lib/test-factories";
+import { getFilteredTestProducts } from "@/lib/test-factories";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { axe, toHaveNoViolations } from "jest-axe";
 import SearchOverlay from "@/ui/components/overlays/SearchOverlay";
@@ -20,12 +20,12 @@ jest.mock("@/lib/fetching-utils", () => ({
 }));
 
 jest.mock("@/lib/actions", () => ({
-    getProductData: jest.fn(),
+    getProducts: jest.fn(),
 }));
 
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 
-const productList = getFilteredFakeProducts();
+const productList = getFilteredTestProducts();
 
 const renderSearchOverlay = () => render(<SearchOverlay />);
 
@@ -85,7 +85,7 @@ describe("SearchOverlay", () => {
         const firstSuggestion = within(getSuggestionsContainer()).getAllByRole("listitem")[0];
         fireEvent.click(firstSuggestion);
 
-        expect(pushMock).toHaveBeenCalledWith("/products/test-id-1/test-product-1");
+        expect(pushMock).toHaveBeenCalledWith("/products/aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1/test-product-1");
     });
 
     it("has no accessibility violations", async () => {

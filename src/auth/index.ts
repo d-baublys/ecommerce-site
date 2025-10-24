@@ -11,14 +11,19 @@ const authOptions: NextAuthConfig = {
             async authorize(credentials) {
                 const user = await getUser(credentials.email as string);
 
-                if (user) {
+                if (user.data) {
+                    const userData = user.data;
                     const verifiedPassword = await comparePasswords(
                         credentials.password as string,
-                        user.password
+                        userData.password
                     );
 
                     if (verifiedPassword) {
-                        return { id: String(user.id), email: user.email, role: user.role };
+                        return {
+                            id: String(userData.id),
+                            email: userData.email,
+                            role: userData.role,
+                        };
                     }
                 }
 

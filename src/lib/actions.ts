@@ -1,31 +1,57 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import {
-    Prisma,
-    OrderStatus as PrismaOrderStatus,
-    Stock as PrismaStock,
-    Product as PrismaProduct,
-    Order as PrismaOrder,
+    ClientOrder,
+    ClientProduct,
+    ClientUser,
+    Order,
+    OrderCreateInput,
+    OrderStatus,
+    Product,
+    StockUpdateInput,
     User,
-} from "@prisma/client";
-import { CredentialsError, ItemMetadata, Product } from "./definitions";
+    UserCreateInput,
+} from "./types";
 import { prisma } from "./prisma";
 import {
-    convertClientProduct,
     convertMultiplePrismaProducts,
     hashPassword,
-    mapStockForPrisma,
+    mapStockForProductCreate,
+    mapStockForProductUpdate,
+    zodErrorResponse,
 } from "./utils";
+import {
+    clientProductSchema,
+    featuredProductCreateSchema,
+    orderCreateSchema,
+    productCreateSchema,
+    stockUpdateSchema,
+    userCreateSchema,
+} from "./schemas";
+import {
+    CreateUpdateDeleteActionResponse,
+    GetActionResponse,
+    GetManyActionResponse,
+} from "./types/actions";
 
-export async function productAdd(productData: Product) {
+export async function createProduct(productData: ClientProduct): CreateUpdateDeleteActionResponse {
     try {
-        const createdProduct = await prisma.product.create({
-            data: convertClientProduct(productData),
-        });
-        await prisma.stock.createMany({
-            data: mapStockForPrisma({ ...productData, id: createdProduct.id }),
-        });
+        const { id, ...netProduct } = productData;
+        const parsedProduct = productCreateSchema.safeParse(netProduct);
 
+        if (!parsedProduct.success) {
+            return zodErrorResponse(parsedProduct);
+        }
+
+        await prisma.product.create({
+            data: {
+                ...parsedProduct.data,
+                stock: {
+                    createMany: { data: mapStockForProductCreate(parsedProduct.data.stock) },
+                },
+            },
+        });
         return { success: true };
     } catch (error) {
         console.error("Error adding product: ", error);
@@ -33,10 +59,10 @@ export async function productAdd(productData: Product) {
     }
 }
 
-export async function getProductData(
+export async function getProducts(
     where?: Prisma.ProductWhereInput,
     orderBy?: Prisma.ProductOrderByWithRelationInput
-) {
+): GetManyActionResponse<ClientProduct> {
     try {
         const rawProducts = await prisma.product.findMany({
             where,
@@ -44,7 +70,7 @@ export async function getProductData(
             orderBy: orderBy ? orderBy : { name: "asc" },
         });
 
-        const products: Product[] = convertMultiplePrismaProducts(rawProducts);
+        const products: ClientProduct[] = convertMultiplePrismaProducts(rawProducts);
 
         return { data: products };
     } catch (error) {
@@ -53,18 +79,26 @@ export async function getProductData(
     }
 }
 
-export async function productUpdate(productData: Product) {
+export async function updateProduct(productData: ClientProduct): CreateUpdateDeleteActionResponse {
     try {
+        const parsedProduct = clientProductSchema.safeParse(productData);
+
+        if (!parsedProduct.success) {
+            return zodErrorResponse(parsedProduct);
+        }
+
+        const { stock, ...netProduct } = parsedProduct.data;
+
         await prisma.$transaction([
             prisma.stock.deleteMany({
-                where: { productId: productData.id },
+                where: { productId: parsedProduct.data.id },
             }),
             prisma.stock.createMany({
-                data: mapStockForPrisma(productData),
+                data: mapStockForProductUpdate(parsedProduct.data),
             }),
             prisma.product.update({
-                where: { id: productData.id },
-                data: convertClientProduct(productData),
+                where: { id: parsedProduct.data.id },
+                data: netProduct,
             }),
         ]);
 
@@ -75,11 +109,31 @@ export async function productUpdate(productData: Product) {
     }
 }
 
-export async function updateStockOnPurchase(
-    productId: PrismaStock["productId"],
-    size: PrismaStock["size"],
-    quantity: PrismaStock["quantity"]
-) {
+export async function deleteProduct(id: Product["id"]): CreateUpdateDeleteActionResponse {
+    try {
+        await prisma.$transaction([
+            prisma.stock.deleteMany({
+                where: { productId: id },
+            }),
+            prisma.product.delete({
+                where: { id },
+            }),
+        ]);
+        return { success: true };
+    } catch {
+        return { success: false };
+    }
+}
+
+export async function updateStock(params: StockUpdateInput): CreateUpdateDeleteActionResponse {
+    const parsedData = stockUpdateSchema.safeParse(params);
+
+    if (!parsedData.success) {
+        return zodErrorResponse(parsedData);
+    }
+
+    const { productId, size, quantity } = parsedData.data;
+
     const stockItem = await prisma.stock.findFirst({
         where: { productId, size },
         select: { id: true, quantity: true },
@@ -109,39 +163,79 @@ export async function updateStockOnPurchase(
     }
 }
 
-export async function productDelete(id: PrismaProduct["id"]) {
+export async function createFeaturedProducts(
+    productData: ClientProduct[]
+): CreateUpdateDeleteActionResponse {
+    const parsedArray = featuredProductCreateSchema.safeParse(
+        productData.map((product) => ({
+            productId: product.id,
+        }))
+    );
+
+    if (!parsedArray.success) {
+        return zodErrorResponse(parsedArray);
+    }
+
     try {
-        await prisma.$transaction([
-            prisma.stock.deleteMany({
-                where: { productId: id },
-            }),
-            prisma.product.delete({
-                where: { id },
-            }),
-        ]);
+        await prisma.featuredProduct.createMany({
+            data: parsedArray.data,
+            skipDuplicates: true,
+        });
         return { success: true };
-    } catch {
+    } catch (error) {
+        console.error("Error creating featured products: ", error);
         return { success: false };
     }
 }
 
-type CreateOrderParams = Prisma.OrderCreateArgs["data"] & { items: ItemMetadata[] };
-
-export async function createOrder({
-    items,
-    subTotal,
-    shippingTotal,
-    total,
-    sessionId,
-    email,
-    paymentIntentId,
-    userId,
-}: CreateOrderParams) {
+export async function getFeaturedProducts(): GetManyActionResponse<ClientProduct> {
     try {
-        const createObj: Prisma.OrderCreateArgs = {
-            data: {
-                items: {
-                    create: items.map((item) => ({
+        const rawProducts = await prisma.featuredProduct.findMany({
+            include: {
+                product: {
+                    include: {
+                        stock: true,
+                    },
+                },
+            },
+        });
+
+        const products: ClientProduct[] = convertMultiplePrismaProducts(
+            rawProducts.map((item) => item.product)
+        );
+
+        return { data: products };
+    } catch (error) {
+        console.error("Error fetching featured products: ", error);
+        throw new Error("Error fetching featured products. Please try again later.");
+    }
+}
+
+export async function deleteFeaturedProducts(): CreateUpdateDeleteActionResponse {
+    try {
+        await prisma.featuredProduct.deleteMany();
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting featured products: ", error);
+        return { success: false };
+    }
+}
+
+export async function createOrder(orderData: OrderCreateInput): CreateUpdateDeleteActionResponse {
+    try {
+        const parsedOrder = orderCreateSchema.safeParse(orderData);
+
+        if (!parsedOrder.success) {
+            return zodErrorResponse(parsedOrder);
+        }
+
+        const { items, subTotal, shippingTotal, total, sessionId, email, paymentIntentId, userId } =
+            parsedOrder.data;
+
+        const createObj: Prisma.OrderCreateArgs["data"] = {
+            items: {
+                createMany: {
+                    data: items.map((item) => ({
                         productId: item.productId,
                         name: item.name,
                         price: item.price,
@@ -149,17 +243,17 @@ export async function createOrder({
                         quantity: item.quantity,
                     })),
                 },
-                subTotal,
-                shippingTotal,
-                total,
-                sessionId,
-                email,
-                paymentIntentId,
-                userId,
             },
+            subTotal,
+            shippingTotal,
+            total,
+            sessionId,
+            email,
+            paymentIntentId,
+            userId,
         };
 
-        await prisma.order.create(createObj);
+        await prisma.order.create({ data: createObj });
 
         return { success: true };
     } catch (error) {
@@ -168,12 +262,15 @@ export async function createOrder({
     }
 }
 
-type GetOrderParams = {
-    sessionId?: PrismaOrder["sessionId"];
-    orderId?: PrismaOrder["id"];
-};
+interface GetOrderParams {
+    sessionId?: Order["sessionId"];
+    orderId?: Order["id"];
+}
 
-export async function getOrder({ sessionId, orderId }: GetOrderParams) {
+export async function getOrder({
+    sessionId,
+    orderId,
+}: GetOrderParams): GetActionResponse<ClientOrder> {
     const whereQuery = {
         ...(sessionId && { sessionId }),
         ...(orderId && { id: orderId }),
@@ -192,10 +289,14 @@ export async function getOrder({ sessionId, orderId }: GetOrderParams) {
     }
 }
 
-export async function getUserOrders({ userId }: { userId: PrismaOrder["userId"] }) {
+export async function getUserOrders({
+    userId,
+}: {
+    userId: User["id"];
+}): GetManyActionResponse<ClientOrder> {
     try {
         const orders = await prisma.order.findMany({
-            where: { userId: Number(userId) },
+            where: { userId },
             include: { items: { include: { product: true } } },
             orderBy: { createdAt: "desc" },
         });
@@ -207,10 +308,9 @@ export async function getUserOrders({ userId }: { userId: PrismaOrder["userId"] 
     }
 }
 
-export async function getOrders(includeObj?: Prisma.OrderInclude) {
+export async function getAllOrders(): GetManyActionResponse<Order> {
     try {
         const orders = await prisma.order.findMany({
-            include: includeObj ?? { items: { include: { product: true } } },
             orderBy: { createdAt: "desc" },
         });
 
@@ -222,13 +322,13 @@ export async function getOrders(includeObj?: Prisma.OrderInclude) {
 }
 
 interface UpdateOrderParams {
-    orderId: PrismaOrder["id"];
-    status: PrismaOrderStatus;
-    returnRequestedAt?: PrismaOrder["returnRequestedAt"];
-    refundedAt?: PrismaOrder["refundedAt"];
+    orderId: Order["id"];
+    status: OrderStatus;
+    returnRequestedAt?: Order["returnRequestedAt"];
+    refundedAt?: Order["refundedAt"];
 }
 
-export async function updateOrder(params: UpdateOrderParams) {
+export async function updateOrder(params: UpdateOrderParams): CreateUpdateDeleteActionResponse {
     const { orderId, status, returnRequestedAt, refundedAt } = params;
 
     try {
@@ -243,65 +343,14 @@ export async function updateOrder(params: UpdateOrderParams) {
     }
 }
 
-export async function createFeaturedProducts(productData: Product[]) {
-    try {
-        await prisma.featuredProduct.createMany({
-            data: productData.map((product) => ({
-                productId: product.id,
-            })),
-            skipDuplicates: true,
-        });
-        return { success: true };
-    } catch (error) {
-        console.error("Error creating featured products: ", error);
-        return { success: false };
+export async function createUser(params: UserCreateInput): CreateUpdateDeleteActionResponse {
+    const parsedData = userCreateSchema.safeParse(params);
+
+    if (!parsedData.success) {
+        return zodErrorResponse(parsedData);
     }
-}
 
-export async function getFeaturedProducts() {
-    try {
-        const rawProducts = await prisma.featuredProduct.findMany({
-            include: {
-                product: {
-                    include: {
-                        stock: true,
-                    },
-                },
-            },
-        });
-
-        const products: Product[] = convertMultiplePrismaProducts(
-            rawProducts.map((item) => item.product)
-        );
-
-        return { data: products };
-    } catch (error) {
-        console.error("Error fetching featured products: ", error);
-        throw new Error("Error fetching featured products. Please try again later.");
-    }
-}
-
-export async function clearFeaturedProducts() {
-    try {
-        await prisma.featuredProduct.deleteMany();
-        return { success: true };
-    } catch (error) {
-        console.error("Error deleting featured products: ", error);
-        return { success: false };
-    }
-}
-
-export async function createUser(
-    email: User["email"],
-    password: User["password"],
-    role: User["role"] = "user"
-) {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const validEmail = emailPattern.test(email);
-
-    if (!validEmail) {
-        throw new CredentialsError("Invalid email address provided.");
-    }
+    const { email, password, role } = parsedData.data;
 
     let user;
 
@@ -315,11 +364,10 @@ export async function createUser(
     }
 
     if (user) {
-        throw new CredentialsError("An account with this email address already exists.");
-    }
-
-    if (password.length < 8) {
-        throw new CredentialsError("Your password must have a minimum of 8 characters.");
+        return {
+            success: false,
+            error: "An account with this email address already exists.",
+        };
     }
 
     const hashedPassword = await hashPassword(password);
@@ -331,18 +379,17 @@ export async function createUser(
         return { success: true };
     } catch (error) {
         console.error("Error creating user: ", error);
+
         return { success: false };
     }
 }
 
-export async function getUser(email: User["email"]) {
+export async function getUser(email: User["email"]): GetActionResponse<ClientUser> {
     try {
         const result = await prisma.user.findFirst({
             where: { email },
         });
-        return result
-            ? { id: result.id, email: result.email, password: result.password, role: result.role }
-            : null;
+        return { data: result };
     } catch (error) {
         console.error("Error fetching user data: ", error);
         throw new Error("Error fetching user data. Please try again later.");

@@ -1,7 +1,7 @@
 "use client";
 
 import { useWishlistToggle } from "@/hooks/useWishlistToggle";
-import { Product } from "@/lib/definitions";
+import { ClientProduct } from "@/lib/types";
 import { IoHeart, IoHeartOutline } from "react-icons/io5";
 
 export default function WishlistToggleIcon({
@@ -10,7 +10,7 @@ export default function WishlistToggleIcon({
     parentHook,
     overrideClasses,
 }: {
-    product: Product;
+    product: ClientProduct;
     iconSize: number;
     parentHook?: ReturnType<typeof useWishlistToggle>;
     overrideClasses?: string;

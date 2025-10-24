@@ -1,8 +1,8 @@
-import { createFakeOrderList } from "@/lib/test-factories";
+import { createTestOrderList } from "@/lib/test-factories";
 import { wrapWithErrorBoundary } from "@/lib/test-utils";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import OrdersPage from "@/app/orders/page";
-import { Order, PrismaOrderNoStock } from "@/lib/definitions";
+import { ClientOrder } from "@/lib/types";
 import { act } from "react";
 
 jest.mock("@/auth", () => ({
@@ -42,17 +42,17 @@ const setUpExistingSession = () => {
         },
     });
 };
-const setUpResolvedFetch = (resolvedValue: (Order | PrismaOrderNoStock)[]) => {
+const setUpResolvedFetch = (resolvedValue: ClientOrder[]) => {
     (getUserOrders as jest.Mock).mockResolvedValue({ data: resolvedValue });
 };
 const setUpPageComplete = async () => {
     (checkIsWithinReturnWindow as jest.Mock).mockReturnValue(true);
     setUpExistingSession();
-    setUpResolvedFetch(fakeOrdersList);
+    setUpResolvedFetch(testOrdersList);
     await renderOrdersPage();
 };
 
-const fakeOrdersList = createFakeOrderList({ variant: "prisma" });
+const testOrdersList = createTestOrderList();
 const renderOrdersPage = async () => await act(async () => render(await OrdersPage()));
 const getAllTiles = () => screen.getAllByTestId("order-tile");
 

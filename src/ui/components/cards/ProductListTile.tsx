@@ -1,19 +1,12 @@
 "use client";
 
-import {
-    BagItem,
-    Order,
-    ClientOrderItemWithProductNoStock,
-    Product,
-    ProductNoStock,
-    Sizes,
-} from "@/lib/definitions";
+import { BagItem, Product, ClientProduct, Sizes, ClientOrder } from "@/lib/types";
 import Link from "next/link";
 import { buildProductUrl } from "@/lib/utils";
 import ProductImage from "@/ui/components/ProductImage";
 
 interface ProductListTileProps {
-    data: Product | Product[] | BagItem | Order;
+    data: ClientProduct | ClientProduct[] | BagItem | ClientOrder;
     wrapWithLink: boolean;
     showSize: boolean;
     endContent?: React.ReactNode | ((idx: number) => React.ReactNode);
@@ -25,7 +18,7 @@ export default function ProductListTile(props: ProductListTileProps) {
     const { data, wrapWithLink, showSize, endContent, externalOverrides, internalOverrides } =
         props;
 
-    let dataArr: (Product | BagItem | ClientOrderItemWithProductNoStock)[];
+    let dataArr: (ClientProduct | BagItem | ClientOrder["items"][number])[];
 
     if ("items" in data) {
         dataArr = data.items;
@@ -35,7 +28,7 @@ export default function ProductListTile(props: ProductListTileProps) {
         dataArr = [data];
     }
 
-    const renderCentralContent = (product: Product | ProductNoStock, size?: Sizes) => {
+    const renderCentralContent = (product: Product | ClientProduct, size?: Sizes) => {
         return (
             <div className={`flex grow gap-2 sm:gap-8 ${internalOverrides ?? ""}`}>
                 <ProductImage

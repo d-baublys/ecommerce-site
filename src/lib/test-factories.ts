@@ -1,41 +1,42 @@
-import { OrderStatus, Prisma, Sizes as PrismaSizes } from "@prisma/client";
 import {
     CypressTestProductData,
     Sizes,
-    VALID_CATEGORIES,
     Categories,
     BagItem,
-    Order,
-    PrismaOrderNoStock,
     Product,
-} from "./definitions";
-import { convertClientProduct, processDateForClient, slugify } from "./utils";
+    ClientProduct,
+    ClientOrder,
+    OrderCreateInput,
+    OrderStatus,
+} from "./types";
+import { slugify } from "./utils";
+import { VALID_CATEGORIES } from "./constants";
 
-export function createFakeProduct({
+export function createTestProduct({
     idx = 0,
     overrides,
 }: {
     idx?: number;
-    overrides?: Partial<Product>;
-} = {}): Product {
+    overrides?: Partial<ClientProduct>;
+} = {}): ClientProduct {
     idx += 1;
     const name = `Test Product ${idx}`;
 
     return {
-        id: `test-id-${idx}`,
+        id: `aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa${idx}`,
         name,
-        gender: Object.keys(VALID_CATEGORIES)[0] as keyof typeof VALID_CATEGORIES,
+        gender: VALID_CATEGORIES[0].key,
         price: 2500,
         slug: slugify(name),
         src: `/nonexistent-img-${idx}.jpg`,
         alt: `Test product image ${idx}`,
-        dateAdded: processDateForClient(),
+        dateAdded: new Date(),
         stock: { s: 8, m: 3, l: 12 },
         ...overrides,
     };
 }
 
-export function createFakeProductList(): Product[] {
+export function createTestProductList(): ClientProduct[] {
     const prices = [5500, 9900, 20100, 15000];
     const stocks = [
         { s: 1, m: 0, l: 0 },
@@ -43,28 +44,32 @@ export function createFakeProductList(): Product[] {
         { s: 1, m: 1, l: 0 },
         { s: 0, m: 0, l: 0 },
     ];
+    const dates = ["2025-08-01", "2025-08-02", "2025-08-02", "2025-08-04"];
     const products = Array.from({ length: 4 }).map((_, idx) =>
-        createFakeProduct({ idx, overrides: { price: prices[idx], stock: stocks[idx] } })
+        createTestProduct({
+            idx,
+            overrides: { price: prices[idx], stock: stocks[idx], dateAdded: new Date(dates[idx]) },
+        })
     );
 
     return products;
 }
 
 export function createLongProductList(): Product[] {
-    return Array.from({ length: 10 }).map((_, idx) => createFakeProduct({ idx }));
+    return Array.from({ length: 10 }).map((_, idx) => createTestProduct({ idx }));
 }
 
-export function getFilteredFakeProducts() {
-    return createFakeProductList().filter((product) =>
+export function getFilteredTestProducts() {
+    return createTestProductList().filter((product) =>
         Object.values(product.stock).some((stockCount) => stockCount > 0)
     ); // in line with real database fetch excluding fully unstocked products
 }
 
-function createCustomBagItem(product: Product, size: Sizes, quantity: number): BagItem {
+function createCustomBagItem(product: ClientProduct, size: Sizes, quantity: number): BagItem {
     return { product, size, quantity };
 }
 
-export function createFakeBagItems(): BagItem[] {
+export function createTestBagItems(): BagItem[] {
     const prices = [5500, 9900];
     const stocks = [
         { s: 1, m: 0, l: 0 },
@@ -76,7 +81,7 @@ export function createFakeBagItems(): BagItem[] {
     const quantities = [1, 2];
 
     const products = Array.from({ length: 2 }).map((_, idx) =>
-        createFakeProduct({
+        createTestProduct({
             idx,
             overrides: {
                 price: prices[idx],
@@ -93,7 +98,7 @@ export function createFakeBagItems(): BagItem[] {
     return bagItems;
 }
 
-export function getFakeUpdatedData(): Product[] {
+export function getTestUpdatedData(): ClientProduct[] {
     const prices = [5500, 9900];
     const validCategories = Object.keys(VALID_CATEGORIES);
     const categories = [validCategories[0], validCategories[1]];
@@ -103,7 +108,7 @@ export function getFakeUpdatedData(): Product[] {
     ];
 
     const products = Array.from({ length: 2 }).map((_, idx) =>
-        createFakeProduct({
+        createTestProduct({
             idx: idx,
             overrides: {
                 price: prices[idx],
@@ -116,43 +121,31 @@ export function getFakeUpdatedData(): Product[] {
     return products;
 }
 
-type FakeOrderBase = {
+type TestOrderBase = {
     idx?: number;
-    overrides?: Partial<Order>;
+    overrides?: Partial<ClientOrder>;
 };
 
-type FakeOrderNever = {
+type TestOrderNever = {
     productList?: never;
     sizesArr?: never;
     quantitiesArr?: never;
 };
 
-type FakeOrderSimple = FakeOrderBase & FakeOrderNever;
+type TestOrderParamsSimple = TestOrderBase & TestOrderNever;
 
-type FakeOrderFull = FakeOrderBase & {
+type TestOrderParamsFull = TestOrderBase & {
     idx: number;
     productList: Product[];
     sizesArr: Sizes[];
     quantitiesArr: number[];
 };
 
-type FakeOrderParams = FakeOrderFull | FakeOrderSimple;
+type TestOrderParams = TestOrderParamsFull | TestOrderParamsSimple;
 
-type FakeOrderObjBaseParams = FakeOrderBase & {
-    idx?: number;
-    productList?: Product[];
-    sizesArr?: Sizes[];
-    quantitiesArr?: number[];
-};
-
-type FakeOrderObjClientParams = FakeOrderObjBaseParams & { variant: "client" };
-type FakeOrderObjPrismaParams = FakeOrderObjBaseParams & { variant: "prisma" };
-
-function getFakeOrderObj(inputs: FakeOrderObjClientParams): Order;
-function getFakeOrderObj(inputs: FakeOrderObjPrismaParams): PrismaOrderNoStock;
-function getFakeOrderObj(inputs: FakeOrderObjClientParams | FakeOrderObjPrismaParams) {
-    const { variant, idx = 0, productList, sizesArr, quantitiesArr, overrides } = inputs;
-    const products: Product[] | undefined = productList ? productList : [createFakeProduct()];
+export function createTestOrder(params: TestOrderParams = {}): ClientOrder {
+    const { idx = 0, productList, sizesArr, quantitiesArr, overrides } = params;
+    const products: Product[] | undefined = productList ? productList : [createTestProduct()];
     const items = products.map((product, prodIdx) => ({
         name: product.name,
         price: product.price,
@@ -161,7 +154,7 @@ function getFakeOrderObj(inputs: FakeOrderObjClientParams | FakeOrderObjPrismaPa
         size: productList && sizesArr ? sizesArr[prodIdx] : "m",
         quantity: productList && quantitiesArr ? quantitiesArr[prodIdx] : 2,
         orderId: idx,
-        product: variant === "prisma" ? convertClientProduct(product) : product,
+        product,
     }));
 
     const dataObj = {
@@ -194,47 +187,8 @@ function getFakeOrderObj(inputs: FakeOrderObjClientParams | FakeOrderObjPrismaPa
     return dataObj;
 }
 
-export function createFakeOrderClient({
-    idx = 0,
-    productList,
-    sizesArr,
-    quantitiesArr,
-    overrides,
-}: FakeOrderParams = {}): Order {
-    return getFakeOrderObj({
-        variant: "client",
-        idx,
-        productList,
-        sizesArr,
-        quantitiesArr,
-        overrides,
-    });
-}
-
-export function createFakeOrderPrisma({
-    idx = 0,
-    productList,
-    sizesArr,
-    quantitiesArr,
-    overrides,
-}: FakeOrderParams = {}): PrismaOrderNoStock {
-    return getFakeOrderObj({
-        variant: "prisma",
-        idx,
-        productList,
-        sizesArr,
-        quantitiesArr,
-        overrides,
-    });
-}
-export function createFakeOrderList({ variant }: { variant: "client" }): Order[];
-export function createFakeOrderList({ variant }: { variant: "prisma" }): PrismaOrderNoStock[];
-export function createFakeOrderList({
-    variant,
-}: {
-    variant: "prisma" | "client";
-}): (Order | PrismaOrderNoStock)[] {
-    const productList = createFakeProductList();
+export function createTestOrderList(): ClientOrder[] {
+    const productList = createTestProductList();
     const firstOrderList = productList.slice(0, 3);
     const secondOrderList = productList.slice(3);
 
@@ -243,41 +197,34 @@ export function createFakeOrderList({
     const quantitiesArr: number[][] = [[2, 1, 1], [1]];
 
     return Array.from({ length: 2 }).map((_, orderIdx) =>
-        variant === "client"
-            ? createFakeOrderClient({
-                  idx: orderIdx,
-                  productList: productLists[orderIdx],
-                  sizesArr: sizesArr[orderIdx],
-                  quantitiesArr: quantitiesArr[orderIdx],
-              })
-            : createFakeOrderPrisma({
-                  idx: orderIdx,
-                  productList: productLists[orderIdx],
-                  sizesArr: sizesArr[orderIdx],
-                  quantitiesArr: quantitiesArr[orderIdx],
-              })
+        createTestOrder({
+            idx: orderIdx,
+            productList: productLists[orderIdx],
+            sizesArr: sizesArr[orderIdx],
+            quantitiesArr: quantitiesArr[orderIdx],
+        })
     );
 }
 
-export type FakeOrderCypressParams = {
+export type TestOrderCypressParams = {
     productsDataArr: CypressTestProductData[];
     idx?: number;
-    sizesArr?: PrismaSizes[];
+    sizesArr?: Sizes[];
     quantitiesArr?: number[];
-    overrides?: Partial<Prisma.OrderUncheckedCreateInput>;
+    overrides?: Partial<OrderCreateInput>;
 };
 
-export function createFakeOrderCypress({
+export function createTestOrderCypress({
     idx = 0,
     productsDataArr,
     sizesArr,
     quantitiesArr,
     overrides,
-}: FakeOrderCypressParams): Prisma.OrderUncheckedCreateInput {
+}: TestOrderCypressParams): OrderCreateInput {
     let subTotal = 0;
     const shippingTotal = 500;
 
-    const items = productsDataArr.map((product, prodIdx) => {
+    const items: OrderCreateInput["items"] = productsDataArr.map((product, prodIdx) => {
         const price = product.price;
         const quantity: number = quantitiesArr ? quantitiesArr[prodIdx] : 2;
         subTotal += price * quantity;
@@ -285,7 +232,7 @@ export function createFakeOrderCypress({
             productId: String(product.id),
             name: product.name,
             price,
-            size: sizesArr ? sizesArr[prodIdx] : ("m" as PrismaSizes),
+            size: sizesArr ? sizesArr[prodIdx] : ("m" as Sizes),
             quantity,
         };
     });
@@ -295,12 +242,12 @@ export function createFakeOrderCypress({
         shippingTotal,
         total: subTotal + shippingTotal,
         status: "paid" as OrderStatus,
-        userId: 1,
+        user: { connect: { id: 1 } },
         email: "test@example.com",
         createdAt: new Date("2025-08-01"),
         sessionId: `sessionId-${idx}`,
         paymentIntentId: `paymentIntentId-${idx}`,
-        items: { create: items },
+        items,
         ...overrides,
     };
 

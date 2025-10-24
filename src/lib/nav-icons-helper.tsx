@@ -8,10 +8,10 @@ import {
     IoSearchOutline,
 } from "react-icons/io5";
 
-type ConditionalNavIcon = {
+interface ConditionalNavIcon {
     renderIcon: (isForMenu: boolean) => React.JSX.Element;
     isVisible: (isAdmin: boolean) => boolean;
-};
+}
 
 interface RenderFixedIconsParams {
     handleSearchClick: () => void;

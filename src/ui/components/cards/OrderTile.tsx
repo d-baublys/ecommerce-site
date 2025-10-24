@@ -12,11 +12,10 @@ import { useModalStore } from "@/stores/modalStore";
 import { updateOrder } from "@/lib/actions";
 import { SetStateAction } from "react";
 import { useRouter } from "next/navigation";
-import { Order as PrismaOrder } from "@prisma/client";
-import { Order } from "@/lib/definitions";
+import { ClientOrder, Order } from "@/lib/types";
 
 interface OrderTileProps {
-    orderData: Order;
+    orderData: ClientOrder;
     messageSetter: React.Dispatch<SetStateAction<string>>;
     openSuccessModal: () => void;
     openFailureModal: () => void;
@@ -48,7 +47,7 @@ export default function OrderTile(props: OrderTileProps) {
             break;
     }
 
-    const handleReturnRequest = async (orderId: PrismaOrder["id"]) => {
+    const handleReturnRequest = async (orderId: Order["id"]) => {
         const returnConfirm = await openModal();
 
         if (returnConfirm) {

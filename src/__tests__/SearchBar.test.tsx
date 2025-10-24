@@ -1,7 +1,7 @@
-import { createFakeProductList } from "@/lib/test-factories";
+import { createTestProductList } from "@/lib/test-factories";
 import SearchBar from "@/ui/components/SearchBar";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { Product } from "@/lib/definitions";
+import { ClientProduct } from "@/lib/types";
 
 jest.mock("next/navigation", () => ({
     useRouter: () => ({
@@ -10,12 +10,12 @@ jest.mock("next/navigation", () => ({
 }));
 
 jest.mock("@/lib/actions", () => ({
-    getProductData: jest.fn(),
+    getProducts: jest.fn(),
 }));
 
-import { getProductData } from "@/lib/actions";
+import { getProducts } from "@/lib/actions";
 
-const productList = { data: createFakeProductList() };
+const productList = { data: createTestProductList() };
 
 const mockResultClick = jest.fn();
 
@@ -28,11 +28,11 @@ const renderLocalSearch = () =>
     );
 
 const mockResolvedFetch = () => {
-    (getProductData as jest.Mock).mockResolvedValue(productList);
+    (getProducts as jest.Mock).mockResolvedValue(productList);
 };
 
 const mockFailedFetch = () => {
-    (getProductData as jest.Mock).mockResolvedValue(undefined);
+    (getProducts as jest.Mock).mockResolvedValue(undefined);
 };
 
 const getInput = () => screen.getByRole("searchbox");
@@ -73,7 +73,7 @@ describe("SearchBar", () => {
     });
 
     it("behaves correctly with a passed handleResultClick function", async () => {
-        const testList: Product[] = [];
+        const testList: ClientProduct[] = [];
         (mockResultClick as jest.Mock).mockImplementation((product) => {
             testList.push(product);
         });

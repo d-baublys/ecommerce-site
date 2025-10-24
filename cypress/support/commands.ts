@@ -39,7 +39,6 @@
 import { adminEmail, adminPassword, standardEmail, standardPassword } from "./credentials";
 import "cypress-axe";
 import "cypress-file-upload";
-import { buildProductUrl } from "../../src/lib/utils";
 
 declare global {
     namespace Cypress {
@@ -62,6 +61,8 @@ declare global {
             awaitTableSettle(): Chainable<void>;
             visitTestAdminProduct(testProductUrl: string): Chainable<void>;
             visitTestProduct(testProductUrl: string): Chainable<void>;
+            assertFormMessage(expectedMessage: string): Chainable<void>;
+            assertTableMessage(expectedMessage: string): Chainable<void>;
         }
     }
 }
@@ -165,4 +166,14 @@ Cypress.Commands.add("visitTestProduct", (testProductUrl) => {
     cy.visit(testProductUrl);
     cy.location("pathname").should("eq", testProductUrl);
     cy.contains("White & medium dark print").should("be.visible");
+});
+
+Cypress.Commands.add("assertFormMessage", (expectedMessage) => {
+    cy.get("#overall-action-container").contains("button", /^Add$/).click();
+    cy.get("#overall-message-container").contains(expectedMessage).should("be.visible");
+});
+
+Cypress.Commands.add("assertTableMessage", (expectedMessage) => {
+    cy.get("#stock-table-button-container").contains("button", /^Add$/).click();
+    cy.get("#stock-table-message-container").contains(expectedMessage).should("be.visible");
 });

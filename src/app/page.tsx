@@ -1,10 +1,10 @@
 import Carousel from "@/ui/components/Carousel";
-import { getFeaturedProducts, getProductData } from "@/lib/actions";
+import { getFeaturedProducts, getProducts } from "@/lib/actions";
 import Link from "next/link";
-import { FEATURED_COUNT } from "@/lib/definitions";
 import BareLayout from "@/ui/layouts/BareLayout";
 import ProductImage from "@/ui/components/ProductImage";
 import { Metadata } from "next";
+import { FEATURED_COUNT } from "@/lib/constants";
 
 export const metadata: Metadata = {
     title: "Home | DB-Wear",
@@ -15,7 +15,7 @@ export default async function HomePage() {
     let featuredList = featuredFetch.data;
 
     if (!featuredList.length) {
-        const fallbackFetch = await getProductData();
+        const fallbackFetch = await getProducts();
 
         const fallbackData = fallbackFetch.data;
 

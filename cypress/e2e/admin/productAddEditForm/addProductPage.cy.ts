@@ -1,9 +1,9 @@
-import { CypressTestDataDeleteParams } from "../../../../src/lib/definitions";
-import { createFakeProduct } from "../../../../src/lib/test-factories";
+import { createTestProduct } from "../../../../src/lib/test-factories";
+import { CypressTestDataDeleteParams } from "../../../../src/lib/types";
 import { processDateForClient, stringifyConvertPrice } from "../../../../src/lib/utils";
 
 let productNameArr: CypressTestDataDeleteParams["productNameArr"] = [];
-const testProduct = createFakeProduct();
+const testProduct = createTestProduct();
 
 describe("Add product page", () => {
     beforeEach(() => {
@@ -20,14 +20,14 @@ describe("Add product page", () => {
             .type(`${stringifyConvertPrice(testProduct.price)}`);
         cy.get("input[name='image-path']").attachFile("test-image.png");
         cy.get("input[name='image-description']").type(testProduct.alt);
-        cy.get("input[name='date-added']").type(testProduct.dateAdded);
+        cy.get("input[name='date-added']").type(processDateForClient(testProduct.dateAdded));
         cy.get("#stock-table-button-container").contains("button", "+ Add Size").click();
         cy.get("[data-cy='size-input']").last().type("s");
         cy.get("[data-cy='quantity-input']").last().type("10");
         cy.get("#stock-table-button-container").contains("button", /^Add$/).click();
     });
 
-    after(() => {
+    afterEach(() => {
         if (productNameArr.length) {
             cy.task("getTestProductMultipleId", productNameArr).then((productIdArr) => {
                 cy.task("deleteTestData", {
@@ -54,6 +54,32 @@ describe("Add product page", () => {
         cy.get("#overall-message-container")
             .contains("Product added successfully")
             .should("be.visible");
+
+        productNameArr.push(testProduct.name);
+    });
+
+    it("hides all operation buttons after successful product creation", () => {
+        cy.get("#overall-action-container").contains("button", "Add").click();
+
+        cy.get("#overall-action-container button").should("have.length", 0);
+        cy.get("#stock-table-button-container button").should("have.length", 0);
+
+        productNameArr.push(testProduct.name);
+    });
+
+    it("doesn't show the 'leave page/stay on page' modal if page reloads after successful product creation", () => {
+        let preventSpy: Cypress.Agent<sinon.SinonSpy>;
+
+        cy.on("window:before:unload", (e) => {
+            preventSpy = cy.spy(e, "preventDefault");
+        });
+
+        cy.get("#overall-action-container").contains("button", "Add").click();
+        cy.get("#overall-action-container button").should("have.length", 0);
+
+        cy.reload().then(() => {
+            cy.wrap(preventSpy).should("not.have.been.called");
+        });
 
         productNameArr.push(testProduct.name);
     });

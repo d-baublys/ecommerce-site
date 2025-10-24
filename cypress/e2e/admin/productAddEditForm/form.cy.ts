@@ -1,6 +1,3 @@
-import { createFakeProduct } from "../../../../src/lib/test-factories";
-import { stringifyConvertPrice } from "../../../../src/lib/utils";
-
 describe("Product add/edit form base tests", () => {
     beforeEach(() => {
         cy.logInAsAdmin();
@@ -35,29 +32,37 @@ describe("Product add/edit form base tests", () => {
         });
     });
 
-    it("shows error message if any main form fields are empty", () => {
+    it("shows expected message when product name is too short", () => {
+        cy.get("input[name='product-name']").type("tes");
+        cy.assertFormMessage("Product name must be at least 4 characters long");
+    });
+
+    it("shows expected message when product price is too low", () => {
         cy.get("input[name='product-name']").type("test");
-        cy.get("#overall-action-container").contains("button", "Add").click();
-        cy.get("#overall-message-container")
-            .contains("Invalid data values. Please check and try again.")
-            .should("be.visible");
+        cy.get("input[name='product-price']").clear().type("0.99");
+        cy.assertFormMessage("Price must be at least 1.00");
+    });
+
+    it("shows expected message when image filepath is left empty", () => {
+        cy.get("input[name='product-name']").type("test");
+        cy.get("input[name='product-price']").clear().type("1.00");
+        cy.assertFormMessage("Invalid image filepath");
+    });
+
+    it("shows expected message when image description is too short", () => {
+        cy.get("input[name='product-name']").type("test");
+        cy.get("input[name='product-price']").clear().type("1.00");
+        cy.get("input[name='image-path']").attachFile("test-image.png");
+        cy.get("input[name='image-description']").type("tes");
+        cy.assertFormMessage("Image description must be at least 4 characters long");
     });
 
     it("shows error message if stock table is left empty", () => {
-        const testProduct = createFakeProduct();
-
-        cy.get("input[name='product-name']").type(testProduct.name);
-        cy.get("select[name='product-category']").select(testProduct.gender);
-        cy.get("input[name='product-price']")
-            .clear()
-            .type(`${stringifyConvertPrice(testProduct.price)}`);
+        cy.get("input[name='product-name']").type("test");
+        cy.get("input[name='product-price']").clear().type("1.00");
         cy.get("input[name='image-path']").attachFile("test-image.png");
-        cy.get("input[name='image-description']").type(testProduct.alt);
-        cy.get("input[name='date-added']").type(testProduct.dateAdded);
-        cy.get("#overall-action-container").contains("button", "Add").click();
-        cy.get("#overall-message-container")
-            .contains("Invalid data values. Please check and try again.")
-            .should("be.visible");
+        cy.get("input[name='image-description']").type("test");
+        cy.assertFormMessage("Stock table must include at least one size");
     });
 
     it("shows 'pending add' state buttons on stock table addition", () => {

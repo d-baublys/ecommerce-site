@@ -1,16 +1,6 @@
 "use client";
 
-import {
-    Categories,
-    PRICE_FILTER_OPTIONS,
-    PriceFilterKey,
-    Product,
-    ProductSortKey,
-    Sizes,
-    SORT_OPTIONS,
-    VALID_CATEGORIES,
-    VALID_SIZES,
-} from "@/lib/definitions";
+import { Categories, ClientProduct, PriceFilterKey, ProductSortKey, Sizes } from "@/lib/types";
 import GridAside from "@/ui/components/product-grid/GridAside";
 import { useEffect, useRef, useState } from "react";
 import { extractFilters, extractSort } from "@/lib/utils";
@@ -23,6 +13,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
 import LoadingIndicator from "@/ui/components/overlays/LoadingIndicator";
+import { PRICE_FILTER_OPTIONS, SORT_OPTIONS, VALID_CATEGORIES, VALID_SIZES } from "@/lib/constants";
 
 type PageOptions = {
     noAside?: boolean;
@@ -50,8 +41,8 @@ export default function CategoryGridPage({
         paramsGetter.get("sort"),
     ];
 
-    const [allCategoryProducts, setAllCategoryProducts] = useState<Product[]>();
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>();
+    const [allCategoryProducts, setAllCategoryProducts] = useState<ClientProduct[]>();
+    const [filteredProducts, setFilteredProducts] = useState<ClientProduct[]>();
 
     const [sizeFilters, setSizeFilters] = useState<Sizes[]>(
         extractFilters<Sizes>(currSizeFilters, VALID_SIZES)
@@ -142,10 +133,10 @@ export default function CategoryGridPage({
     const categoryTabs = () => {
         return (
             <ul aria-label="Category tabs" className="flex w-full border-b-2 gap-8 mb-8 py-2">
-                {Object.entries(VALID_CATEGORIES).map(([key, displayName]) => (
-                    <li key={key}>
-                        <Link href={`/category/${key}`}>
-                            <div>{displayName}</div>
+                {VALID_CATEGORIES.map((c) => (
+                    <li key={c.key}>
+                        <Link href={`/category/${c.key}`}>
+                            <div>{c.label}</div>
                         </Link>
                     </li>
                 ))}

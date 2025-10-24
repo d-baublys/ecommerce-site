@@ -7,9 +7,9 @@ import { getOrder } from "@/lib/actions";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 import { Metadata } from "next";
 
-type AsyncParams = {
+interface AsyncParams {
     searchParams: Promise<{ session_id: string }>;
-};
+}
 
 export const metadata: Metadata = {
     title: "Purchase Success",

@@ -1,31 +1,31 @@
-import { createFakeProduct } from "@/lib/test-factories";
+import { createTestProduct } from "@/lib/test-factories";
 import { getConsoleErrorSpy } from "@/lib/test-utils";
 import { buildProductUrl } from "@/lib/utils";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import ProductPage from "@/app/products/[id]/[slug]/page";
 import { useBagStore } from "@/stores/bagStore";
 
-const fakeProduct = createFakeProduct();
+const testProduct = createTestProduct();
 const getLatestBag = () => useBagStore.getState().bag;
 const { clearBag } = useBagStore.getState();
 
 jest.mock("@/lib/actions", () => ({
-    getProductData: jest.fn(),
+    getProducts: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({
-    usePathname: () => buildProductUrl(fakeProduct.id, fakeProduct.slug),
+    usePathname: () => buildProductUrl(testProduct.id, testProduct.slug),
     notFound: jest.fn(() => {
         throw new Error("notFound called");
     }),
 }));
 
-import { getProductData } from "@/lib/actions";
+import { getProducts } from "@/lib/actions";
 
 const renderPage = async () =>
     render(
         await ProductPage({
-            params: Promise.resolve({ id: fakeProduct.id, slug: fakeProduct.slug }),
+            params: Promise.resolve({ id: testProduct.id, slug: testProduct.slug }),
         })
     );
 
@@ -35,7 +35,7 @@ describe("ProductPage", () => {
     });
 
     it("displays product information", async () => {
-        (getProductData as jest.Mock).mockResolvedValue({ data: [fakeProduct] });
+        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
         await renderPage();
 
         expect(screen.getByTestId("product-detail-name")).toHaveTextContent(/Test Product 1/);
@@ -43,14 +43,14 @@ describe("ProductPage", () => {
     });
 
     it("invokes notFound when provided slug returns no matching products", async () => {
-        (getProductData as jest.Mock).mockResolvedValue({ data: [] });
+        (getProducts as jest.Mock).mockResolvedValue({ data: [] });
 
         expect(renderPage()).rejects.toThrow("notFound called");
     });
 
     it("throws an error when fetch fails", async () => {
         const errorSpy = getConsoleErrorSpy();
-        (getProductData as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
+        (getProducts as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
 
         expect(renderPage()).rejects.toThrow("Fetch failed");
 
@@ -58,7 +58,7 @@ describe("ProductPage", () => {
     });
 
     it("shows disabled product add button by default", async () => {
-        (getProductData as jest.Mock).mockResolvedValue({ data: [fakeProduct] });
+        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
         await renderPage();
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });
@@ -69,7 +69,7 @@ describe("ProductPage", () => {
     });
 
     it("shows enabled product add button after selecting a size", async () => {
-        (getProductData as jest.Mock).mockResolvedValue({ data: [fakeProduct] });
+        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
         await renderPage();
 
         fireEvent.change(screen.getByLabelText("Size selection"), { target: { value: "s" } });
@@ -80,7 +80,7 @@ describe("ProductPage", () => {
     });
 
     it("disables product add button when all remaining stock is added to bag", async () => {
-        (getProductData as jest.Mock).mockResolvedValue({ data: [fakeProduct] });
+        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
         await renderPage();
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });
@@ -103,7 +103,7 @@ describe("ProductPage", () => {
     });
 
     it("disables product add button when added quantity reaches the prescribed limit", async () => {
-        (getProductData as jest.Mock).mockResolvedValue({ data: [fakeProduct] });
+        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
         await renderPage();
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });
@@ -125,10 +125,10 @@ describe("ProductPage", () => {
     });
 
     it("includes all required size options", async () => {
-        (getProductData as jest.Mock).mockResolvedValue({ data: [fakeProduct] });
+        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
         await renderPage();
 
-        Object.keys(fakeProduct.stock).forEach((size) => {
+        Object.keys(testProduct.stock).forEach((size) => {
             expect(
                 screen.getByRole("option", { name: new RegExp(`${size.toUpperCase()}`) })
             ).toBeInTheDocument();
@@ -136,7 +136,7 @@ describe("ProductPage", () => {
     });
 
     it("disables size option when all remaining stock is added to bag", async () => {
-        (getProductData as jest.Mock).mockResolvedValue({ data: [fakeProduct] });
+        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
         await renderPage();
 
         const selectedOption = screen.getByRole("option", { name: "M" });
@@ -159,7 +159,7 @@ describe("ProductPage", () => {
     });
 
     it("caps single item bag quantity per the prescribed limit", async () => {
-        (getProductData as jest.Mock).mockResolvedValue({ data: [fakeProduct] });
+        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
         await renderPage();
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });

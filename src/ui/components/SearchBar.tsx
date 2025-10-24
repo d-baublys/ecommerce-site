@@ -1,8 +1,8 @@
 "use client";
 
-import { getProductData } from "@/lib/actions";
-import { Categories, Product } from "@/lib/definitions";
+import { getProducts } from "@/lib/actions";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
+import { Categories, ClientProduct } from "@/lib/types";
 import { debounce } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { SetStateAction, useEffect, useState } from "react";
@@ -16,19 +16,19 @@ type SearchBarConfig = {
 
 interface SearchBarProps {
     options: SearchBarConfig;
-    handleResultClick?: (product: Product) => void;
+    handleResultClick?: (product: ClientProduct) => void;
     handleSearchClose?: () => void;
     inputRef?: React.RefObject<HTMLInputElement | null>;
-    parentSetter?: React.Dispatch<SetStateAction<Product[]>>;
+    parentSetter?: React.Dispatch<SetStateAction<ClientProduct[]>>;
     parentQuerySetter?: React.Dispatch<SetStateAction<string>>;
     parentFilter?: Categories | null;
     parentLoadingStateSetter?: React.Dispatch<SetStateAction<boolean>>;
 }
 
 export default function SearchBar(props: SearchBarProps) {
-    const [productList, setProductList] = useState<Product[]>();
+    const [productList, setProductList] = useState<ClientProduct[]>();
     const [query, setQuery] = useState<string>("");
-    const [results, setResults] = useState<Product[]>([]);
+    const [results, setResults] = useState<ClientProduct[]>([]);
     const [isResultLoading, setIsResultLoading] = useState<boolean>(false);
     const [activeIdx, setActiveIdx] = useState<number>(-1);
     const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
@@ -49,7 +49,7 @@ export default function SearchBar(props: SearchBarProps) {
         const getData = async () => {
             const productFetch = options.isGlobalSearch
                 ? await fetchFilteredProducts({ category: "all" })
-                : (await getProductData())?.data;
+                : (await getProducts())?.data;
 
             setProductList(productFetch);
             if (parentSetter) parentSetter(productFetch);
@@ -110,7 +110,7 @@ export default function SearchBar(props: SearchBarProps) {
         }
     };
 
-    const handleClick = (product: Product) => {
+    const handleClick = (product: ClientProduct) => {
         handleResultClick?.(product);
         clearAll();
         handleSearchClose?.();
