@@ -9,7 +9,8 @@ import {
     StockCreateInput,
 } from "./types";
 import bcrypt from "bcryptjs";
-import { REFUND_WINDOW, SORT_OPTIONS, VALID_CATEGORIES, VALID_SIZES } from "./constants";
+import { REFUND_WINDOW, SORT_OPTIONS, VALID_CATEGORIES } from "./constants";
+import { ZodSafeParseError } from "zod";
 
 export function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number) {
     let timer: ReturnType<typeof setTimeout>;
@@ -40,16 +41,8 @@ export function checkStock(
     );
 }
 
-export function isValidSize(value: string): value is Sizes {
-    return VALID_SIZES.includes(value as Sizes);
-}
-
-export function isUnique(value: string, stockObj: ClientStock) {
-    return !Object.entries(stockObj).find(([size]) => size === value);
-}
-
-export function isValidStock(value: number): boolean {
-    return value >= 0;
+export function isUnique(sizeKey: Sizes, stockObj: ClientStock) {
+    return !Object.keys(stockObj).includes(sizeKey);
 }
 
 export function capitalize(str: string): string {
@@ -72,8 +65,12 @@ export function slugify(name: string): string {
     return name.toLowerCase().split(" ").join("-");
 }
 
-export function formatImagePath(filePath: string): string {
-    return `/${filePath}`;
+export function formatImageName(fileName: string): string {
+    return `/${fileName}`;
+}
+
+export function stripImagePath(filePath: string): string {
+    return filePath.split("/").slice(-1)[0];
 }
 
 export function createEmptyProduct(): ClientProduct {
@@ -227,4 +224,15 @@ export function checkIsWithinReturnWindow(date: Date): boolean {
 
 export function addReturnWindowDelta(date: Date): Date {
     return new Date(date.getTime() + REFUND_WINDOW);
+}
+
+export function extractZodMessage(safeParseError: ZodSafeParseError<unknown>): string {
+    return safeParseError.error.issues[0].message;
+}
+
+export function zodErrorResponse(safeParseError: ZodSafeParseError<unknown>): {
+    success: false;
+    error: string;
+} {
+    return { success: false, error: extractZodMessage(safeParseError) };
 }

@@ -20,7 +20,7 @@ jest.mock("next/navigation", () => ({
 }));
 
 jest.mock("@/lib/actions", () => ({
-    getProductData: jest.fn(),
+    getProducts: jest.fn(),
 }));
 
 jest.mock("next-auth/react", () => ({

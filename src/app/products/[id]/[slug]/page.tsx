@@ -5,9 +5,9 @@ import MainLayout from "@/ui/layouts/MainLayout";
 import { Metadata } from "next";
 import { buildProductUrl } from "@/lib/utils";
 
-type AsyncParams = {
+interface AsyncParams {
     params: Promise<{ id: string; slug: string }>;
-};
+}
 
 export async function generateMetadata({ params }: AsyncParams): Promise<Metadata> {
     const { id } = await params;

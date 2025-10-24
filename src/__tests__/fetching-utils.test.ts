@@ -1,7 +1,7 @@
 import { Categories, PriceFilterKey, ProductSortKey, Sizes } from "@/lib/types";
 
 jest.mock("@/lib/actions", () => ({
-    getProductData: jest.fn(),
+    getProducts: jest.fn(),
 }));
 
 import { getProducts } from "@/lib/actions";

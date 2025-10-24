@@ -1,7 +1,7 @@
 "use client";
 
 import { ClientProduct, ClientStock, Sizes, StockTableMode } from "@/lib/types";
-import { isUnique, isValidSize } from "@/lib/utils";
+import { extractZodMessage, isUnique } from "@/lib/utils";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import StockTableInput from "@/ui/components/forms/StockTableInput";
 import StockRowDelete from "@/ui/components/buttons/StockRowDelete";
@@ -10,74 +10,78 @@ import RoundedTable from "@/ui/components/forms/RoundedTable";
 import TableHeadCell from "@/ui/components/forms/TableHeadCell";
 import TableBodyCell from "@/ui/components/forms/TableBodyCell";
 import { VALID_SIZES } from "@/lib/constants";
+import { clientStockSchema, sizeSchema } from "@/lib/schemas";
 
 interface ProductStockTableProps {
-    savedDataObj: ClientProduct;
-    provisionalDataObj: ClientProduct;
-    setProvisionalDataObj: React.Dispatch<React.SetStateAction<ClientProduct>>;
+    formSavedProductData: ClientProduct;
+    formProvisionalProductData: ClientProduct;
+    setFormProvisionalProductData: React.Dispatch<React.SetStateAction<ClientProduct>>;
     tableMode: StockTableMode;
     setTableMode: React.Dispatch<React.SetStateAction<StockTableMode>>;
 }
 
 export default function ProductStockTable({
-    savedDataObj,
-    provisionalDataObj,
-    setProvisionalDataObj,
+    formSavedProductData,
+    formProvisionalProductData,
+    setFormProvisionalProductData,
     tableMode,
     setTableMode,
 }: ProductStockTableProps) {
-    const [localStockObj, setLocalStockObj] = useState<ClientStock>(savedDataObj.stock);
+    const [tableLocalStock, setTableLocalStock] = useState<ClientStock>(formSavedProductData.stock);
 
     const [message, setMessage] = useState<string>();
-    const [newSize, setNewSize] = useState<Sizes>();
-    const [newStock, setNewStock] = useState<number>();
+    const [newSize, setNewSize] = useState<string>();
+    const [newQuantity, setNewQuantity] = useState<number>();
 
-    const tableArr = VALID_SIZES.filter((size) => size in localStockObj);
+    const tableArr = VALID_SIZES.filter((size) => size in tableLocalStock);
 
-    useEffect(() => {
-        setLocalStockObj(provisionalDataObj.stock);
+    const resetUi = () => {
         setNewSize(undefined);
-        setNewStock(undefined);
+        setNewQuantity(undefined);
         setTableMode("display");
         setMessage(undefined);
-    }, [provisionalDataObj]);
+    };
+
+    useEffect(() => {
+        setTableLocalStock(formProvisionalProductData.stock);
+        resetUi();
+    }, [formProvisionalProductData]);
+
+    const parseUpdateStock = (stock: ClientStock) => {
+        const parsedStock = clientStockSchema.safeParse(stock);
+
+        if (!parsedStock.success) {
+            setMessage(extractZodMessage(parsedStock));
+            return;
+        }
+
+        setFormProvisionalProductData((prev) => ({ ...prev, stock: parsedStock.data }));
+    };
 
     const handleAdd = async () => {
-        if (
-            newSize !== undefined &&
-            newStock !== undefined &&
-            isValidSize(newSize) &&
-            isUnique(newSize, localStockObj)
-        ) {
-            const updatedStockObj = { ...localStockObj, [newSize]: newStock };
+        const parsedSize = sizeSchema.safeParse(newSize);
 
-            setLocalStockObj(updatedStockObj);
-            setProvisionalDataObj((prev) => ({ ...prev, stock: updatedStockObj }));
-            setNewSize(undefined);
-            setNewStock(undefined);
-            setTableMode("display");
-            setMessage(undefined);
-        } else if (!isValidSize(newSize as Sizes) || !newStock) {
-            setMessage("Invalid size or stock value");
-        } else {
-            setMessage("Duplicate size value");
+        if (!parsedSize.success) {
+            setMessage(extractZodMessage(parsedSize));
+            return;
         }
+
+        if (!isUnique(parsedSize.data, tableLocalStock)) {
+            setMessage("Duplicate size value");
+            return;
+        }
+        const updatedStock = { ...tableLocalStock, [parsedSize.data]: newQuantity };
+
+        parseUpdateStock(updatedStock);
     };
 
     const handleApply = async () => {
-        setProvisionalDataObj((prev) => ({ ...prev, stock: localStockObj }));
-        setNewSize(undefined);
-        setNewStock(undefined);
-        setTableMode("display");
-        setMessage(undefined);
+        parseUpdateStock(tableLocalStock);
     };
 
     const handleCancel = () => {
-        setLocalStockObj(provisionalDataObj.stock);
-        setNewSize(undefined);
-        setNewStock(undefined);
-        setTableMode("display");
-        setMessage(undefined);
+        setTableLocalStock(formProvisionalProductData.stock);
+        resetUi();
     };
 
     const buildHeadCells = () => (
@@ -114,16 +118,16 @@ export default function ProductStockTable({
                             type="number"
                             mode={tableMode}
                             pairKey={stockSize}
-                            value={localStockObj[stockSize]}
-                            stockObjSetter={setLocalStockObj}
-                            setNewStock={setNewStock}
+                            value={tableLocalStock[stockSize]}
+                            setTableLocalStock={setTableLocalStock}
+                            setNewQuantity={setNewQuantity}
                         />
                     </TableBodyCell>
                     <td>
                         {tableMode === "edit" && (
                             <div className="flex grow w-full justify-center items-center">
                                 <StockRowDelete
-                                    stockObjSetter={setLocalStockObj}
+                                    stockObjSetter={setTableLocalStock}
                                     size={stockSize as Sizes}
                                 />
                             </div>
@@ -145,9 +149,9 @@ export default function ProductStockTable({
                         <StockTableInput
                             type="number"
                             mode={tableMode}
-                            stockObjSetter={setLocalStockObj}
+                            setTableLocalStock={setTableLocalStock}
                             isNew
-                            setNewStock={setNewStock}
+                            setNewQuantity={setNewQuantity}
                         />
                     </TableBodyCell>
                 </tr>
@@ -158,7 +162,7 @@ export default function ProductStockTable({
     return (
         <div className="flex flex-col py-4 bg-background-lighter rounded-md ">
             <div id="stock-table-button-container" className="flex justify-between h-12 px-8">
-                {tableMode === "display" && Object.keys(localStockObj)?.length > 0 && (
+                {tableMode === "display" && Object.keys(tableLocalStock)?.length > 0 && (
                     <div>
                         <PlainRoundedButton onClick={() => setTableMode("edit")}>
                             Edit

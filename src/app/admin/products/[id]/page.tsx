@@ -4,9 +4,9 @@ import AdminLayout from "@/ui/layouts/AdminLayout";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-type AsyncParams = {
+interface AsyncParams {
     params: Promise<{ id: string }>;
-};
+}
 
 export const metadata: Metadata = {
     title: "Edit product | Admin",

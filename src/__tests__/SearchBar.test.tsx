@@ -10,7 +10,7 @@ jest.mock("next/navigation", () => ({
 }));
 
 jest.mock("@/lib/actions", () => ({
-    getProductData: jest.fn(),
+    getProducts: jest.fn(),
 }));
 
 import { getProducts } from "@/lib/actions";

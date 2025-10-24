@@ -434,16 +434,12 @@ describe("createUser", () => {
         await expect(result).resolves.toEqual({ success: true });
     });
 
-    it("rejects when provided email is invalid", async () => {
-        const errorSpy = getConsoleErrorSpy();
-
+    it("resolves with error message when provided email is invalid", async () => {
         const result = createUser({
             email: "testexample.com",
             password: "testabc123",
         });
-        await expect(result).rejects.toThrow("Invalid email address.");
-
-        errorSpy.mockRestore();
+        await expect(result).resolves.toEqual({ success: false, error: "Invalid email address." });
     });
 
     it("rejects when user existence data fetch fails", async () => {
@@ -461,24 +457,24 @@ describe("createUser", () => {
         errorSpy.mockRestore();
     });
 
-    it("rejects when a user with the same email already exists", async () => {
-        const errorSpy = getConsoleErrorSpy();
+    it("resolves with error message when a user with the same email already exists", async () => {
         (prisma.user.findFirst as jest.Mock).mockResolvedValue({});
 
         const result = createUser({ email: "test@example.com", password: "testabc123" });
-        await expect(result).rejects.toThrow("An account with this email address already exists.");
-
-        errorSpy.mockRestore();
+        await expect(result).resolves.toEqual({
+            success: false,
+            error: "An account with this email address already exists.",
+        });
     });
 
-    it("rejects when a user with the same email already exists", async () => {
-        const errorSpy = getConsoleErrorSpy();
+    it("resolves with error message when password is too short", async () => {
         (prisma.user.findFirst as jest.Mock).mockResolvedValue(null);
 
         const result = createUser({ email: "test@example.com", password: "testabc" });
-        await expect(result).rejects.toThrow("Your password must have a minimum of 8 characters.");
-
-        errorSpy.mockRestore();
+        await expect(result).resolves.toEqual({
+            success: false,
+            error: "Password must be at least 8 characters long.",
+        });
     });
 
     it("rejects on database error", async () => {
@@ -505,7 +501,7 @@ describe("getUser", () => {
         };
 
         const result = getUser(email);
-        await expect(result).resolves.toEqual(userData);
+        await expect(result).resolves.toEqual({ data: userData });
     });
 
     it("throws an error if fetch fails", async () => {

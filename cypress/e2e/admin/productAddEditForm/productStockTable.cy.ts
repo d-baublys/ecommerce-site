@@ -134,6 +134,15 @@ describe("Product stock table 'edit' mode", () => {
             .should("have.css", "border-color", "rgb(23, 23, 23)");
     });
 
+    it("displays error message when quantity is edited to an invalid value", () => {
+        cy.get("#stock-table-button-container").contains("button", "Edit").click();
+        cy.get("[data-cy='quantity-input']").clear().type("-20");
+        cy.get("#stock-table-button-container").contains("button", "Apply").click();
+        cy.get("#stock-table-message-container")
+            .contains("Invalid quantity value")
+            .should("be.visible");
+    });
+
     it("displays trashcan icon adjacent to every table row", () => {
         cy.get("#stock-table-button-container").contains("button", "+ Add Size").click();
         cy.get("[data-cy='size-input']").last().type("m");
@@ -208,36 +217,24 @@ describe("Product stock table 'add' mode", () => {
 
     it("displays error message when adding with an empty size value", () => {
         cy.get("[data-cy='quantity-input']").last().type("10");
-        cy.get("#stock-table-button-container").contains("button", /^Add$/).click();
-        cy.get("#stock-table-message-container")
-            .contains("Invalid size or stock value")
-            .should("be.visible");
+        cy.assertTableMessage("Invalid size value");
     });
 
     it("displays error message when adding with an empty quantity value", () => {
         cy.get("[data-cy='size-input']").last().type("s");
-        cy.get("#stock-table-button-container").contains("button", /^Add$/).click();
-        cy.get("#stock-table-message-container")
-            .contains("Invalid size or stock value")
-            .should("be.visible");
+        cy.assertTableMessage("Invalid quantity value");
     });
 
     it("displays error message when adding an invalid size", () => {
         cy.get("[data-cy='size-input']").last().type("xd");
         cy.get("[data-cy='quantity-input']").last().type("10");
-        cy.get("#stock-table-button-container").contains("button", /^Add$/).click();
-        cy.get("#stock-table-message-container")
-            .contains("Invalid size or stock value")
-            .should("be.visible");
+        cy.assertTableMessage("Invalid size value");
     });
 
     it("displays error message when adding an invalid quantity", () => {
         cy.get("[data-cy='size-input']").last().type("s");
         cy.get("[data-cy='quantity-input']").last().type("-10");
-        cy.get("#stock-table-button-container").contains("button", /^Add$/).click();
-        cy.get("#stock-table-message-container")
-            .contains("Invalid size or stock value")
-            .should("be.visible");
+        cy.assertTableMessage("Invalid quantity value");
     });
 
     it("displays error message when adding a duplicate size", () => {
@@ -248,10 +245,7 @@ describe("Product stock table 'add' mode", () => {
         cy.get("#stock-table-button-container").contains("button", "+ Add Size").click();
         cy.get("[data-cy='size-input']").last().type("s");
         cy.get("[data-cy='quantity-input']").last().type("10");
-        cy.get("#stock-table-button-container").contains("button", /^Add$/).click();
-        cy.get("#stock-table-message-container")
-            .contains("Duplicate size value")
-            .should("be.visible");
+        cy.assertTableMessage("Duplicate size value");
     });
 
     it("reverts table to provisional state on 'cancel' click", () => {

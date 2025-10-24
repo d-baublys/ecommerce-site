@@ -8,4 +8,6 @@ export const stockSchema = z.object({
     productId: productIdSchema,
 });
 export const stockCreateSchema = stockSchema.omit({ id: true });
-export const clientStockSchema = z.partialRecord(sizeSchema, quantitySchema);
+export const clientStockSchema = z
+    .partialRecord(sizeSchema, quantitySchema)
+    .refine((obj) => Object.keys(obj).length > 0, "Stock table must include at least one size");

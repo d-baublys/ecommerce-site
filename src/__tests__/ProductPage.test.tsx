@@ -10,7 +10,7 @@ const getLatestBag = () => useBagStore.getState().bag;
 const { clearBag } = useBagStore.getState();
 
 jest.mock("@/lib/actions", () => ({
-    getProductData: jest.fn(),
+    getProducts: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({

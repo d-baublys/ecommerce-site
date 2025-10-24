@@ -2,7 +2,7 @@ import { createLongProductList, getFilteredTestProducts } from "@/lib/test-facto
 import { render, screen, waitFor, within } from "@testing-library/react";
 
 jest.mock("@/lib/actions", () => ({
-    getProductData: jest.fn(),
+    getProducts: jest.fn(),
     getFeaturedProducts: jest.fn(),
 }));
 

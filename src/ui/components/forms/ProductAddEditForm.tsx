@@ -7,13 +7,14 @@ import { useEffect, useRef, useState } from "react";
 import {
     convertValidPrice,
     createEmptyProduct,
-    formatImagePath,
+    formatImageName,
     areProductsEqual,
     isValidPrice,
     slugify,
     stringifyConvertPrice,
     buildProductUrl,
     processDateForClient,
+    stripImagePath,
 } from "@/lib/utils";
 import { IoFolder } from "react-icons/io5";
 import ProductStockTable from "./ProductStockTable";
@@ -26,14 +27,17 @@ import Link from "next/link";
 import { VALID_CATEGORIES } from "@/lib/constants";
 
 export default function ProductAddEditForm({ productData }: { productData?: ClientProduct }) {
-    const dataObj: ClientProduct = productData ? productData : createEmptyProduct();
-    const [savedDataObj, setSavedDataObj] = useState<ClientProduct>(dataObj);
-    const [provisionalDataObj, setProvisionalDataObj] = useState<ClientProduct>(dataObj);
-
     const variant = productData ? "edit" : "add";
-    const [tableMode, setTableMode] = useState<StockTableMode>("display");
+    const initialProductData: ClientProduct = productData ?? createEmptyProduct();
 
-    const [price, setPrice] = useState<string>(stringifyConvertPrice(dataObj.price));
+    const [formSavedProductData, setFormSavedProductData] =
+        useState<ClientProduct>(initialProductData);
+    const [formProvisionalProductData, setFormProvisionalProductData] =
+        useState<ClientProduct>(initialProductData);
+
+    const [tableMode, setTableMode] = useState<StockTableMode>("display");
+    const [price, setPrice] = useState<string>(stringifyConvertPrice(initialProductData.price));
+    const [fileName, setFileName] = useState<string>(stripImagePath(initialProductData.src));
     const [message, setMessage] = useState<string | null>();
     const { openModal } = useModalStore((state) => state);
 
@@ -41,21 +45,17 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
     const handleBrowse = () => {
         fileBrowseRef.current?.click();
     };
-    let fileName: string | null = provisionalDataObj.src.slice(1);
 
     const router = useRouter();
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
 
-        fileName = null;
-        let path = "";
-
         if (file) {
-            fileName = file.name;
-            path = formatImagePath(file.name);
+            setFileName(file.name);
+            const path = formatImageName(file.name);
+            setFormProvisionalProductData((prev) => ({ ...prev, src: path }));
         }
-        setProvisionalDataObj((prev) => ({ ...prev, src: path }));
     };
 
     const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +63,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
         setPrice(input);
 
         if (isValidPrice(input)) {
-            setProvisionalDataObj((prev) => ({
+            setFormProvisionalProductData((prev) => ({
                 ...prev,
                 price: convertValidPrice(input),
             }));
@@ -73,42 +73,44 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
     const handleSubmit = async () => {
         setMessage("");
 
-        if (
-            provisionalDataObj.name &&
-            provisionalDataObj.gender &&
-            provisionalDataObj.price &&
-            provisionalDataObj.src &&
-            provisionalDataObj.alt &&
-            provisionalDataObj.dateAdded &&
-            Object.keys(provisionalDataObj.stock)?.length &&
-            tableMode === "display"
-        ) {
-            const dbObj = {
-                ...provisionalDataObj,
-                slug: slugify(provisionalDataObj.name),
-            };
-            const dbAction =
-                variant === "add" ? await createProduct(dbObj) : await updateProduct(dbObj);
-
-            if (dbAction.success) {
-                setSavedDataObj(provisionalDataObj);
-                setMessage(
-                    variant === "add" ? "Product added successfully" : "Changes saved succesfully"
-                );
-            } else {
-                setMessage("Error updating database");
-            }
-        } else if (!(tableMode === "display")) {
+        if (tableMode !== "display") {
             setMessage("Please apply pending stock changes before saving");
         } else {
-            setMessage("Invalid data values. Please check and try again.");
+            const productData = {
+                ...formProvisionalProductData,
+                slug: slugify(formProvisionalProductData.name),
+            };
+
+            try {
+                const dbAction =
+                    variant === "add"
+                        ? await createProduct(productData)
+                        : await updateProduct(productData);
+
+                if (dbAction.success) {
+                    setFormSavedProductData(productData);
+                    setMessage(
+                        variant === "add"
+                            ? "Product added successfully"
+                            : "Changes saved succesfully"
+                    );
+                } else if (dbAction.error) {
+                    setMessage(dbAction.error);
+                } else {
+                    setMessage("Something went wrong. Please try again later.");
+                }
+            } catch (error) {
+                console.error(error);
+                setMessage("Error updating database");
+            }
         }
     };
 
     const handleCancel = () => {
-        setPrice(stringifyConvertPrice(savedDataObj.price));
+        setPrice(stringifyConvertPrice(formSavedProductData.price));
+        setFileName(stripImagePath(formSavedProductData.src));
         setMessage("");
-        setProvisionalDataObj(savedDataObj);
+        setFormProvisionalProductData(formSavedProductData);
     };
 
     const handleDelete = async (id: string) => {
@@ -124,7 +126,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
         }
     };
 
-    const productChanged = !areProductsEqual(savedDataObj, provisionalDataObj);
+    const productChanged = !areProductsEqual(formSavedProductData, formProvisionalProductData);
 
     useEffect(() => {
         setMessage("");
@@ -148,18 +150,21 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
     return (
         <>
             {variant === "edit" && (
-                <Link href={buildProductUrl(savedDataObj.id, savedDataObj.slug)}>
-                    <DisplayTile productData={savedDataObj} />
+                <Link href={buildProductUrl(formSavedProductData.id, formSavedProductData.slug)}>
+                    <DisplayTile productData={formSavedProductData} />
                 </Link>
             )}
             <form className="flex flex-col w-full p-4 gap-8 bg-background-lightest rounded-lg">
                 <FormInput
                     name="product-name"
                     onChange={(e) => {
-                        setProvisionalDataObj((prev) => ({ ...prev, name: e.target.value }));
+                        setFormProvisionalProductData((prev) => ({
+                            ...prev,
+                            name: e.target.value,
+                        }));
                     }}
                     legend="Product Name"
-                    value={provisionalDataObj.name}
+                    value={formProvisionalProductData.name}
                 />
                 <fieldset>
                     <legend className="mb-2 text-sz-label-button lg:text-sz-label-button-lg">
@@ -168,13 +173,13 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
                     <select
                         name="product-category"
                         onChange={(e) => {
-                            setProvisionalDataObj((prev) => ({
+                            setFormProvisionalProductData((prev) => ({
                                 ...prev,
                                 gender: e.target.value as Categories,
                             }));
                         }}
                         className="p-1.5 rounded-lg bg-white"
-                        value={provisionalDataObj.gender}
+                        value={formProvisionalProductData.gender}
                     >
                         {VALID_CATEGORIES.map((c, idx) => (
                             <option key={idx} value={c.key}>
@@ -212,27 +217,27 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
                 <FormInput
                     name="image-description"
                     onChange={(e) =>
-                        setProvisionalDataObj((prev) => ({ ...prev, alt: e.target.value }))
+                        setFormProvisionalProductData((prev) => ({ ...prev, alt: e.target.value }))
                     }
                     legend="Image Description"
-                    value={provisionalDataObj.alt}
+                    value={formProvisionalProductData.alt}
                 />
                 <FormInput
                     name="date-added"
                     type="date"
                     onChange={(e) =>
-                        setProvisionalDataObj((prev) => ({
+                        setFormProvisionalProductData((prev) => ({
                             ...prev,
                             dateAdded: new Date(e.target.value),
                         }))
                     }
                     legend="Date Added"
-                    value={processDateForClient(provisionalDataObj.dateAdded)}
+                    value={processDateForClient(formProvisionalProductData.dateAdded)}
                 />
                 <ProductStockTable
-                    savedDataObj={savedDataObj}
-                    provisionalDataObj={provisionalDataObj}
-                    setProvisionalDataObj={setProvisionalDataObj}
+                    formSavedProductData={formSavedProductData}
+                    formProvisionalProductData={formProvisionalProductData}
+                    setFormProvisionalProductData={setFormProvisionalProductData}
                     tableMode={tableMode}
                     setTableMode={setTableMode}
                 />
@@ -254,7 +259,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
                         <div>
                             <PlainRoundedButton
                                 overrideClasses="!bg-danger-color !text-contrasted !border-danger-color"
-                                onClick={() => handleDelete(provisionalDataObj.id)}
+                                onClick={() => handleDelete(formProvisionalProductData.id)}
                             >
                                 Delete
                             </PlainRoundedButton>

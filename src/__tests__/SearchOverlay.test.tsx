@@ -20,7 +20,7 @@ jest.mock("@/lib/fetching-utils", () => ({
 }));
 
 jest.mock("@/lib/actions", () => ({
-    getProductData: jest.fn(),
+    getProducts: jest.fn(),
 }));
 
 import { fetchFilteredProducts } from "@/lib/fetching-utils";

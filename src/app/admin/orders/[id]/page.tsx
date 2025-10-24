@@ -6,9 +6,9 @@ import OrdersPageTemplate from "@/ui/pages/OrdersPageTemplate";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-type AsyncParams = {
+interface AsyncParams {
     params: Promise<{ id: string }>;
-};
+}
 
 export async function generateMetadata({ params }: AsyncParams): Promise<Metadata> {
     const { id: orderId } = await params;

@@ -4,13 +4,15 @@ import { orderSchema } from "./order";
 
 export const userSchema = z.object({
     id: incrementedIdSchema,
-    password: z.string().min(8, "Your password must have a minimum of 8 characters."),
+    password: z.string().min(8, "Password must be at least 8 characters long."),
     email: z.email("Invalid email address."),
     role: userRoleSchema,
     orders: z.array(orderSchema),
-    createdAt: z.date().nullable(),
+    createdAt: z.date(),
 });
+
+export const clientUserSchema = userSchema.omit({ orders: true });
 
 export const userCreateSchema = userSchema
     .omit({ id: true, orders: true, createdAt: true })
-    .extend({ role: userRoleSchema.default("user") });
+    .extend({ role: userRoleSchema.default("user"), createdAt: userSchema.optional() });

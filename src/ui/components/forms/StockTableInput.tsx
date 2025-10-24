@@ -1,15 +1,14 @@
 "use client";
 
-import { ClientStock, Product, Sizes, StockTableMode } from "@/lib/types";
-import { isValidStock } from "@/lib/utils";
+import { ClientStock, StockTableMode } from "@/lib/types";
 
 interface StockTableInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     type: "text" | "number";
     mode: StockTableMode;
     pairKey?: string | number;
-    stockObjSetter?: React.Dispatch<React.SetStateAction<ClientStock>>;
-    setNewSize?: React.Dispatch<React.SetStateAction<Sizes | undefined>>;
-    setNewStock?: React.Dispatch<React.SetStateAction<number | undefined>>;
+    setTableLocalStock?: React.Dispatch<React.SetStateAction<ClientStock>>;
+    setNewSize?: React.Dispatch<React.SetStateAction<string | undefined>>;
+    setNewQuantity?: React.Dispatch<React.SetStateAction<number | undefined>>;
     isNew?: boolean;
 }
 
@@ -17,24 +16,26 @@ export default function StockTableInput({
     type,
     mode,
     pairKey,
-    stockObjSetter,
+    setTableLocalStock,
     setNewSize,
-    setNewStock,
+    setNewQuantity,
     isNew,
     ...props
 }: StockTableInputProps) {
     const editable = (mode === "edit" && type === "number") || isNew;
 
     function handleChange(e: React.FormEvent<HTMLInputElement>) {
-        const newValue = e.currentTarget.value;
+        const inputValue = e.currentTarget.value;
 
         if (type === "text" && setNewSize) {
-            setNewSize(newValue.toLowerCase() as Sizes);
-        } else if (type === "number" && setNewStock && isValidStock(Number(newValue))) {
-            if (pairKey && stockObjSetter) {
-                stockObjSetter((prev) => ({ ...prev, [pairKey as Sizes]: Number(newValue) }));
+            setNewSize(inputValue.toLowerCase());
+        } else if (type === "number" && setNewQuantity) {
+            const quantity = !isNaN(Number(inputValue)) ? Number(inputValue) : undefined;
+
+            if (pairKey && setTableLocalStock) {
+                setTableLocalStock((prev) => ({ ...prev, [pairKey]: quantity }));
             } else {
-                setNewStock(Number(newValue));
+                setNewQuantity(quantity);
             }
         }
     }

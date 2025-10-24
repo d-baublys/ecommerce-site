@@ -36,7 +36,7 @@ describe("Create account page base tests", () => {
         cy.get("input[name='password']").type("123");
         cy.get("input[name='password-confirm']").type("123");
         cy.get("button[type='submit']").click();
-        cy.contains("Your password must have a minimum of 8 characters.").should("be.visible");
+        cy.contains("Password must be at least 8 characters long.").should("be.visible");
     });
 });
 

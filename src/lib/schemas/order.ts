@@ -43,6 +43,8 @@ export const orderSchema = z.object({
 
 export const clientOrderSchema = orderSchema.extend({ items: z.array(orderItemClientSchema) });
 
+export const adminOrderSchema = orderSchema.omit({ items: true });
+
 export const orderCreateSchema = orderSchema
     .omit({
         id: true,

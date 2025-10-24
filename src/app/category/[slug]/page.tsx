@@ -5,9 +5,9 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { VALID_CATEGORIES } from "@/lib/constants";
 
-type AsyncParams = {
+interface AsyncParams {
     params: Promise<{ slug: string }>;
-};
+}
 
 export async function generateMetadata({ params }: AsyncParams): Promise<Metadata> {
     const { slug } = await params;
