@@ -2,7 +2,7 @@
 
 import { updateOrder } from "@/lib/actions";
 import { ORDER_STATUS_OPTIONS, ORDER_TABLE_COLUMNS } from "@/lib/constants";
-import { AdminOrder } from "@/lib/types";
+import { Order } from "@/lib/types";
 import { processDateForClient, stringifyConvertPrice } from "@/lib/utils";
 import { useModalStore } from "@/stores/modalStore";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
@@ -17,11 +17,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaSort } from "react-icons/fa";
 
-export default function AdminOrdersClient({ ordersData }: { ordersData: AdminOrder[] }) {
+export default function AdminOrdersClient({ ordersData }: { ordersData: Order[] }) {
     const columns = ORDER_TABLE_COLUMNS.map((columnData) => columnData.key);
     type TableColumns = (typeof columns)[number];
     type OrderOptions = "asc" | "desc";
-    const [sortedData, setSortedData] = useState<AdminOrder[]>(ordersData);
+    const [sortedData, setSortedData] = useState<Order[]>(ordersData);
     const [sortColumn, setSortColumn] = useState<TableColumns>("returnRequestedAt");
     const [sortOrder, setSortOrder] = useState<OrderOptions>("desc");
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState<boolean>(false);
@@ -30,7 +30,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: AdminOrd
     const { openModal } = useModalStore((state) => state);
     const router = useRouter();
 
-    const requestRefund = async (orderId: AdminOrder["id"]) => {
+    const requestRefund = async (orderId: Order["id"]) => {
         const res = await fetch("/api/refund", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -45,8 +45,8 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: AdminOrd
     };
 
     function compareValues<K extends TableColumns>(
-        a: AdminOrder[K],
-        b: AdminOrder[K],
+        a: Order[K],
+        b: Order[K],
         order: OrderOptions
     ): number {
         let result: number = 0;
@@ -86,7 +86,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: AdminOrd
         });
     }, [sortOrder, sortColumn]);
 
-    const handleApproval = async (orderId: AdminOrder["id"]) => {
+    const handleApproval = async (orderId: Order["id"]) => {
         const returnConfirm = await openModal();
 
         if (returnConfirm) {

@@ -13,7 +13,6 @@ export const productSchema = z.strictObject({
     dateAdded: z.date(),
 });
 export const clientProductSchema = productSchema.extend({ stock: clientStockSchema });
-export const productCreateSchema = productSchema.omit({ id: true });
-export const clientProductCreateSchema = clientProductSchema.omit({ id: true });
+export const productCreateSchema = clientProductSchema.omit({ id: true });
 export const featuredProductSchema = z.object({ id: z.uuid(), productId: productIdSchema });
 export const featuredProductCreateSchema = z.array(featuredProductSchema.pick({ productId: true }));

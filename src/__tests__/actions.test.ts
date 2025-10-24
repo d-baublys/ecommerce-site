@@ -61,7 +61,6 @@ jest.mock("@/lib/prisma", () => ({
 describe("createProduct", () => {
     it("adds a product and its stock successfully", async () => {
         (prisma.product.create as jest.Mock).mockResolvedValue({});
-        (prisma.stock.createMany as jest.Mock).mockResolvedValue({});
 
         const result = createProduct(createTestProduct());
         await expect(result).resolves.toEqual({ success: true });

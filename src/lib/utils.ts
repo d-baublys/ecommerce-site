@@ -7,6 +7,7 @@ import {
     Stock,
     ClientStock,
     StockCreateInput,
+    StockUpdateInput,
 } from "./types";
 import bcrypt from "bcryptjs";
 import { REFUND_WINDOW, SORT_OPTIONS, VALID_CATEGORIES } from "./constants";
@@ -136,11 +137,18 @@ export function areProductsEqual(productA: ClientProduct, productB: ClientProduc
     return areStocksEqual(productA.stock, productB.stock);
 }
 
-export function mapStockForPrisma(productData: ClientProduct): StockCreateInput[] {
-    return Object.entries(productData.stock).map(([size, quantity]) => ({
-        productId: productData.id,
+export function mapStockForProductCreate(stock: ClientStock): StockCreateInput[] {
+    return Object.entries(stock).map(([size, quantity]) => ({
         size: size as Sizes,
         quantity,
+    }));
+}
+
+export function mapStockForProductUpdate(product: ClientProduct): StockUpdateInput[] {
+    return Object.entries(product.stock).map(([size, quantity]) => ({
+        size: size as Sizes,
+        quantity,
+        productId: product.id,
     }));
 }
 

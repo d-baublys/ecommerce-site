@@ -9,19 +9,14 @@ import {
     sizeSchema,
 } from "./base";
 
-export const itemMetadataSchema = z.object({
+export const orderItemSchema = z.object({
+    id: z.uuid(),
     productId: productSchema.shape.id,
     name: productNameSchema,
     price: priceSchema,
     size: sizeSchema,
     quantity: quantitySchema,
 });
-
-export const orderItemSchema = itemMetadataSchema.extend({
-    id: z.uuid(),
-});
-
-export const orderItemClientSchema = orderItemSchema.extend({ product: productSchema });
 
 export const orderItemCreateSchema = z.array(orderItemSchema.omit({ id: true }));
 
@@ -38,12 +33,11 @@ export const orderSchema = z.object({
     refundedAt: z.date().nullable(),
     sessionId: z.string(),
     paymentIntentId: z.string(),
-    items: z.array(orderItemSchema),
 });
 
-export const clientOrderSchema = orderSchema.extend({ items: z.array(orderItemClientSchema) });
-
-export const adminOrderSchema = orderSchema.omit({ items: true });
+export const clientOrderSchema = orderSchema.extend({
+    items: z.array(orderItemSchema.extend({ product: productSchema })),
+});
 
 export const orderCreateSchema = orderSchema
     .omit({

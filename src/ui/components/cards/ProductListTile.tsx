@@ -1,6 +1,6 @@
 "use client";
 
-import { BagItem, Order, Product, ClientProduct, Sizes, ClientOrder } from "@/lib/types";
+import { BagItem, Product, ClientProduct, Sizes, ClientOrder } from "@/lib/types";
 import Link from "next/link";
 import { buildProductUrl } from "@/lib/utils";
 import ProductImage from "@/ui/components/ProductImage";

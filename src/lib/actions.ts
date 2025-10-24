@@ -2,7 +2,6 @@
 
 import { Prisma } from "@prisma/client";
 import {
-    AdminOrder,
     ClientOrder,
     ClientProduct,
     ClientUser,
@@ -10,7 +9,7 @@ import {
     OrderCreateInput,
     OrderStatus,
     Product,
-    StockCreateInput,
+    StockUpdateInput,
     User,
     UserCreateInput,
 } from "./types";
@@ -18,15 +17,16 @@ import { prisma } from "./prisma";
 import {
     convertMultiplePrismaProducts,
     hashPassword,
-    mapStockForPrisma,
+    mapStockForProductCreate,
+    mapStockForProductUpdate,
     zodErrorResponse,
 } from "./utils";
 import {
     clientProductSchema,
-    clientStockSchema,
     featuredProductCreateSchema,
     orderCreateSchema,
     productCreateSchema,
+    stockUpdateSchema,
     userCreateSchema,
 } from "./schemas";
 import {
@@ -37,29 +37,21 @@ import {
 
 export async function createProduct(productData: ClientProduct): CreateUpdateDeleteActionResponse {
     try {
-        const { id, stock, ...netProduct } = productData;
+        const { id, ...netProduct } = productData;
         const parsedProduct = productCreateSchema.safeParse(netProduct);
-        const parsedStock = clientStockSchema.safeParse(stock);
 
         if (!parsedProduct.success) {
             return zodErrorResponse(parsedProduct);
         }
 
-        if (!parsedStock.success) {
-            return zodErrorResponse(parsedStock);
-        }
-
-        const createdProduct = await prisma.product.create({
-            data: parsedProduct.data,
-        });
-        await prisma.stock.createMany({
-            data: mapStockForPrisma({
+        await prisma.product.create({
+            data: {
                 ...parsedProduct.data,
-                stock: parsedStock.data,
-                id: createdProduct.id,
-            }),
+                stock: {
+                    createMany: { data: mapStockForProductCreate(parsedProduct.data.stock) },
+                },
+            },
         });
-
         return { success: true };
     } catch (error) {
         console.error("Error adding product: ", error);
@@ -102,7 +94,7 @@ export async function updateProduct(productData: ClientProduct): CreateUpdateDel
                 where: { productId: parsedProduct.data.id },
             }),
             prisma.stock.createMany({
-                data: mapStockForPrisma(parsedProduct.data),
+                data: mapStockForProductUpdate(parsedProduct.data),
             }),
             prisma.product.update({
                 where: { id: parsedProduct.data.id },
@@ -133,11 +125,15 @@ export async function deleteProduct(id: Product["id"]): CreateUpdateDeleteAction
     }
 }
 
-export async function updateStock({
-    productId,
-    size,
-    quantity,
-}: StockCreateInput): CreateUpdateDeleteActionResponse {
+export async function updateStock(params: StockUpdateInput): CreateUpdateDeleteActionResponse {
+    const parsedData = stockUpdateSchema.safeParse(params);
+
+    if (!parsedData.success) {
+        return zodErrorResponse(parsedData);
+    }
+
+    const { productId, size, quantity } = parsedData.data;
+
     const stockItem = await prisma.stock.findFirst({
         where: { productId, size },
         select: { id: true, quantity: true },
@@ -238,13 +234,15 @@ export async function createOrder(orderData: OrderCreateInput): CreateUpdateDele
 
         const createObj: Prisma.OrderCreateArgs["data"] = {
             items: {
-                create: items.map((item) => ({
-                    productId: item.productId,
-                    name: item.name,
-                    price: item.price,
-                    size: item.size,
-                    quantity: item.quantity,
-                })),
+                createMany: {
+                    data: items.map((item) => ({
+                        productId: item.productId,
+                        name: item.name,
+                        price: item.price,
+                        size: item.size,
+                        quantity: item.quantity,
+                    })),
+                },
             },
             subTotal,
             shippingTotal,
@@ -294,11 +292,11 @@ export async function getOrder({
 export async function getUserOrders({
     userId,
 }: {
-    userId: Order["userId"];
+    userId: User["id"];
 }): GetManyActionResponse<ClientOrder> {
     try {
         const orders = await prisma.order.findMany({
-            where: { userId: Number(userId) },
+            where: { userId },
             include: { items: { include: { product: true } } },
             orderBy: { createdAt: "desc" },
         });
@@ -310,7 +308,7 @@ export async function getUserOrders({
     }
 }
 
-export async function getAllOrders(): GetManyActionResponse<AdminOrder> {
+export async function getAllOrders(): GetManyActionResponse<Order> {
     try {
         const orders = await prisma.order.findMany({
             orderBy: { createdAt: "desc" },

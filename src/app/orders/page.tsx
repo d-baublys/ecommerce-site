@@ -19,6 +19,8 @@ export default async function OrdersPage() {
 
     if (session?.user?.id === undefined) throw new Error("User ID not found");
 
+    if (isNaN(Number(session.user.id))) throw new Error("Invalid User ID");
+
     const ordersFetch = await getUserOrders({ userId: Number(session.user.id) });
 
     const orderData: ClientOrder[] = ordersFetch.data;

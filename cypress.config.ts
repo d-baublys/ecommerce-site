@@ -7,7 +7,7 @@ import {
     createTestProduct,
     TestOrderCypressParams,
 } from "./src/lib/test-factories";
-import { hashPassword } from "./src/lib/utils";
+import { hashPassword, mapStockForProductCreate } from "./src/lib/utils";
 import {
     ClientProduct,
     CypressTestDataDeleteParams,
@@ -34,13 +34,11 @@ export default defineConfig({
                     const testProduct: ClientProduct = createTestProduct();
                     const { stock, ...netProduct } = testProduct;
 
-                    const createdProduct = await prisma.product.create({ data: netProduct });
-                    await prisma.stock.createMany({
-                        data: Object.entries(stock).map(([size, quantity]) => ({
-                            size: size as Sizes,
-                            quantity: quantity,
-                            productId: createdProduct.id,
-                        })),
+                    const createdProduct = await prisma.product.create({
+                        data: {
+                            ...netProduct,
+                            stock: { createMany: { data: mapStockForProductCreate(stock) } },
+                        },
                     });
 
                     return {
@@ -54,7 +52,7 @@ export default defineConfig({
                     const createObj: OrderCreateInput = createTestOrderCypress(params);
 
                     const res = await prisma.order.create({
-                        data: { ...createObj, items: { create: createObj.items } },
+                        data: { ...createObj, items: { createMany: { data: createObj.items } } },
                     });
                     return res.id;
                 },
