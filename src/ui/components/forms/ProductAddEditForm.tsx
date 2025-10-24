@@ -36,6 +36,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
         useState<ClientProduct>(initialProductData);
 
     const [tableMode, setTableMode] = useState<StockTableMode>("display");
+    const [addComplete, setAddComplete] = useState<boolean>(false);
     const [price, setPrice] = useState<string>(stringifyConvertPrice(initialProductData.price));
     const [fileName, setFileName] = useState<string>(stripImagePath(initialProductData.src));
     const [message, setMessage] = useState<string | null>();
@@ -89,11 +90,13 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
 
                 if (dbAction.success) {
                     setFormSavedProductData(productData);
-                    setMessage(
-                        variant === "add"
-                            ? "Product added successfully"
-                            : "Changes saved succesfully"
-                    );
+
+                    if (variant === "add") {
+                        setAddComplete(true);
+                        setMessage("Product added successfully");
+                    } else {
+                        setMessage("Changes saved succesfully");
+                    }
                 } else if (dbAction.error) {
                     setMessage(dbAction.error);
                 } else {
@@ -138,14 +141,14 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
     };
 
     useEffect(() => {
-        if (productChanged) {
+        if (!addComplete && productChanged) {
             window.addEventListener("beforeunload", handleUnload);
         } else {
             window.removeEventListener("beforeunload", handleUnload);
         }
 
         return () => window.removeEventListener("beforeunload", handleUnload);
-    }, [productChanged]);
+    }, [productChanged, addComplete]);
 
     return (
         <>
@@ -240,17 +243,18 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
                     setFormProvisionalProductData={setFormProvisionalProductData}
                     tableMode={tableMode}
                     setTableMode={setTableMode}
+                    addComplete={addComplete}
                 />
                 <div id="overall-message-container" className="flex justify-center p-2 h-8">
                     <p className="text-center">{message}</p>
                 </div>
                 <div id="overall-action-container" className="flex justify-between gap-8">
-                    {productChanged && (
+                    {productChanged && !addComplete && (
                         <PlainRoundedButton onClick={handleSubmit}>
                             {variant === "add" ? "Add" : "Save"}
                         </PlainRoundedButton>
                     )}
-                    {productChanged && (
+                    {productChanged && !addComplete && (
                         <PlainRoundedButton onClick={handleCancel}>Cancel</PlainRoundedButton>
                     )}
                 </div>

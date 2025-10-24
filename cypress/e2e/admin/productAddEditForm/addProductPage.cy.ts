@@ -27,7 +27,7 @@ describe("Add product page", () => {
         cy.get("#stock-table-button-container").contains("button", /^Add$/).click();
     });
 
-    after(() => {
+    afterEach(() => {
         if (productNameArr.length) {
             cy.task("getTestProductMultipleId", productNameArr).then((productIdArr) => {
                 cy.task("deleteTestData", {
@@ -54,6 +54,32 @@ describe("Add product page", () => {
         cy.get("#overall-message-container")
             .contains("Product added successfully")
             .should("be.visible");
+
+        productNameArr.push(testProduct.name);
+    });
+
+    it("hides all operation buttons after successful product creation", () => {
+        cy.get("#overall-action-container").contains("button", "Add").click();
+
+        cy.get("#overall-action-container button").should("have.length", 0);
+        cy.get("#stock-table-button-container button").should("have.length", 0);
+
+        productNameArr.push(testProduct.name);
+    });
+
+    it("doesn't show the 'leave page/stay on page' modal if page reloads after successful product creation", () => {
+        let preventSpy: Cypress.Agent<sinon.SinonSpy>;
+
+        cy.on("window:before:unload", (e) => {
+            preventSpy = cy.spy(e, "preventDefault");
+        });
+
+        cy.get("#overall-action-container").contains("button", "Add").click();
+        cy.get("#overall-action-container button").should("have.length", 0);
+
+        cy.reload().then(() => {
+            cy.wrap(preventSpy).should("not.have.been.called");
+        });
 
         productNameArr.push(testProduct.name);
     });

@@ -18,6 +18,7 @@ interface ProductStockTableProps {
     setFormProvisionalProductData: React.Dispatch<React.SetStateAction<ClientProduct>>;
     tableMode: StockTableMode;
     setTableMode: React.Dispatch<React.SetStateAction<StockTableMode>>;
+    addComplete: boolean;
 }
 
 export default function ProductStockTable({
@@ -26,6 +27,7 @@ export default function ProductStockTable({
     setFormProvisionalProductData,
     tableMode,
     setTableMode,
+    addComplete,
 }: ProductStockTableProps) {
     const [tableLocalStock, setTableLocalStock] = useState<ClientStock>(formSavedProductData.stock);
 
@@ -162,37 +164,45 @@ export default function ProductStockTable({
     return (
         <div className="flex flex-col py-4 bg-background-lighter rounded-md ">
             <div id="stock-table-button-container" className="flex justify-between h-12 px-8">
-                {tableMode === "display" && Object.keys(tableLocalStock)?.length > 0 && (
-                    <div>
-                        <PlainRoundedButton onClick={() => setTableMode("edit")}>
-                            Edit
-                        </PlainRoundedButton>
-                    </div>
-                )}
-                {tableMode === "edit" && (
-                    <div>
-                        <PlainRoundedButton onClick={() => handleApply()}>Apply</PlainRoundedButton>
-                    </div>
-                )}
-                {tableMode === "add" && (
-                    <div>
-                        <PlainRoundedButton onClick={() => handleAdd()}>Add</PlainRoundedButton>
-                    </div>
-                )}
-                {tableMode === "display" && (
-                    <div>
-                        <PlainRoundedButton onClick={() => setTableMode("add")}>
-                            + Add Size
-                        </PlainRoundedButton>
-                    </div>
-                )}
-                {(tableMode === "edit" || tableMode === "add") && (
-                    <div>
-                        <PlainRoundedButton onClick={() => handleCancel()}>
-                            Cancel
-                        </PlainRoundedButton>
-                    </div>
-                )}
+                {!addComplete ? (
+                    <>
+                        {tableMode === "display" && Object.keys(tableLocalStock)?.length > 0 && (
+                            <div>
+                                <PlainRoundedButton onClick={() => setTableMode("edit")}>
+                                    Edit
+                                </PlainRoundedButton>
+                            </div>
+                        )}
+                        {tableMode === "edit" && (
+                            <div>
+                                <PlainRoundedButton onClick={() => handleApply()}>
+                                    Apply
+                                </PlainRoundedButton>
+                            </div>
+                        )}
+                        {tableMode === "add" && (
+                            <div>
+                                <PlainRoundedButton onClick={() => handleAdd()}>
+                                    Add
+                                </PlainRoundedButton>
+                            </div>
+                        )}
+                        {tableMode === "display" && (
+                            <div>
+                                <PlainRoundedButton onClick={() => setTableMode("add")}>
+                                    + Add Size
+                                </PlainRoundedButton>
+                            </div>
+                        )}
+                        {(tableMode === "edit" || tableMode === "add") && (
+                            <div>
+                                <PlainRoundedButton onClick={() => handleCancel()}>
+                                    Cancel
+                                </PlainRoundedButton>
+                            </div>
+                        )}
+                    </>
+                ) : null}
             </div>
             <div id="stock-table-message-container" className="flex justify-center h-8 p-2">
                 <p className="text-center text-white">{message}</p>
