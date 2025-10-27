@@ -1,16 +1,16 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ProductGridTile from "@/ui/components/cards/ProductGridTile";
 import { ClientProduct } from "@/lib/types";
-import { createTestProduct } from "@/lib/test-factories";
+import { buildTestProduct } from "@/lib/test-factories";
 import { act } from "react";
 import { axe, toHaveNoViolations } from "jest-axe";
 
 expect.extend(toHaveNoViolations);
 
-const testStockedProduct: ClientProduct = createTestProduct({
+const testStockedProduct: ClientProduct = buildTestProduct({
     overrides: { stock: { s: 3, m: 0, l: 8 } },
 });
-const testUnstockedProduct: ClientProduct = createTestProduct({ overrides: { stock: { s: 0 } } });
+const testUnstockedProduct: ClientProduct = buildTestProduct({ overrides: { stock: { s: 0 } } });
 
 const renderAndGetTile = (product: ClientProduct = testStockedProduct) => {
     render(<ProductGridTile product={product} />);

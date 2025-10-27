@@ -1,8 +1,8 @@
 import { TestOrderCypressParams } from "../../../src/lib/test-factories";
 import { CypressTestDataDeleteParams, CypressTestProductData, Order } from "../../../src/lib/types";
 
-let orderIdArr: CypressTestDataDeleteParams["orderIdArr"] = [];
-let productIdArr: CypressTestDataDeleteParams["productIdArr"] = [];
+let orderIds: CypressTestDataDeleteParams["orderIds"] = [];
+let productIds: CypressTestDataDeleteParams["productIds"] = [];
 
 describe("Admin orders page base tests", () => {
     beforeEach(() => {
@@ -20,41 +20,41 @@ describe("Admin orders page base tests", () => {
 describe("Admin orders page seeded tests", () => {
     before(() => {
         cy.task("createCypressTestProduct").then((productData: CypressTestProductData) => {
-            productIdArr.push(productData.id);
+            productIds.push(productData.id);
 
-            const quantities: TestOrderCypressParams["quantitiesArr"][] = [[1], [2], [3]];
-            const statusArr: NonNullable<TestOrderCypressParams["overrides"]>["status"][] = [
+            const quantityMap: TestOrderCypressParams["quantityMap"][] = [[1], [2], [3]];
+            const statusMap: NonNullable<TestOrderCypressParams["overrides"]>["status"][] = [
                 "paid",
                 "refunded",
                 "pendingReturn",
             ];
-            const createdAtArr: NonNullable<TestOrderCypressParams["overrides"]>["createdAt"][] = [
+            const createdAtMap: NonNullable<TestOrderCypressParams["overrides"]>["createdAt"][] = [
                 new Date("2025-08-03"),
                 new Date("2025-08-01"),
                 new Date("2025-08-02"),
             ];
 
-            const returnRequestedAtArr: NonNullable<
+            const returnRequestedAtMap: NonNullable<
                 TestOrderCypressParams["overrides"]
             >["returnRequestedAt"][] = [null, new Date("2025-08-15"), new Date("2025-08-10")];
 
-            const refundedAtArr: NonNullable<TestOrderCypressParams["overrides"]>["refundedAt"][] =
+            const refundedAtMap: NonNullable<TestOrderCypressParams["overrides"]>["refundedAt"][] =
                 [null, new Date("2025-08-20"), null];
 
             Array.from({ length: 3 }).forEach((_, idx) => {
                 const params: TestOrderCypressParams = {
                     idx,
-                    productsDataArr: [productData],
-                    quantitiesArr: quantities[idx],
+                    testProductsData: [productData],
+                    quantityMap: quantityMap[idx],
                     overrides: {
-                        status: statusArr[idx],
-                        createdAt: createdAtArr[idx],
-                        returnRequestedAt: returnRequestedAtArr[idx],
-                        refundedAt: refundedAtArr[idx],
+                        status: statusMap[idx],
+                        createdAt: createdAtMap[idx],
+                        returnRequestedAt: returnRequestedAtMap[idx],
+                        refundedAt: refundedAtMap[idx],
                     },
                 };
                 cy.task("createCypressTestOrder", params).then((orderId: Order["id"]) => {
-                    orderIdArr.push(orderId);
+                    orderIds.push(orderId);
                 });
             });
         });
@@ -68,10 +68,10 @@ describe("Admin orders page seeded tests", () => {
     });
 
     after(() => {
-        if (orderIdArr.length || productIdArr.length) {
+        if (orderIds.length || productIds.length) {
             cy.task("deleteTestData", {
-                orderIdArr,
-                productIdArr,
+                orderIds,
+                productIds,
             });
         }
     });
@@ -173,7 +173,7 @@ describe("Admin orders page seeded tests", () => {
     it("navigates to individual admin order page on anchor link click", () => {
         cy.awaitTableSettle();
         cy.get("tbody a").first().click();
-        cy.location("pathname").should("eq", `/admin/orders/${orderIdArr[1]}`);
+        cy.location("pathname").should("eq", `/admin/orders/${orderIds[1]}`);
         cy.contains("p", "TEST PRODUCT 1").should("be.visible");
     });
 });

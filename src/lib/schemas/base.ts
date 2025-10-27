@@ -13,6 +13,6 @@ export const quantitySchema = z
     })
     .nonnegative("Invalid quantity value");
 export const sizeSchema = z.enum(VALID_SIZES, "Invalid size value");
-export const categorySchema = z.enum(VALID_CATEGORIES.map((c) => c.key));
-export const orderStatusSchema = z.enum(ORDER_STATUS_OPTIONS.map((s) => s.key));
+export const categorySchema = z.enum(VALID_CATEGORIES.map((c) => c.id));
+export const orderStatusSchema = z.enum(ORDER_STATUS_OPTIONS.map((s) => s.id));
 export const userRoleSchema = z.enum(USER_ROLES);

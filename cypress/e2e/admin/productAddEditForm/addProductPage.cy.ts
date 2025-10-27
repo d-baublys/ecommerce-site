@@ -1,9 +1,9 @@
-import { createTestProduct } from "../../../../src/lib/test-factories";
+import { buildTestProduct } from "../../../../src/lib/test-factories";
 import { CypressTestDataDeleteParams } from "../../../../src/lib/types";
 import { processDateForClient, stringifyConvertPrice } from "../../../../src/lib/utils";
 
-let productNameArr: CypressTestDataDeleteParams["productNameArr"] = [];
-const testProduct = createTestProduct();
+let productNames: CypressTestDataDeleteParams["productNames"] = [];
+const testProduct = buildTestProduct();
 
 describe("Add product page", () => {
     beforeEach(() => {
@@ -28,10 +28,10 @@ describe("Add product page", () => {
     });
 
     afterEach(() => {
-        if (productNameArr.length) {
-            cy.task("getTestProductMultipleId", productNameArr).then((productIdArr) => {
+        if (productNames.length) {
+            cy.task("getTestProductMultipleIds", productNames).then((productIds) => {
                 cy.task("deleteTestData", {
-                    productIdArr,
+                    productIds,
                 });
             });
         }
@@ -55,7 +55,7 @@ describe("Add product page", () => {
             .contains("Product added successfully")
             .should("be.visible");
 
-        productNameArr.push(testProduct.name);
+        productNames.push(testProduct.name);
     });
 
     it("hides all operation buttons after successful product creation", () => {
@@ -64,7 +64,7 @@ describe("Add product page", () => {
         cy.get("#overall-action-container button").should("have.length", 0);
         cy.get("#stock-table-button-container button").should("have.length", 0);
 
-        productNameArr.push(testProduct.name);
+        productNames.push(testProduct.name);
     });
 
     it("doesn't show the 'leave page/stay on page' modal if page reloads after successful product creation", () => {
@@ -81,6 +81,6 @@ describe("Add product page", () => {
             cy.wrap(preventSpy).should("not.have.been.called");
         });
 
-        productNameArr.push(testProduct.name);
+        productNames.push(testProduct.name);
     });
 });

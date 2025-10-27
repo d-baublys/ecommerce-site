@@ -1,9 +1,9 @@
 import BagPage from "@/app/bag/page";
-import { createTestBagItems, createTestProduct, getTestUpdatedData } from "@/lib/test-factories";
+import { buildTestBagItemList, buildTestProduct, getTestUpdatedData } from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { Product } from "@/lib/types";
-import { createBagItem } from "@/lib/utils";
+import { buildBagItem } from "@/lib/utils";
 import { act } from "react";
 
 jest.mock("next/navigation", () => ({
@@ -37,7 +37,7 @@ import { getProducts } from "@/lib/actions";
 import { getConsoleErrorSpy, wrapWithErrorBoundary } from "@/lib/test-utils";
 
 const { addToBag, clearBag } = useBagStore.getState();
-const testBagItems = createTestBagItems();
+const testBagItems = buildTestBagItemList();
 const bagUnchangedData = testBagItems.map((bagItem) => bagItem.product);
 const bagUpdatedData = getTestUpdatedData();
 
@@ -155,9 +155,9 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("shows 'out of stock' in place of combobox when latest size stock is nil", async () => {
-        const testProduct = createTestProduct({ overrides: { stock: { s: 1 } } });
-        const latestTestProduct = createTestProduct({ overrides: { stock: { s: 0 } } });
-        const mockBagItem = createBagItem(testProduct, "s");
+        const testProduct = buildTestProduct({ overrides: { stock: { s: 1 } } });
+        const latestTestProduct = buildTestProduct({ overrides: { stock: { s: 0 } } });
+        const mockBagItem = buildBagItem(testProduct, "s");
 
         addToBag(mockBagItem);
         setUpResolvedFetch([latestTestProduct]);
@@ -174,9 +174,9 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("shows all quantity options", async () => {
-        const testProduct = createTestProduct();
+        const testProduct = buildTestProduct();
 
-        addToBag(createBagItem(testProduct, "m"));
+        addToBag(buildBagItem(testProduct, "m"));
         setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
@@ -194,10 +194,10 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("updates subtotal when quantity selection changes", async () => {
-        const testProduct = createTestProduct();
+        const testProduct = buildTestProduct();
 
-        addToBag(createBagItem(testProduct, "s"));
-        addToBag(createBagItem(testProduct, "s"));
+        addToBag(buildBagItem(testProduct, "s"));
+        addToBag(buildBagItem(testProduct, "s"));
         setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
@@ -220,9 +220,9 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("caps quantity options per the prescribed limit", async () => {
         const itemLimit = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
-        const testProduct = createTestProduct({ overrides: { stock: { s: itemLimit + 5 } } });
+        const testProduct = buildTestProduct({ overrides: { stock: { s: itemLimit + 5 } } });
 
-        addToBag(createBagItem(testProduct, "s"));
+        addToBag(buildBagItem(testProduct, "s"));
         setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
@@ -259,10 +259,10 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("renders checkout button & shows correct shipping when at least some bag item sizes are stocked", async () => {
-        const testProduct = createTestProduct({ overrides: { stock: { s: 0, m: 1 } } });
+        const testProduct = buildTestProduct({ overrides: { stock: { s: 0, m: 1 } } });
 
-        addToBag(createBagItem(testProduct, "s"));
-        addToBag(createBagItem(testProduct, "m"));
+        addToBag(buildBagItem(testProduct, "s"));
+        addToBag(buildBagItem(testProduct, "m"));
         setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
@@ -273,10 +273,10 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("doesn't render checkout button & shows correct shipping when all bag item sizes are unstocked", async () => {
-        const testProduct = createTestProduct({ overrides: { stock: { s: 0, m: 0 } } });
+        const testProduct = buildTestProduct({ overrides: { stock: { s: 0, m: 0 } } });
 
-        addToBag(createBagItem(testProduct, "s"));
-        addToBag(createBagItem(testProduct, "m"));
+        addToBag(buildBagItem(testProduct, "s"));
+        addToBag(buildBagItem(testProduct, "m"));
         setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();

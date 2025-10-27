@@ -1,4 +1,4 @@
-import { createTestOrder } from "@/lib/test-factories";
+import { buildTestOrderData } from "@/lib/test-factories";
 import OrderTile from "@/ui/components/cards/OrderTile";
 import { render, screen, waitFor } from "@testing-library/react";
 
@@ -13,11 +13,11 @@ jest.mock("@/lib/utils", () => ({
 
 import { checkIsWithinReturnWindow } from "@/lib/utils";
 
-const testPaidOrder = createTestOrder();
-const testPendingOrder = createTestOrder({
+const testPaidOrder = buildTestOrderData();
+const testPendingOrder = buildTestOrderData({
     overrides: { status: "pendingReturn", returnRequestedAt: new Date("2025-08-02") },
 });
-const testRefundedOrder = createTestOrder({
+const testRefundedOrder = buildTestOrderData({
     overrides: {
         status: "refunded",
         returnRequestedAt: new Date("2025-08-02"),

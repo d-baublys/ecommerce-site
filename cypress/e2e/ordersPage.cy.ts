@@ -1,7 +1,7 @@
-import { CypressTestDataDeleteParams, CypressTestProductData, Order } from "../../src/lib/types";
+import { CypressTestDataDeleteParams, CypressTestProductData } from "../../src/lib/types";
 
-let orderIdArr: CypressTestDataDeleteParams["orderIdArr"] = [];
-let productIdArr: CypressTestDataDeleteParams["productIdArr"] = [];
+let orderIds: CypressTestDataDeleteParams["orderIds"] = [];
+let productIds: CypressTestDataDeleteParams["productIds"] = [];
 
 describe("Orders page unauthenticated tests", () => {
     beforeEach(() => {
@@ -49,10 +49,10 @@ describe("Orders page authenticated tests", () => {
 describe("Orders page authenticated & seeded tests", () => {
     before(() => {
         cy.task("createCypressTestProduct").then((productData: CypressTestProductData) => {
-            cy.task("createCypressTestOrder", { productsDataArr: [productData] }).then(
-                (orderId: Order["id"]) => {
-                    orderIdArr.push(orderId);
-                    productIdArr.push(productData.id);
+            cy.task("createCypressTestOrder", { testProductsData: [productData] }).then(
+                (orderId: CypressTestDataDeleteParams["orderIds"][number]) => {
+                    orderIds.push(orderId);
+                    productIds.push(productData.id);
                 }
             );
         });
@@ -66,10 +66,10 @@ describe("Orders page authenticated & seeded tests", () => {
     });
 
     after(() => {
-        if (orderIdArr.length || productIdArr.length) {
+        if (orderIds.length || productIds.length) {
             cy.task("deleteTestData", {
-                orderIdArr,
-                productIdArr,
+                orderIds,
+                productIds,
             });
         }
     });

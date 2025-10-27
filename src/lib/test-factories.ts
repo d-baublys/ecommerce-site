@@ -8,11 +8,13 @@ import {
     ClientOrder,
     OrderCreateInput,
     OrderStatus,
+    Order,
+    OrderItem,
 } from "./types";
 import { slugify } from "./utils";
 import { VALID_CATEGORIES } from "./constants";
 
-export function createTestProduct({
+export function buildTestProduct({
     idx = 0,
     overrides,
 }: {
@@ -25,7 +27,7 @@ export function createTestProduct({
     return {
         id: `aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa${idx}`,
         name,
-        gender: VALID_CATEGORIES[0].key,
+        gender: VALID_CATEGORIES[0].id,
         price: 2500,
         slug: slugify(name),
         src: `/nonexistent-img-${idx}.jpg`,
@@ -36,7 +38,7 @@ export function createTestProduct({
     };
 }
 
-export function createTestProductList(): ClientProduct[] {
+export function buildTestProductList(): ClientProduct[] {
     const prices = [5500, 9900, 20100, 15000];
     const stocks = [
         { s: 1, m: 0, l: 0 },
@@ -46,7 +48,7 @@ export function createTestProductList(): ClientProduct[] {
     ];
     const dates = ["2025-08-01", "2025-08-02", "2025-08-02", "2025-08-04"];
     const products = Array.from({ length: 4 }).map((_, idx) =>
-        createTestProduct({
+        buildTestProduct({
             idx,
             overrides: { price: prices[idx], stock: stocks[idx], dateAdded: new Date(dates[idx]) },
         })
@@ -55,21 +57,21 @@ export function createTestProductList(): ClientProduct[] {
     return products;
 }
 
-export function createLongProductList(): Product[] {
-    return Array.from({ length: 10 }).map((_, idx) => createTestProduct({ idx }));
+export function buildLongProductList(): Product[] {
+    return Array.from({ length: 10 }).map((_, idx) => buildTestProduct({ idx }));
 }
 
 export function getFilteredTestProducts() {
-    return createTestProductList().filter((product) =>
+    return buildTestProductList().filter((product) =>
         Object.values(product.stock).some((stockCount) => stockCount > 0)
     ); // in line with real database fetch excluding fully unstocked products
 }
 
-function createCustomBagItem(product: ClientProduct, size: Sizes, quantity: number): BagItem {
+function buildTestBagItem(product: ClientProduct, size: Sizes, quantity: number): BagItem {
     return { product, size, quantity };
 }
 
-export function createTestBagItems(): BagItem[] {
+export function buildTestBagItemList(): BagItem[] {
     const prices = [5500, 9900];
     const stocks = [
         { s: 1, m: 0, l: 0 },
@@ -81,7 +83,7 @@ export function createTestBagItems(): BagItem[] {
     const quantities = [1, 2];
 
     const products = Array.from({ length: 2 }).map((_, idx) =>
-        createTestProduct({
+        buildTestProduct({
             idx,
             overrides: {
                 price: prices[idx],
@@ -92,7 +94,7 @@ export function createTestBagItems(): BagItem[] {
     );
 
     const bagItems = Array.from({ length: 2 }).map((_, idx) =>
-        createCustomBagItem(products[idx], sizes[idx] as Sizes, quantities[idx])
+        buildTestBagItem(products[idx], sizes[idx] as Sizes, quantities[idx])
     );
 
     return bagItems;
@@ -108,7 +110,7 @@ export function getTestUpdatedData(): ClientProduct[] {
     ];
 
     const products = Array.from({ length: 2 }).map((_, idx) =>
-        createTestProduct({
+        buildTestProduct({
             idx: idx,
             overrides: {
                 price: prices[idx],
@@ -128,8 +130,8 @@ type TestOrderBase = {
 
 type TestOrderNever = {
     productList?: never;
-    sizesArr?: never;
-    quantitiesArr?: never;
+    sizeMap?: never;
+    quantityMap?: never;
 };
 
 type TestOrderParamsSimple = TestOrderBase & TestOrderNever;
@@ -137,27 +139,27 @@ type TestOrderParamsSimple = TestOrderBase & TestOrderNever;
 type TestOrderParamsFull = TestOrderBase & {
     idx: number;
     productList: Product[];
-    sizesArr: Sizes[];
-    quantitiesArr: number[];
+    sizeMap: Sizes[];
+    quantityMap: number[];
 };
 
 type TestOrderParams = TestOrderParamsFull | TestOrderParamsSimple;
 
-export function createTestOrder(params: TestOrderParams = {}): ClientOrder {
-    const { idx = 0, productList, sizesArr, quantitiesArr, overrides } = params;
-    const products: Product[] | undefined = productList ? productList : [createTestProduct()];
+export function buildTestOrderData(params: TestOrderParams = {}): ClientOrder {
+    const { idx = 0, productList, sizeMap, quantityMap, overrides } = params;
+    const products: Product[] | undefined = productList ? productList : [buildTestProduct()];
     const items = products.map((product, prodIdx) => ({
         name: product.name,
         price: product.price,
         id: `order-${idx}-${prodIdx}`,
         productId: product.id,
-        size: productList && sizesArr ? sizesArr[prodIdx] : "m",
-        quantity: productList && quantitiesArr ? quantitiesArr[prodIdx] : 2,
+        size: productList && sizeMap ? sizeMap[prodIdx] : "m",
+        quantity: productList && quantityMap ? quantityMap[prodIdx] : 2,
         orderId: idx,
         product,
     }));
 
-    const dataObj = {
+    const orderCreateData = {
         id: idx,
         subTotal: 5000,
         shippingTotal: 500,
@@ -174,75 +176,78 @@ export function createTestOrder(params: TestOrderParams = {}): ClientOrder {
         ...overrides,
     };
 
-    if (dataObj.status === "pendingReturn" && !dataObj.returnRequestedAt) {
+    if (orderCreateData.status === "pendingReturn" && !orderCreateData.returnRequestedAt) {
         throw new Error("Missing 'return requested date' for 'pending return' status");
     }
 
-    if (dataObj.status === "refunded" && !(dataObj.returnRequestedAt && dataObj.refundedAt)) {
+    if (
+        orderCreateData.status === "refunded" &&
+        !(orderCreateData.returnRequestedAt && orderCreateData.refundedAt)
+    ) {
         throw new Error(
             "Missing 'return requested date' and 'refunded date' for 'refunded' status"
         );
     }
 
-    return dataObj;
+    return orderCreateData;
 }
 
-export function createTestOrderList(): ClientOrder[] {
-    const productList = createTestProductList();
+export function buildTestOrderList(): ClientOrder[] {
+    const productList = buildTestProductList();
     const firstOrderList = productList.slice(0, 3);
     const secondOrderList = productList.slice(3);
 
     const productLists = [firstOrderList, secondOrderList];
-    const sizesArr: Sizes[][] = [["m", "l", "m"], ["l"]];
-    const quantitiesArr: number[][] = [[2, 1, 1], [1]];
+    const sizeMaps: OrderItem["size"][][] = [["m", "l", "m"], ["l"]];
+    const quantityMaps: OrderItem["quantity"][][] = [[2, 1, 1], [1]];
 
     return Array.from({ length: 2 }).map((_, orderIdx) =>
-        createTestOrder({
+        buildTestOrderData({
             idx: orderIdx,
             productList: productLists[orderIdx],
-            sizesArr: sizesArr[orderIdx],
-            quantitiesArr: quantitiesArr[orderIdx],
+            sizeMap: sizeMaps[orderIdx],
+            quantityMap: quantityMaps[orderIdx],
         })
     );
 }
 
 export type TestOrderCypressParams = {
-    productsDataArr: CypressTestProductData[];
-    idx?: number;
-    sizesArr?: Sizes[];
-    quantitiesArr?: number[];
+    testProductsData: CypressTestProductData[];
+    idx?: Order["id"];
+    sizeMap?: OrderItem["size"][];
+    quantityMap?: OrderItem["quantity"][];
     overrides?: Partial<OrderCreateInput>;
 };
 
-export function createTestOrderCypress({
+export function buildTestOrderDataCypress({
     idx = 0,
-    productsDataArr,
-    sizesArr,
-    quantitiesArr,
+    testProductsData,
+    sizeMap,
+    quantityMap,
     overrides,
 }: TestOrderCypressParams): OrderCreateInput {
     let subTotal = 0;
     const shippingTotal = 500;
 
-    const items: OrderCreateInput["items"] = productsDataArr.map((product, prodIdx) => {
+    const items: OrderCreateInput["items"] = testProductsData.map((product, prodIdx) => {
         const price = product.price;
-        const quantity: number = quantitiesArr ? quantitiesArr[prodIdx] : 2;
+        const quantity: number = quantityMap ? quantityMap[prodIdx] : 2;
         subTotal += price * quantity;
         return {
             productId: String(product.id),
             name: product.name,
             price,
-            size: sizesArr ? sizesArr[prodIdx] : ("m" as Sizes),
+            size: sizeMap ? sizeMap[prodIdx] : ("m" as Sizes),
             quantity,
         };
     });
 
-    const dataObj = {
+    const orderCreateData: OrderCreateInput = {
         subTotal,
         shippingTotal,
         total: subTotal + shippingTotal,
         status: "paid" as OrderStatus,
-        user: { connect: { id: 1 } },
+        userId: 1,
         email: "test@example.com",
         createdAt: new Date("2025-08-01"),
         sessionId: `sessionId-${idx}`,
@@ -251,15 +256,18 @@ export function createTestOrderCypress({
         ...overrides,
     };
 
-    if (dataObj.status === "pendingReturn" && !dataObj.returnRequestedAt) {
+    if (orderCreateData.status === "pendingReturn" && !orderCreateData.returnRequestedAt) {
         throw new Error("Missing 'return requested date' for 'pending return' status");
     }
 
-    if (dataObj.status === "refunded" && !(dataObj.returnRequestedAt && dataObj.refundedAt)) {
+    if (
+        orderCreateData.status === "refunded" &&
+        !(orderCreateData.returnRequestedAt && orderCreateData.refundedAt)
+    ) {
         throw new Error(
             "Missing 'return requested date' and 'refunded date' for 'refunded' status"
         );
     }
 
-    return dataObj;
+    return orderCreateData;
 }

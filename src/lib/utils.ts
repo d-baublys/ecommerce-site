@@ -2,7 +2,7 @@ import {
     BagItem,
     Product,
     Sizes,
-    ProductSortKey,
+    ProductSortId,
     ClientProduct,
     Stock,
     ClientStock,
@@ -42,8 +42,8 @@ export function checkStock(
     );
 }
 
-export function isUnique(sizeKey: Sizes, stockObj: ClientStock) {
-    return !Object.keys(stockObj).includes(sizeKey);
+export function isUnique(sizeKey: Sizes, stockData: ClientStock) {
+    return !Object.keys(stockData).includes(sizeKey);
 }
 
 export function capitalize(str: string): string {
@@ -78,7 +78,7 @@ export function createEmptyProduct(): ClientProduct {
     return {
         id: "",
         name: "",
-        gender: VALID_CATEGORIES[0].key,
+        gender: VALID_CATEGORIES[0].id,
         price: 0,
         slug: "",
         src: "",
@@ -91,7 +91,7 @@ export function createEmptyProduct(): ClientProduct {
 export function convertPrismaProduct(product: Product & { stock: Stock[] }): ClientProduct {
     return {
         ...product,
-        stock: buildStockObjForClient(product.stock),
+        stock: buildStockForClient(product.stock),
     };
 }
 
@@ -152,7 +152,7 @@ export function mapStockForProductUpdate(product: ClientProduct): StockUpdateInp
     }));
 }
 
-export function buildStockObjForClient(stock: Stock[]): ClientStock {
+export function buildStockForClient(stock: Stock[]): ClientStock {
     return stock.reduce((acc, stockItem) => {
         acc[stockItem.size] = stockItem.quantity;
         return acc;
@@ -186,8 +186,8 @@ export function extractFilters<T extends string>(
     return param.split("|").filter((val): val is T => validValues.includes(val as T));
 }
 
-export function extractSort(param: string | null): ProductSortKey | "placeholder" {
-    return param && param in SORT_OPTIONS ? (param as ProductSortKey) : "placeholder";
+export function extractSort(param: string | null): ProductSortId | "placeholder" {
+    return param && param in SORT_OPTIONS ? (param as ProductSortId) : "placeholder";
 }
 
 export function isolateInteraction(
@@ -200,7 +200,7 @@ export function escapeRegExp(string: string): string {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export function createBagItem(product: ClientProduct, size: Sizes): BagItem {
+export function buildBagItem(product: ClientProduct, size: Sizes): BagItem {
     return { product, size, quantity: 1 };
 }
 

@@ -135,7 +135,7 @@ const productStubs: Omit<PrismaProduct, "id" | "dateAdded" | "slug" | "price" | 
 const mensSizes: PrismaSizes[] = ["s", "m", "l", "xl", "xxl"];
 const womensSizes: PrismaSizes[] = ["xs", "s", "m", "l", "xl"];
 
-const createStockArr = (productCount: number): number[][] => {
+const buildStockMap = (productCount: number): number[][] => {
     if (nodeEnv === "test") {
         return Array.from({ length: productCount }, (_, i) => {
             switch (i) {
@@ -157,7 +157,7 @@ const createStockArr = (productCount: number): number[][] => {
 const prisma = new PrismaClient();
 
 async function seedProducts() {
-    const stock = createStockArr(16);
+    const stockMap = buildStockMap(16);
 
     for (let i in productStubs) {
         const product = productStubs[i];
@@ -176,7 +176,7 @@ async function seedProducts() {
                     createMany: {
                         data: productSizes.map((size, idx) => ({
                             size: size as PrismaSizes,
-                            quantity: stock[i][idx],
+                            quantity: stockMap[i][idx],
                         })),
                     },
                 },

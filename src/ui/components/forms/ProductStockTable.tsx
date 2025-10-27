@@ -35,7 +35,7 @@ export default function ProductStockTable({
     const [newSize, setNewSize] = useState<string>();
     const [newQuantity, setNewQuantity] = useState<number>();
 
-    const tableArr = VALID_SIZES.filter((size) => size in tableLocalStock);
+    const tableRows = VALID_SIZES.filter((size) => size in tableLocalStock);
 
     const resetUi = () => {
         setNewSize(undefined);
@@ -100,27 +100,23 @@ export default function ProductStockTable({
 
     const buildBodyCells = () => (
         <>
-            {tableArr.map((stockSize, idx) => (
-                <tr key={stockSize} data-cy="table-row">
+            {tableRows.map((size, idx) => (
+                <tr key={size} data-cy="table-row">
                     <TableBodyCell
                         variant="leftEnd"
-                        isLastRow={idx === tableArr.length - 1 && !(tableMode === "add")}
+                        isLastRow={idx === tableRows.length - 1 && !(tableMode === "add")}
                     >
-                        <StockTableInput
-                            type="text"
-                            mode={tableMode}
-                            value={stockSize.toUpperCase()}
-                        />
+                        <StockTableInput type="text" mode={tableMode} value={size.toUpperCase()} />
                     </TableBodyCell>
                     <TableBodyCell
                         variant="rightEnd"
-                        isLastRow={idx === tableArr.length - 1 && !(tableMode === "add")}
+                        isLastRow={idx === tableRows.length - 1 && !(tableMode === "add")}
                     >
                         <StockTableInput
                             type="number"
                             mode={tableMode}
-                            pairKey={stockSize}
-                            value={tableLocalStock[stockSize]}
+                            pairKey={size}
+                            value={tableLocalStock[size]}
                             setTableLocalStock={setTableLocalStock}
                             setNewQuantity={setNewQuantity}
                         />
@@ -129,8 +125,8 @@ export default function ProductStockTable({
                         {tableMode === "edit" && (
                             <div className="flex grow w-full justify-center items-center">
                                 <StockRowDelete
-                                    stockObjSetter={setTableLocalStock}
-                                    size={stockSize as Sizes}
+                                    stockSetter={setTableLocalStock}
+                                    size={size as Sizes}
                                 />
                             </div>
                         )}

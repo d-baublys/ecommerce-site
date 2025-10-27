@@ -1,5 +1,5 @@
-import { ClientProduct, PriceFilterKey, Sizes } from "@/lib/types";
-import { createTestProductList } from "@/lib/test-factories";
+import { ClientProduct, PriceFilterId, Sizes } from "@/lib/types";
+import { buildTestProductList } from "@/lib/test-factories";
 import { matchPriceRangeLabel, matchSizeLabel } from "@/lib/test-utils";
 import GridAside from "@/ui/components/product-grid/GridAside";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -7,7 +7,7 @@ import { axe, toHaveNoViolations } from "jest-axe";
 
 expect.extend(toHaveNoViolations);
 
-const testProductList: ClientProduct[] = createTestProductList();
+const testProductList: ClientProduct[] = buildTestProductList();
 const filteredTestProducts: ClientProduct[] = testProductList.filter((product) =>
     Object.values(product.stock).some((stockCount) => stockCount > 0)
 ); // parent would not pass list containing fully unstocked products
@@ -180,7 +180,7 @@ describe("GridAside", () => {
     });
 
     it("toggles a price filter on when clicked", () => {
-        const initialPriceFilters: PriceFilterKey[] = [];
+        const initialPriceFilters: PriceFilterId[] = [];
 
         const { rerender } = render(
             <GridAside
@@ -218,7 +218,7 @@ describe("GridAside", () => {
     });
 
     it("toggles an active price filter off when clicked", () => {
-        const initialPriceFilters: PriceFilterKey[] = ["b"];
+        const initialPriceFilters: PriceFilterId[] = ["b"];
 
         const { rerender } = render(
             <GridAside

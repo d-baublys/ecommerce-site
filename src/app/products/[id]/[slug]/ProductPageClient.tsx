@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { ClientProduct, Sizes } from "@/lib/types";
 import GoButton from "@/ui/components/buttons/GoButton";
 import { IoBag } from "react-icons/io5";
-import { checkStock, createBagItem } from "@/lib/utils";
+import { checkStock, buildBagItem } from "@/lib/utils";
 import ZoomableImage from "@/ui/components/ZoomableImage";
 import WishlistToggleButton from "@/ui/components/buttons/WishlistToggleButton";
 import AddSuccessModal from "@/ui/components/overlays/AddSuccessModal";
@@ -35,7 +35,7 @@ export default function ProductPageClient({ productData }: { productData: Client
     }, [selectedSize, bag, productData]);
 
     const handleAdd = () => {
-        addToBag(createBagItem(productData, selectedSize as Sizes));
+        addToBag(buildBagItem(productData, selectedSize as Sizes));
         setIsModalOpen(true);
     };
 

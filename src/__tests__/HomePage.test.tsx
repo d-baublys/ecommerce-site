@@ -1,4 +1,4 @@
-import { createLongProductList, getFilteredTestProducts } from "@/lib/test-factories";
+import { buildLongProductList, getFilteredTestProducts } from "@/lib/test-factories";
 import { render, screen, waitFor, within } from "@testing-library/react";
 
 jest.mock("@/lib/actions", () => ({
@@ -11,7 +11,7 @@ import HomePage from "@/app/page";
 
 const renderHomePage = async () => render(await HomePage());
 const testFeaturedList = getFilteredTestProducts();
-const testProductList = createLongProductList();
+const testProductList = buildLongProductList();
 
 Element.prototype.scrollIntoView = jest.fn();
 window.scrollTo = jest.fn();

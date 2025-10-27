@@ -44,11 +44,11 @@ export default function AdminProductsClient() {
             </div>
             <ul className="flex flex-row justify-evenly items-center w-full">
                 {VALID_CATEGORIES.map((c) => (
-                    <li key={c.key}>
+                    <li key={c.id}>
                         <PlainRoundedButton
-                            onClick={() => setFilter((curr) => (curr === c.key ? null : c.key))}
+                            onClick={() => setFilter((curr) => (curr === c.id ? null : c.id))}
                             overrideClasses={`!bg-background-lightest ${
-                                filter === c.key &&
+                                filter === c.id &&
                                 "!bg-component-color !border-component-color !text-contrasted"
                             }`}
                         >

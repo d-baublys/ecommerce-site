@@ -6,7 +6,7 @@ import { buildProductUrl } from "@/lib/utils";
 import ProductImage from "@/ui/components/ProductImage";
 
 interface ProductListTileProps {
-    data: ClientProduct | ClientProduct[] | BagItem | ClientOrder;
+    inputData: ClientProduct | ClientProduct[] | BagItem | ClientOrder;
     wrapWithLink: boolean;
     showSize: boolean;
     endContent?: React.ReactNode | ((idx: number) => React.ReactNode);
@@ -15,17 +15,17 @@ interface ProductListTileProps {
 }
 
 export default function ProductListTile(props: ProductListTileProps) {
-    const { data, wrapWithLink, showSize, endContent, externalOverrides, internalOverrides } =
+    const { inputData, wrapWithLink, showSize, endContent, externalOverrides, internalOverrides } =
         props;
 
-    let dataArr: (ClientProduct | BagItem | ClientOrder["items"][number])[];
+    let tileData: (ClientProduct | BagItem | ClientOrder["items"][number])[];
 
-    if ("items" in data) {
-        dataArr = data.items;
-    } else if (data instanceof Array) {
-        dataArr = data;
+    if ("items" in inputData) {
+        tileData = inputData.items;
+    } else if (inputData instanceof Array) {
+        tileData = inputData;
     } else {
-        dataArr = [data];
+        tileData = [inputData];
     }
 
     const renderCentralContent = (product: Product | ClientProduct, size?: Sizes) => {
@@ -52,12 +52,12 @@ export default function ProductListTile(props: ProductListTileProps) {
     return (
         <div className={`flex w-full flex-row bg-white border-2 p-2 ${externalOverrides ?? ""}`}>
             <div className="flex flex-col w-full gap-8">
-                {dataArr.map((itemData, idx) => {
-                    const productData = "product" in itemData ? itemData.product : itemData;
-                    const hasSize = "size" in itemData;
+                {tileData.map((item, idx) => {
+                    const productData = "product" in item ? item.product : item;
+                    const hasSize = "size" in item;
                     return (
                         <div
-                            key={`${productData.id}-${hasSize ? itemData.size : 1}`}
+                            key={`${productData.id}-${hasSize ? item.size : 1}`}
                             className="flex flex-row"
                         >
                             {wrapWithLink ? (
@@ -67,13 +67,13 @@ export default function ProductListTile(props: ProductListTileProps) {
                                 >
                                     {renderCentralContent(
                                         productData,
-                                        hasSize ? itemData.size : undefined
+                                        hasSize ? item.size : undefined
                                     )}
                                 </Link>
                             ) : (
                                 renderCentralContent(
                                     productData,
-                                    hasSize ? itemData.size : undefined
+                                    hasSize ? item.size : undefined
                                 )
                             )}
                             <div className="flex items-end max-w-[33%] min-h-full ml-4 md:ml-8">

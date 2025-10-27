@@ -232,7 +232,7 @@ export async function createOrder(orderData: OrderCreateInput): CreateUpdateDele
         const { items, subTotal, shippingTotal, total, sessionId, email, paymentIntentId, userId } =
             parsedOrder.data;
 
-        const createObj: Prisma.OrderCreateArgs["data"] = {
+        const orderCreateData: Prisma.OrderCreateArgs["data"] = {
             items: {
                 createMany: {
                     data: items.map((item) => ({
@@ -253,7 +253,7 @@ export async function createOrder(orderData: OrderCreateInput): CreateUpdateDele
             userId,
         };
 
-        await prisma.order.create({ data: createObj });
+        await prisma.order.create({ data: orderCreateData });
 
         return { success: true };
     } catch (error) {

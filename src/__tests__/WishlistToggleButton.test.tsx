@@ -1,4 +1,4 @@
-import { createTestProduct } from "@/lib/test-factories";
+import { buildTestProduct } from "@/lib/test-factories";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import WishlistToggleButton from "@/ui/components/buttons/WishlistToggleButton";
 import { fireEvent, render, waitFor } from "@testing-library/react";
@@ -7,7 +7,7 @@ import { axe, toHaveNoViolations } from "jest-axe";
 
 expect.extend(toHaveNoViolations);
 
-const testProduct = createTestProduct();
+const testProduct = buildTestProduct();
 const getLatestWishlist = () => useWishlistStore.getState().wishlist;
 const { clearWishlist, addToWishlist } = useWishlistStore.getState();
 

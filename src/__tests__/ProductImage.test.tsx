@@ -1,5 +1,5 @@
 import { ClientProduct } from "@/lib/types";
-import { createTestProduct } from "@/lib/test-factories";
+import { buildTestProduct } from "@/lib/test-factories";
 import ProductImage from "@/ui/components/ProductImage";
 import { screen, waitFor } from "@testing-library/dom";
 import { act, render } from "@testing-library/react";
@@ -15,7 +15,7 @@ jest.mock("next/image", () => ({
     },
 }));
 
-const testProduct: ClientProduct = createTestProduct();
+const testProduct: ClientProduct = buildTestProduct();
 const renderProductImage = () => render(<ProductImage product={testProduct} />);
 
 describe("ProductImage", () => {

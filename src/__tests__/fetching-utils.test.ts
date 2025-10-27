@@ -1,4 +1,4 @@
-import { Categories, PriceFilterKey, ProductSortKey, Sizes } from "@/lib/types";
+import { Categories, PriceFilterId, ProductSortId, Sizes } from "@/lib/types";
 
 jest.mock("@/lib/actions", () => ({
     getProducts: jest.fn(),
@@ -6,11 +6,11 @@ jest.mock("@/lib/actions", () => ({
 
 import { getProducts } from "@/lib/actions";
 import { fetchFilteredProducts } from "@/lib/fetching-utils";
-import { createTestProductList } from "@/lib/test-factories";
+import { buildTestProductList } from "@/lib/test-factories";
 
 describe("fetchFilteredProducts", () => {
     beforeEach(() => {
-        const productList = createTestProductList();
+        const productList = buildTestProductList();
         (getProducts as jest.Mock).mockResolvedValue({ data: productList });
     });
 
@@ -73,7 +73,7 @@ describe("fetchFilteredProducts", () => {
 
     it("calls with the expected priceFilters argument", async () => {
         const category: Categories | "all" = "all";
-        const priceFilters: PriceFilterKey[] = ["a", "e"];
+        const priceFilters: PriceFilterId[] = ["a", "e"];
 
         await fetchFilteredProducts({ category, priceFilters });
         expect(getProducts).toHaveBeenCalledWith(
@@ -120,7 +120,7 @@ describe("fetchFilteredProducts", () => {
 
     it("calls with the expected productSort argument", async () => {
         const category: Categories | "all" = "all";
-        const productSort: ProductSortKey = "a";
+        const productSort: ProductSortId = "a";
 
         await fetchFilteredProducts({ category, productSort });
         expect(getProducts).toHaveBeenCalledWith(

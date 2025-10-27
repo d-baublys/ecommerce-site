@@ -1,4 +1,4 @@
-import { createTestProduct } from "../../../../src/lib/test-factories";
+import { buildTestProduct } from "../../../../src/lib/test-factories";
 import {
     CypressTestDataDeleteParams,
     CypressTestProductData,
@@ -6,27 +6,27 @@ import {
 } from "../../../../src/lib/types";
 import { buildAdminProductUrl, processDateForClient } from "../../../../src/lib/utils";
 
-let productIdArr: CypressTestDataDeleteParams["productIdArr"] = [];
-const testProduct: Product = createTestProduct();
-let testProductLink: string;
+let productIds: CypressTestDataDeleteParams["productIds"] = [];
+const testProduct: Product = buildTestProduct();
+let testProductPath: string;
 
 describe("Edit product page", () => {
     before(() => {
         cy.task("createCypressTestProduct").then((data: CypressTestProductData) => {
-            testProductLink = buildAdminProductUrl(data.id);
-            productIdArr.push(data.id);
+            testProductPath = buildAdminProductUrl(data.id);
+            productIds.push(data.id);
         });
     });
 
     beforeEach(() => {
         cy.logInAsAdmin();
-        cy.visitTestAdminProduct(testProductLink);
+        cy.visitTestAdminProduct(testProductPath);
     });
 
     after(() => {
-        if (productIdArr.length) {
+        if (productIds.length) {
             cy.task("deleteTestData", {
-                productIdArr,
+                productIds,
             });
         }
     });
@@ -77,6 +77,6 @@ describe("Edit product page", () => {
         cy.contains("button", "Confirm").click();
         cy.location("pathname").should("eq", "/admin/products");
 
-        productIdArr = [];
+        productIds = [];
     });
 });

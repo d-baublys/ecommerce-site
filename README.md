@@ -34,6 +34,7 @@ Simulated checkout details:
 - Ensuring the app is accessible through manual and automated means
 - Using local PostgreSQL databases for development and test data
 - Using Auth.js to guard routes and UI with both authentication and authorisation
+- Refactoring existing logic and type system to use Zod for unified runtime and compile-time validation
 
 ## Demonstrates
 - Understanding of ecommerce user flows, including purchase, auth, and simple order management

@@ -6,22 +6,22 @@ import { usePathname } from "next/navigation";
 
 export default function Breadcrumbs({ lastCrumbText }: { lastCrumbText?: string }) {
     const pathname = usePathname();
-    const segmentArr = pathname.split("/").filter(Boolean);
+    const pathSegments = pathname.split("/").filter(Boolean);
 
     const crumbLink = (link: string, label: string, idx: number) => (
         <li key={idx} className="mr-2">
             <Link href={link}>{label}</Link>
-            {idx !== segmentArr.length && <span className="ml-2">/</span>}
+            {idx !== pathSegments.length && <span className="ml-2">/</span>}
         </li>
     );
 
-    const buildCrumbs = (segmentArr: string[]) => {
-        const crumbs = segmentArr.map((segment, idx) => {
-            if (segmentArr[idx - 1] === "products" && segmentArr[idx - 2] !== "admin") return;
+    const buildCrumbs = (pathSegments: string[]) => {
+        const crumbs = pathSegments.map((segment, idx) => {
+            if (pathSegments[idx - 1] === "products" && pathSegments[idx - 2] !== "admin") return;
 
-            const link = "/" + segmentArr.slice(0, idx + 1).join("/");
+            const link = "/" + pathSegments.slice(0, idx + 1).join("/");
             const label =
-                lastCrumbText && idx === segmentArr.length - 1
+                lastCrumbText && idx === pathSegments.length - 1
                     ? lastCrumbText
                     : capitalize(decodeURIComponent(segment).replace(/-/g, " "));
 
@@ -33,10 +33,10 @@ export default function Breadcrumbs({ lastCrumbText }: { lastCrumbText?: string 
 
     return (
         <nav className="flex w-full items-end h-1/2 text-sz-label-button lg:text-sz-label-button-lg">
-            {segmentArr.length > 0 && (
+            {pathSegments.length > 0 && (
                 <ol className="flex">
                     {crumbLink("/", "Home", 0)}
-                    {buildCrumbs(segmentArr)}
+                    {buildCrumbs(pathSegments)}
                 </ol>
             )}
         </nav>

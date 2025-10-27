@@ -26,7 +26,7 @@ export default function DisplayTile({
 
     return (
         <ProductListTile
-            data={productData}
+            inputData={productData}
             wrapWithLink={false}
             showSize={false}
             endContent={buildEndContent()}

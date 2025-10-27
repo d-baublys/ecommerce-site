@@ -66,7 +66,7 @@ export default function BagTile({
 
     return (
         <ProductListTile
-            data={bagItem}
+            inputData={bagItem}
             wrapWithLink={true}
             showSize={true}
             endContent={buildEndContent()}

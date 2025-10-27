@@ -1,5 +1,5 @@
 import { Sizes } from "@/lib/types";
-import { createTestProductList } from "@/lib/test-factories";
+import { buildTestProductList } from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
 import NavBar from "@/ui/components/NavBar";
 import { screen, waitFor } from "@testing-library/dom";
@@ -23,7 +23,7 @@ jest.mock("next/navigation", () => ({
 import { useSession } from "next-auth/react";
 
 const { addToBag, clearBag } = useBagStore.getState();
-const testProductList = createTestProductList();
+const testProductList = buildTestProductList();
 const renderNavBar = () => render(<NavBar />);
 
 const getSessionWithAuth = () => {

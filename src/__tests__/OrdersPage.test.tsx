@@ -1,4 +1,4 @@
-import { createTestOrderList } from "@/lib/test-factories";
+import { buildTestOrderList } from "@/lib/test-factories";
 import { wrapWithErrorBoundary } from "@/lib/test-utils";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import OrdersPage from "@/app/orders/page";
@@ -52,7 +52,7 @@ const setUpPageComplete = async () => {
     await renderOrdersPage();
 };
 
-const testOrdersList = createTestOrderList();
+const testOrdersList = buildTestOrderList();
 const renderOrdersPage = async () => await act(async () => render(await OrdersPage()));
 const getAllTiles = () => screen.getAllByTestId("order-tile");
 

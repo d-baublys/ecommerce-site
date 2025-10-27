@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { getProducts } from "./actions";
-import { Categories, PriceFilterKey, ProductSortKey, Sizes } from "./types";
+import { Categories, PriceFilterId, ProductSortId, Sizes } from "./types";
 import { PRICE_FILTER_OPTIONS, SORT_OPTIONS } from "./constants";
 
 export async function fetchFilteredProducts({
@@ -12,8 +12,8 @@ export async function fetchFilteredProducts({
 }: {
     category: Categories | "all";
     sizeFilters?: Sizes[];
-    priceFilters?: string[];
-    productSort?: ProductSortKey | "placeholder";
+    priceFilters?: PriceFilterId[];
+    productSort?: ProductSortId | "placeholder";
     query?: string;
 }) {
     const filterQuery: Prisma.ProductWhereInput = {
@@ -36,8 +36,8 @@ export async function fetchFilteredProducts({
     }
 
     if (priceFilters.length > 0) {
-        filterQuery.OR = priceFilters.map((key) => {
-            const { min, max } = PRICE_FILTER_OPTIONS[key as PriceFilterKey];
+        filterQuery.OR = priceFilters.map((filterId) => {
+            const { min, max } = PRICE_FILTER_OPTIONS[filterId];
             return isFinite(max) ? { price: { gte: min, lt: max } } : { price: { gte: min } };
         });
     }

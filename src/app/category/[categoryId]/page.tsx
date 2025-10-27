@@ -6,39 +6,38 @@ import { Metadata } from "next";
 import { VALID_CATEGORIES } from "@/lib/constants";
 
 interface AsyncParams {
-    params: Promise<{ slug: string }>;
+    params: Promise<{ categoryId: string }>;
 }
 
 export async function generateMetadata({ params }: AsyncParams): Promise<Metadata> {
-    const { slug } = await params;
+    const { categoryId } = await params;
 
     const title =
-        slug === "all" ? "All Products" : VALID_CATEGORIES.find((c) => c.key === slug)!.label;
+        categoryId === "all"
+            ? "All Products"
+            : VALID_CATEGORIES.find((c) => c.id === categoryId)!.label;
 
     return { title };
 }
 
 export default async function CategoryPage({ params }: AsyncParams) {
-    const { slug } = await params;
+    const { categoryId } = await params;
 
-    if (
-        !(
-            VALID_CATEGORIES.some((c) => Object.values(c).includes(slug as Categories)) ||
-            slug === "all"
-        )
-    ) {
+    if (!(categoryId === "all" || VALID_CATEGORIES.find((c) => c.id === categoryId))) {
         notFound();
     }
 
     const subheaderText =
-        slug === "all" ? "All Products" : VALID_CATEGORIES.find((c) => c.key === slug)!.label;
+        categoryId === "all"
+            ? "All Products"
+            : VALID_CATEGORIES.find((c) => c.id === categoryId)!.label;
 
     return (
         <MainLayout
             subheaderText={subheaderText}
-            lastCrumbText={slug === "all" ? "All" : subheaderText}
+            lastCrumbText={categoryId === "all" ? "All" : subheaderText}
         >
-            <CategoryGridPage category={slug as Categories} />
+            <CategoryGridPage category={categoryId as Categories} />
         </MainLayout>
     );
 }

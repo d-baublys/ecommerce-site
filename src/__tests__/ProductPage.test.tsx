@@ -1,11 +1,11 @@
-import { createTestProduct } from "@/lib/test-factories";
+import { buildTestProduct } from "@/lib/test-factories";
 import { getConsoleErrorSpy } from "@/lib/test-utils";
 import { buildProductUrl } from "@/lib/utils";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import ProductPage from "@/app/products/[id]/[slug]/page";
 import { useBagStore } from "@/stores/bagStore";
 
-const testProduct = createTestProduct();
+const testProduct = buildTestProduct();
 const getLatestBag = () => useBagStore.getState().bag;
 const { clearBag } = useBagStore.getState();
 

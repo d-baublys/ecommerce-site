@@ -1,4 +1,4 @@
-import { createTestProductList } from "@/lib/test-factories";
+import { buildTestProductList } from "@/lib/test-factories";
 import SearchBar from "@/ui/components/SearchBar";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { ClientProduct } from "@/lib/types";
@@ -15,7 +15,7 @@ jest.mock("@/lib/actions", () => ({
 
 import { getProducts } from "@/lib/actions";
 
-const productList = { data: createTestProductList() };
+const productList = { data: buildTestProductList() };
 
 const mockResultClick = jest.fn();
 

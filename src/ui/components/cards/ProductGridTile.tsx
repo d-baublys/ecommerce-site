@@ -4,7 +4,7 @@ import { ClientProduct, Sizes } from "@/lib/types";
 import {
     buildProductUrl,
     checkStock,
-    createBagItem,
+    buildBagItem,
     isolateInteraction,
     processDateForClient,
     stringifyConvertPrice,
@@ -50,7 +50,7 @@ export default function ProductGridTile({ product }: { product: ClientProduct })
 
     const handleSizeClick = (e: React.TouchEvent | React.MouseEvent, size: Sizes) => {
         isolateInteraction(e);
-        const permitted = addToBag(createBagItem(product, size));
+        const permitted = addToBag(buildBagItem(product, size));
         permitted && setIsModalOpen(true);
     };
 

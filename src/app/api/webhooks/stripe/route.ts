@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
         if (paymentIntentId === null)
             return new Response("Payment intent data not found", { status: 400 });
 
-        const orderObj: OrderCreateInput = {
+        const orderCreateData: OrderCreateInput = {
             items,
             subTotal,
             shippingTotal,
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
             paymentIntentId,
         };
 
-        const newOrder = await createOrder(orderObj);
+        const newOrder = await createOrder(orderCreateData);
 
         if (!newOrder.success) {
             return new Response("Error creating new order", { status: 400 });

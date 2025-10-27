@@ -120,7 +120,7 @@ export default function OrderTile(props: OrderTileProps) {
                 </div>
             </div>
             <ProductListTile
-                data={orderData}
+                inputData={orderData}
                 wrapWithLink={true}
                 showSize={true}
                 endContent={(idx) => buildEndContent(idx)}

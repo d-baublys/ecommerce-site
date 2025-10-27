@@ -3,8 +3,8 @@ import dotenv from "dotenv";
 import path from "path";
 import { PrismaClient } from "@prisma/client";
 import {
-    createTestOrderCypress,
-    createTestProduct,
+    buildTestOrderDataCypress,
+    buildTestProduct,
     TestOrderCypressParams,
 } from "./src/lib/test-factories";
 import { hashPassword, mapStockForProductCreate } from "./src/lib/utils";
@@ -13,7 +13,6 @@ import {
     CypressTestDataDeleteParams,
     OrderCreateInput,
     Product,
-    Sizes,
 } from "./src/lib/types";
 
 dotenv.config({
@@ -31,7 +30,7 @@ export default defineConfig({
         setupNodeEvents(on, config) {
             on("task", {
                 async createCypressTestProduct() {
-                    const testProduct: ClientProduct = createTestProduct();
+                    const testProduct: ClientProduct = buildTestProduct();
                     const { stock, ...netProduct } = testProduct;
 
                     const createdProduct = await prisma.product.create({
@@ -49,10 +48,13 @@ export default defineConfig({
                     };
                 },
                 async createCypressTestOrder(params: TestOrderCypressParams) {
-                    const createObj: OrderCreateInput = createTestOrderCypress(params);
+                    const orderCreateData: OrderCreateInput = buildTestOrderDataCypress(params);
 
                     const res = await prisma.order.create({
-                        data: { ...createObj, items: { createMany: { data: createObj.items } } },
+                        data: {
+                            ...orderCreateData,
+                            items: { createMany: { data: orderCreateData.items } },
+                        },
                     });
                     return res.id;
                 },
@@ -72,22 +74,22 @@ export default defineConfig({
 
                     return { id: res?.id, slug: res?.slug };
                 },
-                async getTestProductMultipleId(productNameArr: Product["name"][]) {
+                async getTestProductMultipleIds(productNames: Product["name"][]) {
                     const res = await prisma.product.findMany({
-                        where: { name: { in: productNameArr } },
+                        where: { name: { in: productNames } },
                     });
 
                     return res.map((product) => product.id);
                 },
-                async deleteTestData({ orderIdArr, productIdArr }: CypressTestDataDeleteParams) {
+                async deleteTestData({ orderIds, productIds }: CypressTestDataDeleteParams) {
                     await prisma.$transaction([
-                        prisma.orderItem.deleteMany({ where: { orderId: { in: orderIdArr } } }),
-                        prisma.order.deleteMany({ where: { id: { in: orderIdArr } } }),
+                        prisma.orderItem.deleteMany({ where: { orderId: { in: orderIds } } }),
+                        prisma.order.deleteMany({ where: { id: { in: orderIds } } }),
                         prisma.stock.deleteMany({
-                            where: { productId: { in: productIdArr } },
+                            where: { productId: { in: productIds } },
                         }),
                         prisma.product.deleteMany({
-                            where: { id: { in: productIdArr } },
+                            where: { id: { in: productIds } },
                         }),
                     ]);
                     return null;

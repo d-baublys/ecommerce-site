@@ -185,7 +185,7 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
                         value={formProvisionalProductData.gender}
                     >
                         {VALID_CATEGORIES.map((c, idx) => (
-                            <option key={idx} value={c.key}>
+                            <option key={idx} value={c.id}>
                                 {c.label}
                             </option>
                         ))}

@@ -2,7 +2,7 @@
 
 import { updateOrder } from "@/lib/actions";
 import { ORDER_STATUS_OPTIONS, ORDER_TABLE_COLUMNS } from "@/lib/constants";
-import { Order } from "@/lib/types";
+import { Order, TableSortOptions, TableColumns } from "@/lib/types";
 import { processDateForClient, stringifyConvertPrice } from "@/lib/utils";
 import { useModalStore } from "@/stores/modalStore";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
@@ -18,12 +18,9 @@ import { useEffect, useState } from "react";
 import { FaSort } from "react-icons/fa";
 
 export default function AdminOrdersClient({ ordersData }: { ordersData: Order[] }) {
-    const columns = ORDER_TABLE_COLUMNS.map((columnData) => columnData.key);
-    type TableColumns = (typeof columns)[number];
-    type OrderOptions = "asc" | "desc";
     const [sortedData, setSortedData] = useState<Order[]>(ordersData);
     const [sortColumn, setSortColumn] = useState<TableColumns>("returnRequestedAt");
-    const [sortOrder, setSortOrder] = useState<OrderOptions>("desc");
+    const [sortOrder, setSortOrder] = useState<TableSortOptions>("desc");
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState<boolean>(false);
     const [isFailureModalOpen, setIsFailureModalOpen] = useState<boolean>(false);
     const [modalMessage, setModalMessage] = useState<string>("");
@@ -47,7 +44,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: Order[] 
     function compareValues<K extends TableColumns>(
         a: Order[K],
         b: Order[K],
-        order: OrderOptions
+        order: TableSortOptions
     ): number {
         let result: number = 0;
 
@@ -121,11 +118,11 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: Order[] 
     ) => {
         if (inputData instanceof Date) {
             return processDateForClient(inputData);
-        } else if (column.key === "status") {
-            return ORDER_STATUS_OPTIONS.find((s) => s.key === inputData)!.label;
+        } else if (column.id === "status") {
+            return ORDER_STATUS_OPTIONS.find((s) => s.id === inputData)!.label;
         } else if (
             typeof inputData === "number" &&
-            (column.key === "subTotal" || column.key === "shippingTotal" || column.key === "total")
+            (column.id === "subTotal" || column.id === "shippingTotal" || column.id === "total")
         ) {
             return `£${stringifyConvertPrice(inputData)}`;
         } else {
@@ -136,7 +133,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: Order[] 
     const buildHeadCells = () =>
         ORDER_TABLE_COLUMNS.map((column, colIdx) => (
             <TableHeadCell
-                key={column.key}
+                key={column.id}
                 variant={
                     colIdx === 0
                         ? "leftEnd"
@@ -151,7 +148,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: Order[] 
                     <button
                         aria-label={`Sort by ${column.label.toLocaleLowerCase()}`}
                         title={`Sort by ${column.label.toLocaleLowerCase()}`}
-                        onClick={() => handleSortClick(column.key)}
+                        onClick={() => handleSortClick(column.id)}
                         className="cursor-pointer"
                     >
                         <FaSort />
@@ -165,12 +162,12 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: Order[] 
             <tr key={`order-${order.id}`}>
                 {ORDER_TABLE_COLUMNS.map((column, colIdx) => {
                     const cellData: string | number | Date | null = processCellData(
-                        order[column.key],
+                        order[column.id],
                         column
                     );
                     return (
                         <TableBodyCell
-                            key={`${order.id}-${column.key}`}
+                            key={`${order.id}-${column.id}`}
                             variant={
                                 colIdx === 0
                                     ? "leftEnd"
@@ -181,7 +178,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: Order[] 
                             isLastRow={rowIdx === sortedData.length - 1}
                             overrideClasses="p-2"
                         >
-                            {column.key === "id" ? (
+                            {column.id === "id" ? (
                                 <Link
                                     href={`/admin/orders/${order.id}`}
                                     className="font-semibold underline decoration-1"
@@ -191,7 +188,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: Order[] 
                             ) : (
                                 <p>{cellData}</p>
                             )}
-                            {column.key === "status" && order.status === "pendingReturn" && (
+                            {column.id === "status" && order.status === "pendingReturn" && (
                                 <div className="mt-4">
                                     <PlainRoundedButton
                                         onClick={() => handleApproval(order.id)}

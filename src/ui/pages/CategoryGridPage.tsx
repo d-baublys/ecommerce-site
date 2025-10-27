@@ -1,6 +1,6 @@
 "use client";
 
-import { Categories, ClientProduct, PriceFilterKey, ProductSortKey, Sizes } from "@/lib/types";
+import { Categories, ClientProduct, PriceFilterId, ProductSortId, Sizes } from "@/lib/types";
 import GridAside from "@/ui/components/product-grid/GridAside";
 import { useEffect, useRef, useState } from "react";
 import { extractFilters, extractSort } from "@/lib/utils";
@@ -47,13 +47,13 @@ export default function CategoryGridPage({
     const [sizeFilters, setSizeFilters] = useState<Sizes[]>(
         extractFilters<Sizes>(currSizeFilters, VALID_SIZES)
     );
-    const [priceFilters, setPriceFilters] = useState<PriceFilterKey[]>(
-        extractFilters<PriceFilterKey>(
+    const [priceFilters, setPriceFilters] = useState<PriceFilterId[]>(
+        extractFilters<PriceFilterId>(
             currPriceFilters,
-            Object.keys(PRICE_FILTER_OPTIONS) as PriceFilterKey[]
+            Object.keys(PRICE_FILTER_OPTIONS) as PriceFilterId[]
         )
     );
-    const [productSort, setProductSort] = useState<ProductSortKey | "placeholder">(
+    const [productSort, setProductSort] = useState<ProductSortId | "placeholder">(
         extractSort(currSort)
     );
 
@@ -134,8 +134,8 @@ export default function CategoryGridPage({
         return (
             <ul aria-label="Category tabs" className="flex w-full border-b-2 gap-8 mb-8 py-2">
                 {VALID_CATEGORIES.map((c) => (
-                    <li key={c.key}>
-                        <Link href={`/category/${c.key}`}>
+                    <li key={c.id}>
+                        <Link href={`/category/${c.id}`}>
                             <div>{c.label}</div>
                         </Link>
                     </li>
@@ -163,7 +163,7 @@ export default function CategoryGridPage({
                             ? "font-normal"
                             : "max-w-[85px] lg:max-w-[95px] font-semibold"
                     }`}
-                    onChange={(e) => setProductSort(e.target.value as ProductSortKey)}
+                    onChange={(e) => setProductSort(e.target.value as ProductSortId)}
                     value={productSort}
                 >
                     <option disabled hidden value="placeholder">

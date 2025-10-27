@@ -1,20 +1,20 @@
 "use client";
 
-import { ClientStock, Product, Sizes } from "@/lib/types";
+import { ClientStock, Sizes } from "@/lib/types";
 import { IoTrash } from "react-icons/io5";
 
 interface StockRowDeleteProps extends React.HtmlHTMLAttributes<HTMLButtonElement> {
-    stockObjSetter: React.Dispatch<React.SetStateAction<ClientStock>>;
+    stockSetter: React.Dispatch<React.SetStateAction<ClientStock>>;
     size: Sizes;
 }
 
-export default function StockRowDelete({ stockObjSetter, size, ...props }: StockRowDeleteProps) {
+export default function StockRowDelete({ stockSetter, size, ...props }: StockRowDeleteProps) {
     const handleDelete = () => {
-        stockObjSetter((prev) => {
-            const newObj = { ...prev };
-            delete newObj[size];
+        stockSetter((prev) => {
+            const updatedStock = { ...prev };
+            delete updatedStock[size];
 
-            return newObj;
+            return updatedStock;
         });
     };
 

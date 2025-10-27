@@ -3,37 +3,37 @@ import { Order } from "./types";
 
 export const VALID_SIZES = ["xs", "s", "m", "l", "xl", "xxl"] as const;
 export const VALID_CATEGORIES = [
-    { key: "mens", label: "Men's" },
-    { key: "womens", label: "Women's" },
+    { id: "mens", label: "Men's" },
+    { id: "womens", label: "Women's" },
 ] as const;
 export const ORDER_STATUS_OPTIONS = [
     {
-        key: "paid",
+        id: "paid",
         label: "Paid",
     },
     {
-        key: "pendingReturn",
+        id: "pendingReturn",
         label: "Pending Return",
     },
     {
-        key: "refunded",
+        id: "refunded",
         label: "Refunded",
     },
 ] as const;
 export const ORDER_TABLE_COLUMNS: {
-    key: keyof Omit<Order, "paymentIntentId" | "sessionId" | "items">;
+    id: keyof Omit<Order, "paymentIntentId" | "sessionId" | "items">;
     label: string;
 }[] = [
-    { key: "id", label: "Order #" },
-    { key: "userId", label: "Customer Id" },
-    { key: "email", label: "Customer Email" },
-    { key: "subTotal", label: "Subtotal" },
-    { key: "shippingTotal", label: "Shipping" },
-    { key: "total", label: "Total" },
-    { key: "createdAt", label: "Date Created" },
-    { key: "returnRequestedAt", label: "Date Return Requested" },
-    { key: "refundedAt", label: "Date Refunded" },
-    { key: "status", label: "Status" },
+    { id: "id", label: "Order #" },
+    { id: "userId", label: "Customer Id" },
+    { id: "email", label: "Customer Email" },
+    { id: "subTotal", label: "Subtotal" },
+    { id: "shippingTotal", label: "Shipping" },
+    { id: "total", label: "Total" },
+    { id: "createdAt", label: "Date Created" },
+    { id: "returnRequestedAt", label: "Date Return Requested" },
+    { id: "refundedAt", label: "Date Refunded" },
+    { id: "status", label: "Status" },
 ];
 export const PRICE_FILTER_OPTIONS = {
     a: { min: 0, max: 5000 },
