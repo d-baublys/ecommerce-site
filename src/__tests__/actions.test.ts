@@ -13,7 +13,6 @@ import {
     deleteProduct,
     updateProduct,
     updateOrder,
-    updateStock,
 } from "@/lib/actions";
 import { prisma } from "@/lib/prisma";
 import {
@@ -132,80 +131,6 @@ describe("updateProduct", () => {
     });
 });
 
-describe("updateStock", () => {
-    it("updates successfully with valid data", async () => {
-        (prisma.stock.findFirst as jest.Mock).mockResolvedValue({
-            id: "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1",
-            quantity: 4,
-        });
-        (prisma.stock.update as jest.Mock).mockResolvedValue({});
-
-        const result = updateStock({
-            productId: "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1",
-            size: "m",
-            quantity: 2,
-        });
-        await expect(result).resolves.toEqual({ success: true });
-    });
-
-    it("throws an error if quantity exceeds stock", async () => {
-        (prisma.stock.findFirst as jest.Mock).mockResolvedValue({
-            id: "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1",
-            quantity: 1,
-        });
-
-        const result = updateStock({
-            productId: "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1",
-            size: "m",
-            quantity: 2,
-        });
-        await expect(result).rejects.toThrow('Quantity exceeds stock for size "M"');
-    });
-
-    it("throws an error if product is not found", async () => {
-        (prisma.stock.findFirst as jest.Mock).mockResolvedValue(null);
-
-        const result = updateStock({
-            productId: "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1",
-            size: "m",
-            quantity: 2,
-        });
-        await expect(result).rejects.toThrow("Product not found or has no stock");
-    });
-
-    it("throws an error if product is no longer stocked", async () => {
-        (prisma.stock.findFirst as jest.Mock).mockResolvedValue({
-            id: "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1",
-            quantity: 0,
-        });
-
-        const result = updateStock({
-            productId: "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1",
-            size: "m",
-            quantity: 2,
-        });
-        await expect(result).rejects.toThrow("Product not found or has no stock");
-    });
-
-    it("resolves with expected value on database error", async () => {
-        const errorSpy = getConsoleErrorSpy();
-        (prisma.stock.findFirst as jest.Mock).mockResolvedValue({
-            id: "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1",
-            quantity: 4,
-        });
-        (prisma.stock.update as jest.Mock).mockRejectedValue(new Error("Database error"));
-
-        const result = updateStock({
-            productId: "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1",
-            size: "m",
-            quantity: 2,
-        });
-        await expect(result).resolves.toEqual({ success: false });
-
-        errorSpy.mockRestore();
-    });
-});
-
 describe("deleteProduct", () => {
     it("deletes product stock successfully", async () => {
         (prisma.$transaction as jest.Mock).mockResolvedValue(true);
@@ -227,7 +152,7 @@ describe("deleteProduct", () => {
 
 describe("createOrder", () => {
     it("creates order successfully", async () => {
-        (prisma.order.create as jest.Mock).mockResolvedValue({});
+        (prisma.$transaction as jest.Mock).mockResolvedValue({});
 
         const result = createOrder(buildTestOrderData());
         await expect(result).resolves.toEqual({ success: true });
@@ -235,7 +160,7 @@ describe("createOrder", () => {
 
     it("rejects on database error", async () => {
         const errorSpy = getConsoleErrorSpy();
-        (prisma.order.create as jest.Mock).mockRejectedValue(new Error("Database error"));
+        (prisma.$transaction as jest.Mock).mockRejectedValue(new Error("Database error"));
 
         const testOrder: ClientOrder = buildTestOrderData();
         const testOrderNoItems = { ...testOrder, items: [] };
@@ -313,7 +238,7 @@ describe("updateOrder", () => {
         (prisma.order.update as jest.Mock).mockResolvedValue({});
 
         const result = updateOrder({
-            orderId: 1,
+            id: 1,
             status: "pendingReturn",
             returnRequestedAt: new Date(),
         });
@@ -325,7 +250,7 @@ describe("updateOrder", () => {
         (prisma.order.update as jest.Mock).mockRejectedValue(new Error("Database error"));
 
         const result = updateOrder({
-            orderId: 1,
+            id: 1,
             status: "pendingReturn",
             returnRequestedAt: new Date(),
         });

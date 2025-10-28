@@ -7,9 +7,8 @@ import {
     ClientUser,
     Order,
     OrderCreateInput,
-    OrderStatus,
+    OrderUpdateInput,
     Product,
-    StockUpdateInput,
     User,
     UserCreateInput,
 } from "./types";
@@ -25,8 +24,8 @@ import {
     clientProductSchema,
     featuredProductCreateSchema,
     orderCreateSchema,
+    orderUpdateSchema,
     productCreateSchema,
-    stockUpdateSchema,
     userCreateSchema,
 } from "./schemas";
 import {
@@ -36,14 +35,14 @@ import {
 } from "./types/actions";
 
 export async function createProduct(productData: ClientProduct): CreateUpdateDeleteActionResponse {
+    const { id, ...netProduct } = productData;
+    const parsedProduct = productCreateSchema.safeParse(netProduct);
+
+    if (!parsedProduct.success) {
+        return zodErrorResponse(parsedProduct);
+    }
+
     try {
-        const { id, ...netProduct } = productData;
-        const parsedProduct = productCreateSchema.safeParse(netProduct);
-
-        if (!parsedProduct.success) {
-            return zodErrorResponse(parsedProduct);
-        }
-
         await prisma.product.create({
             data: {
                 ...parsedProduct.data,
@@ -80,24 +79,24 @@ export async function getProducts(
 }
 
 export async function updateProduct(productData: ClientProduct): CreateUpdateDeleteActionResponse {
+    const parsedData = clientProductSchema.safeParse(productData);
+
+    if (!parsedData.success) {
+        return zodErrorResponse(parsedData);
+    }
+
+    const { stock, ...netProduct } = parsedData.data;
+
     try {
-        const parsedProduct = clientProductSchema.safeParse(productData);
-
-        if (!parsedProduct.success) {
-            return zodErrorResponse(parsedProduct);
-        }
-
-        const { stock, ...netProduct } = parsedProduct.data;
-
         await prisma.$transaction([
             prisma.stock.deleteMany({
-                where: { productId: parsedProduct.data.id },
+                where: { productId: parsedData.data.id },
             }),
             prisma.stock.createMany({
-                data: mapStockForProductUpdate(parsedProduct.data),
+                data: mapStockForProductUpdate(parsedData.data),
             }),
             prisma.product.update({
-                where: { id: parsedProduct.data.id },
+                where: { id: parsedData.data.id },
                 data: netProduct,
             }),
         ]);
@@ -125,60 +124,22 @@ export async function deleteProduct(id: Product["id"]): CreateUpdateDeleteAction
     }
 }
 
-export async function updateStock(params: StockUpdateInput): CreateUpdateDeleteActionResponse {
-    const parsedData = stockUpdateSchema.safeParse(params);
-
-    if (!parsedData.success) {
-        return zodErrorResponse(parsedData);
-    }
-
-    const { productId, size, quantity } = parsedData.data;
-
-    const stockItem = await prisma.stock.findFirst({
-        where: { productId, size },
-        select: { id: true, quantity: true },
-    });
-
-    if (!stockItem || !stockItem.quantity) {
-        throw new Error("Product not found or has no stock.");
-    }
-
-    const currentStock = stockItem.quantity;
-
-    if (quantity > currentStock) {
-        throw new Error(`Quantity exceeds stock for size "${size.toUpperCase()}"`);
-    }
-
-    const updatedStock = currentStock - quantity;
-
-    try {
-        await prisma.stock.update({
-            where: { id: stockItem.id },
-            data: { quantity: updatedStock },
-        });
-        return { success: true };
-    } catch (error) {
-        console.error("Error updating stock data: ", error);
-        return { success: false };
-    }
-}
-
 export async function createFeaturedProducts(
     productData: ClientProduct[]
 ): CreateUpdateDeleteActionResponse {
-    const parsedArray = featuredProductCreateSchema.safeParse(
+    const parsedData = featuredProductCreateSchema.safeParse(
         productData.map((product) => ({
             productId: product.id,
         }))
     );
 
-    if (!parsedArray.success) {
-        return zodErrorResponse(parsedArray);
+    if (!parsedData.success) {
+        return zodErrorResponse(parsedData);
     }
 
     try {
         await prisma.featuredProduct.createMany({
-            data: parsedArray.data,
+            data: parsedData.data,
             skipDuplicates: true,
         });
         return { success: true };
@@ -222,38 +183,70 @@ export async function deleteFeaturedProducts(): CreateUpdateDeleteActionResponse
 }
 
 export async function createOrder(orderData: OrderCreateInput): CreateUpdateDeleteActionResponse {
-    try {
-        const parsedOrder = orderCreateSchema.safeParse(orderData);
+    const parsedData = orderCreateSchema.safeParse(orderData);
 
-        if (!parsedOrder.success) {
-            return zodErrorResponse(parsedOrder);
-        }
+    if (!parsedData.success) {
+        return zodErrorResponse(parsedData);
+    }
 
-        const { items, subTotal, shippingTotal, total, sessionId, email, paymentIntentId, userId } =
-            parsedOrder.data;
+    const { items, subTotal, shippingTotal, total, sessionId, email, paymentIntentId, userId } =
+        parsedData.data;
 
-        const orderCreateData: Prisma.OrderCreateArgs["data"] = {
-            items: {
-                createMany: {
-                    data: items.map((item) => ({
-                        productId: item.productId,
-                        name: item.name,
-                        price: item.price,
-                        size: item.size,
-                        quantity: item.quantity,
-                    })),
-                },
+    const orderCreateData: Prisma.OrderCreateArgs["data"] = {
+        items: {
+            createMany: {
+                data: items.map((item) => ({
+                    productId: item.productId,
+                    name: item.name,
+                    price: item.price,
+                    size: item.size,
+                    quantity: item.quantity,
+                })),
             },
-            subTotal,
-            shippingTotal,
-            total,
-            sessionId,
-            email,
-            paymentIntentId,
-            userId,
-        };
+        },
+        subTotal,
+        shippingTotal,
+        total,
+        sessionId,
+        email,
+        paymentIntentId,
+        userId,
+    };
 
-        await prisma.order.create({ data: orderCreateData });
+    try {
+        await prisma.$transaction(async (tx) => {
+            for (const item of items) {
+                const { productId, size, quantity } = item;
+
+                const stockItem = await tx.stock.findFirst({
+                    where: { productId, size },
+                    select: { id: true, quantity: true },
+                });
+
+                if (!stockItem) {
+                    throw new Error(
+                        `Stock data for ${item.name} size "${size.toUpperCase()} not found`
+                    );
+                }
+
+                const currentStock = stockItem.quantity;
+
+                if (quantity > currentStock) {
+                    throw new Error(
+                        `Quantity exceeds stock for ${item.name} size "${size.toUpperCase()}"`
+                    );
+                }
+
+                const updatedStock = currentStock - quantity;
+
+                await tx.stock.update({
+                    where: { id: stockItem.id },
+                    data: { quantity: updatedStock },
+                });
+            }
+
+            await prisma.order.create({ data: orderCreateData });
+        });
 
         return { success: true };
     } catch (error) {
@@ -321,19 +314,18 @@ export async function getAllOrders(): GetManyActionResponse<Order> {
     }
 }
 
-interface UpdateOrderParams {
-    orderId: Order["id"];
-    status: OrderStatus;
-    returnRequestedAt?: Order["returnRequestedAt"];
-    refundedAt?: Order["refundedAt"];
-}
+export async function updateOrder(updatedData: OrderUpdateInput): CreateUpdateDeleteActionResponse {
+    const parsedData = orderUpdateSchema.safeParse(updatedData);
 
-export async function updateOrder(params: UpdateOrderParams): CreateUpdateDeleteActionResponse {
-    const { orderId, status, returnRequestedAt, refundedAt } = params;
+    if (!parsedData.success) {
+        return zodErrorResponse(parsedData);
+    }
+
+    const { id, status, returnRequestedAt, refundedAt } = parsedData.data;
 
     try {
         await prisma.order.update({
-            where: { id: orderId },
+            where: { id },
             data: { status, returnRequestedAt, refundedAt },
         });
         return { success: true };
@@ -343,8 +335,8 @@ export async function updateOrder(params: UpdateOrderParams): CreateUpdateDelete
     }
 }
 
-export async function createUser(params: UserCreateInput): CreateUpdateDeleteActionResponse {
-    const parsedData = userCreateSchema.safeParse(params);
+export async function createUser(userData: UserCreateInput): CreateUpdateDeleteActionResponse {
+    const parsedData = userCreateSchema.safeParse(userData);
 
     if (!parsedData.success) {
         return zodErrorResponse(parsedData);

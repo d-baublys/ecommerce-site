@@ -91,7 +91,7 @@ export default function AdminOrdersClient({ ordersData }: { ordersData: Order[] 
 
             if (refund.success) {
                 const orderUpdate = await updateOrder({
-                    orderId,
+                    id: orderId,
                     status: "refunded",
                     refundedAt: new Date(),
                 });

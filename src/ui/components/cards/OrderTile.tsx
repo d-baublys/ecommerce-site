@@ -53,7 +53,7 @@ export default function OrderTile(props: OrderTileProps) {
         if (returnConfirm) {
             try {
                 const response = await updateOrder({
-                    orderId,
+                    id: orderId,
                     status: "pendingReturn",
                     returnRequestedAt: new Date(),
                 });

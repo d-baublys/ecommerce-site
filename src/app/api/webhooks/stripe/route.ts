@@ -1,5 +1,5 @@
 import stripe from "@/lib/stripe";
-import { createOrder, updateStock } from "@/lib/actions";
+import { createOrder } from "@/lib/actions";
 import { OrderCreateInput, OrderItemCreateInput } from "@/lib/types";
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
@@ -68,21 +68,13 @@ export async function POST(req: NextRequest) {
             paymentIntentId,
         };
 
-        const newOrder = await createOrder(orderCreateData);
+        const result = await createOrder(orderCreateData);
 
-        if (!newOrder.success) {
+        if (!result.success && result.error) {
+            console.error("Error parsing order data: ", result.error);
+            return new Response("Error parsing order data", { status: 400 });
+        } else if (!result.success) {
             return new Response("Error creating new order", { status: 400 });
-        }
-
-        for (const item of items) {
-            const result = await updateStock({
-                productId: item.productId,
-                size: item.size,
-                quantity: item.quantity,
-            });
-            if (!result.success) {
-                return new Response("Error updating stock", { status: 400 });
-            }
         }
     }
 

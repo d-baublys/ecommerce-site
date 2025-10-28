@@ -51,3 +51,8 @@ export const orderCreateSchema = orderSchema
         refundedAt: orderSchema.shape.refundedAt.optional(),
         items: orderItemCreateSchema,
     });
+
+export const orderUpdateSchema = z.intersection(
+    orderSchema.pick({ id: true, status: true }),
+    orderCreateSchema.pick({ returnRequestedAt: true, refundedAt: true })
+);
