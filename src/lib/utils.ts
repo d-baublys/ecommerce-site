@@ -23,23 +23,33 @@ export function debounce<T extends (...args: unknown[]) => void>(func: T, delay:
     };
 }
 
-export function checkStock(
+export function findBagItem(
+    productId: ClientProduct["id"],
+    size: Sizes,
+    bag: BagItem[]
+): BagItem | undefined {
+    return bag.find((bagItem) => bagItem.productId === productId && bagItem.size === size);
+}
+
+export function isBagAddPermitted(currentBagQty: BagItem["quantity"], stockQty: number) {
+    return !(
+        currentBagQty >= Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY) ||
+        currentBagQty >= stockQty
+    );
+}
+
+export function checkSizeAvailable(
     productData: ClientProduct,
-    productSize: Sizes,
+    size: Sizes,
     bag: BagItem[]
 ): boolean {
-    const stock = productData.stock[productSize as keyof typeof productData.stock] ?? 0;
+    const stock = productData.stock[size as Sizes] ?? 0;
 
-    const existing = bag.find(
-        (bagItem) => bagItem.product.id === productData.id && bagItem.size === productSize
-    );
+    const itemInBag = findBagItem(productData.id, size, bag);
 
-    const bagQuantity = existing?.quantity ?? 0;
+    const currentQty = itemInBag ? itemInBag.quantity : 0;
 
-    return !(
-        bagQuantity >= Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY) ||
-        bagQuantity >= stock
-    );
+    return isBagAddPermitted(currentQty, stock);
 }
 
 export function isUnique(sizeKey: Sizes, stockData: ClientStock) {
@@ -201,7 +211,13 @@ export function escapeRegExp(string: string): string {
 }
 
 export function buildBagItem(product: ClientProduct, size: Sizes): BagItem {
-    return { product, size, quantity: 1 };
+    return {
+        productId: product.id,
+        productName: product.name,
+        price: product.price,
+        size,
+        quantity: 1,
+    };
 }
 
 export function buildProductUrl(id: string, slug: string): string {

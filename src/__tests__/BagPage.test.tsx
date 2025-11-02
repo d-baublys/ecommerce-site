@@ -37,14 +37,15 @@ import { getProducts } from "@/lib/actions";
 import { getConsoleErrorSpy, wrapWithErrorBoundary } from "@/lib/test-utils";
 
 const { addToBag, clearBag } = useBagStore.getState();
-const testBagItems = buildTestBagItemList();
-const bagUnchangedData = testBagItems.map((bagItem) => bagItem.product);
+const testBagData = buildTestBagItemList();
+const testBagItems = testBagData.bagItems;
+const testProducts = testBagData.products;
 const bagUpdatedData = getTestUpdatedData();
 
 const renderBagPage = async () => render(await BagPage());
 const setUpTestBag = () =>
-    testBagItems.forEach((item) => {
-        addToBag(item);
+    testBagItems.forEach((item, idx) => {
+        addToBag(testProducts[idx], item);
     });
 
 const getSessionWithAuth = () => {
@@ -79,7 +80,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("shows correct bag subtotal", async () => {
         setUpTestBag();
-        setUpResolvedFetch(bagUnchangedData);
+        setUpResolvedFetch(testProducts);
         act(() => {
             renderBagPage();
         });
@@ -126,7 +127,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("preselects correct quantities", async () => {
         setUpTestBag();
-        setUpResolvedFetch(bagUnchangedData);
+        setUpResolvedFetch(testProducts);
         act(() => {
             renderBagPage();
         });
@@ -159,7 +160,7 @@ describe("BagPage auth-agnostic tests", () => {
         const latestTestProduct = buildTestProduct({ overrides: { stock: { s: 0 } } });
         const mockBagItem = buildBagItem(testProduct, "s");
 
-        addToBag(mockBagItem);
+        addToBag(testProduct, mockBagItem);
         setUpResolvedFetch([latestTestProduct]);
         act(() => {
             renderBagPage();
@@ -176,7 +177,7 @@ describe("BagPage auth-agnostic tests", () => {
     it("shows all quantity options", async () => {
         const testProduct = buildTestProduct();
 
-        addToBag(buildBagItem(testProduct, "m"));
+        addToBag(testProduct, buildBagItem(testProduct, "m"));
         setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
@@ -196,8 +197,8 @@ describe("BagPage auth-agnostic tests", () => {
     it("updates subtotal when quantity selection changes", async () => {
         const testProduct = buildTestProduct();
 
-        addToBag(buildBagItem(testProduct, "s"));
-        addToBag(buildBagItem(testProduct, "s"));
+        addToBag(testProduct, buildBagItem(testProduct, "s"));
+        addToBag(testProduct, buildBagItem(testProduct, "s"));
         setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
@@ -222,7 +223,7 @@ describe("BagPage auth-agnostic tests", () => {
         const itemLimit = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
         const testProduct = buildTestProduct({ overrides: { stock: { s: itemLimit + 5 } } });
 
-        addToBag(buildBagItem(testProduct, "s"));
+        addToBag(testProduct, buildBagItem(testProduct, "s"));
         setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
@@ -238,7 +239,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("removes items from bag as expected", async () => {
         setUpTestBag();
-        setUpResolvedFetch(bagUnchangedData);
+        setUpResolvedFetch(testProducts);
         act(() => {
             renderBagPage();
         });
@@ -261,8 +262,8 @@ describe("BagPage auth-agnostic tests", () => {
     it("renders checkout button & shows correct shipping when at least some bag item sizes are stocked", async () => {
         const testProduct = buildTestProduct({ overrides: { stock: { s: 0, m: 1 } } });
 
-        addToBag(buildBagItem(testProduct, "s"));
-        addToBag(buildBagItem(testProduct, "m"));
+        addToBag(testProduct, buildBagItem(testProduct, "s"));
+        addToBag(testProduct, buildBagItem(testProduct, "m"));
         setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
@@ -275,8 +276,8 @@ describe("BagPage auth-agnostic tests", () => {
     it("doesn't render checkout button & shows correct shipping when all bag item sizes are unstocked", async () => {
         const testProduct = buildTestProduct({ overrides: { stock: { s: 0, m: 0 } } });
 
-        addToBag(buildBagItem(testProduct, "s"));
-        addToBag(buildBagItem(testProduct, "m"));
+        addToBag(testProduct, buildBagItem(testProduct, "s"));
+        addToBag(testProduct, buildBagItem(testProduct, "m"));
         setUpResolvedFetch([testProduct]);
         act(() => {
             renderBagPage();
@@ -317,7 +318,7 @@ describe("BagPage authenticated tests", () => {
         } as Response);
 
         setUpTestBag();
-        setUpResolvedFetch(bagUnchangedData);
+        setUpResolvedFetch(testProducts);
         act(() => {
             renderBagPage();
         });

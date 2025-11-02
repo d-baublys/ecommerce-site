@@ -3,7 +3,7 @@
 import { ClientProduct, Sizes } from "@/lib/types";
 import {
     buildProductUrl,
-    checkStock,
+    checkSizeAvailable,
     buildBagItem,
     isolateInteraction,
     processDateForClient,
@@ -29,7 +29,7 @@ export default function ProductGridTile({ product }: { product: ClientProduct })
     const tileRef = useRef<HTMLDivElement>(null);
 
     const availableSizes = VALID_SIZES.filter(
-        (size) => size in product.stock && checkStock(product, size, bag)
+        (size) => size in product.stock && checkSizeAvailable(product, size, bag)
     );
 
     const handleTouchStart = () => {
@@ -50,8 +50,8 @@ export default function ProductGridTile({ product }: { product: ClientProduct })
 
     const handleSizeClick = (e: React.TouchEvent | React.MouseEvent, size: Sizes) => {
         isolateInteraction(e);
-        const permitted = addToBag(buildBagItem(product, size));
-        permitted && setIsModalOpen(true);
+        addToBag(product, buildBagItem(product, size));
+        setIsModalOpen(true);
     };
 
     const handleBlur = (e: React.FocusEvent) => {

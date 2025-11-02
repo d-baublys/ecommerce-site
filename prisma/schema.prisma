@@ -62,6 +62,22 @@ model Stock {
     @@unique([productId, size])
 }
 
+model ReservationItem {
+    id            String      @id @default(uuid())
+    productId     String
+    size          Sizes
+    quantity      Int
+    Reservation   Reservation @relation(fields: [reservationId], references: [id])
+    reservationId String
+}
+
+model Reservation {
+    id        String            @id @default(uuid())
+    items     ReservationItem[]
+    createdAt DateTime          @default(now())
+    expiresAt DateTime
+}
+
 model FeaturedProduct {
     id        String  @id @default(uuid())
     productId String

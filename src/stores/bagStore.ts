@@ -1,11 +1,12 @@
-import { BagItem, Sizes } from "@/lib/types";
+import { BagItem, ClientProduct, Sizes } from "@/lib/types";
 import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { findBagItem, isBagAddPermitted } from "@/lib/utils";
 
 type BagStore = {
     bag: BagItem[];
-    addToBag: (item: BagItem) => boolean;
+    addToBag: (product: ClientProduct, item: BagItem) => void;
     removeFromBag: (id: string, size: Sizes) => void;
     clearBag: () => void;
     updateQuantity: (id: string, size: Sizes, quantity: number) => void;
@@ -17,47 +18,35 @@ export const useBagStore = create<BagStore>()(
     persist(
         (set, get) => ({
             bag: [],
-            addToBag: (newItem) => {
+            addToBag: (product, newItem) => {
                 const currentBag = get().bag;
-                let permitted = true;
                 let updatedBag = currentBag;
-                const { product, size, quantity } = newItem;
+                const { size, quantity: addedQuantity } = newItem;
 
-                const existing = currentBag.find(
-                    (bagItem) => bagItem.product.id === product.id && bagItem.size === size
-                );
+                const existing = findBagItem(product.id, size, currentBag);
 
                 if (existing) {
-                    if (
-                        !(
-                            existing.quantity >=
-                                Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY) ||
-                            existing.quantity >= product.stock[size]!
-                        )
-                    ) {
-                        updatedBag = currentBag.map((existingItem) =>
-                            existingItem.product.id === product.id && existingItem.size === size
+                    if (isBagAddPermitted(existing.quantity, product.stock[size]!)) {
+                        updatedBag = currentBag.map((bagItem) =>
+                            bagItem.productId === product.id && bagItem.size === size
                                 ? {
-                                      ...existing,
-                                      quantity: existingItem.quantity + quantity,
+                                      ...bagItem,
+                                      quantity: bagItem.quantity + addedQuantity,
                                   }
-                                : existingItem
+                                : bagItem
                         );
-                    } else {
-                        permitted = false;
                     }
                 } else {
                     updatedBag = [...currentBag, newItem];
                 }
 
                 set({ bag: updatedBag });
-                return permitted;
             },
             removeFromBag: (id, size) => {
                 const currentBag = get().bag;
                 let updatedBag = currentBag;
                 updatedBag = currentBag.filter(
-                    (item) => !(item.product.id === id && item.size === size)
+                    (item) => !(item.productId === id && item.size === size)
                 );
 
                 setTimeout(() => {
@@ -71,7 +60,7 @@ export const useBagStore = create<BagStore>()(
                 const currentBag = get().bag;
                 let updatedBag = currentBag;
                 updatedBag = currentBag.map((item) =>
-                    item.product.id === id && item.size === size ? { ...item, quantity } : item
+                    item.productId === id && item.size === size ? { ...item, quantity } : item
                 );
 
                 set({ bag: updatedBag });

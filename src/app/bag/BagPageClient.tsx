@@ -12,7 +12,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 import LoadingIndicator from "@/ui/components/overlays/LoadingIndicator";
-import { ClientProduct, MergedBagItem } from "@/lib/types";
+import { ClientProduct } from "@/lib/types";
 
 export default function BagPageClient() {
     const [latestData, setLatestData] = useState<ClientProduct[]>();
@@ -22,13 +22,13 @@ export default function BagPageClient() {
     const { bag, removeFromBag, hasHydrated } = useBagStore((state) => state);
     const emptyBag = !bag.length;
     const noStock = !useBagStore((state) => state.getTotalBagCount());
-    const bagProductIds = bag.map((bagItem) => bagItem.product.id);
+    const bagProductIds = bag.map((bagItem) => bagItem.productId);
     const router = useRouter();
     const session = useSession();
     const searchParams = useSearchParams();
 
     const orderSubtotal = bag.reduce(
-        (subTotal, bagItem) => subTotal + bagItem.product.price * bagItem.quantity,
+        (subTotal, bagItem) => subTotal + bagItem.price * bagItem.quantity,
         0
     );
     const shippingCost = !emptyBag && orderSubtotal ? 500 : 0;
@@ -94,13 +94,6 @@ export default function BagPageClient() {
 
     if (!latestData) return null;
 
-    const latestDataMap = new Map(latestData.map((item) => [item.id, item.stock]));
-    const mergedItems: MergedBagItem[] = bag.map((item) => {
-        const latestSizeStock = latestDataMap.get(item.product.id)?.[item.size] ?? 0;
-
-        return { ...item, latestSizeStock };
-    });
-
     return (
         <>
             <MainLayout subheaderText="My Bag">
@@ -111,15 +104,20 @@ export default function BagPageClient() {
                             data-testid="bag-tile-ul"
                             className="flex flex-col w-full lg:gap-8"
                         >
-                            {mergedItems.map((mergedItem) => (
+                            {bag.map((bagItem) => (
                                 <li
-                                    key={`${mergedItem.product.id}-${mergedItem.size}`}
+                                    key={`${bagItem.productId}-${bagItem.size}`}
                                     className="bag-tile w-full mb-8 lg:mb-0"
                                 >
                                     <BagTile
-                                        bagItem={mergedItem}
+                                        bagItem={bagItem}
                                         handleDelete={() =>
-                                            removeFromBag(mergedItem.product.id, mergedItem.size)
+                                            removeFromBag(bagItem.productId, bagItem.size)
+                                        }
+                                        productData={
+                                            latestData.find(
+                                                (product) => product.id === bagItem.productId
+                                            )!
                                         }
                                     />
                                 </li>

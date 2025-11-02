@@ -11,7 +11,7 @@ import {
     Order,
     OrderItem,
 } from "./types";
-import { slugify } from "./utils";
+import { buildBagItem, slugify } from "./utils";
 import { VALID_CATEGORIES } from "./constants";
 
 export function buildTestProduct({
@@ -68,10 +68,10 @@ export function getFilteredTestProducts() {
 }
 
 function buildTestBagItem(product: ClientProduct, size: Sizes, quantity: number): BagItem {
-    return { product, size, quantity };
+    return { ...buildBagItem(product, size), quantity };
 }
 
-export function buildTestBagItemList(): BagItem[] {
+export function buildTestBagItemList(): { bagItems: BagItem[]; products: ClientProduct[] } {
     const prices = [5500, 9900];
     const stocks = [
         { s: 1, m: 0, l: 0 },
@@ -97,7 +97,7 @@ export function buildTestBagItemList(): BagItem[] {
         buildTestBagItem(products[idx], sizes[idx] as Sizes, quantities[idx])
     );
 
-    return bagItems;
+    return { bagItems, products };
 }
 
 export function getTestUpdatedData(): ClientProduct[] {

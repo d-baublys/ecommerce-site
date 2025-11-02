@@ -9,6 +9,8 @@ import {
     OrderCreateInput,
     OrderUpdateInput,
     Product,
+    Reservation,
+    ReservationCreateInput,
     User,
     UserCreateInput,
 } from "./types";
@@ -26,6 +28,7 @@ import {
     orderCreateSchema,
     orderUpdateSchema,
     productCreateSchema,
+    reservationCreateSchema,
     userCreateSchema,
 } from "./schemas";
 import {
@@ -178,6 +181,38 @@ export async function deleteFeaturedProducts(): CreateUpdateDeleteActionResponse
         return { success: true };
     } catch (error) {
         console.error("Error deleting featured products: ", error);
+        return { success: false };
+    }
+}
+
+export async function createReservation(
+    data: ReservationCreateInput
+): CreateUpdateDeleteActionResponse {
+    const parsedData = reservationCreateSchema.safeParse(data);
+
+    if (!parsedData.success) {
+        return zodErrorResponse(parsedData);
+    }
+
+    try {
+        await prisma.reservation.create({
+            data: { ...data, items: { createMany: { data: parsedData.data.items } } },
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error creating reservation: ", error);
+        return { success: false };
+    }
+}
+
+export async function deleteReservation(id: Reservation["id"]): CreateUpdateDeleteActionResponse {
+    try {
+        await prisma.$transaction([
+            prisma.reservationItem.deleteMany({ where: { reservationId: id } }),
+            prisma.reservation.delete({ where: { id } }),
+        ]);
+        return { success: true };
+    } catch (error) {
         return { success: false };
     }
 }

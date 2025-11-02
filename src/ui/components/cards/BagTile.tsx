@@ -1,6 +1,6 @@
 "use client";
 
-import { MergedBagItem } from "@/lib/types";
+import { BagItem, ClientProduct } from "@/lib/types";
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect } from "react";
 import { stringifyConvertPrice } from "@/lib/utils";
@@ -10,37 +10,38 @@ import ProductListTile from "@/ui/components/cards/ProductListTile";
 export default function BagTile({
     bagItem,
     handleDelete,
+    productData,
 }: {
-    bagItem: MergedBagItem;
+    bagItem: BagItem;
+    productData: ClientProduct;
     handleDelete?: () => void;
 }) {
-    const productData = bagItem.product;
     const updateQuantity = useBagStore((state) => state.updateQuantity);
 
-    const stock = bagItem.latestSizeStock;
-    const maxQty = Math.min(stock ?? 0, Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY));
-    const latestQuantity = Math.min(bagItem.quantity, stock);
+    const latestQty = productData.stock[bagItem.size] ?? 0;
+    const maxQty = Math.min(latestQty, Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY));
+    const currentQty = Math.min(bagItem.quantity, latestQty);
 
     useEffect(() => {
-        if (latestQuantity !== bagItem.quantity) {
-            updateQuantity(productData.id, bagItem.size, latestQuantity);
+        if (bagItem.quantity !== currentQty) {
+            updateQuantity(bagItem.productId, bagItem.size, currentQty);
         }
-    }, [latestQuantity]);
+    }, [currentQty]);
 
     const buildEndContent = () => (
         <div className="flex flex-col justify-between items-end h-full">
             <p className="text-sz-interm lg:text-sz-interm-lg">
                 <span>£</span>
-                <span>{stringifyConvertPrice(productData.price * bagItem.quantity)}</span>
+                <span>{stringifyConvertPrice(bagItem.price * bagItem.quantity)}</span>
             </p>
             <div className="flex items-center gap-2 pr-2">
-                {stock ? (
+                {latestQty ? (
                     <select
                         aria-label="Quantity selection"
                         value={bagItem.quantity}
                         className="h-10 w-10 pl-1 border-2 rounded-md bg-white"
                         onChange={(e) =>
-                            updateQuantity(productData.id, bagItem.size, Number(e.target.value))
+                            updateQuantity(bagItem.productId, bagItem.size, Number(e.target.value))
                         }
                     >
                         {Array.from({ length: maxQty }, (_, idx) => (
@@ -66,7 +67,7 @@ export default function BagTile({
 
     return (
         <ProductListTile
-            inputData={bagItem}
+            inputData={{ ...bagItem, product: productData }}
             wrapWithLink={true}
             showSize={true}
             endContent={buildEndContent()}

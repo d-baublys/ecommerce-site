@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { ClientProduct, Sizes } from "@/lib/types";
 import GoButton from "@/ui/components/buttons/GoButton";
 import { IoBag } from "react-icons/io5";
-import { checkStock, buildBagItem } from "@/lib/utils";
+import { checkSizeAvailable, buildBagItem } from "@/lib/utils";
 import ZoomableImage from "@/ui/components/ZoomableImage";
 import WishlistToggleButton from "@/ui/components/buttons/WishlistToggleButton";
 import AddSuccessModal from "@/ui/components/overlays/AddSuccessModal";
@@ -18,24 +18,20 @@ export default function ProductPageClient({ productData }: { productData: Client
     const bag = useBagStore((state) => state.bag);
     const addToBag = useBagStore((state) => state.addToBag);
 
-    function getLocalFormatting(price: number) {
+    const getLocalFormatting = (price: number) => {
         return Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
             price / 100
         );
-    }
+    };
 
     useEffect(() => {
-        const selectedAvailable = checkStock(
-            productData,
-            selectedSize as keyof typeof productData.stock,
-            bag
-        );
+        const selectedAvailable = checkSizeAvailable(productData, selectedSize as Sizes, bag);
 
         setIsButtonDisabled(!selectedAvailable);
     }, [selectedSize, bag, productData]);
 
     const handleAdd = () => {
-        addToBag(buildBagItem(productData, selectedSize as Sizes));
+        addToBag(productData, buildBagItem(productData, selectedSize as Sizes));
         setIsModalOpen(true);
     };
 
@@ -71,7 +67,7 @@ export default function ProductPageClient({ productData }: { productData: Client
                             </option>
                             {VALID_SIZES.filter((size) => size in productData.stock).map(
                                 (productSize) => {
-                                    const thisSizeAvailable = checkStock(
+                                    const thisSizeAvailable = checkSizeAvailable(
                                         productData,
                                         productSize as keyof typeof productData.stock,
                                         bag

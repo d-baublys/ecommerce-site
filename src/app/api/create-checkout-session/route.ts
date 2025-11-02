@@ -10,9 +10,9 @@ export async function POST(req: Request) {
             price_data: {
                 currency: "gbp",
                 product_data: {
-                    name: bagItem.product.name,
+                    name: bagItem.productName,
                 },
-                unit_amount: bagItem.product.price,
+                unit_amount: bagItem.price,
             },
             quantity: bagItem.quantity,
         })),
@@ -38,9 +38,9 @@ export async function POST(req: Request) {
             metadata: {
                 items: JSON.stringify(
                     bagItems.map((bagItem: BagItem) => ({
-                        productId: bagItem.product.id,
-                        name: bagItem.product.name,
-                        price: bagItem.product.price,
+                        productId: bagItem.productId,
+                        name: bagItem.productName,
+                        price: bagItem.price,
                         size: bagItem.size,
                         quantity: bagItem.quantity,
                     }))
@@ -50,6 +50,7 @@ export async function POST(req: Request) {
             },
             success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/bag`,
+            // expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
         });
 
         return NextResponse.json({ url: session.url });

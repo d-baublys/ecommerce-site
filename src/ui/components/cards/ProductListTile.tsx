@@ -6,7 +6,11 @@ import { buildProductUrl } from "@/lib/utils";
 import ProductImage from "@/ui/components/ProductImage";
 
 interface ProductListTileProps {
-    inputData: ClientProduct | ClientProduct[] | BagItem | ClientOrder;
+    inputData:
+        | ClientProduct
+        | ClientProduct[]
+        | (BagItem & { product: ClientProduct })
+        | ClientOrder;
     wrapWithLink: boolean;
     showSize: boolean;
     endContent?: React.ReactNode | ((idx: number) => React.ReactNode);
@@ -18,7 +22,11 @@ export default function ProductListTile(props: ProductListTileProps) {
     const { inputData, wrapWithLink, showSize, endContent, externalOverrides, internalOverrides } =
         props;
 
-    let tileData: (ClientProduct | BagItem | ClientOrder["items"][number])[];
+    let tileData: (
+        | ClientProduct
+        | (BagItem & { product: ClientProduct })
+        | ClientOrder["items"][number]
+    )[];
 
     if ("items" in inputData) {
         tileData = inputData.items;
@@ -71,10 +79,7 @@ export default function ProductListTile(props: ProductListTileProps) {
                                     )}
                                 </Link>
                             ) : (
-                                renderCentralContent(
-                                    productData,
-                                    hasSize ? item.size : undefined
-                                )
+                                renderCentralContent(productData, hasSize ? item.size : undefined)
                             )}
                             <div className="flex items-end max-w-[33%] min-h-full ml-4 md:ml-8">
                                 {typeof endContent === "function"
