@@ -1,12 +1,49 @@
 import { NextResponse } from "next/server";
 import stripe from "@/lib/stripe";
-import { BagItem } from "@/lib/types";
+import { BagItem, ReservedItemCreateInput } from "@/lib/types";
+import { createReservedItems } from "@/lib/actions";
+import { bagItemListSchema, userSchema } from "@/lib/schemas";
+import { extractZodMessage } from "@/lib/utils";
 
 export async function POST(req: Request) {
     const { bagItems, shippingCost, userId } = await req.json();
 
+    const parsedBagItems = bagItemListSchema.safeParse(bagItems);
+    const parsedUserId = userSchema.shape.id.safeParse(userId);
+
+    if (!parsedBagItems.success) {
+        console.error("Error parsing bag item data");
+        return NextResponse.json(
+            { error: "Error parsing bag item data" + extractZodMessage(parsedBagItems) },
+            { status: 400 }
+        );
+    }
+
+    if (!parsedUserId.success) {
+        console.error("Error parsing user ID");
+        return NextResponse.json(
+            { error: "Error parsing user ID: " + extractZodMessage(parsedUserId) },
+            { status: 400 }
+        );
+    }
+
+    const expiresAt = Date.now() + 31 * (60 * 1000); // 30 mins + 1 min buffer
+
+    const reservedItems: ReservedItemCreateInput = parsedBagItems.data.map((item) => ({
+        productId: item.productId,
+        size: item.size,
+        quantity: item.quantity,
+        expiresAt: new Date(expiresAt),
+    }));
+
+    const result = await createReservedItems(reservedItems);
+
+    if (!result.success) {
+        return NextResponse.json({ error: "Error creating reserved items" }, { status: 500 });
+    }
+
     const lineItems = [
-        ...bagItems.map((bagItem: BagItem) => ({
+        ...parsedBagItems.data.map((bagItem: BagItem) => ({
             price_data: {
                 currency: "gbp",
                 product_data: {
@@ -47,10 +84,11 @@ export async function POST(req: Request) {
                 ),
                 shippingCost,
                 userId,
+                reservedItemIds: JSON.stringify(result.data),
             },
             success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/bag`,
-            // expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
+            expires_at: Math.floor(expiresAt / 1000) - 1, // 30 mins
         });
 
         return NextResponse.json({ url: session.url });

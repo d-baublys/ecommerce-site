@@ -1,6 +1,6 @@
 "use client";
 
-import { BagItem, ClientProduct } from "@/lib/types";
+import { BagItem, ClientProduct, StateSetter } from "@/lib/types";
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect } from "react";
 import { stringifyConvertPrice } from "@/lib/utils";
@@ -9,22 +9,35 @@ import ProductListTile from "@/ui/components/cards/ProductListTile";
 
 export default function BagTile({
     bagItem,
-    handleDelete,
     productData,
+    handleDelete,
+    modalSetter,
+    reservedQty,
 }: {
     bagItem: BagItem;
     productData: ClientProduct;
     handleDelete?: () => void;
+    modalSetter: StateSetter<boolean>;
+    reservedQty: number;
 }) {
     const updateQuantity = useBagStore((state) => state.updateQuantity);
 
-    const latestQty = productData.stock[bagItem.size] ?? 0;
+    const latestQty = Math.max(
+        0,
+        productData?.stock[bagItem.size] !== undefined
+            ? productData.stock[bagItem.size]! - reservedQty
+            : 0
+    );
     const maxQty = Math.min(latestQty, Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY));
     const currentQty = Math.min(bagItem.quantity, latestQty);
 
     useEffect(() => {
-        if (bagItem.quantity !== currentQty) {
+        if (bagItem.quantity > currentQty) {
             updateQuantity(bagItem.productId, bagItem.size, currentQty);
+            modalSetter(true);
+        } else if (bagItem.quantity === 0 && latestQty > 0) {
+            updateQuantity(bagItem.productId, bagItem.size, 1);
+            modalSetter(true);
         }
     }, [currentQty]);
 

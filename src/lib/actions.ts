@@ -9,10 +9,13 @@ import {
     OrderCreateInput,
     OrderUpdateInput,
     Product,
-    Reservation,
-    ReservationCreateInput,
+    ReservedItemCreateInput,
+    ReservedItem,
     User,
     UserCreateInput,
+    GetManyActionResponse,
+    CreateUpdateDeleteActionResponse,
+    GetActionResponse,
 } from "./types";
 import { prisma } from "./prisma";
 import {
@@ -28,14 +31,9 @@ import {
     orderCreateSchema,
     orderUpdateSchema,
     productCreateSchema,
-    reservationCreateSchema,
+    reservedItemCreateSchema,
     userCreateSchema,
 } from "./schemas";
-import {
-    CreateUpdateDeleteActionResponse,
-    GetActionResponse,
-    GetManyActionResponse,
-} from "./types/actions";
 
 export async function createProduct(productData: ClientProduct): CreateUpdateDeleteActionResponse {
     const { id, ...netProduct } = productData;
@@ -185,34 +183,50 @@ export async function deleteFeaturedProducts(): CreateUpdateDeleteActionResponse
     }
 }
 
-export async function createReservation(
-    data: ReservationCreateInput
-): CreateUpdateDeleteActionResponse {
-    const parsedData = reservationCreateSchema.safeParse(data);
+export async function createReservedItems(
+    data: ReservedItemCreateInput
+): CreateUpdateDeleteActionResponse<ReservedItem["id"][]> {
+    const parsedData = reservedItemCreateSchema.safeParse(data);
 
     if (!parsedData.success) {
         return zodErrorResponse(parsedData);
     }
 
     try {
-        await prisma.reservation.create({
-            data: { ...data, items: { createMany: { data: parsedData.data.items } } },
+        const result = await prisma.reservedItem.createManyAndReturn({
+            data: parsedData.data,
         });
-        return { success: true };
+        return { success: true, data: result.map((item) => item.id) };
     } catch (error) {
-        console.error("Error creating reservation: ", error);
+        console.error("Error creating reserved items: ", error);
         return { success: false };
     }
 }
 
-export async function deleteReservation(id: Reservation["id"]): CreateUpdateDeleteActionResponse {
+export async function getReservedItems({
+    productIds,
+}: {
+    productIds: ReservedItem["productId"][];
+}): GetManyActionResponse<ReservedItem> {
     try {
-        await prisma.$transaction([
-            prisma.reservationItem.deleteMany({ where: { reservationId: id } }),
-            prisma.reservation.delete({ where: { id } }),
-        ]);
+        const result = await prisma.reservedItem.findMany({
+            where: { productId: { in: productIds } },
+        });
+        return { data: result };
+    } catch (error) {
+        console.error("Error fetching reserved items: ", error);
+        throw new Error("Error fetching reserved items. Please try again later.");
+    }
+}
+
+export async function deleteReservedItems(
+    itemIds: ReservedItem["id"][]
+): CreateUpdateDeleteActionResponse {
+    try {
+        await prisma.reservedItem.deleteMany({ where: { id: { in: itemIds } } });
         return { success: true };
     } catch (error) {
+        console.error("Error deleting reserved items: ", error);
         return { success: false };
     }
 }

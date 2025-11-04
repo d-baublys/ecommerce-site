@@ -1,10 +1,11 @@
-import { ClientProduct } from "@/lib/types";
+import { ClientProduct, ReservedItem } from "@/lib/types";
 import { pluralise } from "@/lib/utils";
 import ProductGrid from "@/ui/components/product-grid/ProductGrid";
 import PlainRoundedButtonLink from "../components/buttons/PlainRoundedButtonLink";
 
 interface BaseGridPageProps {
     displayedProducts: ClientProduct[];
+    groupedReservedItems: ReservedItem[];
     noProductMessage: string;
     linkWhenEmptyList: boolean;
     categoryTabs?: React.ReactNode;
@@ -15,6 +16,7 @@ interface BaseGridPageProps {
 
 export default function BaseGridPage({
     displayedProducts,
+    groupedReservedItems,
     noProductMessage,
     linkWhenEmptyList,
     categoryTabs,
@@ -37,7 +39,10 @@ export default function BaseGridPage({
                     </div>
                     <div className="flex grow">
                         {displayedProducts.length > 0 ? (
-                            <ProductGrid productList={displayedProducts} />
+                            <ProductGrid
+                                productList={displayedProducts}
+                                groupedReservedItems={groupedReservedItems}
+                            />
                         ) : (
                             <div className="flex flex-col justify-center items-center w-full p-4 gap-8">
                                 <p className="text-center">{noProductMessage}</p>

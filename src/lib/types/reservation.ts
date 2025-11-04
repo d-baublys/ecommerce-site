@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { reservationCreateSchema, reservationSchema } from "../schemas/reservation";
+import { reservedItemCreateSchema, reservedItemSchema } from "../schemas";
 
-export type Reservation = z.infer<typeof reservationSchema>;
+export type ReservedItem = z.infer<typeof reservedItemSchema>;
 
-export type ReservationCreateInput = z.infer<typeof reservationCreateSchema>;
+export type ReservedItemCreateInput = z.infer<typeof reservedItemCreateSchema>;

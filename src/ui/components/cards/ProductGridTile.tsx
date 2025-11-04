@@ -1,6 +1,6 @@
 "use client";
 
-import { ClientProduct, Sizes } from "@/lib/types";
+import { ClientProduct, ReservedItem, Sizes } from "@/lib/types";
 import {
     buildProductUrl,
     checkSizeAvailable,
@@ -18,7 +18,13 @@ import Link from "next/link";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import { VALID_SIZES } from "@/lib/constants";
 
-export default function ProductGridTile({ product }: { product: ClientProduct }) {
+export default function ProductGridTile({
+    product,
+    groupedReservedItems,
+}: {
+    product: ClientProduct;
+    groupedReservedItems: ReservedItem[];
+}) {
     const { bag, addToBag } = useBagStore((state) => state);
 
     const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -29,7 +35,14 @@ export default function ProductGridTile({ product }: { product: ClientProduct })
     const tileRef = useRef<HTMLDivElement>(null);
 
     const availableSizes = VALID_SIZES.filter(
-        (size) => size in product.stock && checkSizeAvailable(product, size, bag)
+        (size) =>
+            size in product.stock &&
+            checkSizeAvailable(
+                product,
+                size,
+                bag,
+                groupedReservedItems.filter((item) => item.id === product.id)
+            ).success
     );
 
     const handleTouchStart = () => {

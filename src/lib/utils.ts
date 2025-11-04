@@ -8,6 +8,7 @@ import {
     ClientStock,
     StockCreateInput,
     StockUpdateInput,
+    ReservedItem,
 } from "./types";
 import bcrypt from "bcryptjs";
 import { REFUND_WINDOW, SORT_OPTIONS, VALID_CATEGORIES } from "./constants";
@@ -31,25 +32,50 @@ export function findBagItem(
     return bag.find((bagItem) => bagItem.productId === productId && bagItem.size === size);
 }
 
-export function isBagAddPermitted(currentBagQty: BagItem["quantity"], stockQty: number) {
+export function isBagAddPermitted(
+    currentBagQty: BagItem["quantity"],
+    stockQty: number,
+    totalReservedItems?: number
+) {
     return !(
         currentBagQty >= Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY) ||
-        currentBagQty >= stockQty
+        currentBagQty >= stockQty - (totalReservedItems ?? 0)
     );
 }
+
+export function calculateTotalReservedQty(items: ReservedItem[]): number {
+    return items.reduce((total, curr) => total + curr.quantity, 0);
+}
+
+type SizeCheckResult = { success: true } | { success: false; error: "nil" | "limit" };
 
 export function checkSizeAvailable(
     productData: ClientProduct,
     size: Sizes,
-    bag: BagItem[]
-): boolean {
-    const stock = productData.stock[size as Sizes] ?? 0;
-
+    bag: BagItem[],
+    reservedItems: ReservedItem[]
+): SizeCheckResult {
+    const stockQty = productData.stock[size as Sizes] ?? 0;
     const itemInBag = findBagItem(productData.id, size, bag);
+    const currentQty = itemInBag?.quantity ?? 0;
+    const totalReservedItems = calculateTotalReservedQty(reservedItems);
 
-    const currentQty = itemInBag ? itemInBag.quantity : 0;
+    let result: SizeCheckResult = { success: true };
+    const permitted = isBagAddPermitted(currentQty, stockQty, totalReservedItems);
 
-    return isBagAddPermitted(currentQty, stock);
+    if (!permitted) {
+        const error: "nil" | "limit" =
+            currentQty >= Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY)
+                ? "limit"
+                : "nil";
+
+        result = {
+            success: false,
+            error,
+        };
+    }
+
+    return result;
 }
 
 export function isUnique(sizeKey: Sizes, stockData: ClientStock) {

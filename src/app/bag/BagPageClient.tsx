@@ -4,24 +4,28 @@ import GoButton from "@/ui/components/buttons/GoButton";
 import BagTile from "@/ui/components/cards/BagTile";
 import { useBagStore } from "@/stores/bagStore";
 import { loadStripe } from "@stripe/stripe-js";
-import { useEffect, useState } from "react";
-import { getProducts } from "@/lib/actions";
-import { stringifyConvertPrice } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react";
+import { getReservedItems, getProducts } from "@/lib/actions";
+import { calculateTotalReservedQty, stringifyConvertPrice } from "@/lib/utils";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 import LoadingIndicator from "@/ui/components/overlays/LoadingIndicator";
-import { ClientProduct } from "@/lib/types";
+import { ClientProduct, Product, ReservedItem, Sizes } from "@/lib/types";
+import FailureModal from "@/ui/components/overlays/FailureModal";
 
 export default function BagPageClient() {
     const [latestData, setLatestData] = useState<ClientProduct[]>();
+    const [groupedReservedItems, setGroupedReservedItems] = useState<ReservedItem[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<Error | null>(null);
+    const [isFailureModalOpen, setIsFailureModalOpen] = useState<boolean>(false);
+    const [checkoutTriggered, setCheckoutTriggered] = useState<boolean>(false);
+    const modalStateRef = useRef<boolean>(false);
 
     const { bag, removeFromBag, hasHydrated } = useBagStore((state) => state);
     const emptyBag = !bag.length;
-    const noStock = !useBagStore((state) => state.getTotalBagCount());
     const bagProductIds = bag.map((bagItem) => bagItem.productId);
     const router = useRouter();
     const session = useSession();
@@ -34,6 +38,8 @@ export default function BagPageClient() {
     const shippingCost = !emptyBag && orderSubtotal ? 500 : 0;
     const orderTotal = orderSubtotal + shippingCost;
 
+    const checkoutPermitted = !(emptyBag || bag.some((item) => item.quantity === 0));
+
     const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
     useEffect(() => {
@@ -41,15 +47,25 @@ export default function BagPageClient() {
 
         const getData = async () => {
             try {
-                const dataFetch = await getProducts({ id: { in: bagProductIds } });
-                setLatestData(dataFetch.data);
+                const products = await getProducts({ id: { in: bagProductIds } });
+                setLatestData(products.data);
+
+                const reservedItems = await getReservedItems({
+                    productIds: bagProductIds,
+                });
+
+                setGroupedReservedItems(reservedItems.data);
             } catch {
                 setError(new Error("Error fetching product data. Please try again later."));
             }
         };
 
         getData();
-    }, [hasHydrated]);
+    }, [hasHydrated, checkoutTriggered]);
+
+    useEffect(() => {
+        modalStateRef.current = isFailureModalOpen;
+    }, [isFailureModalOpen]);
 
     const goToCheckout = async () => {
         const res = await fetch("/api/create-checkout-session", {
@@ -58,13 +74,15 @@ export default function BagPageClient() {
             body: JSON.stringify({
                 bagItems: bag,
                 shippingCost,
-                userId: session.data?.user?.id,
+                userId: Number(session.data?.user?.id),
             }),
         });
         const data = await res.json();
         if (data.url) {
             await stripePromise;
             window.location.href = data.url;
+        } else if (data.error) {
+            setError(new Error(data.error));
         } else {
             setError(new Error("Error starting checkout. Please try again later."));
         }
@@ -75,7 +93,12 @@ export default function BagPageClient() {
             router.push("/login?redirect_after=bag");
             return;
         } else if (session.status === "authenticated") {
-            goToCheckout();
+            setCheckoutTriggered(true);
+            setTimeout(() => {
+                setCheckoutTriggered(false);
+                if (modalStateRef.current) return;
+                goToCheckout();
+            }, 1000);
         }
     };
 
@@ -94,6 +117,14 @@ export default function BagPageClient() {
 
     if (!latestData) return null;
 
+    const getReservedQuantity = (productId: Product["id"], size: Sizes) => {
+        return calculateTotalReservedQty(
+            groupedReservedItems.filter(
+                (item) => item.productId === productId && item.size === size
+            )
+        );
+    };
+
     return (
         <>
             <MainLayout subheaderText="My Bag">
@@ -104,24 +135,36 @@ export default function BagPageClient() {
                             data-testid="bag-tile-ul"
                             className="flex flex-col w-full lg:gap-8"
                         >
-                            {bag.map((bagItem) => (
-                                <li
-                                    key={`${bagItem.productId}-${bagItem.size}`}
-                                    className="bag-tile w-full mb-8 lg:mb-0"
-                                >
-                                    <BagTile
-                                        bagItem={bagItem}
-                                        handleDelete={() =>
-                                            removeFromBag(bagItem.productId, bagItem.size)
-                                        }
-                                        productData={
-                                            latestData.find(
-                                                (product) => product.id === bagItem.productId
-                                            )!
-                                        }
-                                    />
-                                </li>
-                            ))}
+                            {bag.map((bagItem) => {
+                                const productData = latestData.find(
+                                    (product) => product.id === bagItem.productId
+                                );
+
+                                if (!productData)
+                                    throw new Error(
+                                        "Bag item data not found in product data fetch"
+                                    );
+
+                                return (
+                                    <li
+                                        key={`${bagItem.productId}-${bagItem.size}`}
+                                        className="bag-tile w-full mb-8 lg:mb-0"
+                                    >
+                                        <BagTile
+                                            bagItem={bagItem}
+                                            productData={productData}
+                                            handleDelete={() =>
+                                                removeFromBag(bagItem.productId, bagItem.size)
+                                            }
+                                            modalSetter={setIsFailureModalOpen}
+                                            reservedQty={getReservedQuantity(
+                                                bagItem.productId,
+                                                bagItem.size
+                                            )}
+                                        />
+                                    </li>
+                                );
+                            })}
                         </ul>
                     ) : (
                         <div className="flex flex-col justify-center items-center w-full h-full p-8 md:p-0 gap-8">
@@ -165,12 +208,12 @@ export default function BagPageClient() {
                                 <p aria-label="Bag total">£{stringifyConvertPrice(orderTotal)}</p>
                             </div>
                         </div>
-                        {!(emptyBag || noStock) && (
+                        {checkoutPermitted && (
                             <div className="flex pt-4 w-full justify-center">
                                 <GoButton
                                     onClick={handleCheckout}
-                                    predicate={!(emptyBag || noStock)}
-                                    disabled={emptyBag || noStock}
+                                    predicate={checkoutPermitted}
+                                    disabled={!checkoutPermitted}
                                 >
                                     Checkout
                                 </GoButton>
@@ -180,6 +223,20 @@ export default function BagPageClient() {
                 </div>
             </MainLayout>
             {isLoading && <LoadingIndicator />}
+            {isFailureModalOpen && (
+                <FailureModal
+                    message={
+                        <>
+                            Available stock for some of your items has changed.
+                            <br />
+                            <br />
+                            Quantity selections have been automatically updated.
+                        </>
+                    }
+                    handleClose={() => setIsFailureModalOpen(false)}
+                    isOpenState={isFailureModalOpen}
+                />
+            )}
         </>
     );
 }

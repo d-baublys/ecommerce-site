@@ -1,5 +1,5 @@
 import stripe from "@/lib/stripe";
-import { createOrder } from "@/lib/actions";
+import { createOrder, deleteReservedItems } from "@/lib/actions";
 import { OrderCreateInput, OrderItemCreateInput } from "@/lib/types";
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
@@ -68,12 +68,20 @@ export async function POST(req: NextRequest) {
             paymentIntentId,
         };
 
-        const result = await createOrder(orderCreateData);
+        const reservedDelete = await deleteReservedItems(
+            JSON.parse(session.metadata.reservedItemIds)
+        );
 
-        if (!result.success && result.error) {
-            console.error("Error parsing order data: ", result.error);
+        if (!reservedDelete.success) {
+            return new Response("Error deleting reserved items", { status: 400 });
+        }
+
+        const orderResult = await createOrder(orderCreateData);
+
+        if (!orderResult.success && orderResult.error) {
+            console.error("Error parsing order data: ", orderResult.error);
             return new Response("Error parsing order data", { status: 400 });
-        } else if (!result.success) {
+        } else if (!orderResult.success) {
             return new Response("Error creating new order", { status: 400 });
         }
     }

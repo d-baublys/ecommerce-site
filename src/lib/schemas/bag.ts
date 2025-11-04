@@ -14,3 +14,5 @@ export const bagItemSchema = z.object({
     size: sizeSchema,
     quantity: quantitySchema,
 });
+
+export const bagItemListSchema = z.array(bagItemSchema);
