@@ -9,10 +9,12 @@ import {
     StockCreateInput,
     StockUpdateInput,
     ReservedItem,
+    UniformReservedItems,
 } from "./types";
 import bcrypt from "bcryptjs";
 import { REFUND_WINDOW, SORT_OPTIONS, VALID_CATEGORIES } from "./constants";
 import { ZodSafeParseError } from "zod";
+import { uniformReservedItemsSchema } from "./schemas";
 
 export function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number) {
     let timer: ReturnType<typeof setTimeout>;
@@ -43,7 +45,7 @@ export function isBagAddPermitted(
     );
 }
 
-export function calculateTotalReservedQty(items: ReservedItem[]): number {
+export function calculateTotalReservedQty(items: UniformReservedItems): number {
     return items.reduce((total, curr) => total + curr.quantity, 0);
 }
 
@@ -53,12 +55,18 @@ export function checkSizeAvailable(
     productData: ClientProduct,
     size: Sizes,
     bag: BagItem[],
-    reservedItems: ReservedItem[]
+    uniformReservedItems: UniformReservedItems
 ): SizeCheckResult {
+    const parsedItems = uniformReservedItemsSchema.safeParse(uniformReservedItems);
+
+    if (!parsedItems.success) {
+        throw new Error("Reserved item data in size check is not uniform");
+    }
+
     const stockQty = productData.stock[size as Sizes] ?? 0;
     const itemInBag = findBagItem(productData.id, size, bag);
     const currentQty = itemInBag?.quantity ?? 0;
-    const totalReservedItems = calculateTotalReservedQty(reservedItems);
+    const totalReservedItems = calculateTotalReservedQty(parsedItems.data);
 
     let result: SizeCheckResult = { success: true };
     const permitted = isBagAddPermitted(currentQty, stockQty, totalReservedItems);
@@ -285,4 +293,16 @@ export function zodErrorResponse(safeParseError: ZodSafeParseError<unknown>): {
     error: string;
 } {
     return { success: false, error: extractZodMessage(safeParseError) };
+}
+
+export function getUniformReservedItems({
+    items,
+    productId,
+    size,
+}: {
+    items: ReservedItem[];
+    productId: ReservedItem["productId"];
+    size: ReservedItem["size"];
+}): UniformReservedItems {
+    return items.filter((item) => item.productId === productId && item.size === size);
 }

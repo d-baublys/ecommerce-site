@@ -44,8 +44,7 @@ export const useBagStore = create<BagStore>()(
             },
             removeFromBag: (id, size) => {
                 const currentBag = get().bag;
-                let updatedBag = currentBag;
-                updatedBag = currentBag.filter(
+                const updatedBag = currentBag.filter(
                     (item) => !(item.productId === id && item.size === size)
                 );
 
@@ -58,8 +57,7 @@ export const useBagStore = create<BagStore>()(
             },
             updateQuantity: (id, size, quantity) => {
                 const currentBag = get().bag;
-                let updatedBag = currentBag;
-                updatedBag = currentBag.map((item) =>
+                const updatedBag = currentBag.map((item) =>
                     item.productId === id && item.size === size ? { ...item, quantity } : item
                 );
 

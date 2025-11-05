@@ -9,13 +9,14 @@ import {
     OrderCreateInput,
     OrderUpdateInput,
     Product,
-    ReservedItemCreateInput,
     ReservedItem,
     User,
     UserCreateInput,
     GetManyActionResponse,
     CreateUpdateDeleteActionResponse,
     GetActionResponse,
+    CheckoutSessionCreateInput,
+    CheckoutSession,
 } from "./types";
 import { prisma } from "./prisma";
 import {
@@ -26,12 +27,12 @@ import {
     zodErrorResponse,
 } from "./utils";
 import {
+    checkoutSessionCreateSchema,
     clientProductSchema,
     featuredProductCreateSchema,
     orderCreateSchema,
     orderUpdateSchema,
     productCreateSchema,
-    reservedItemCreateSchema,
     userCreateSchema,
 } from "./schemas";
 
@@ -183,22 +184,36 @@ export async function deleteFeaturedProducts(): CreateUpdateDeleteActionResponse
     }
 }
 
-export async function createReservedItems(
-    data: ReservedItemCreateInput
-): CreateUpdateDeleteActionResponse<ReservedItem["id"][]> {
-    const parsedData = reservedItemCreateSchema.safeParse(data);
+export async function createCheckoutSession(
+    data: CheckoutSessionCreateInput
+): CreateUpdateDeleteActionResponse {
+    const parsedData = checkoutSessionCreateSchema.safeParse(data);
 
     if (!parsedData.success) {
         return zodErrorResponse(parsedData);
     }
 
+    const { items, ...baseData } = parsedData.data;
+
     try {
-        const result = await prisma.reservedItem.createManyAndReturn({
-            data: parsedData.data,
+        await prisma.checkoutSession.create({
+            data: { ...baseData, reservedItems: { createMany: { data: items } } },
         });
-        return { success: true, data: result.map((item) => item.id) };
+        return { success: true };
     } catch (error) {
-        console.error("Error creating reserved items: ", error);
+        console.error("Error creating checkout session: ", error);
+        return { success: false };
+    }
+}
+
+export async function deleteCheckoutSessions(
+    userId: CheckoutSession["userId"]
+): CreateUpdateDeleteActionResponse {
+    try {
+        await prisma.checkoutSession.deleteMany({ where: { userId } });
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting checkout session: ", error);
         return { success: false };
     }
 }
@@ -216,18 +231,6 @@ export async function getReservedItems({
     } catch (error) {
         console.error("Error fetching reserved items: ", error);
         throw new Error("Error fetching reserved items. Please try again later.");
-    }
-}
-
-export async function deleteReservedItems(
-    itemIds: ReservedItem["id"][]
-): CreateUpdateDeleteActionResponse {
-    try {
-        await prisma.reservedItem.deleteMany({ where: { id: { in: itemIds } } });
-        return { success: true };
-    } catch (error) {
-        console.error("Error deleting reserved items: ", error);
-        return { success: false };
     }
 }
 

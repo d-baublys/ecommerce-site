@@ -8,6 +8,7 @@ import {
     isolateInteraction,
     processDateForClient,
     stringifyConvertPrice,
+    getUniformReservedItems,
 } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { useBagStore } from "@/stores/bagStore";
@@ -34,16 +35,25 @@ export default function ProductGridTile({
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const tileRef = useRef<HTMLDivElement>(null);
 
-    const availableSizes = VALID_SIZES.filter(
-        (size) =>
-            size in product.stock &&
-            checkSizeAvailable(
+    const availableSizes = VALID_SIZES.filter((size) => {
+        try {
+            const sizeCheck = checkSizeAvailable(
                 product,
                 size,
                 bag,
-                groupedReservedItems.filter((item) => item.id === product.id)
-            ).success
-    );
+                getUniformReservedItems({
+                    items: groupedReservedItems,
+                    productId: product.id,
+                    size,
+                })
+            );
+
+            return sizeCheck.success && size in product.stock;
+        } catch (error) {
+            const e = error as Error;
+            throw new Error(e.message);
+        }
+    });
 
     const handleTouchStart = () => {
         timerRef.current = setTimeout(() => setIsHovered(true), 300);

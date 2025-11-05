@@ -4,29 +4,26 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 type WishlistStore = {
-    wishlist: ClientProduct[];
-    addToWishlist: (product: ClientProduct) => void;
-    removeFromWishlist: (id: string) => void;
+    wishlist: ClientProduct["id"][];
+    addToWishlist: (id: ClientProduct["id"]) => void;
+    removeFromWishlist: (id: ClientProduct["id"]) => void;
     clearWishlist: () => void;
+    hasHydrated: boolean;
 };
 
 export const useWishlistStore = create<WishlistStore>()(
     persist(
         (set, get) => ({
             wishlist: [],
-            addToWishlist: (newItem) => {
+            addToWishlist: (id) => {
                 const currentWishlist = get().wishlist;
-                let updatedWishlist = currentWishlist;
-
-                updatedWishlist = [...currentWishlist, newItem];
+                const updatedWishlist = [...currentWishlist, id];
 
                 set({ wishlist: updatedWishlist });
             },
             removeFromWishlist: (id) => {
                 const currentWishlist = get().wishlist;
-                let updatedWishlist = currentWishlist;
-
-                updatedWishlist = currentWishlist.filter((product) => !(product.id === id));
+                const updatedWishlist = currentWishlist.filter((wishlistId) => wishlistId !== id);
 
                 setTimeout(() => {
                     set({ wishlist: updatedWishlist });
@@ -35,7 +32,13 @@ export const useWishlistStore = create<WishlistStore>()(
             clearWishlist: () => {
                 set({ wishlist: [] });
             },
+            hasHydrated: false,
         }),
-        { name: STORAGE_KEYS.WISHLIST }
+        {
+            name: STORAGE_KEYS.WISHLIST,
+            onRehydrateStorage: () => (state) => {
+                state!.hasHydrated = true;
+            },
+        }
     )
 );

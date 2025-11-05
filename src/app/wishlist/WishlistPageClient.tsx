@@ -4,29 +4,38 @@ import { useWishlistStore } from "@/stores/wishlistStore";
 import BaseGridPage from "@/ui/pages/BaseGridPage";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { useEffect, useState } from "react";
-import { ReservedItem } from "@/lib/types";
-import { getReservedItems } from "@/lib/actions";
+import { ClientProduct, ReservedItem } from "@/lib/types";
+import { getProducts, getReservedItems } from "@/lib/actions";
 
 export default function WishlistPageClient() {
-    const wishlist = useWishlistStore((state) => state.wishlist);
-    const [groupedReservedItems, setGroupedReservedItems] = useState<ReservedItem[]>([]);
+    const { wishlist, hasHydrated } = useWishlistStore((state) => state);
+    const [products, setProducts] = useState<ClientProduct[]>();
+    const [groupedReservedItems, setGroupedReservedItems] = useState<ReservedItem[]>();
 
     useEffect(() => {
+        if (!hasHydrated) return;
+
         const getData = async () => {
-            const result = await getReservedItems({
-                productIds: wishlist.map((item) => item.id),
+            const productFetch = await getProducts({ id: { in: wishlist } });
+
+            setProducts(productFetch.data);
+
+            const reservedFetch = await getReservedItems({
+                productIds: wishlist,
             });
 
-            setGroupedReservedItems(result.data);
+            setGroupedReservedItems(reservedFetch.data);
         };
 
         getData();
-    }, []);
+    }, [wishlist, hasHydrated]);
+
+    if (!products || !groupedReservedItems) return null;
 
     return (
         <MainLayout subheaderText="My Wishlist">
             <BaseGridPage
-                displayedProducts={wishlist}
+                displayedProducts={products}
                 groupedReservedItems={groupedReservedItems}
                 noProductMessage="Your wishlist is empty!"
                 linkWhenEmptyList={true}

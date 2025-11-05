@@ -6,16 +6,18 @@ export const reservedItemSchema = z.object({
     productId: productIdSchema,
     size: sizeSchema,
     quantity: quantitySchema,
-    createdAt: z.date(),
-    expiresAt: z.date(),
 });
 
 export const reservedItemCreateSchema = z.array(
-    reservedItemSchema
-        .omit({
-            id: true,
-        })
-        .extend({
-            createdAt: reservedItemSchema.shape.createdAt.optional(),
-        })
+    reservedItemSchema.omit({
+        id: true,
+    })
 );
+
+export const uniformReservedItemsSchema = z.array(reservedItemSchema).refine((items) => {
+    if (items.length === 0) return true;
+
+    const { productId, size } = items[0];
+
+    return items.every((item) => item.productId === productId && item.size === size);
+}, "All reserved items must have the same product ID and size");

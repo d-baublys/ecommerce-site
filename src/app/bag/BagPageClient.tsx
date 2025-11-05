@@ -5,23 +5,27 @@ import BagTile from "@/ui/components/cards/BagTile";
 import { useBagStore } from "@/stores/bagStore";
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useRef, useState } from "react";
-import { getReservedItems, getProducts } from "@/lib/actions";
-import { calculateTotalReservedQty, stringifyConvertPrice } from "@/lib/utils";
+import { getReservedItems, getProducts, deleteCheckoutSessions } from "@/lib/actions";
+import {
+    calculateTotalReservedQty,
+    getUniformReservedItems,
+    stringifyConvertPrice,
+} from "@/lib/utils";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 import LoadingIndicator from "@/ui/components/overlays/LoadingIndicator";
-import { ClientProduct, Product, ReservedItem, Sizes } from "@/lib/types";
+import { ClientProduct, ReservedItem } from "@/lib/types";
 import FailureModal from "@/ui/components/overlays/FailureModal";
 
 export default function BagPageClient() {
-    const [latestData, setLatestData] = useState<ClientProduct[]>();
-    const [groupedReservedItems, setGroupedReservedItems] = useState<ReservedItem[]>([]);
+    const [products, setProducts] = useState<ClientProduct[]>();
+    const [groupedReservedItems, setGroupedReservedItems] = useState<ReservedItem[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<Error | null>(null);
     const [isFailureModalOpen, setIsFailureModalOpen] = useState<boolean>(false);
-    const [checkoutTriggered, setCheckoutTriggered] = useState<boolean>(false);
+    const [checkoutTrigger, setCheckoutTrigger] = useState<boolean>(false);
     const modalStateRef = useRef<boolean>(false);
 
     const { bag, removeFromBag, hasHydrated } = useBagStore((state) => state);
@@ -41,27 +45,36 @@ export default function BagPageClient() {
     const checkoutPermitted = !(emptyBag || bag.some((item) => item.quantity === 0));
 
     const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+    const userId = Number(session.data?.user?.id);
+
+    useEffect(() => {
+        const resetUserSessions = async () => {
+            await deleteCheckoutSessions(userId);
+        };
+
+        resetUserSessions();
+    }, []);
 
     useEffect(() => {
         if (!hasHydrated) return;
 
         const getData = async () => {
             try {
-                const products = await getProducts({ id: { in: bagProductIds } });
-                setLatestData(products.data);
+                const productsFetch = await getProducts({ id: { in: bagProductIds } });
+                setProducts(productsFetch.data);
 
-                const reservedItems = await getReservedItems({
+                const reservedFetch = await getReservedItems({
                     productIds: bagProductIds,
                 });
 
-                setGroupedReservedItems(reservedItems.data);
+                setGroupedReservedItems(reservedFetch.data);
             } catch {
                 setError(new Error("Error fetching product data. Please try again later."));
             }
         };
 
         getData();
-    }, [hasHydrated, checkoutTriggered]);
+    }, [hasHydrated, checkoutTrigger]);
 
     useEffect(() => {
         modalStateRef.current = isFailureModalOpen;
@@ -74,7 +87,7 @@ export default function BagPageClient() {
             body: JSON.stringify({
                 bagItems: bag,
                 shippingCost,
-                userId: Number(session.data?.user?.id),
+                userId,
             }),
         });
         const data = await res.json();
@@ -93,9 +106,8 @@ export default function BagPageClient() {
             router.push("/login?redirect_after=bag");
             return;
         } else if (session.status === "authenticated") {
-            setCheckoutTriggered(true);
+            setCheckoutTrigger((prev) => !prev);
             setTimeout(() => {
-                setCheckoutTriggered(false);
                 if (modalStateRef.current) return;
                 goToCheckout();
             }, 1000);
@@ -115,13 +127,14 @@ export default function BagPageClient() {
 
     if (error) throw error;
 
-    if (!latestData) return null;
+    if (!products || !groupedReservedItems) return null;
 
-    const getReservedQuantity = (productId: Product["id"], size: Sizes) => {
+    const getReservedQuantity = (
+        productId: ReservedItem["productId"],
+        size: ReservedItem["size"]
+    ) => {
         return calculateTotalReservedQty(
-            groupedReservedItems.filter(
-                (item) => item.productId === productId && item.size === size
-            )
+            getUniformReservedItems({ items: groupedReservedItems, productId, size })
         );
     };
 
@@ -136,7 +149,7 @@ export default function BagPageClient() {
                             className="flex flex-col w-full lg:gap-8"
                         >
                             {bag.map((bagItem) => {
-                                const productData = latestData.find(
+                                const productData = products.find(
                                     (product) => product.id === bagItem.productId
                                 );
 

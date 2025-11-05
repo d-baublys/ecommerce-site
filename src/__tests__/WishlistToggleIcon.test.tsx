@@ -57,14 +57,14 @@ describe("WishlistToggleIcon", () => {
         await waitFor(() => {
             const wishlist = getLatestWishlist();
 
-            expect(wishlist.some((item) => item.id === testProduct.id)).toBe(true);
+            expect(wishlist.some((id) => id === testProduct.id)).toBe(true);
             expect(screen.getByTestId("outline-heart")).toBeInTheDocument();
             expect(screen.getByTestId("filled-heart")).toHaveClass("show-filled");
         });
     });
 
     it("removes item from store & hides filled heart when clicking wishlisted item", async () => {
-        addToWishlist(testProduct);
+        addToWishlist(testProduct.id);
 
         renderIcon();
         const icon = screen.getByLabelText("Add or remove from wishlist");
@@ -79,7 +79,7 @@ describe("WishlistToggleIcon", () => {
         await waitFor(() => {
             const wishlist = getLatestWishlist();
 
-            expect(wishlist.some((item) => item.id === testProduct.id)).toBe(false);
+            expect(wishlist.some((id) => id === testProduct.id)).toBe(false);
             expect(screen.getByTestId("outline-heart")).toBeInTheDocument();
             expect(screen.getByTestId("filled-heart")).not.toHaveClass("show-filled");
         });
@@ -97,7 +97,7 @@ describe("WishlistToggleIcon", () => {
         });
 
         const wishlist = getLatestWishlist();
-        const occurrences = wishlist.filter((item) => item.id === testProduct.id).length;
+        const occurrences = wishlist.filter((id) => id === testProduct.id).length;
 
         expect(occurrences).toBe(0);
     });

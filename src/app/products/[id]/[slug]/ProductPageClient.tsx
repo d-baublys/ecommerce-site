@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { ClientProduct, ReservedItem, Sizes } from "@/lib/types";
 import GoButton from "@/ui/components/buttons/GoButton";
 import { IoBag } from "react-icons/io5";
-import { checkSizeAvailable, buildBagItem } from "@/lib/utils";
+import { checkSizeAvailable, buildBagItem, getUniformReservedItems } from "@/lib/utils";
 import ZoomableImage from "@/ui/components/ZoomableImage";
 import WishlistToggleButton from "@/ui/components/buttons/WishlistToggleButton";
 import AddSuccessModal from "@/ui/components/overlays/AddSuccessModal";
@@ -16,7 +16,7 @@ export default function ProductPageClient({ productData }: { productData: Client
     const [selectedSize, setSelectedSize] = useState<Sizes | "placeholder">("placeholder");
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [reservedItems, setReservedItems] = useState<ReservedItem[]>([]);
+    const [reservedItems, setReservedItems] = useState<ReservedItem[]>();
     const bag = useBagStore((state) => state.bag);
     const addToBag = useBagStore((state) => state.addToBag);
     const addPermitted = !(selectedSize === "placeholder" || isButtonDisabled);
@@ -38,15 +38,24 @@ export default function ProductPageClient({ productData }: { productData: Client
 
         reservedFetch();
 
-        if (selectedSize !== "placeholder") {
+        if (selectedSize === "placeholder" || !reservedItems) return;
+
+        try {
             const selectedSizeCheck = checkSizeAvailable(
                 productData,
                 selectedSize as Sizes,
                 bag,
-                reservedItems
+                getUniformReservedItems({
+                    items: reservedItems,
+                    productId: productData.id,
+                    size: selectedSize,
+                })
             );
 
             setIsButtonDisabled(!selectedSizeCheck.success);
+        } catch (error) {
+            const e = error as Error;
+            throw new Error(e.message);
         }
     }, [selectedSize, bag, productData]);
 
@@ -54,6 +63,8 @@ export default function ProductPageClient({ productData }: { productData: Client
         addToBag(productData, buildBagItem(productData, selectedSize as Sizes));
         setIsModalOpen(true);
     };
+
+    if (!productData || !reservedItems) return null;
 
     return (
         <>
@@ -91,8 +102,13 @@ export default function ProductPageClient({ productData }: { productData: Client
                                         productData,
                                         productSize as Sizes,
                                         bag,
-                                        reservedItems
+                                        getUniformReservedItems({
+                                            items: reservedItems,
+                                            productId: productData.id,
+                                            size: productSize,
+                                        })
                                     );
+
                                     return (
                                         <option
                                             key={productSize}

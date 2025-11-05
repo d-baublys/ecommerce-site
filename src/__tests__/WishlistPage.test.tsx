@@ -14,7 +14,7 @@ const testProductList = getFilteredTestProducts();
 const renderWishlistPage = () => render(<WishlistPage />);
 const setUpTestWishlist = () =>
     testProductList.forEach((item) => {
-        addToWishlist(item);
+        addToWishlist(item.id);
     });
 const getAllTiles = () => screen.getAllByTestId("product-tile");
 

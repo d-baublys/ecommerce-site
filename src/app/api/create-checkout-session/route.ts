@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import stripe from "@/lib/stripe";
-import { BagItem, ReservedItemCreateInput } from "@/lib/types";
-import { createReservedItems } from "@/lib/actions";
+import { BagItem, CheckoutSessionCreateInput } from "@/lib/types";
+import { createCheckoutSession } from "@/lib/actions";
 import { bagItemListSchema, userSchema } from "@/lib/schemas";
 import { extractZodMessage } from "@/lib/utils";
 
@@ -25,21 +25,6 @@ export async function POST(req: Request) {
             { error: "Error parsing user ID: " + extractZodMessage(parsedUserId) },
             { status: 400 }
         );
-    }
-
-    const expiresAt = Date.now() + 31 * (60 * 1000); // 30 mins + 1 min buffer
-
-    const reservedItems: ReservedItemCreateInput = parsedBagItems.data.map((item) => ({
-        productId: item.productId,
-        size: item.size,
-        quantity: item.quantity,
-        expiresAt: new Date(expiresAt),
-    }));
-
-    const result = await createReservedItems(reservedItems);
-
-    if (!result.success) {
-        return NextResponse.json({ error: "Error creating reserved items" }, { status: 500 });
     }
 
     const lineItems = [
@@ -67,6 +52,8 @@ export async function POST(req: Request) {
         ],
     ];
 
+    const expiresAt = Date.now() + 31 * (60 * 1000); // in ms, 30 mins + 1 min buffer
+
     try {
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
@@ -84,12 +71,31 @@ export async function POST(req: Request) {
                 ),
                 shippingCost,
                 userId,
-                reservedItemIds: JSON.stringify(result.data),
             },
             success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/bag`,
-            expires_at: Math.floor(expiresAt / 1000) - 1, // 30 mins
+            expires_at: Math.floor(expiresAt / 1000) - 1, // in s, 30 mins
         });
+
+        const sessionData: CheckoutSessionCreateInput = {
+            id: session.id,
+            userId,
+            expiresAt: new Date(expiresAt),
+            items: bagItems.map((bagItem: BagItem) => ({
+                productId: bagItem.productId,
+                size: bagItem.size,
+                quantity: bagItem.quantity,
+            })),
+        };
+
+        const checkoutCreate = await createCheckoutSession(sessionData);
+
+        if (!checkoutCreate.success) {
+            return NextResponse.json(
+                { error: "Error creating checkout session data" },
+                { status: 500 }
+            );
+        }
 
         return NextResponse.json({ url: session.url });
     } catch {
