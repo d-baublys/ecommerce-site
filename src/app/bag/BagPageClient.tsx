@@ -45,15 +45,6 @@ export default function BagPageClient() {
     const checkoutPermitted = !(emptyBag || bag.some((item) => item.quantity === 0));
 
     const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-    const userId = Number(session.data?.user?.id);
-
-    useEffect(() => {
-        const resetUserSessions = async () => {
-            await deleteCheckoutSessions(userId);
-        };
-
-        resetUserSessions();
-    }, []);
 
     useEffect(() => {
         if (!hasHydrated) return;
@@ -77,6 +68,18 @@ export default function BagPageClient() {
     }, [hasHydrated, checkoutTrigger]);
 
     useEffect(() => {
+        if (session.data?.user?.id === undefined) return;
+
+        const id = session.data.user.id;
+
+        const resetUserSessions = async () => {
+            await deleteCheckoutSessions(Number(id));
+        };
+
+        resetUserSessions();
+    }, [session]);
+
+    useEffect(() => {
         modalStateRef.current = isFailureModalOpen;
     }, [isFailureModalOpen]);
 
@@ -87,10 +90,14 @@ export default function BagPageClient() {
             body: JSON.stringify({
                 bagItems: bag,
                 shippingCost,
-                userId,
+                userId: Number(session.data?.user?.id),
             }),
         });
+
         const data = await res.json();
+
+        if (process.env.APP_ENV === "test") return;
+
         if (data.url) {
             await stripePromise;
             window.location.href = data.url;
@@ -107,7 +114,9 @@ export default function BagPageClient() {
             return;
         } else if (session.status === "authenticated") {
             setCheckoutTrigger((prev) => !prev);
+            setIsLoading(true);
             setTimeout(() => {
+                setIsLoading(false);
                 if (modalStateRef.current) return;
                 goToCheckout();
             }, 1000);
@@ -117,11 +126,8 @@ export default function BagPageClient() {
     useEffect(() => {
         const redirect = searchParams.get("from_login");
 
-        if (redirect === "true" && session.status === "authenticated") {
-            setIsLoading(true);
-            setTimeout(() => {
-                goToCheckout();
-            }, 1000);
+        if (redirect === "true") {
+            handleCheckout();
         }
     }, [session]);
 

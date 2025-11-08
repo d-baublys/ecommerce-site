@@ -1,13 +1,6 @@
 "use client";
 
-import {
-    Categories,
-    ClientProduct,
-    PriceFilterId,
-    ProductSortId,
-    ReservedItem,
-    Sizes,
-} from "@/lib/types";
+import { Categories, ClientProduct, PriceFilterId, ProductSortId, Sizes } from "@/lib/types";
 import GridAside from "@/ui/components/product-grid/GridAside";
 import { useEffect, useRef, useState } from "react";
 import { extractFilters, extractSort } from "@/lib/utils";
@@ -18,10 +11,9 @@ import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { fetchFilteredProducts } from "@/lib/fetching-utils";
+import { getFilteredProducts } from "@/lib/fetching-utils";
 import LoadingIndicator from "@/ui/components/overlays/LoadingIndicator";
 import { PRICE_FILTER_OPTIONS, SORT_OPTIONS, VALID_CATEGORIES, VALID_SIZES } from "@/lib/constants";
-import { getReservedItems } from "@/lib/actions";
 
 type PageOptions = {
     noAside?: boolean;
@@ -51,7 +43,6 @@ export default function CategoryGridPage({
 
     const [allCategoryProducts, setAllCategoryProducts] = useState<ClientProduct[]>();
     const [filteredProducts, setFilteredProducts] = useState<ClientProduct[]>();
-    const [groupedReservedItems, setGroupedReservedItems] = useState<ReservedItem[]>();
 
     const [sizeFilters, setSizeFilters] = useState<Sizes[]>(
         extractFilters<Sizes>(currSizeFilters, VALID_SIZES)
@@ -67,18 +58,15 @@ export default function CategoryGridPage({
     );
 
     const [error, setError] = useState<Error | null>(null);
-    const [isQueryLoading, setIsQueryLoading] = useState<boolean>(true);
+    const [isQueryLoading, setIsQueryLoading] = useState<boolean>(false);
     const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
     const isFirstLoad = useRef<boolean>(true);
 
     useEffect(() => {
         const fetchInitial = async () => {
             try {
-                setIsQueryLoading(true);
-                const products = await fetchFilteredProducts({ category, query });
-
+                const products = await getFilteredProducts({ category, query });
                 setAllCategoryProducts(products);
-                setIsQueryLoading(false);
             } catch {
                 setError(new Error("Error fetching product data. Please try again later."));
             }
@@ -88,10 +76,15 @@ export default function CategoryGridPage({
     }, [query]);
 
     useEffect(() => {
+        if (isQueryLoading) return;
+
         const fetchFiltered = async () => {
             try {
                 setIsQueryLoading(true);
-                const filtered = await fetchFilteredProducts({
+
+                const start = Date.now();
+
+                const filtered = await getFilteredProducts({
                     category,
                     sizeFilters,
                     priceFilters,
@@ -99,27 +92,31 @@ export default function CategoryGridPage({
                     query,
                 });
 
-                const reserved = await getReservedItems({
-                    productIds: filtered.map((product) => product.id),
-                });
+                setFilteredProducts(filtered);
 
-                const setStates = () => {
-                    setFilteredProducts(filtered);
-                    setIsQueryLoading(false);
-                    setGroupedReservedItems(reserved.data);
-                };
+                const now = Date.now();
+                const elapsed = now - start;
+                const MIN_LOADING_TIME = 400;
 
                 if (isFirstLoad.current) {
                     isFirstLoad.current = false;
-                    setStates();
+                    setIsQueryLoading(false);
                 } else {
-                    setTimeout(() => {
-                        setStates();
-                    }, 400);
+                    setTimeout(
+                        () => {
+                            setIsQueryLoading(false);
+                        },
+                        elapsed < MIN_LOADING_TIME ? MIN_LOADING_TIME - elapsed : 0
+                    );
                 }
             } catch {
                 setError(new Error("Error fetching product data. Please try again later."));
+                setIsQueryLoading(false);
             }
+
+            return () => {
+                setIsQueryLoading(false);
+            };
         };
 
         fetchFiltered();
@@ -202,8 +199,7 @@ export default function CategoryGridPage({
 
     if (error) throw error;
 
-    if (!(allCategoryProducts && filteredProducts && groupedReservedItems))
-        return <LoadingIndicator />;
+    if (!(allCategoryProducts && filteredProducts)) return <LoadingIndicator />;
 
     const shouldRenderTabs = !options?.noCategoryTabs && category === "all";
     const shouldRenderAside = !options?.noAside && (filteredProducts.length > 0 || !query);
@@ -266,7 +262,6 @@ export default function CategoryGridPage({
     return (
         <BaseGridPage
             displayedProducts={filteredProducts}
-            groupedReservedItems={groupedReservedItems}
             noProductMessage={
                 allCategoryProducts.length > 0
                     ? "No products matching your filter"

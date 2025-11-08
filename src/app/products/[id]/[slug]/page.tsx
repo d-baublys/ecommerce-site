@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { getProducts } from "@/lib/actions";
+import { getProducts, getReservedItems } from "@/lib/actions";
 import ProductPageClient from "./ProductPageClient";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { Metadata } from "next";
@@ -33,9 +33,13 @@ export default async function ProductPage({ params }: AsyncParams) {
         redirect(buildProductUrl(productData.id, productData.slug));
     }
 
+    const reservedFetch = await getReservedItems({
+        productIds: [productData.id],
+    });
+
     return (
         <MainLayout lastCrumbText={productData.name}>
-            <ProductPageClient productData={productData} />
+            <ProductPageClient productData={productData} reservedItems={reservedFetch.data} />
         </MainLayout>
     );
 }

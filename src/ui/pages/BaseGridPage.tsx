@@ -2,10 +2,11 @@ import { ClientProduct, ReservedItem } from "@/lib/types";
 import { pluralise } from "@/lib/utils";
 import ProductGrid from "@/ui/components/product-grid/ProductGrid";
 import PlainRoundedButtonLink from "../components/buttons/PlainRoundedButtonLink";
+import { useEffect, useState } from "react";
+import { getReservedItems } from "@/lib/actions";
 
 interface BaseGridPageProps {
     displayedProducts: ClientProduct[];
-    groupedReservedItems: ReservedItem[];
     noProductMessage: string;
     linkWhenEmptyList: boolean;
     categoryTabs?: React.ReactNode;
@@ -16,7 +17,6 @@ interface BaseGridPageProps {
 
 export default function BaseGridPage({
     displayedProducts,
-    groupedReservedItems,
     noProductMessage,
     linkWhenEmptyList,
     categoryTabs,
@@ -24,6 +24,24 @@ export default function BaseGridPage({
     fixedOverlays,
     sortingUnit,
 }: BaseGridPageProps) {
+    const [groupedReservedItems, setGroupedReservedItems] = useState<ReservedItem[]>();
+
+    useEffect(() => {
+        if (!displayedProducts) return;
+
+        const fetchReserved = async () => {
+            const reserved = await getReservedItems({
+                productIds: displayedProducts.map((product) => product.id),
+            });
+
+            setGroupedReservedItems(reserved.data);
+        };
+
+        fetchReserved();
+    }, [displayedProducts]);
+
+    if (!groupedReservedItems) return null;
+
     return (
         <>
             {categoryTabs ?? null}
