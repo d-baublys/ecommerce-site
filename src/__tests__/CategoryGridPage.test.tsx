@@ -9,7 +9,11 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { getFilteredTestProducts } from "@/lib/test-factories";
 
 jest.mock("@/lib/fetching-utils", () => ({
-    fetchFilteredProducts: jest.fn(),
+    getFilteredProducts: jest.fn(),
+}));
+
+jest.mock("@/lib/actions", () => ({
+    getReservedItems: jest.fn(),
 }));
 
 const replaceMock = jest.fn();
@@ -27,7 +31,8 @@ jest.mock("next/navigation", () => ({
     usePathname: () => "/category/all",
 }));
 
-import { fetchFilteredProducts } from "@/lib/fetching-utils";
+import { getFilteredProducts } from "@/lib/fetching-utils";
+import { getReservedItems } from "@/lib/actions";
 
 const filteredTestProducts = getFilteredTestProducts();
 
@@ -38,19 +43,22 @@ const renderPage = () => render(testComponent);
 const renderPageWithQuery = () => render(testComponentWithQuery);
 
 const mockBothQuerysetsEmpty = () => {
-    (fetchFilteredProducts as jest.Mock).mockResolvedValue([]);
+    (getFilteredProducts as jest.Mock).mockResolvedValue([]);
+    (getReservedItems as jest.Mock).mockResolvedValue({ data: [] });
 };
 const mockBothQuerysetsFull = () => {
-    (fetchFilteredProducts as jest.Mock).mockResolvedValue(filteredTestProducts);
+    (getFilteredProducts as jest.Mock).mockResolvedValue(filteredTestProducts);
+    (getReservedItems as jest.Mock).mockResolvedValue({ data: [] });
 };
 const mockFilterQuerysetEmpty = () => {
-    (fetchFilteredProducts as jest.Mock).mockResolvedValueOnce(filteredTestProducts); // for allCategoryProducts
-    (fetchFilteredProducts as jest.Mock).mockResolvedValueOnce([]); // for filteredProducts
+    (getFilteredProducts as jest.Mock).mockResolvedValueOnce(filteredTestProducts); // for allCategoryProducts
+    (getFilteredProducts as jest.Mock).mockResolvedValueOnce([]); // for filteredProducts
+    (getReservedItems as jest.Mock).mockResolvedValue({ data: [] });
 };
 
 describe("CategoryGridPage", () => {
     it("displays loading indicator while fetching", async () => {
-        (fetchFilteredProducts as jest.Mock).mockImplementation(() => new Promise(() => {})); // never-resolving promise
+        (getFilteredProducts as jest.Mock).mockImplementation(() => new Promise(() => {})); // never-resolving promise
         renderPage();
 
         expect(screen.getByLabelText("Loading indicator")).toBeInTheDocument();
@@ -58,7 +66,7 @@ describe("CategoryGridPage", () => {
 
     it("throws an error when fetch fails", async () => {
         const errorSpy = getConsoleErrorSpy();
-        (fetchFilteredProducts as jest.Mock).mockRejectedValue(new Error("Fetch Failed"));
+        (getFilteredProducts as jest.Mock).mockRejectedValue(new Error("Fetch Failed"));
         render(wrapWithErrorBoundary(testComponent));
 
         await waitFor(() => {
@@ -123,17 +131,17 @@ describe("CategoryGridPage", () => {
         mockBothQuerysetsFull();
         renderPage();
 
-        (fetchFilteredProducts as jest.Mock).mockClear();
+        (getFilteredProducts as jest.Mock).mockClear();
 
         const filterBtn = await screen.findByRole("button", { name: matchSizeLabel(2, "M") });
         fireEvent.click(filterBtn);
 
         await waitFor(() => {
-            expect(fetchFilteredProducts).toHaveBeenCalledWith(
+            expect(getFilteredProducts).toHaveBeenCalledWith(
                 expect.objectContaining({ sizeFilters: ["m"] })
             );
 
-            expect(fetchFilteredProducts).toHaveBeenCalledTimes(1);
+            expect(getFilteredProducts).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -141,7 +149,7 @@ describe("CategoryGridPage", () => {
         mockBothQuerysetsFull();
         renderPage();
 
-        (fetchFilteredProducts as jest.Mock).mockClear();
+        (getFilteredProducts as jest.Mock).mockClear();
 
         const filterBtn = await screen.findByRole("button", {
             name: matchPriceRangeLabel(1, "200"),
@@ -149,11 +157,11 @@ describe("CategoryGridPage", () => {
         fireEvent.click(filterBtn);
 
         await waitFor(() => {
-            expect(fetchFilteredProducts).toHaveBeenCalledWith(
+            expect(getFilteredProducts).toHaveBeenCalledWith(
                 expect.objectContaining({ priceFilters: ["e"] })
             );
 
-            expect(fetchFilteredProducts).toHaveBeenCalledTimes(1);
+            expect(getFilteredProducts).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -161,17 +169,17 @@ describe("CategoryGridPage", () => {
         mockBothQuerysetsFull();
         renderPage();
 
-        (fetchFilteredProducts as jest.Mock).mockClear();
+        (getFilteredProducts as jest.Mock).mockClear();
 
         const sortSelect = await screen.findByLabelText("Sort By");
         fireEvent.change(sortSelect, { target: { value: "b" } });
 
         await waitFor(() => {
-            expect(fetchFilteredProducts).toHaveBeenCalledWith(
+            expect(getFilteredProducts).toHaveBeenCalledWith(
                 expect.objectContaining({ productSort: "b" })
             );
 
-            expect(fetchFilteredProducts).toHaveBeenCalledTimes(1);
+            expect(getFilteredProducts).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -219,7 +227,7 @@ describe("CategoryGridPage", () => {
         renderPage();
 
         await waitFor(() => {
-            expect(fetchFilteredProducts).toHaveBeenCalledWith(
+            expect(getFilteredProducts).toHaveBeenCalledWith(
                 expect.objectContaining({ productSort: "c" })
             );
         });
@@ -261,7 +269,7 @@ describe("CategoryGridPage", () => {
         const { rerender } = render(<CategoryGridPage category="all" query="first query" />);
 
         await waitFor(() => {
-            expect(fetchFilteredProducts).toHaveBeenCalledWith(
+            expect(getFilteredProducts).toHaveBeenCalledWith(
                 expect.objectContaining({ query: "first query" })
             );
         });
@@ -269,7 +277,7 @@ describe("CategoryGridPage", () => {
         rerender(<CategoryGridPage category="all" query="second query" />);
 
         await waitFor(() => {
-            expect(fetchFilteredProducts).toHaveBeenCalledWith(
+            expect(getFilteredProducts).toHaveBeenCalledWith(
                 expect.objectContaining({ query: "second query" })
             );
         });

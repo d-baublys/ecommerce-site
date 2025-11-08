@@ -16,14 +16,14 @@ jest.mock("next/navigation", () => ({
 }));
 
 jest.mock("@/lib/fetching-utils", () => ({
-    fetchFilteredProducts: jest.fn(),
+    getFilteredProducts: jest.fn(),
 }));
 
 jest.mock("@/lib/actions", () => ({
     getProducts: jest.fn(),
 }));
 
-import { fetchFilteredProducts } from "@/lib/fetching-utils";
+import { getFilteredProducts } from "@/lib/fetching-utils";
 
 const productList = getFilteredTestProducts();
 
@@ -32,7 +32,7 @@ const renderSearchOverlay = () => render(<SearchOverlay />);
 const getInput = () => screen.getByRole("searchbox");
 const getSuggestionsContainer = () => screen.getByTestId("suggestions-ul");
 const mockResolvedFetch = () => {
-    (fetchFilteredProducts as jest.Mock).mockResolvedValue(productList);
+    (getFilteredProducts as jest.Mock).mockResolvedValue(productList);
 };
 const fireInputAndWait = async (queryText: string) => {
     await act(async () => {
@@ -85,7 +85,9 @@ describe("SearchOverlay", () => {
         const firstSuggestion = within(getSuggestionsContainer()).getAllByRole("listitem")[0];
         fireEvent.click(firstSuggestion);
 
-        expect(pushMock).toHaveBeenCalledWith("/products/aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1/test-product-1");
+        expect(pushMock).toHaveBeenCalledWith(
+            "/products/aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1/test-product-1"
+        );
     });
 
     it("has no accessibility violations", async () => {

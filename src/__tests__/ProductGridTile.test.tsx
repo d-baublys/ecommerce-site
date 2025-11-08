@@ -13,7 +13,7 @@ const testStockedProduct: ClientProduct = buildTestProduct({
 const testUnstockedProduct: ClientProduct = buildTestProduct({ overrides: { stock: { s: 0 } } });
 
 const renderAndGetTile = (product: ClientProduct = testStockedProduct) => {
-    render(<ProductGridTile product={product} />);
+    render(<ProductGridTile product={product} groupedReservedItems={[]} />);
     const tile = screen.getByText("Test Product 1").closest("div");
     if (!tile) throw new Error("No tile found");
     return tile;
@@ -87,7 +87,9 @@ describe("ProductGridTile", () => {
     });
 
     it("has no accessibility violations", async () => {
-        const { container } = render(<ProductGridTile product={testStockedProduct} />);
+        const { container } = render(
+            <ProductGridTile product={testStockedProduct} groupedReservedItems={[]} />
+        );
 
         await waitFor(async () => {
             const results = await axe(container);

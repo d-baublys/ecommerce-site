@@ -5,10 +5,10 @@ jest.mock("@/lib/actions", () => ({
 }));
 
 import { getProducts } from "@/lib/actions";
-import { fetchFilteredProducts } from "@/lib/fetching-utils";
+import { getFilteredProducts } from "@/lib/fetching-utils";
 import { buildTestProductList } from "@/lib/test-factories";
 
-describe("fetchFilteredProducts", () => {
+describe("getFilteredProducts", () => {
     beforeEach(() => {
         const productList = buildTestProductList();
         (getProducts as jest.Mock).mockResolvedValue({ data: productList });
@@ -17,7 +17,7 @@ describe("fetchFilteredProducts", () => {
     it("calls at least with a basic stock filter", async () => {
         const category: Categories | "all" = "all";
 
-        await fetchFilteredProducts({ category });
+        await getFilteredProducts({ category });
         expect(getProducts).toHaveBeenCalledWith(
             expect.objectContaining({
                 stock: {
@@ -35,7 +35,7 @@ describe("fetchFilteredProducts", () => {
     it("calls with the expected category argument", async () => {
         const category: Categories | "all" = "mens";
 
-        await fetchFilteredProducts({ category });
+        await getFilteredProducts({ category });
         expect(getProducts).toHaveBeenCalledWith(
             expect.objectContaining({
                 stock: {
@@ -55,7 +55,7 @@ describe("fetchFilteredProducts", () => {
         const category: Categories | "all" = "all";
         const sizeFilters: Sizes[] = ["m"];
 
-        await fetchFilteredProducts({ category, sizeFilters });
+        await getFilteredProducts({ category, sizeFilters });
         expect(getProducts).toHaveBeenCalledWith(
             expect.objectContaining({
                 stock: {
@@ -75,7 +75,7 @@ describe("fetchFilteredProducts", () => {
         const category: Categories | "all" = "all";
         const priceFilters: PriceFilterId[] = ["a", "e"];
 
-        await fetchFilteredProducts({ category, priceFilters });
+        await getFilteredProducts({ category, priceFilters });
         expect(getProducts).toHaveBeenCalledWith(
             expect.objectContaining({
                 stock: {
@@ -102,7 +102,7 @@ describe("fetchFilteredProducts", () => {
         const category: Categories | "all" = "all";
         const query = "test";
 
-        await fetchFilteredProducts({ category, query });
+        await getFilteredProducts({ category, query });
         expect(getProducts).toHaveBeenCalledWith(
             expect.objectContaining({
                 stock: {
@@ -122,7 +122,7 @@ describe("fetchFilteredProducts", () => {
         const category: Categories | "all" = "all";
         const productSort: ProductSortId = "a";
 
-        await fetchFilteredProducts({ category, productSort });
+        await getFilteredProducts({ category, productSort });
         expect(getProducts).toHaveBeenCalledWith(
             expect.objectContaining({
                 stock: {

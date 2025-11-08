@@ -1,8 +1,13 @@
 import BagPage from "@/app/bag/page";
-import { buildTestBagItemList, buildTestProduct, getTestUpdatedData } from "@/lib/test-factories";
+import {
+    buildReservedItem,
+    buildTestBagItemList,
+    buildTestProduct,
+    getTestUpdatedData,
+} from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { Product } from "@/lib/types";
+import { Product, ReservedItem } from "@/lib/types";
 import { buildBagItem } from "@/lib/utils";
 import { act } from "react";
 
@@ -21,6 +26,8 @@ jest.mock("next/navigation", () => ({
 
 jest.mock("@/lib/actions", () => ({
     getProducts: jest.fn(),
+    deleteCheckoutSessions: jest.fn(),
+    getReservedItems: jest.fn(),
 }));
 
 jest.mock("next-auth/react", () => ({
@@ -33,7 +40,7 @@ jest.mock("@/auth", () => ({
 }));
 
 import { useSession } from "next-auth/react";
-import { getProducts } from "@/lib/actions";
+import { getProducts, getReservedItems } from "@/lib/actions";
 import { getConsoleErrorSpy, wrapWithErrorBoundary } from "@/lib/test-utils";
 
 const { addToBag, clearBag } = useBagStore.getState();
@@ -41,6 +48,7 @@ const testBagData = buildTestBagItemList();
 const testBagItems = testBagData.bagItems;
 const testProducts = testBagData.products;
 const bagUpdatedData = getTestUpdatedData();
+const reservedItems = [buildReservedItem()];
 
 const renderBagPage = async () => render(await BagPage());
 const setUpTestBag = () =>
@@ -67,8 +75,9 @@ const getSessionWithoutAuth = () => {
     });
 };
 
-const setUpResolvedFetch = (resolvedValue: Product[]) => {
-    (getProducts as jest.Mock).mockResolvedValue({ data: resolvedValue });
+const setUpResolvedFetch = (resolvedProducts: Product[], resolvedReserved: ReservedItem[] = []) => {
+    (getProducts as jest.Mock).mockResolvedValue({ data: resolvedProducts });
+    (getReservedItems as jest.Mock).mockResolvedValue({ data: resolvedReserved });
 };
 const getAllTiles = () => within(screen.getByTestId("bag-tile-ul")).getAllByRole("listitem");
 
@@ -113,7 +122,7 @@ describe("BagPage auth-agnostic tests", () => {
         errorSpy.mockRestore();
     });
 
-    it("updates subtotal if latest size stock has decreased to below bag quantity", async () => {
+    it("updates subtotal if available stock has decreased to below bag quantity", async () => {
         setUpTestBag();
         setUpResolvedFetch(bagUpdatedData);
         act(() => {
@@ -140,7 +149,7 @@ describe("BagPage auth-agnostic tests", () => {
         });
     });
 
-    it("updates preselected quantities if latest size stock has decreased to below bag quantity", async () => {
+    it("updates quantity selections on page load if available stock has decreased to below bag quantity", async () => {
         setUpTestBag();
         setUpResolvedFetch(bagUpdatedData);
         act(() => {
@@ -155,7 +164,21 @@ describe("BagPage auth-agnostic tests", () => {
         });
     });
 
-    it("shows 'out of stock' in place of combobox when latest size stock is nil", async () => {
+    it("shows info modal on page load if available stock has decreased to below bag quantity", async () => {
+        setUpTestBag();
+        setUpResolvedFetch(bagUpdatedData);
+        act(() => {
+            renderBagPage();
+        });
+
+        await waitFor(() => {
+            expect(
+                screen.getByText(/Available stock for some of your items has changed/)
+            ).toBeInTheDocument();
+        });
+    });
+
+    it("shows 'out of stock' in place of combobox when available stock is nil", async () => {
         const testProduct = buildTestProduct({ overrides: { stock: { s: 1 } } });
         const latestTestProduct = buildTestProduct({ overrides: { stock: { s: 0 } } });
         const mockBagItem = buildBagItem(testProduct, "s");
@@ -259,7 +282,7 @@ describe("BagPage auth-agnostic tests", () => {
         });
     });
 
-    it("renders checkout button & shows correct shipping when at least some bag item sizes are stocked", async () => {
+    it("doesn't render checkout button & shows correct amounts when some bag items are unstocked", async () => {
         const testProduct = buildTestProduct({ overrides: { stock: { s: 0, m: 1 } } });
 
         addToBag(testProduct, buildBagItem(testProduct, "s"));
@@ -269,11 +292,12 @@ describe("BagPage auth-agnostic tests", () => {
             renderBagPage();
         });
 
-        expect(await screen.findByRole("button", { name: "Checkout" })).toBeInTheDocument();
-        expect(screen.getByLabelText("Shipping cost")).not.toHaveTextContent("-");
+        expect(await screen.findByRole("button", { name: "Checkout" })).not.toBeInTheDocument();
+        expect(screen.getByLabelText("Bag subtotal")).toHaveTextContent("£25.00");
+        expect(screen.getByLabelText("Shipping cost")).toHaveTextContent("£5.00");
     });
 
-    it("doesn't render checkout button & shows correct shipping when all bag item sizes are unstocked", async () => {
+    it("doesn't render checkout button & shows correct shipping when all bag items are unstocked", async () => {
         const testProduct = buildTestProduct({ overrides: { stock: { s: 0, m: 0 } } });
 
         addToBag(testProduct, buildBagItem(testProduct, "s"));
@@ -327,13 +351,112 @@ describe("BagPage authenticated tests", () => {
 
         fireEvent.click(checkoutBtn);
 
-        await waitFor(() => {
-            expect(mockFetch).toHaveBeenCalledWith(
-                "/api/create-checkout-session",
-                expect.anything()
-            );
-        });
+        await waitFor(
+            () => {
+                expect(mockFetch).toHaveBeenCalledWith(
+                    "/api/create-checkout-session",
+                    expect.anything()
+                );
+            },
+            { timeout: 2000 }
+        );
 
         mockFetch.mockRestore();
+    });
+
+    it("updates quantity selections on checkout click if available stock has decreased to below bag quantity", async () => {
+        setUpTestBag();
+        setUpResolvedFetch(testProducts);
+        act(() => {
+            renderBagPage();
+        });
+
+        await waitFor(() => {
+            const bagTiles = getAllTiles();
+
+            expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
+            expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("2");
+        });
+
+        setUpResolvedFetch(bagUpdatedData);
+
+        fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
+
+        await waitFor(() => {
+            const bagTiles = getAllTiles();
+
+            expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
+            expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("1");
+        });
+    });
+
+    it("shows info modal on checkout click if available stock has decreased to below bag quantity", async () => {
+        setUpTestBag();
+        setUpResolvedFetch(testProducts);
+        act(() => {
+            renderBagPage();
+        });
+
+        await waitFor(() => {
+            expect(screen.getByRole("button", { name: "Checkout" })).toBeInTheDocument();
+        });
+
+        setUpResolvedFetch(bagUpdatedData);
+
+        fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
+
+        await waitFor(() => {
+            expect(
+                screen.getByText(/Available stock for some of your items has changed/)
+            ).toBeInTheDocument();
+        });
+    });
+
+    it("updates quantity selections on checkout click if there are relevant reserved items", async () => {
+        setUpTestBag();
+        setUpResolvedFetch(testProducts);
+        act(() => {
+            renderBagPage();
+        });
+
+        await waitFor(() => {
+            const bagTiles = getAllTiles();
+
+            expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
+            expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("2");
+        });
+
+        setUpResolvedFetch(testProducts, reservedItems);
+
+        fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
+
+        await waitFor(() => {
+            const bagTiles = getAllTiles();
+
+            expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
+            expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("1");
+        });
+    });
+
+    it("shows info modal on checkout click if there are relevant reserved items", async () => {
+        setUpTestBag();
+        setUpResolvedFetch(testProducts);
+        act(() => {
+            renderBagPage();
+        });
+
+        await waitFor(() => {
+            expect(screen.getByRole("button", { name: "Checkout" })).toBeInTheDocument();
+        });
+
+        setUpResolvedFetch(testProducts, reservedItems);
+
+        fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
+
+        await waitFor(() => {
+            expect(
+                screen.getByText(/Available stock for some of your items has changed/)
+            ).toBeInTheDocument();
+        });
     });
 });

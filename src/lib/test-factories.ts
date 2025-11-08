@@ -10,6 +10,7 @@ import {
     OrderStatus,
     Order,
     OrderItem,
+    ReservedItem,
 } from "./types";
 import { buildBagItem, slugify } from "./utils";
 import { VALID_CATEGORIES } from "./constants";
@@ -59,6 +60,15 @@ export function buildTestProductList(): ClientProduct[] {
 
 export function buildLongProductList(): Product[] {
     return Array.from({ length: 10 }).map((_, idx) => buildTestProduct({ idx }));
+}
+
+export function buildReservedItem(): ReservedItem {
+    return {
+        id: "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1",
+        productId: "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa2",
+        size: "m",
+        quantity: 2,
+    };
 }
 
 export function getFilteredTestProducts() {
