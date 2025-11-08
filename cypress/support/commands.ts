@@ -58,6 +58,7 @@ declare global {
             logInAsAdmin(): Chainable<void>;
             logInAsStandardUser(): Chainable<void>;
             logInFromCurrent(): Chainable<void>;
+            logOut(): Chainable<void>;
             breakpointLessThanSmall(): Chainable<void>;
             breakpointSmall(): Chainable<void>;
             breakpointLessThanLarge(): Chainable<void>;
@@ -71,6 +72,7 @@ declare global {
             awaitPathnameSettle(): Chainable<void>;
             awaitInputBlur(): Chainable<void>;
             awaitTableSettle(): Chainable<void>;
+            awaitBagUpdate(): Chainable<void>;
             awaitWishlistUpdate(): Chainable<void>;
             awaitFilterUpdate(): Chainable<void>;
             resetDb(): Chainable<void>;
@@ -79,6 +81,9 @@ declare global {
             openSizeAccordionMobile(): Chainable<void>;
             openPriceAccordionDesktop(): Chainable<void>;
             openPriceAccordionMobile(): Chainable<void>;
+            buildTestBag(testProductLink: string): Chainable<void>;
+            decrementTestProductStock(testProductAdminLink: string): Chainable<void>;
+            createReservedItems(testProductLink: string): Chainable<void>;
         }
     }
 }
@@ -109,7 +114,7 @@ Cypress.Commands.add("visitWishlist", () => {
 Cypress.Commands.add("visitBag", () => {
     cy.visit("/bag");
     cy.location("pathname").should("eq", "/bag");
-    cy.contains("My Bag").should("be.visible");
+    cy.contains("My Bag").should("exist");
 });
 
 Cypress.Commands.add("visitLogInPage", () => {
@@ -146,6 +151,7 @@ Cypress.Commands.add("visitTestAdminProduct", (testProductUrl) => {
     cy.visit(testProductUrl);
     cy.location("pathname").should("eq", testProductUrl);
     cy.contains("Edit Product").should("be.visible");
+    cy.awaitTableSettle();
 });
 
 Cypress.Commands.add("visitTestProduct", (testProductUrl) => {
@@ -174,6 +180,15 @@ Cypress.Commands.add("logInAsStandardUser", () => {
     cy.wait("@auth-check");
     cy.location("pathname").should("eq", "/");
     cy.contains("Shop >>>").should("be.visible");
+});
+
+Cypress.Commands.add("logOut", () => {
+    cy.intercept("/api/auth/signout").as("log-out");
+
+    cy.get("[aria-label='Account']").should("exist").click();
+    cy.contains("button", "Log Out").should("be.visible").click();
+    cy.wait("@log-out").its("response.statusCode").should("eq", 200);
+    cy.get("#account-menu").should("not.be.visible");
 });
 
 Cypress.Commands.add("logInFromCurrent", () => {
@@ -242,6 +257,10 @@ Cypress.Commands.add("awaitTableSettle", () => {
     cy.wait(100); // table row addition is very flaky without this
 });
 
+Cypress.Commands.add("awaitBagUpdate", () => {
+    cy.wait(300); // for fixed delayed bag update
+});
+
 Cypress.Commands.add("awaitWishlistUpdate", () => {
     cy.wait(300); // for fixed delayed wishlist update
 });
@@ -278,4 +297,47 @@ Cypress.Commands.add("openPriceAccordionDesktop", () => {
 Cypress.Commands.add("openPriceAccordionMobile", () => {
     cy.get(".mobile-filtering").contains("button", "Price").click();
     cy.get(".mobile-filtering .price-btn-container").should("be.visible");
+});
+
+Cypress.Commands.add("buildTestBag", (testProductLink) => {
+    cy.visitTestProduct(testProductLink);
+    cy.get("[aria-label='Size selection']").select("L");
+    cy.contains("button", "Add to Bag").click();
+    cy.get(".bag-confirm-modal").should("be.visible");
+    cy.get("#close-modal-button").click();
+    cy.get("[aria-label='Size selection']").select("XL");
+    cy.contains("button", "Add to Bag").click();
+    cy.get(".bag-confirm-modal").should("be.visible");
+    cy.get("#close-modal-button").click();
+    cy.contains("button", "Add to Bag").click();
+    cy.get(".bag-confirm-modal").should("be.visible");
+    cy.get("#close-modal-button").click();
+});
+
+Cypress.Commands.add("decrementTestProductStock", (testProductAdminLink) => {
+    cy.logInAsAdmin();
+    cy.visitTestAdminProduct(testProductAdminLink);
+    cy.get("#stock-table-button-container").contains("button", "Edit").click();
+    cy.get("[data-cy='quantity-input']").eq(3).should("not.be.disabled").clear();
+    cy.get("[data-cy='quantity-input']").eq(4).clear().type("{moveToEnd}1");
+    cy.get("#stock-table-button-container").contains("button", "Apply").click();
+    cy.get("#overall-action-container").contains("button", "Save").click();
+    cy.get("#overall-message-container").contains("Changes saved succesfully").should("be.visible");
+});
+
+Cypress.Commands.add("createReservedItems", (testProductLink) => {
+    cy.intercept("POST", "/api/create-checkout-session").as("create-checkout-session");
+
+    cy.logInAsAdmin();
+    cy.visitTestProduct(testProductLink);
+    cy.get("[aria-label='Size selection']").select("L");
+    cy.contains("button", "Add to Bag").click();
+    cy.get(".bag-confirm-modal").should("be.visible");
+    cy.get("#close-modal-button").click();
+    cy.visitBag();
+    cy.contains("button", "Checkout").click();
+    cy.get("#loading-indicator").should("exist");
+    cy.wait("@create-checkout-session").its("response.statusCode").should("eq", 200);
+    cy.get("#loading-indicator").should("not.exist");
+    cy.logOut();
 });

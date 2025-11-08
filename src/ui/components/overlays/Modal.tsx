@@ -38,7 +38,7 @@ export default function Modal(props: ModalProps) {
                     aria-modal="true"
                 >
                     {hasCloseButton && (
-                        <div className="absolute top-0 right-0 p-4">
+                        <div id="close-modal-button" className="absolute top-0 right-0 p-4">
                             <CloseButton onClick={handleClose} />
                         </div>
                     )}

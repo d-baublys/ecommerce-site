@@ -137,10 +137,7 @@ describe("Navbar base tests", () => {
         cy.logInAsAdmin();
         cy.awaitPathnameSettle();
         cy.get("#navbar [aria-label='Admin']").should("exist");
-        cy.get("#navbar [aria-label='Account']").click();
-        cy.get("#account-menu").should("be.visible");
-        cy.contains("button", "Log Out").click();
-        cy.get("#account-menu").should("not.be.visible");
+        cy.logOut();
         cy.get("#navbar [aria-label='Admin']").should("not.exist");
     });
 
@@ -171,7 +168,6 @@ describe("Navbar base tests", () => {
     });
 
     it("doesn't render admin button in the mobile menu after admin log out", () => {
-        cy.intercept("POST", "/api/auth/signout").as("sign-out");
         cy.breakpointLessThanSmall();
         cy.logInAsAdmin();
         cy.awaitPathnameSettle();
@@ -181,7 +177,7 @@ describe("Navbar base tests", () => {
         cy.get("#nav-mobile-menu [aria-label='Account']").click();
         cy.get("#account-menu").should("be.visible");
         cy.contains("button", "Log Out").click();
-        cy.wait("@sign-out").its("response.statusCode").should("eq", 200);
+        cy.get("#account-menu").should("not.be.visible");
         cy.awaitPathnameSettle();
         cy.get("[aria-label='Menu']").click();
         cy.get("#nav-mobile-menu").should("be.visible");

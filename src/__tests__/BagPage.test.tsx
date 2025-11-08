@@ -149,22 +149,7 @@ describe("BagPage auth-agnostic tests", () => {
         });
     });
 
-    it("updates quantity selections on page load if available stock has decreased to below bag quantity", async () => {
-        setUpTestBag();
-        setUpResolvedFetch(bagUpdatedData);
-        act(() => {
-            renderBagPage();
-        });
-
-        await waitFor(() => {
-            const bagTiles = getAllTiles();
-
-            expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
-            expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("1");
-        });
-    });
-
-    it("shows info modal on page load if available stock has decreased to below bag quantity", async () => {
+    it("updates quantity selections & shows info modal on page load if available stock has decreased to below bag quantity", async () => {
         setUpTestBag();
         setUpResolvedFetch(bagUpdatedData);
         act(() => {
@@ -175,6 +160,30 @@ describe("BagPage auth-agnostic tests", () => {
             expect(
                 screen.getByText(/Available stock for some of your items has changed/)
             ).toBeInTheDocument();
+
+            const bagTiles = getAllTiles();
+
+            expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
+            expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("1");
+        });
+    });
+
+    it("updates quantity selections & shows info modal on page load if there are relevant reserved items", async () => {
+        setUpTestBag();
+        setUpResolvedFetch(testProducts, reservedItems);
+        act(() => {
+            renderBagPage();
+        });
+
+        await waitFor(() => {
+            expect(
+                screen.getByText(/Available stock for some of your items has changed/)
+            ).toBeInTheDocument();
+
+            const bagTiles = getAllTiles();
+
+            expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
+            expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("1");
         });
     });
 
@@ -364,7 +373,7 @@ describe("BagPage authenticated tests", () => {
         mockFetch.mockRestore();
     });
 
-    it("updates quantity selections on checkout click if available stock has decreased to below bag quantity", async () => {
+    it("updates quantity selections & shows info modal on checkout click if available stock has decreased to below bag quantity", async () => {
         setUpTestBag();
         setUpResolvedFetch(testProducts);
         act(() => {
@@ -383,6 +392,10 @@ describe("BagPage authenticated tests", () => {
         fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
 
         await waitFor(() => {
+            expect(
+                screen.getByText(/Available stock for some of your items has changed/)
+            ).toBeInTheDocument();
+
             const bagTiles = getAllTiles();
 
             expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
@@ -390,29 +403,7 @@ describe("BagPage authenticated tests", () => {
         });
     });
 
-    it("shows info modal on checkout click if available stock has decreased to below bag quantity", async () => {
-        setUpTestBag();
-        setUpResolvedFetch(testProducts);
-        act(() => {
-            renderBagPage();
-        });
-
-        await waitFor(() => {
-            expect(screen.getByRole("button", { name: "Checkout" })).toBeInTheDocument();
-        });
-
-        setUpResolvedFetch(bagUpdatedData);
-
-        fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
-
-        await waitFor(() => {
-            expect(
-                screen.getByText(/Available stock for some of your items has changed/)
-            ).toBeInTheDocument();
-        });
-    });
-
-    it("updates quantity selections on checkout click if there are relevant reserved items", async () => {
+    it("updates quantity selections & shows info modal on checkout click if there are relevant reserved items", async () => {
         setUpTestBag();
         setUpResolvedFetch(testProducts);
         act(() => {
@@ -431,32 +422,14 @@ describe("BagPage authenticated tests", () => {
         fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
 
         await waitFor(() => {
+            expect(
+                screen.getByText(/Available stock for some of your items has changed/)
+            ).toBeInTheDocument();
+
             const bagTiles = getAllTiles();
 
             expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
             expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("1");
-        });
-    });
-
-    it("shows info modal on checkout click if there are relevant reserved items", async () => {
-        setUpTestBag();
-        setUpResolvedFetch(testProducts);
-        act(() => {
-            renderBagPage();
-        });
-
-        await waitFor(() => {
-            expect(screen.getByRole("button", { name: "Checkout" })).toBeInTheDocument();
-        });
-
-        setUpResolvedFetch(testProducts, reservedItems);
-
-        fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
-
-        await waitFor(() => {
-            expect(
-                screen.getByText(/Available stock for some of your items has changed/)
-            ).toBeInTheDocument();
         });
     });
 });

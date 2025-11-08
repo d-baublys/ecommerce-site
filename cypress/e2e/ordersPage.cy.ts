@@ -34,11 +34,7 @@ describe("Orders page authenticated tests", () => {
     });
 
     it("redirects to login page on log out", () => {
-        cy.get("[aria-label='Account']").should("be.visible");
-        cy.get("[aria-label='Account']").click();
-        cy.contains("button", "Log Out").should("be.visible");
-        cy.contains("button", "Log Out").click();
-        cy.get("#account-menu").should("not.be.visible");
+        cy.logOut();
         cy.location("pathname").should("eq", "/login");
         cy.location("search").should("eq", "?redirect_after=orders");
     });
