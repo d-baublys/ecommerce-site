@@ -17,5 +17,5 @@
 import "./commands";
 
 before(() => {
-    cy.exec("npm run db:reset:test");
+    cy.resetDb();
 });

@@ -2,9 +2,7 @@ import { standardEmail } from "../support/credentials";
 
 describe("Create account page base tests", () => {
     beforeEach(() => {
-        cy.visit("/create-account");
-        cy.location("pathname").should("eq", "/create-account");
-        cy.contains("Create Account").should("be.visible");
+        cy.visitCreateAccountPage();
     });
 
     it("shows error message when provided passwords do not match", () => {
@@ -42,9 +40,7 @@ describe("Create account page base tests", () => {
 
 describe("Create account page seeded tests", () => {
     before(() => {
-        cy.visit("/create-account");
-        cy.location("pathname").should("eq", "/create-account");
-        cy.contains("Create Account").should("be.visible");
+        cy.visitCreateAccountPage();
     });
 
     after(() => {

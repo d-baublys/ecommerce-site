@@ -1,10 +1,7 @@
 describe("Product stock table base tests", () => {
     beforeEach(() => {
         cy.logInAsAdmin();
-        cy.visit("/admin/products/add-product");
-        cy.location("pathname").should("eq", "/admin/products/add-product");
-        cy.contains("Add Product").should("be.visible");
-        cy.get("#stock-table").should("be.visible");
+        cy.visitAddProductPage();
         cy.awaitTableSettle();
     });
 
@@ -70,10 +67,7 @@ describe("Product stock table base tests", () => {
 describe("Product stock table 'display' mode", () => {
     beforeEach(() => {
         cy.logInAsAdmin();
-        cy.visit("/admin/products/add-product");
-        cy.location("pathname").should("eq", "/admin/products/add-product");
-        cy.contains("Add Product").should("be.visible");
-        cy.get("#stock-table").should("be.visible");
+        cy.visitAddProductPage();
         cy.awaitTableSettle();
 
         cy.get("#stock-table-button-container").contains("button", "+ Add Size").click();
@@ -103,10 +97,7 @@ describe("Product stock table 'display' mode", () => {
 describe("Product stock table 'edit' mode", () => {
     beforeEach(() => {
         cy.logInAsAdmin();
-        cy.visit("/admin/products/add-product");
-        cy.location("pathname").should("eq", "/admin/products/add-product");
-        cy.contains("Add Product").should("be.visible");
-        cy.get("#stock-table").should("be.visible");
+        cy.visitAddProductPage();
         cy.awaitTableSettle();
 
         cy.get("#stock-table-button-container").contains("button", "+ Add Size").click();
@@ -184,10 +175,7 @@ describe("Product stock table 'edit' mode", () => {
 describe("Product stock table 'add' mode", () => {
     beforeEach(() => {
         cy.logInAsAdmin();
-        cy.visit("/admin/products/add-product");
-        cy.location("pathname").should("eq", "/admin/products/add-product");
-        cy.contains("Add Product").should("be.visible");
-        cy.get("#stock-table").should("be.visible");
+        cy.visitAddProductPage();
         cy.awaitTableSettle();
         cy.get("#stock-table-button-container").contains("button", "+ Add Size").click();
     });

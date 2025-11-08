@@ -1,8 +1,7 @@
 describe("Product grid page desktop accessbility tests", () => {
     beforeEach(() => {
-        cy.largeBreakpoint();
-        cy.visit("/category/all");
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.breakpointLarge();
+        cy.visitCategoryPage();
     });
 
     it("prevents focus to filters when filter accordion is collapsed", () => {
@@ -23,9 +22,8 @@ describe("Product grid page desktop accessbility tests", () => {
     });
 
     it("has no accessibility violations when filter accordions are open", () => {
-        cy.get(".desktop-filtering").contains("Size").click();
-        cy.get(".desktop-filtering").contains("Price").click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.openSizeAccordionDesktop();
+        cy.openPriceAccordionDesktop();
         cy.injectAxe();
         cy.checkA11y();
     });
@@ -33,9 +31,8 @@ describe("Product grid page desktop accessbility tests", () => {
 
 describe("Product grid page mobile accessbility tests", () => {
     beforeEach(() => {
-        cy.lessThanLargeBreakpoint();
-        cy.visit("/category/all");
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.breakpointLessThanLarge();
+        cy.visitCategoryPage();
     });
 
     it("has no accessibility violations in the base page state", () => {
@@ -45,9 +42,8 @@ describe("Product grid page mobile accessbility tests", () => {
 
     it("has no accessibility violations when the filtering menu and and filter accordions are open", () => {
         cy.contains("button", "Filter").click();
-        cy.get(".mobile-filtering").contains("Size").click();
-        cy.get(".mobile-filtering").contains("Price").click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.openSizeAccordionMobile();
+        cy.openPriceAccordionMobile();
         cy.injectAxe();
         cy.checkA11y();
     });

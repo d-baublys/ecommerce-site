@@ -26,9 +26,7 @@ describe("Orders page unauthenticated tests", () => {
 describe("Orders page authenticated tests", () => {
     beforeEach(() => {
         cy.logInAsStandardUser();
-        cy.visit("/orders");
-        cy.location("pathname").should("eq", "/orders");
-        cy.contains("My Orders").should("be.visible");
+        cy.visitOrdersPage();
     });
 
     it("shows correct message when logged in but no orders to show", () => {
@@ -60,9 +58,7 @@ describe("Orders page authenticated & seeded tests", () => {
 
     beforeEach(() => {
         cy.logInAsAdmin();
-        cy.visit("/orders");
-        cy.location("pathname").should("eq", "/orders");
-        cy.contains("My Orders").should("be.visible");
+        cy.visitOrdersPage();
     });
 
     after(() => {

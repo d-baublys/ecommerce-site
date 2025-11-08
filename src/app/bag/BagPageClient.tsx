@@ -19,6 +19,8 @@ import LoadingIndicator from "@/ui/components/overlays/LoadingIndicator";
 import { ClientProduct, ReservedItem } from "@/lib/types";
 import FailureModal from "@/ui/components/overlays/FailureModal";
 
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
 export default function BagPageClient() {
     const [products, setProducts] = useState<ClientProduct[]>();
     const [groupedReservedItems, setGroupedReservedItems] = useState<ReservedItem[]>();
@@ -43,8 +45,6 @@ export default function BagPageClient() {
     const orderTotal = orderSubtotal + shippingCost;
 
     const checkoutPermitted = !(emptyBag || bag.some((item) => item.quantity === 0));
-
-    const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
     useEffect(() => {
         if (!hasHydrated) return;
@@ -96,7 +96,7 @@ export default function BagPageClient() {
 
         const data = await res.json();
 
-        if (process.env.APP_ENV === "test") return;
+        if (process.env.NEXT_PUBLIC_APP_ENV === "test") return;
 
         if (data.url) {
             await stripePromise;

@@ -7,9 +7,7 @@ let productIds: CypressTestDataDeleteParams["productIds"] = [];
 describe("Admin orders page base tests", () => {
     beforeEach(() => {
         cy.logInAsAdmin();
-        cy.visit("/admin/orders");
-        cy.location("pathname").should("eq", "/admin/orders");
-        cy.contains("Orders").should("be.visible");
+        cy.visitAdminOrdersPage();
     });
 
     it("shows fallback message when there is no order data", () => {
@@ -62,9 +60,7 @@ describe("Admin orders page seeded tests", () => {
 
     beforeEach(() => {
         cy.logInAsAdmin();
-        cy.visit("/admin/orders");
-        cy.location("pathname").should("eq", "/admin/orders");
-        cy.contains("Orders").should("be.visible");
+        cy.visitAdminOrdersPage();
     });
 
     after(() => {

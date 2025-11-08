@@ -7,10 +7,11 @@ describe("Home page", () => {
         cy.get("h1").should("contain.text", "Summer 2025 styles here and now.");
         cy.contains("a", "Shop >>>").click();
         cy.location("pathname").should("eq", "/category/all");
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
     });
 
     it("rotates product carousel correctly", () => {
+        cy.get("#featured-1").should("be.visible");
+        cy.get("#featured-2").should("be.visible");
         cy.get("#carousel-slider").then(($slider) => {
             const sliderBounds = $slider[0].getBoundingClientRect();
 

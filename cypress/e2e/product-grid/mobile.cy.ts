@@ -2,9 +2,8 @@ import { matchPriceRangeLabel, matchSizeLabel } from "../../../src/lib/test-util
 
 describe("Product grid page mobile viewport base tests", () => {
     beforeEach(() => {
-        cy.lessThanLargeBreakpoint();
-        cy.visit("/category/all");
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.breakpointLessThanLarge();
+        cy.visitCategoryPage();
     });
 
     it("displays the correct number of items", () => {
@@ -31,14 +30,13 @@ describe("Product grid page mobile viewport base tests", () => {
 
 describe("Category grid page mobile viewport filtering tests", () => {
     beforeEach(() => {
-        cy.lessThanLargeBreakpoint();
-        cy.visit("/category/all");
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.breakpointLessThanLarge();
+        cy.visitCategoryPage();
         cy.contains("button", "Filter").click();
     });
 
     it("displays the correct number of size filters", () => {
-        cy.get(".mobile-filtering").contains("button", "Size").click();
+        cy.openSizeAccordionMobile();
         cy.get(".mobile-filtering .size-btn-container li").should("have.length", 6);
         cy.get(".mobile-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XS"))
@@ -61,7 +59,7 @@ describe("Category grid page mobile viewport filtering tests", () => {
     });
 
     it("displays the correct number of price filters", () => {
-        cy.get(".mobile-filtering").contains("button", "Price").click();
+        cy.openPriceAccordionMobile();
         cy.get(".mobile-filtering .price-btn-container li").should("have.length", 5);
         cy.get(".mobile-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(4, "0", "49"))
@@ -81,94 +79,94 @@ describe("Category grid page mobile viewport filtering tests", () => {
     });
 
     it("filters correctly on single size filter selection", () => {
-        cy.get(".mobile-filtering").contains("button", "Size").click();
+        cy.openSizeAccordionMobile();
         cy.get(".mobile-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
+        cy.awaitFilterUpdate();
         cy.get("[aria-label='Close menu']").click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 7);
         cy.contains(/7\s*Items/).should("be.visible");
     });
 
     it("filters correctly on compound size filter selection", () => {
-        cy.get(".mobile-filtering").contains("button", "Size").click();
+        cy.openSizeAccordionMobile();
         cy.get(".mobile-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XS"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".mobile-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
+        cy.awaitFilterUpdate();
         cy.get("[aria-label='Close menu']").click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 14);
         cy.contains(/14\s*Items/).should("be.visible");
     });
 
     it("filters correctly on single price filter selection", () => {
-        cy.get(".mobile-filtering").contains("button", "Price").click();
+        cy.openPriceAccordionMobile();
+        cy.get(".mobile-filtering .price-btn-container").should("be.visible");
         cy.get(".mobile-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
+        cy.awaitFilterUpdate();
         cy.get("[aria-label='Close menu']").click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 1);
         cy.contains(/1\s*Item/).should("be.visible");
     });
 
     it("filters correctly on compound price filter selection", () => {
-        cy.get(".mobile-filtering").contains("button", "Price").click();
+        cy.openPriceAccordionMobile();
         cy.get(".mobile-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(4, "0", "49"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".mobile-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
+        cy.awaitFilterUpdate();
         cy.get("[aria-label='Close menu']").click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 5);
         cy.contains(/5\s*Items/).should("be.visible");
     });
 
     it("filters correctly on combined size and price filter selection", () => {
-        cy.get(".mobile-filtering").contains("button", "Size").click();
-        cy.get(".mobile-filtering").contains("button", "Price").click();
+        cy.openSizeAccordionMobile();
+        cy.openPriceAccordionMobile();
         cy.get(".mobile-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".mobile-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
+        cy.awaitFilterUpdate();
         cy.get("[aria-label='Close menu']").click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").should("have.length", 0);
         cy.contains(/0\s*Items/).should("be.visible");
     });
 
     it("displays the correct message when filtering returns no results", () => {
-        cy.get(".mobile-filtering").contains("button", "Size").click();
-        cy.get(".mobile-filtering").contains("button", "Price").click();
+        cy.openSizeAccordionMobile();
+        cy.openPriceAccordionMobile();
         cy.get(".mobile-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".mobile-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
+        cy.awaitFilterUpdate();
         cy.get("[aria-label='Close menu']").click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.contains("No products matching your filter").should("be.visible");
     });
 });
 
 describe("Category grid page mobile viewport tile touch tests", () => {
     beforeEach(() => {
-        cy.lessThanLargeBreakpoint();
-        cy.visit("/category/all");
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.breakpointLessThanLarge();
+        cy.visitCategoryPage();
     });
 
     it("displays conditional product tile elements when touch is held longer than timeout", () => {

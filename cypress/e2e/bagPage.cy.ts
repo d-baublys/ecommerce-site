@@ -5,9 +5,7 @@ let testProductLink: string;
 
 describe("Bag page base tests", () => {
     beforeEach(() => {
-        cy.visit("/bag");
-        cy.location("pathname").should("eq", "/bag");
-        cy.contains("My Bag").should("be.visible");
+        cy.visitBag();
     });
 
     it("shows correct message when the bag is empty", () => {
@@ -51,9 +49,7 @@ describe("Bag page populated tests", () => {
         cy.contains("button", "Add to Bag").click();
         cy.get(".bag-confirm-modal").should("be.visible");
         cy.get("#close-modal-button").click();
-        cy.visit("/bag");
-        cy.location("pathname").should("eq", "/bag");
-        cy.contains("My Bag").should("be.visible");
+        cy.visitBag();
     });
 
     it("correctly totals items in the bag and renders 'checkout' button", () => {
@@ -142,19 +138,18 @@ describe("Bag page populated tests", () => {
         cy.location("search").should("eq", "?redirect_after=bag");
     });
 
-    it("navigates to Stripe on 'checkout' button click when authenticated", () => {
+    it("initiates checkout on 'checkout' button click when authenticated", () => {
         cy.intercept("POST", "/api/create-checkout-session").as("createCheckoutSession");
 
         cy.logInAsStandardUser();
-        cy.visit("/bag");
-        cy.location("pathname").should("eq", "/bag");
-        cy.contains("My Bag").should("be.visible");
+        cy.visitBag();
         cy.contains("button", "Checkout").click();
         cy.wait("@createCheckoutSession").its("response.statusCode").should("eq", 200);
+        cy.resetUserCheckouts();
     });
 
     it("automatically initiates checkout after logging in from redirect", () => {
-        cy.intercept("POST", "https://m.stripe.com/6").as("stripeEntryOnRedirect");
+        cy.intercept("POST", "/api/create-checkout-session").as("createCheckoutSession");
 
         cy.contains("button", "Checkout").click();
         cy.location("pathname").should("eq", "/login");
@@ -162,16 +157,15 @@ describe("Bag page populated tests", () => {
         cy.logInFromCurrent();
         cy.location("pathname").should("eq", "/bag");
         cy.location("search").should("eq", "?from_login=true");
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
-        cy.wait("@stripeEntryOnRedirect").its("response.statusCode").should("eq", 200);
+        cy.get("#loading-indicator").should("not.exist");
+        cy.wait("@createCheckoutSession").its("response.statusCode").should("eq", 200);
+        cy.resetUserCheckouts();
     });
 
     it("redirects to log in page on 'checkout' button click after logging out", () => {
         cy.intercept("POST", "/api/auth/signout").as("sign-out");
         cy.logInAsStandardUser();
-        cy.visit("/bag");
-        cy.location("pathname").should("eq", "/bag");
-        cy.contains("My Bag").should("be.visible");
+        cy.visitBag();
         cy.awaitPathnameSettle();
         cy.get("#navbar [aria-label='Account']").click();
         cy.contains("button", "Log Out").click();

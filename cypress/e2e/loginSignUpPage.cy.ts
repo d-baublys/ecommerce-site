@@ -1,8 +1,6 @@
 describe("Login/signup page", () => {
     beforeEach(() => {
-        cy.visit("/login");
-        cy.location("pathname").should("eq", "/login");
-        cy.contains("Log In").should("be.visible");
+        cy.visitLogInPage();
     });
 
     it("displays labels within the input & without displaying 'required' message by default", () => {

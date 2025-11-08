@@ -43,26 +43,42 @@ import "cypress-file-upload";
 declare global {
     namespace Cypress {
         interface Chainable {
+            visitHome(): Chainable<void>;
+            visitHomeAwaitPathnameSettle(): Chainable<void>;
+            visitCategoryPage(): Chainable<void>;
+            visitWishlist(): Chainable<void>;
+            visitBag(): Chainable<void>;
+            visitLogInPage(): Chainable<void>;
+            visitCreateAccountPage(): Chainable<void>;
+            visitAddProductPage(): Chainable<void>;
+            visitOrdersPage(): Chainable<void>;
+            visitAdminOrdersPage(): Chainable<void>;
+            visitTestAdminProduct(testProductUrl: string): Chainable<void>;
+            visitTestProduct(testProductUrl: string): Chainable<void>;
             logInAsAdmin(): Chainable<void>;
             logInAsStandardUser(): Chainable<void>;
             logInFromCurrent(): Chainable<void>;
-            visitHome(): Chainable<void>;
-            lessThanSmallBreakpoint(): Chainable<void>;
-            smallBreakpoint(): Chainable<void>;
-            lessThanLargeBreakpoint(): Chainable<void>;
-            largeBreakpoint(): Chainable<void>;
+            breakpointLessThanSmall(): Chainable<void>;
+            breakpointSmall(): Chainable<void>;
+            breakpointLessThanLarge(): Chainable<void>;
+            breakpointLarge(): Chainable<void>;
             performTestScroll(): Chainable<void>;
             assertNoScroll(): Chainable<void>;
             assertScrollHookCssExist(): Chainable<void>;
             assertScrollHookCssNotExist(): Chainable<void>;
-            awaitPathnameSettle(): Chainable<void>;
-            visitHomeAwaitPathnameSettle(): Chainable<void>;
-            awaitInputBlur(): Chainable<void>;
-            awaitTableSettle(): Chainable<void>;
-            visitTestAdminProduct(testProductUrl: string): Chainable<void>;
-            visitTestProduct(testProductUrl: string): Chainable<void>;
             assertFormMessage(expectedMessage: string): Chainable<void>;
             assertTableMessage(expectedMessage: string): Chainable<void>;
+            awaitPathnameSettle(): Chainable<void>;
+            awaitInputBlur(): Chainable<void>;
+            awaitTableSettle(): Chainable<void>;
+            awaitWishlistUpdate(): Chainable<void>;
+            awaitFilterUpdate(): Chainable<void>;
+            resetDb(): Chainable<void>;
+            resetUserCheckouts(): Chainable<void>;
+            openSizeAccordionDesktop(): Chainable<void>;
+            openSizeAccordionMobile(): Chainable<void>;
+            openPriceAccordionDesktop(): Chainable<void>;
+            openPriceAccordionMobile(): Chainable<void>;
         }
     }
 }
@@ -71,6 +87,71 @@ Cypress.Commands.add("visitHome", () => {
     cy.visit("/");
     cy.location("pathname").should("eq", "/");
     cy.contains("Shop >>>").should("be.visible");
+});
+
+Cypress.Commands.add("visitHomeAwaitPathnameSettle", () => {
+    cy.visitHome();
+    cy.awaitPathnameSettle();
+});
+
+Cypress.Commands.add("visitCategoryPage", () => {
+    cy.visit("/category/all");
+    cy.location("pathname").should("eq", "/category/all");
+    cy.get("#loading-indicator").should("not.exist");
+    cy.contains(/\d+\s*Item(s)?/).should("be.visible");
+});
+
+Cypress.Commands.add("visitWishlist", () => {
+    cy.visit("/wishlist");
+    cy.contains(/\d+\s*Item(s)?/).should("be.visible");
+});
+
+Cypress.Commands.add("visitBag", () => {
+    cy.visit("/bag");
+    cy.location("pathname").should("eq", "/bag");
+    cy.contains("My Bag").should("be.visible");
+});
+
+Cypress.Commands.add("visitLogInPage", () => {
+    cy.visit("/login");
+    cy.location("pathname").should("eq", "/login");
+    cy.contains("Log In").should("be.visible");
+});
+
+Cypress.Commands.add("visitCreateAccountPage", () => {
+    cy.visit("/create-account");
+    cy.location("pathname").should("eq", "/create-account");
+    cy.contains("Create Account").should("be.visible");
+});
+
+Cypress.Commands.add("visitAddProductPage", () => {
+    cy.visit("/admin/products/add-product");
+    cy.location("pathname").should("eq", "/admin/products/add-product");
+    cy.contains("Add Product").should("be.visible");
+});
+
+Cypress.Commands.add("visitOrdersPage", () => {
+    cy.visit("/orders");
+    cy.location("pathname").should("eq", "/orders");
+    cy.contains("My Orders").should("be.visible");
+});
+
+Cypress.Commands.add("visitAdminOrdersPage", () => {
+    cy.visit("/admin/orders");
+    cy.location("pathname").should("eq", "/admin/orders");
+    cy.contains("Orders").should("be.visible");
+});
+
+Cypress.Commands.add("visitTestAdminProduct", (testProductUrl) => {
+    cy.visit(testProductUrl);
+    cy.location("pathname").should("eq", testProductUrl);
+    cy.contains("Edit Product").should("be.visible");
+});
+
+Cypress.Commands.add("visitTestProduct", (testProductUrl) => {
+    cy.visit(testProductUrl);
+    cy.location("pathname").should("eq", testProductUrl);
+    cy.contains("White & medium dark print").should("be.visible");
 });
 
 Cypress.Commands.add("logInAsAdmin", () => {
@@ -103,20 +184,24 @@ Cypress.Commands.add("logInFromCurrent", () => {
     cy.wait("@auth-check");
 });
 
-Cypress.Commands.add("lessThanSmallBreakpoint", () => {
+Cypress.Commands.add("breakpointLessThanSmall", () => {
     cy.viewport(639, 600);
 });
 
-Cypress.Commands.add("smallBreakpoint", () => {
+Cypress.Commands.add("breakpointSmall", () => {
     cy.viewport(640, 600);
 });
 
-Cypress.Commands.add("largeBreakpoint", () => {
+Cypress.Commands.add("breakpointLessThanLarge", () => {
+    cy.viewport(1023, 600);
+});
+
+Cypress.Commands.add("breakpointLarge", () => {
     cy.viewport(1024, 600);
 });
 
-Cypress.Commands.add("lessThanLargeBreakpoint", () => {
-    cy.viewport(1023, 600);
+Cypress.Commands.add("performTestScroll", () => {
+    cy.scrollTo("bottom", { ensureScrollable: false });
 });
 
 Cypress.Commands.add("assertNoScroll", () => {
@@ -135,17 +220,18 @@ Cypress.Commands.add("assertScrollHookCssNotExist", () => {
     cy.get("body").should("not.have.css", "position", "fixed");
 });
 
-Cypress.Commands.add("performTestScroll", () => {
-    cy.scrollTo("bottom", { ensureScrollable: false });
+Cypress.Commands.add("assertFormMessage", (expectedMessage) => {
+    cy.get("#overall-action-container").contains("button", /^Add$/).click();
+    cy.get("#overall-message-container").contains(expectedMessage).should("be.visible");
+});
+
+Cypress.Commands.add("assertTableMessage", (expectedMessage) => {
+    cy.get("#stock-table-button-container").contains("button", /^Add$/).click();
+    cy.get("#stock-table-message-container").contains(expectedMessage).should("be.visible");
 });
 
 Cypress.Commands.add("awaitPathnameSettle", () => {
     cy.wait(100); // prevent modals from prematurely closing from preceding pathname change
-});
-
-Cypress.Commands.add("visitHomeAwaitPathnameSettle", () => {
-    cy.visitHome();
-    cy.awaitPathnameSettle();
 });
 
 Cypress.Commands.add("awaitInputBlur", () => {
@@ -156,24 +242,40 @@ Cypress.Commands.add("awaitTableSettle", () => {
     cy.wait(100); // table row addition is very flaky without this
 });
 
-Cypress.Commands.add("visitTestAdminProduct", (testProductUrl) => {
-    cy.visit(testProductUrl);
-    cy.location("pathname").should("eq", testProductUrl);
-    cy.contains("Edit Product").should("be.visible");
+Cypress.Commands.add("awaitWishlistUpdate", () => {
+    cy.wait(300); // for fixed delayed wishlist update
 });
 
-Cypress.Commands.add("visitTestProduct", (testProductUrl) => {
-    cy.visit(testProductUrl);
-    cy.location("pathname").should("eq", testProductUrl);
-    cy.contains("White & medium dark print").should("be.visible");
+Cypress.Commands.add("awaitFilterUpdate", () => {
+    cy.get("#loading-indicator").should("exist");
+    cy.wait(400); // for fixed minimum throttling period
+    cy.get("#loading-indicator").should("not.exist");
 });
 
-Cypress.Commands.add("assertFormMessage", (expectedMessage) => {
-    cy.get("#overall-action-container").contains("button", /^Add$/).click();
-    cy.get("#overall-message-container").contains(expectedMessage).should("be.visible");
+Cypress.Commands.add("resetDb", () => {
+    cy.exec("npm run db:reset:test");
 });
 
-Cypress.Commands.add("assertTableMessage", (expectedMessage) => {
-    cy.get("#stock-table-button-container").contains("button", /^Add$/).click();
-    cy.get("#stock-table-message-container").contains(expectedMessage).should("be.visible");
+Cypress.Commands.add("resetUserCheckouts", () => {
+    cy.visitBag();
+});
+
+Cypress.Commands.add("openSizeAccordionDesktop", () => {
+    cy.get(".desktop-filtering").contains("button", "Size").click();
+    cy.get(".desktop-filtering .size-btn-container").should("be.visible");
+});
+
+Cypress.Commands.add("openSizeAccordionMobile", () => {
+    cy.get(".mobile-filtering").contains("button", "Size").click();
+    cy.get(".mobile-filtering .size-btn-container").should("be.visible");
+});
+
+Cypress.Commands.add("openPriceAccordionDesktop", () => {
+    cy.get(".desktop-filtering").contains("button", "Price").click();
+    cy.get(".desktop-filtering .price-btn-container").should("be.visible");
+});
+
+Cypress.Commands.add("openPriceAccordionMobile", () => {
+    cy.get(".mobile-filtering").contains("button", "Price").click();
+    cy.get(".mobile-filtering .price-btn-container").should("be.visible");
 });

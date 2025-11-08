@@ -8,9 +8,7 @@ const testProduct = buildTestProduct();
 describe("Add product page", () => {
     beforeEach(() => {
         cy.logInAsAdmin();
-        cy.visit("/admin/products/add-product");
-        cy.location("pathname").should("eq", "/admin/products/add-product");
-        cy.contains("Add Product").should("be.visible");
+        cy.visitAddProductPage();
         cy.awaitTableSettle();
 
         cy.get("input[name='product-name']").type(testProduct.name);
