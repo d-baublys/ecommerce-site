@@ -3,7 +3,7 @@ import { getProducts } from "./actions";
 import { Categories, PriceFilterId, ProductSortId, Sizes } from "./types";
 import { PRICE_FILTER_OPTIONS, SORT_OPTIONS } from "./constants";
 
-export async function fetchFilteredProducts({
+export async function getFilteredProducts({
     category,
     sizeFilters = [],
     priceFilters = [],

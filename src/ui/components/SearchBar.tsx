@@ -1,7 +1,7 @@
 "use client";
 
 import { getProducts } from "@/lib/actions";
-import { fetchFilteredProducts } from "@/lib/fetching-utils";
+import { getFilteredProducts } from "@/lib/fetching-utils";
 import { Categories, ClientProduct, StateSetter } from "@/lib/types";
 import { debounce } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -48,7 +48,7 @@ export default function SearchBar(props: SearchBarProps) {
     useEffect(() => {
         const getData = async () => {
             const productFetch = options.isGlobalSearch
-                ? await fetchFilteredProducts({ category: "all" })
+                ? await getFilteredProducts({ category: "all" })
                 : (await getProducts())?.data;
 
             setProductList(productFetch);
