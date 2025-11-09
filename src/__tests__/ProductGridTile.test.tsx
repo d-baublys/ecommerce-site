@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import ProductGridTile from "@/ui/components/cards/ProductGridTile";
-import { ClientProduct } from "@/lib/types";
-import { buildTestProduct } from "@/lib/test-factories";
+import { ClientProduct, ReservedItem } from "@/lib/types";
+import { buildReservedItem, buildTestProduct } from "@/lib/test-factories";
 import { act } from "react";
 import { axe, toHaveNoViolations } from "jest-axe";
 
@@ -11,9 +11,22 @@ const testStockedProduct: ClientProduct = buildTestProduct({
     overrides: { stock: { s: 3, m: 0, l: 8 } },
 });
 const testUnstockedProduct: ClientProduct = buildTestProduct({ overrides: { stock: { s: 0 } } });
-
-const renderAndGetTile = (product: ClientProduct = testStockedProduct) => {
-    render(<ProductGridTile product={product} groupedReservedItems={[]} />);
+const testReservedItems = Array.from({ length: 3 }, () =>
+    buildReservedItem({ size: "s", quantity: 1 })
+);
+const renderAndGetTile = ({
+    product,
+    groupedReservedItems,
+}: {
+    product?: ClientProduct;
+    groupedReservedItems?: ReservedItem[];
+} = {}) => {
+    render(
+        <ProductGridTile
+            product={product ?? testStockedProduct}
+            groupedReservedItems={groupedReservedItems ?? []}
+        />
+    );
     const tile = screen.getByText("Test Product 1").closest("div");
     if (!tile) throw new Error("No tile found");
     return tile;
@@ -54,20 +67,32 @@ describe("ProductGridTile", () => {
         jest.useRealTimers();
     });
 
-    it("only shows buttons for extant size stock", () => {
+    it("shows only buttons for extant size stock", () => {
         const tile = renderAndGetTile();
         fireEvent.mouseEnter(tile);
 
         const button = screen.getByRole("button", { name: "Quick Add" });
-        fireEvent.click(button!);
+        fireEvent.click(button);
 
         expect(screen.getByRole("button", { name: "S" })).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: "L" })).toBeInTheDocument();
         expect(screen.queryByRole("button", { name: "M" })).not.toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "L" })).toBeInTheDocument();
+    });
+
+    it("doesn't show buttons for sizes which are out of stock due to reserved items", async () => {
+        const tile = renderAndGetTile({ groupedReservedItems: testReservedItems });
+        fireEvent.mouseEnter(tile);
+
+        const button = screen.getByRole("button", { name: "Quick Add" });
+        fireEvent.click(button);
+
+        expect(screen.queryByRole("button", { name: "S" })).not.toBeInTheDocument();
+        expect(screen.queryByRole("button", { name: "M" })).not.toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "L" })).toBeInTheDocument();
     });
 
     it("shows out of stock instead of quick add for unstocked products", () => {
-        const tile = renderAndGetTile(testUnstockedProduct);
+        const tile = renderAndGetTile({ product: testUnstockedProduct });
         fireEvent.mouseEnter(tile);
 
         expect(screen.queryByRole("button", { name: "Quick Add" })).not.toBeInTheDocument();
@@ -79,7 +104,7 @@ describe("ProductGridTile", () => {
         fireEvent.mouseEnter(tile);
 
         const quickAdd = screen.getByRole("button", { name: "Quick Add" });
-        fireEvent.click(quickAdd!);
+        fireEvent.click(quickAdd);
         const sizeBtn = screen.getByRole("button", { name: "S" });
         fireEvent.click(sizeBtn);
 

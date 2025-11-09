@@ -1,10 +1,9 @@
-import { buildTestProduct } from "@/lib/test-factories";
-import { getConsoleErrorSpy } from "@/lib/test-utils";
+import { buildReservedItem, buildTestProduct } from "@/lib/test-factories";
+import { getConsoleErrorSpy, getFetchResolutionHelper } from "@/lib/test-utils";
 import { buildProductUrl } from "@/lib/utils";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import ProductPage from "@/app/products/[id]/[slug]/page";
 import { useBagStore } from "@/stores/bagStore";
-import { Product } from "@/lib/types";
 
 jest.mock("@/lib/actions", () => ({
     getProducts: jest.fn(),
@@ -21,6 +20,7 @@ jest.mock("next/navigation", () => ({
 }));
 
 const testProduct = buildTestProduct();
+const reservedItems = [buildReservedItem()];
 const getLatestBag = () => useBagStore.getState().bag;
 const { clearBag } = useBagStore.getState();
 
@@ -31,10 +31,7 @@ const renderPage = async () =>
         })
     );
 
-const setUpResolvedFetch = (resolvedProducts: Product[] = [testProduct]) => {
-    (getProducts as jest.Mock).mockResolvedValue({ data: resolvedProducts });
-    (getReservedItems as jest.Mock).mockResolvedValue({ data: [] });
-};
+const setUpResolvedFetch = getFetchResolutionHelper([testProduct]);
 
 describe("ProductPage", () => {
     beforeEach(() => {
@@ -50,7 +47,7 @@ describe("ProductPage", () => {
     });
 
     it("invokes notFound when provided slug returns no matching products", async () => {
-        setUpResolvedFetch([]);
+        setUpResolvedFetch({ resolvedProducts: [] });
 
         expect(renderPage()).rejects.toThrow("notFound called");
     });
@@ -181,5 +178,25 @@ describe("ProductPage", () => {
         });
 
         expect(getLatestBag()[0].quantity).toBe(itemLimit);
+    });
+
+    it("caps available stock if there are relevant reserved items", async () => {
+        setUpResolvedFetch({ resolvedReserved: reservedItems });
+        await renderPage();
+
+        const btn = screen.getByRole("button", { name: "Add to Bag" });
+        const selectedOption = screen.getByRole("option", { name: "M" });
+
+        expect(selectedOption).not.toBeDisabled();
+        expect(selectedOption).toHaveTextContent(`M`);
+
+        fireEvent.change(screen.getByLabelText("Size selection"), { target: { value: "m" } });
+
+        act(() => {
+            fireEvent.click(btn);
+        });
+
+        expect(selectedOption).toBeDisabled();
+        expect(selectedOption).toHaveTextContent(`M - out of stock`);
     });
 });

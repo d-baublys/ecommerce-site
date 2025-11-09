@@ -1,6 +1,5 @@
 import {
     Gender,
-    Prisma,
     PrismaClient,
     Product as PrismaProduct,
     Sizes as PrismaSizes,

@@ -2,7 +2,6 @@ import { getFilteredTestProducts } from "@/lib/test-factories";
 import { render, screen, waitFor } from "@testing-library/react";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import WishlistPage from "@/app/wishlist/page";
-import { Product, ReservedItem } from "@/lib/types";
 
 jest.mock("next/navigation", () => ({
     usePathname: () => "/wishlist",
@@ -13,25 +12,16 @@ jest.mock("@/lib/actions", () => ({
     getReservedItems: jest.fn(),
 }));
 
-import { getProducts, getReservedItems } from "@/lib/actions";
+import { getFetchResolutionHelper } from "@/lib/test-utils";
 
-const { addToWishlist, clearWishlist } = useWishlistStore.getState();
+const { clearWishlist } = useWishlistStore.getState();
 const testProductList = getFilteredTestProducts();
 
 const renderWishlistPage = () => render(<WishlistPage />);
-const setUpTestWishlist = () =>
-    testProductList.forEach((item) => {
-        addToWishlist(item.id);
-    });
+
 const getAllTiles = () => screen.getAllByTestId("product-tile");
 
-const setUpResolvedFetch = (
-    resolvedProducts: Product[] = [],
-    resolvedReserved: ReservedItem[] = []
-) => {
-    (getProducts as jest.Mock).mockResolvedValue({ data: resolvedProducts });
-    (getReservedItems as jest.Mock).mockResolvedValue({ data: resolvedReserved });
-};
+const setUpResolvedFetch = getFetchResolutionHelper(testProductList);
 
 describe("WishlistPage", () => {
     beforeEach(() => {
@@ -39,7 +29,7 @@ describe("WishlistPage", () => {
     });
 
     it("shows correct number of items", async () => {
-        setUpResolvedFetch(testProductList);
+        setUpResolvedFetch();
         renderWishlistPage();
 
         await waitFor(() => {
@@ -48,7 +38,7 @@ describe("WishlistPage", () => {
     });
 
     it("shows fallback text when wishlist is empty", async () => {
-        setUpResolvedFetch();
+        setUpResolvedFetch({ resolvedProducts: [] });
         renderWishlistPage();
 
         await waitFor(() => {

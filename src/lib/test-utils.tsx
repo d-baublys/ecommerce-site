@@ -1,4 +1,6 @@
 import React from "react";
+import { ClientProduct, ReservedItem } from "./types";
+import { getProducts, getReservedItems } from "./actions";
 
 class ErrorBoundary extends React.Component<
     { children: React.ReactNode },
@@ -48,4 +50,17 @@ export function matchPriceRangeLabel(
 
 export function getConsoleErrorSpy() {
     return jest.spyOn(console, "error").mockImplementation(() => {});
+}
+
+export function getFetchResolutionHelper(defaultProducts: ClientProduct[]) {
+    return ({
+        resolvedProducts,
+        resolvedReserved,
+    }: {
+        resolvedProducts?: ClientProduct[];
+        resolvedReserved?: ReservedItem[];
+    } = {}) => {
+        (getProducts as jest.Mock).mockResolvedValue({ data: resolvedProducts ?? defaultProducts });
+        (getReservedItems as jest.Mock).mockResolvedValue({ data: resolvedReserved ?? [] });
+    };
 }

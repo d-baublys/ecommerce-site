@@ -58,16 +58,19 @@ export function buildTestProductList(): ClientProduct[] {
     return products;
 }
 
-export function buildLongProductList(): Product[] {
+export function buildLongProductList(): ClientProduct[] {
     return Array.from({ length: 10 }).map((_, idx) => buildTestProduct({ idx }));
 }
 
-export function buildReservedItem(): ReservedItem {
+export function buildReservedItem(
+    overrides: Partial<ReservedItem & { idx: number }> = {}
+): ReservedItem {
     return {
-        id: "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1",
-        productId: "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa2",
+        id: `aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa${overrides?.idx ?? 1}`,
+        productId: `aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa${overrides?.idx ?? 1}`,
         size: "m",
         quantity: 2,
+        ...overrides,
     };
 }
 

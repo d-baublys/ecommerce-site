@@ -7,7 +7,7 @@ import {
 } from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { Product, ReservedItem } from "@/lib/types";
+import { ClientProduct, ReservedItem } from "@/lib/types";
 import { buildBagItem } from "@/lib/utils";
 import { act } from "react";
 
@@ -41,14 +41,14 @@ jest.mock("@/auth", () => ({
 
 import { useSession } from "next-auth/react";
 import { getProducts, getReservedItems } from "@/lib/actions";
-import { getConsoleErrorSpy, wrapWithErrorBoundary } from "@/lib/test-utils";
+import { getConsoleErrorSpy, getFetchResolutionHelper, wrapWithErrorBoundary } from "@/lib/test-utils";
 
 const { addToBag, clearBag } = useBagStore.getState();
 const testBagData = buildTestBagItemList();
 const testBagItems = testBagData.bagItems;
 const testProducts = testBagData.products;
 const bagUpdatedData = getTestUpdatedData();
-const reservedItems = [buildReservedItem()];
+const reservedItems = [buildReservedItem({ idx: 2 })];
 
 const renderBagPage = async () => render(await BagPage());
 const setUpTestBag = () =>
@@ -75,10 +75,8 @@ const getSessionWithoutAuth = () => {
     });
 };
 
-const setUpResolvedFetch = (resolvedProducts: Product[], resolvedReserved: ReservedItem[] = []) => {
-    (getProducts as jest.Mock).mockResolvedValue({ data: resolvedProducts });
-    (getReservedItems as jest.Mock).mockResolvedValue({ data: resolvedReserved });
-};
+const setUpResolvedFetch = getFetchResolutionHelper(testProducts);
+
 const getAllTiles = () => within(screen.getByTestId("bag-tile-ul")).getAllByRole("listitem");
 
 describe("BagPage auth-agnostic tests", () => {
@@ -89,7 +87,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("shows correct bag subtotal", async () => {
         setUpTestBag();
-        setUpResolvedFetch(testProducts);
+        setUpResolvedFetch();
         act(() => {
             renderBagPage();
         });
@@ -100,7 +98,7 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("shows fallback text when bag is empty", async () => {
-        setUpResolvedFetch([]);
+        setUpResolvedFetch({ resolvedProducts: [] });
         act(() => {
             renderBagPage();
         });
@@ -124,7 +122,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("updates subtotal if available stock has decreased to below bag quantity", async () => {
         setUpTestBag();
-        setUpResolvedFetch(bagUpdatedData);
+        setUpResolvedFetch({ resolvedProducts: bagUpdatedData });
         act(() => {
             renderBagPage();
         });
@@ -136,7 +134,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("preselects correct quantities", async () => {
         setUpTestBag();
-        setUpResolvedFetch(testProducts);
+        setUpResolvedFetch();
         act(() => {
             renderBagPage();
         });
@@ -151,7 +149,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("updates quantity selections & shows info modal on page load if available stock has decreased to below bag quantity", async () => {
         setUpTestBag();
-        setUpResolvedFetch(bagUpdatedData);
+        setUpResolvedFetch({ resolvedProducts: bagUpdatedData });
         act(() => {
             renderBagPage();
         });
@@ -170,7 +168,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("updates quantity selections & shows info modal on page load if there are relevant reserved items", async () => {
         setUpTestBag();
-        setUpResolvedFetch(testProducts, reservedItems);
+        setUpResolvedFetch({ resolvedReserved: reservedItems });
         act(() => {
             renderBagPage();
         });
@@ -193,7 +191,7 @@ describe("BagPage auth-agnostic tests", () => {
         const mockBagItem = buildBagItem(testProduct, "s");
 
         addToBag(testProduct, mockBagItem);
-        setUpResolvedFetch([latestTestProduct]);
+        setUpResolvedFetch({ resolvedProducts: [latestTestProduct] });
         act(() => {
             renderBagPage();
         });
@@ -210,7 +208,7 @@ describe("BagPage auth-agnostic tests", () => {
         const testProduct = buildTestProduct();
 
         addToBag(testProduct, buildBagItem(testProduct, "m"));
-        setUpResolvedFetch([testProduct]);
+        setUpResolvedFetch({ resolvedProducts: [testProduct] });
         act(() => {
             renderBagPage();
         });
@@ -231,7 +229,7 @@ describe("BagPage auth-agnostic tests", () => {
 
         addToBag(testProduct, buildBagItem(testProduct, "s"));
         addToBag(testProduct, buildBagItem(testProduct, "s"));
-        setUpResolvedFetch([testProduct]);
+        setUpResolvedFetch({ resolvedProducts: [testProduct] });
         act(() => {
             renderBagPage();
         });
@@ -256,7 +254,7 @@ describe("BagPage auth-agnostic tests", () => {
         const testProduct = buildTestProduct({ overrides: { stock: { s: itemLimit + 5 } } });
 
         addToBag(testProduct, buildBagItem(testProduct, "s"));
-        setUpResolvedFetch([testProduct]);
+        setUpResolvedFetch({ resolvedProducts: [testProduct] });
         act(() => {
             renderBagPage();
         });
@@ -271,7 +269,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("removes items from bag as expected", async () => {
         setUpTestBag();
-        setUpResolvedFetch(testProducts);
+        setUpResolvedFetch();
         act(() => {
             renderBagPage();
         });
@@ -296,7 +294,7 @@ describe("BagPage auth-agnostic tests", () => {
 
         addToBag(testProduct, buildBagItem(testProduct, "s"));
         addToBag(testProduct, buildBagItem(testProduct, "m"));
-        setUpResolvedFetch([testProduct]);
+        setUpResolvedFetch({ resolvedProducts: [testProduct] });
         act(() => {
             renderBagPage();
         });
@@ -311,7 +309,7 @@ describe("BagPage auth-agnostic tests", () => {
 
         addToBag(testProduct, buildBagItem(testProduct, "s"));
         addToBag(testProduct, buildBagItem(testProduct, "m"));
-        setUpResolvedFetch([testProduct]);
+        setUpResolvedFetch({ resolvedProducts: [testProduct] });
         act(() => {
             renderBagPage();
         });
@@ -324,7 +322,7 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("doesn't render checkout button & shows correct shipping when bag is empty", async () => {
-        setUpResolvedFetch([]);
+        setUpResolvedFetch({ resolvedProducts: [] });
         act(() => {
             renderBagPage();
         });
@@ -351,7 +349,7 @@ describe("BagPage authenticated tests", () => {
         } as Response);
 
         setUpTestBag();
-        setUpResolvedFetch(testProducts);
+        setUpResolvedFetch();
         act(() => {
             renderBagPage();
         });
@@ -375,7 +373,7 @@ describe("BagPage authenticated tests", () => {
 
     it("updates quantity selections & shows info modal on checkout click if available stock has decreased to below bag quantity", async () => {
         setUpTestBag();
-        setUpResolvedFetch(testProducts);
+        setUpResolvedFetch();
         act(() => {
             renderBagPage();
         });
@@ -387,7 +385,7 @@ describe("BagPage authenticated tests", () => {
             expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("2");
         });
 
-        setUpResolvedFetch(bagUpdatedData);
+        setUpResolvedFetch({ resolvedProducts: bagUpdatedData });
 
         fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
 
@@ -405,7 +403,7 @@ describe("BagPage authenticated tests", () => {
 
     it("updates quantity selections & shows info modal on checkout click if there are relevant reserved items", async () => {
         setUpTestBag();
-        setUpResolvedFetch(testProducts);
+        setUpResolvedFetch();
         act(() => {
             renderBagPage();
         });
@@ -417,7 +415,7 @@ describe("BagPage authenticated tests", () => {
             expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("2");
         });
 
-        setUpResolvedFetch(testProducts, reservedItems);
+        setUpResolvedFetch({ resolvedReserved: reservedItems });
 
         fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
 
