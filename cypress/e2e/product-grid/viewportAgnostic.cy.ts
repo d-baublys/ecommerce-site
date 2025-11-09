@@ -1,4 +1,4 @@
-import { matchPriceRangeLabel } from "../../../src/lib/test-utils";
+import { matchPriceRangeLabel, matchSizeLabel } from "../../../src/lib/test-utils";
 
 describe("Product grid page viewport-agnostic tests", () => {
     beforeEach(() => {
@@ -192,6 +192,61 @@ describe("Product grid page viewport-agnostic tests", () => {
             const sortedDates = [...dates].sort((a, b) => a.getTime() - b.getTime());
 
             expect(dates).to.deep.equal(sortedDates);
+        });
+    });
+
+    it("resets size filters on client-side pathname change", () => {
+        cy.openSizeAccordionDesktop();
+        cy.get(".desktop-filtering .size-btn-container")
+            .contains("button", matchSizeLabel(7, "XXL"))
+            .click();
+        cy.awaitFilterUpdate();
+        cy.get(".grid-tile-container .product-tile").should("have.length", 7);
+        cy.contains(/7\s*Items/).should("be.visible");
+
+        cy.get("nav").contains("All").click();
+        cy.get(".grid-tile-container .product-tile").should("have.length", 15);
+        cy.awaitFilterUpdate();
+        cy.contains(/15\s*Items/).should("be.visible");
+    });
+
+    it("resets price filters on client-side pathname change", () => {
+        cy.openPriceAccordionDesktop();
+        cy.get(".desktop-filtering .price-btn-container")
+            .contains("button", matchPriceRangeLabel(1, "200"))
+            .click();
+        cy.awaitFilterUpdate();
+        cy.get(".grid-tile-container .product-tile").should("have.length", 1);
+        cy.contains(/1\s*Item/).should("be.visible");
+
+        cy.get("nav").contains("All").click();
+        cy.get(".grid-tile-container .product-tile").should("have.length", 15);
+        cy.awaitFilterUpdate();
+        cy.contains(/15\s*Items/).should("be.visible");
+    });
+
+    it("resets sort on client-side pathname change", () => {
+        cy.get("#sort-select").select("Price (Low to High)");
+        cy.awaitFilterUpdate();
+        cy.get(".tile-price").then((tilePrices) => {
+            const prices = [...tilePrices].map((price) =>
+                parseFloat(price.innerText.replace("£", ""))
+            );
+            const sortedAsc = [...prices].sort((a, b) => a - b);
+
+            expect(prices).to.deep.equal(sortedAsc);
+        });
+
+        cy.get("nav").contains("All").click();
+        cy.get(".grid-tile-container .product-tile").should("have.length", 15);
+        cy.awaitFilterUpdate();
+        cy.get(".tile-price").then(($tilePrices) => {
+            const prices = [...$tilePrices].map((price) =>
+                parseFloat(price.innerText.replace("£", ""))
+            );
+            const sortedDesc = [...prices].sort((a, b) => b - a);
+
+            expect(prices).to.not.deep.equal(sortedDesc);
         });
     });
 });

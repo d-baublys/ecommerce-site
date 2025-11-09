@@ -123,6 +123,19 @@ export default function CategoryGridPage({
     }, [category, sizeFilters, priceFilters, productSort, query]);
 
     useEffect(() => {
+        setSizeFilters(extractFilters<Sizes>(currSizeFilters, VALID_SIZES));
+
+        setPriceFilters(
+            extractFilters<PriceFilterId>(
+                currPriceFilters,
+                Object.keys(PRICE_FILTER_OPTIONS) as PriceFilterId[]
+            )
+        );
+
+        setProductSort(extractSort(currSort));
+    }, [currSizeFilters, currPriceFilters, currSort]);
+
+    useEffect(() => {
         if (sizeFilters.length) {
             paramsSetter.set("s", sizeFilters.join("|"));
         } else {
