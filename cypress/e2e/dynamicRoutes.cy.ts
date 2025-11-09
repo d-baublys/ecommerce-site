@@ -1,3 +1,4 @@
+import { fakeUuid } from "../../src/lib/test-factories";
 import { CypressTestProductData } from "../../src/lib/types";
 import { buildProductUrl } from "../../src/lib/utils";
 
@@ -23,7 +24,7 @@ describe("Dynamic route redirects", () => {
     });
 
     it("redirects 'products' routes without a slug segment", () => {
-        cy.visit("/products/aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1");
+        cy.visit(`/products/${fakeUuid}`);
         cy.location("pathname").should("eq", "/category/all");
     });
 

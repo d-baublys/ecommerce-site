@@ -205,8 +205,8 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.contains(/7\s*Items/).should("be.visible");
 
         cy.get("nav").contains("All").click();
-        cy.get(".grid-tile-container .product-tile").should("have.length", 15);
         cy.awaitFilterUpdate();
+        cy.get(".grid-tile-container .product-tile").should("have.length", 15);
         cy.contains(/15\s*Items/).should("be.visible");
     });
 
@@ -220,8 +220,8 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.contains(/1\s*Item/).should("be.visible");
 
         cy.get("nav").contains("All").click();
-        cy.get(".grid-tile-container .product-tile").should("have.length", 15);
         cy.awaitFilterUpdate();
+        cy.get(".grid-tile-container .product-tile").should("have.length", 15);
         cy.contains(/15\s*Items/).should("be.visible");
     });
 
@@ -238,8 +238,8 @@ describe("Product grid page viewport-agnostic tests", () => {
         });
 
         cy.get("nav").contains("All").click();
-        cy.get(".grid-tile-container .product-tile").should("have.length", 15);
         cy.awaitFilterUpdate();
+        cy.get(".grid-tile-container .product-tile").should("have.length", 15);
         cy.get(".tile-price").then(($tilePrices) => {
             const prices = [...$tilePrices].map((price) =>
                 parseFloat(price.innerText.replace("£", ""))

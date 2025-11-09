@@ -172,7 +172,7 @@ describe("Navbar base tests", () => {
         cy.logInAsAdmin();
         cy.awaitPathnameSettle();
         cy.get("[aria-label='Menu']").click();
-        cy.get("#nav-mobile-menu").should("be.visible");
+        cy.get("#nav-mobile-menu").should("exist").and("be.visible");
         cy.get("#nav-mobile-menu [aria-label='Admin']").should("exist");
         cy.get("#nav-mobile-menu [aria-label='Account']").click();
         cy.get("#account-menu").should("be.visible");

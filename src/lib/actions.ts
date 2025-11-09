@@ -112,14 +112,9 @@ export async function updateProduct(productData: ClientProduct): CreateUpdateDel
 
 export async function deleteProduct(id: Product["id"]): CreateUpdateDeleteActionResponse {
     try {
-        await prisma.$transaction([
-            prisma.stock.deleteMany({
-                where: { productId: id },
-            }),
-            prisma.product.delete({
-                where: { id },
-            }),
-        ]);
+        await prisma.product.delete({
+            where: { id },
+        });
         return { success: true };
     } catch {
         return { success: false };

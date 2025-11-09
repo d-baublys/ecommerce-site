@@ -26,7 +26,7 @@ export function buildTestProduct({
     const name = `Test Product ${idx}`;
 
     return {
-        id: `aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa${idx}`,
+        id: `${getSlicedUuid(idx)}${idx}`,
         name,
         gender: VALID_CATEGORIES[0].id,
         price: 2500,
@@ -65,9 +65,11 @@ export function buildLongProductList(): ClientProduct[] {
 export function buildReservedItem(
     overrides: Partial<ReservedItem & { idx: number }> = {}
 ): ReservedItem {
+    const idx = overrides?.idx ?? 1;
+
     return {
-        id: `aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa${overrides?.idx ?? 1}`,
-        productId: `aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa${overrides?.idx ?? 1}`,
+        id: `${getSlicedUuid(idx)}${idx}`,
+        productId: `${getSlicedUuid(idx)}${idx}`,
         size: "m",
         quantity: 2,
         ...overrides,
@@ -283,4 +285,10 @@ export function buildTestOrderDataCypress({
     }
 
     return orderCreateData;
+}
+
+export const fakeUuid = "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1";
+
+export function getSlicedUuid(endString: string | number) {
+    return fakeUuid.slice(0, -String(endString).length);
 }

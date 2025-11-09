@@ -1,4 +1,4 @@
-import { getFilteredTestProducts } from "@/lib/test-factories";
+import { getFilteredTestProducts, getSlicedUuid } from "@/lib/test-factories";
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { axe, toHaveNoViolations } from "jest-axe";
 import SearchOverlay from "@/ui/components/overlays/SearchOverlay";
@@ -85,9 +85,7 @@ describe("SearchOverlay", () => {
         const firstSuggestion = within(getSuggestionsContainer()).getAllByRole("listitem")[0];
         fireEvent.click(firstSuggestion);
 
-        expect(pushMock).toHaveBeenCalledWith(
-            "/products/aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1/test-product-1"
-        );
+        expect(pushMock).toHaveBeenCalledWith(`/products/${getSlicedUuid(1)}1/test-product-1`);
     });
 
     it("has no accessibility violations", async () => {
