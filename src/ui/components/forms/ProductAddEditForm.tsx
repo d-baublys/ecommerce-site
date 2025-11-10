@@ -120,10 +120,10 @@ export default function ProductAddEditForm({ productData }: { productData?: Clie
         const deleteConfirm = await openModal();
 
         if (deleteConfirm) {
-            try {
-                await deleteProduct(id);
+            const result = await deleteProduct(id);
+            if (result.success) {
                 router.push(`./`);
-            } catch {
+            } else {
                 setMessage("Error deleting product");
             }
         }
