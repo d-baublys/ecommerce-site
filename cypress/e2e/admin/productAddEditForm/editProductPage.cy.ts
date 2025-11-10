@@ -24,11 +24,7 @@ describe("Edit product page", () => {
     });
 
     after(() => {
-        if (productIds.length) {
-            cy.task("deleteTestData", {
-                productIds,
-            });
-        }
+        cy.clearTestData({ productIds });
     });
 
     it("shows 'delete' button", () => {

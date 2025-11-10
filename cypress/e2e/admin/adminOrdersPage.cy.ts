@@ -64,12 +64,7 @@ describe("Admin orders page seeded tests", () => {
     });
 
     after(() => {
-        if (orderIds.length || productIds.length) {
-            cy.task("deleteTestData", {
-                orderIds,
-                productIds,
-            });
-        }
+        cy.clearTestData({ productIds, orderIds });
     });
 
     it("renders correct number of table rows", () => {

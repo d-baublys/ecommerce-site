@@ -27,10 +27,8 @@ describe("Add product page", () => {
 
     afterEach(() => {
         if (productNames.length) {
-            cy.task("getTestProductMultipleIds", productNames).then((productIds) => {
-                cy.task("deleteTestData", {
-                    productIds,
-                });
+            cy.task("getTestProductMultipleIds", productNames).then((productIds: string[]) => {
+                cy.clearTestData({ productIds });
             });
         }
     });

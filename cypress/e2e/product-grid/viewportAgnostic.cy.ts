@@ -204,7 +204,7 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.get(".grid-tile-container .product-tile").should("have.length", 7);
         cy.contains(/7\s*Items/).should("be.visible");
 
-        cy.get("nav").contains("All").click();
+        cy.get("#breadcrumbs").contains("All").click();
         cy.awaitFilterUpdate();
         cy.get(".grid-tile-container .product-tile").should("have.length", 15);
         cy.contains(/15\s*Items/).should("be.visible");
@@ -219,7 +219,7 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.get(".grid-tile-container .product-tile").should("have.length", 1);
         cy.contains(/1\s*Item/).should("be.visible");
 
-        cy.get("nav").contains("All").click();
+        cy.get("#breadcrumbs").contains("All").click();
         cy.awaitFilterUpdate();
         cy.get(".grid-tile-container .product-tile").should("have.length", 15);
         cy.contains(/15\s*Items/).should("be.visible");
@@ -237,7 +237,7 @@ describe("Product grid page viewport-agnostic tests", () => {
             expect(prices).to.deep.equal(sortedAsc);
         });
 
-        cy.get("nav").contains("All").click();
+        cy.get("#breadcrumbs").contains("All").click();
         cy.awaitFilterUpdate();
         cy.get(".grid-tile-container .product-tile").should("have.length", 15);
         cy.get(".tile-price").then(($tilePrices) => {

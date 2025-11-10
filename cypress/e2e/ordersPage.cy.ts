@@ -1,4 +1,4 @@
-import { CypressTestDataDeleteParams, CypressTestProductData } from "../../src/lib/types";
+import { CypressTestDataDeleteParams } from "../../src/lib/types";
 
 let orderIds: CypressTestDataDeleteParams["orderIds"] = [];
 let productIds: CypressTestDataDeleteParams["productIds"] = [];
@@ -42,14 +42,7 @@ describe("Orders page authenticated tests", () => {
 
 describe("Orders page authenticated & seeded tests", () => {
     before(() => {
-        cy.task("createCypressTestProduct").then((productData: CypressTestProductData) => {
-            cy.task("createCypressTestOrder", { testProductsData: [productData] }).then(
-                (orderId: CypressTestDataDeleteParams["orderIds"][number]) => {
-                    orderIds.push(orderId);
-                    productIds.push(productData.id);
-                }
-            );
-        });
+        cy.createTestOrder({ productIds, orderIds });
     });
 
     beforeEach(() => {
@@ -58,12 +51,7 @@ describe("Orders page authenticated & seeded tests", () => {
     });
 
     after(() => {
-        if (orderIds.length || productIds.length) {
-            cy.task("deleteTestData", {
-                orderIds,
-                productIds,
-            });
-        }
+        cy.clearTestData({ productIds, orderIds });
     });
 
     it("renders correct number of order tiles", () => {

@@ -1,50 +1,19 @@
 /// <reference types="cypress" />
-// ***********************************************
-// This example commands.ts shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-//
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
 
 import { adminEmail, adminPassword, standardEmail, standardPassword } from "./credentials";
 import "cypress-axe";
 import "cypress-file-upload";
+import {
+    Categories,
+    CypressTestDataDeleteParams,
+    CypressTestProductData,
+} from "../../src/lib/types";
 
 declare global {
     namespace Cypress {
         interface Chainable {
             visitHome(): Chainable<void>;
-            visitCategoryPage(): Chainable<void>;
+            visitCategoryPage(categoryId?: "all" | Categories): Chainable<void>;
             visitWishlist(): Chainable<void>;
             visitBag(): Chainable<void>;
             visitLogInPage(): Chainable<void>;
@@ -52,8 +21,8 @@ declare global {
             visitAddProductPage(): Chainable<void>;
             visitOrdersPage(): Chainable<void>;
             visitAdminOrdersPage(): Chainable<void>;
-            visitTestAdminProduct(testProductUrl: string): Chainable<void>;
             visitTestProduct(testProductUrl: string): Chainable<void>;
+            visitTestAdminProduct(testAdminProductUrl: string): Chainable<void>;
             logInAsAdmin(featuredCount?: number): Chainable<void>;
             logInAsStandardUser(): Chainable<void>;
             logInFromCurrent(): Chainable<void>;
@@ -69,6 +38,7 @@ declare global {
             assertFormMessage(expectedMessage: string): Chainable<void>;
             assertTableMessage(expectedMessage: string): Chainable<void>;
             assertHomeSettled(featuredCount?: number): Chainable<void>;
+            assertBreadcrumbs(targetJoinedBreadcrumbs: string): Chainable<void>;
             awaitInputBlur(): Chainable<void>;
             awaitTableSettle(): Chainable<void>;
             awaitBagUpdate(): Chainable<void>;
@@ -83,6 +53,20 @@ declare global {
             buildTestBag(testProductLink: string): Chainable<void>;
             decrementTestProductStock(testProductAdminLink: string): Chainable<void>;
             createReservedItems(testProductLink: string): Chainable<void>;
+            createTestOrder({
+                orderIds,
+                productIds,
+            }: {
+                productIds: CypressTestDataDeleteParams["productIds"];
+                orderIds: CypressTestDataDeleteParams["orderIds"];
+            }): Chainable<void>;
+            clearTestData({
+                orderIds,
+                productIds,
+            }: {
+                productIds: CypressTestDataDeleteParams["productIds"];
+                orderIds?: CypressTestDataDeleteParams["orderIds"];
+            }): Chainable<void>;
         }
     }
 }
@@ -92,9 +76,9 @@ Cypress.Commands.add("visitHome", () => {
     cy.assertHomeSettled();
 });
 
-Cypress.Commands.add("visitCategoryPage", () => {
-    cy.visit("/category/all");
-    cy.location("pathname").should("eq", "/category/all");
+Cypress.Commands.add("visitCategoryPage", (categoryId) => {
+    cy.visit(`/category/${categoryId ?? "all"}`);
+    cy.location("pathname").should("eq", `/category/${categoryId ?? "all"}`);
     cy.get("#loading-indicator").should("not.exist");
     cy.contains(/\d+\s*Item(s)?/).should("be.visible");
 });
@@ -140,9 +124,9 @@ Cypress.Commands.add("visitAdminOrdersPage", () => {
     cy.contains("Orders").should("be.visible");
 });
 
-Cypress.Commands.add("visitTestAdminProduct", (testProductUrl) => {
-    cy.visit(testProductUrl);
-    cy.location("pathname").should("eq", testProductUrl);
+Cypress.Commands.add("visitTestAdminProduct", (testAdminProductUrl) => {
+    cy.visit(testAdminProductUrl);
+    cy.location("pathname").should("eq", testAdminProductUrl);
     cy.contains("Edit Product").should("be.visible");
     cy.awaitTableSettle();
 });
@@ -243,6 +227,13 @@ Cypress.Commands.add("assertHomeSettled", (featuredCount = 2) => {
     }
 });
 
+Cypress.Commands.add("assertBreadcrumbs", (targetJoinedBreadcrumbs) => {
+    cy.get("#breadcrumbs li").then(($items) => {
+        const joined = [...$items].map((item) => item.innerText).join("");
+        expect(joined).to.equal(targetJoinedBreadcrumbs);
+    });
+});
+
 Cypress.Commands.add("awaitInputBlur", () => {
     cy.wait(200); // for fixed timeout on search bar blur
 });
@@ -334,4 +325,22 @@ Cypress.Commands.add("createReservedItems", (testProductLink) => {
     cy.wait("@create-checkout-session").its("response.statusCode").should("eq", 200);
     cy.get("#loading-indicator").should("not.exist");
     cy.logOut();
+});
+
+Cypress.Commands.add("createTestOrder", ({ productIds, orderIds }) => {
+    cy.task("createCypressTestProduct").then((productData: CypressTestProductData) => {
+        cy.task("createCypressTestOrder", { testProductsData: [productData] }).then(
+            (orderId: CypressTestDataDeleteParams["orderIds"][number]) => {
+                orderIds.push(orderId);
+                productIds.push(productData.id);
+            }
+        );
+    });
+});
+
+Cypress.Commands.add("clearTestData", ({ productIds, orderIds }) => {
+    cy.task("deleteTestData", {
+        orderIds,
+        productIds,
+    });
 });
