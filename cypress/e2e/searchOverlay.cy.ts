@@ -152,7 +152,6 @@ describe("Search overlay base tests", () => {
 describe("Search overlay accessibility tests", () => {
     beforeEach(() => {
         cy.visitHome();
-        cy.wait(500); // need to wait for trap hook initialisation
         cy.get("[aria-label='Search']").click();
         cy.get("#search-overlay-container").should("exist");
     });

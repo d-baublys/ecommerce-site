@@ -41,7 +41,8 @@ export default function SearchOverlay() {
     }, [isSearchLoaded]);
 
     useEffect(() => {
-        closeOverlay();
+        setIsSearchLoaded(false);
+        setIsSearchOpen(false);
     }, [pathname]);
 
     const trapRef = useFocusTrap(isSearchOpen, closeOverlay);
