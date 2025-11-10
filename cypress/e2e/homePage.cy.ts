@@ -10,8 +10,6 @@ describe("Home page", () => {
     });
 
     it("rotates product carousel correctly", () => {
-        cy.get("#featured-1").should("be.visible");
-        cy.get("#featured-2").should("be.visible");
         cy.get("#carousel-slider").then(($slider) => {
             const sliderBounds = $slider[0].getBoundingClientRect();
 

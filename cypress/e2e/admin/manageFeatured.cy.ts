@@ -1,6 +1,6 @@
 describe("Manage featured products page", () => {
     beforeEach(() => {
-        cy.logInAsAdmin();
+        cy.logInAsAdmin(1);
         cy.visit("/admin/manage-featured");
         cy.location("pathname").should("eq", "/admin/manage-featured");
         cy.get("h1").contains("Manage Featured").should("be.visible");

@@ -279,13 +279,10 @@ describe("Bag page populated tests", () => {
     });
 
     it("redirects to log in page on 'checkout' button click after logging out", () => {
-        cy.intercept("POST", "/api/auth/signout").as("sign-out");
         cy.logInAsStandardUser();
         cy.visitBag();
-        cy.awaitPathnameSettle();
         cy.logOut();
-        cy.wait("@sign-out").its("response.statusCode").should("eq", 200);
-        cy.contains("button", "Checkout").click();
+        cy.contains("button", "Checkout").should("be.visible").click();
         cy.location("pathname").should("eq", "/login");
         cy.location("search").should("eq", "?redirect_after=bag");
     });

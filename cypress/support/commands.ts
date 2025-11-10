@@ -44,7 +44,6 @@ declare global {
     namespace Cypress {
         interface Chainable {
             visitHome(): Chainable<void>;
-            visitHomeAwaitPathnameSettle(): Chainable<void>;
             visitCategoryPage(): Chainable<void>;
             visitWishlist(): Chainable<void>;
             visitBag(): Chainable<void>;
@@ -55,7 +54,7 @@ declare global {
             visitAdminOrdersPage(): Chainable<void>;
             visitTestAdminProduct(testProductUrl: string): Chainable<void>;
             visitTestProduct(testProductUrl: string): Chainable<void>;
-            logInAsAdmin(): Chainable<void>;
+            logInAsAdmin(featuredCount?: number): Chainable<void>;
             logInAsStandardUser(): Chainable<void>;
             logInFromCurrent(): Chainable<void>;
             logOut(): Chainable<void>;
@@ -69,7 +68,7 @@ declare global {
             assertScrollHookCssNotExist(): Chainable<void>;
             assertFormMessage(expectedMessage: string): Chainable<void>;
             assertTableMessage(expectedMessage: string): Chainable<void>;
-            awaitPathnameSettle(): Chainable<void>;
+            assertHomeSettled(featuredCount?: number): Chainable<void>;
             awaitInputBlur(): Chainable<void>;
             awaitTableSettle(): Chainable<void>;
             awaitBagUpdate(): Chainable<void>;
@@ -90,13 +89,7 @@ declare global {
 
 Cypress.Commands.add("visitHome", () => {
     cy.visit("/");
-    cy.location("pathname").should("eq", "/");
-    cy.contains("Shop >>>").should("be.visible");
-});
-
-Cypress.Commands.add("visitHomeAwaitPathnameSettle", () => {
-    cy.visitHome();
-    cy.awaitPathnameSettle();
+    cy.assertHomeSettled();
 });
 
 Cypress.Commands.add("visitCategoryPage", () => {
@@ -160,15 +153,14 @@ Cypress.Commands.add("visitTestProduct", (testProductUrl) => {
     cy.contains("White & medium dark print").should("be.visible");
 });
 
-Cypress.Commands.add("logInAsAdmin", () => {
+Cypress.Commands.add("logInAsAdmin", (featuredCount) => {
     cy.intercept("GET", "/api/auth/session").as("auth-check");
     cy.visit("/login");
     cy.get("input[name='email']").type(adminEmail);
     cy.get("input[name='password']").type(adminPassword);
     cy.get("button[type='submit']").click();
     cy.wait("@auth-check");
-    cy.location("pathname").should("eq", "/");
-    cy.contains("Shop >>>").should("be.visible");
+    cy.assertHomeSettled(featuredCount);
 });
 
 Cypress.Commands.add("logInAsStandardUser", () => {
@@ -178,8 +170,7 @@ Cypress.Commands.add("logInAsStandardUser", () => {
     cy.get("input[name='password']").type(standardPassword);
     cy.get("button[type='submit']").click();
     cy.wait("@auth-check");
-    cy.location("pathname").should("eq", "/");
-    cy.contains("Shop >>>").should("be.visible");
+    cy.assertHomeSettled();
 });
 
 Cypress.Commands.add("logOut", () => {
@@ -245,8 +236,11 @@ Cypress.Commands.add("assertTableMessage", (expectedMessage) => {
     cy.get("#stock-table-message-container").contains(expectedMessage).should("be.visible");
 });
 
-Cypress.Commands.add("awaitPathnameSettle", () => {
-    cy.wait(100); // prevent modals from prematurely closing from preceding pathname change
+Cypress.Commands.add("assertHomeSettled", (featuredCount = 2) => {
+    cy.location("pathname").should("eq", "/");
+    for (let i = 0; i < featuredCount; i++) {
+        cy.get(`#featured-${i + 1}`).should("be.visible");
+    }
 });
 
 Cypress.Commands.add("awaitInputBlur", () => {
