@@ -6,11 +6,7 @@ import { useBagStore } from "@/stores/bagStore";
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useRef, useState } from "react";
 import { getReservedItems, getProducts, deleteCheckoutSessions } from "@/lib/actions";
-import {
-    calculateTotalReservedQty,
-    getUniformReservedItems,
-    stringifyConvertPrice,
-} from "@/lib/utils";
+import { stringifyConvertPrice } from "@/lib/utils";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -135,15 +131,6 @@ export default function BagPageClient() {
 
     if (!products || !groupedReservedItems) return null;
 
-    const getReservedQuantity = (
-        productId: ReservedItem["productId"],
-        size: ReservedItem["size"]
-    ) => {
-        return calculateTotalReservedQty(
-            getUniformReservedItems({ items: groupedReservedItems, productId, size })
-        );
-    };
-
     return (
         <>
             <MainLayout subheaderText="My Bag">
@@ -172,14 +159,11 @@ export default function BagPageClient() {
                                         <BagTile
                                             bagItem={bagItem}
                                             productData={productData}
+                                            groupedReservedItems={groupedReservedItems}
                                             handleDelete={() =>
                                                 removeFromBag(bagItem.productId, bagItem.size)
                                             }
                                             modalSetter={setIsFailureModalOpen}
-                                            reservedQty={getReservedQuantity(
-                                                bagItem.productId,
-                                                bagItem.size
-                                            )}
                                         />
                                     </li>
                                 );

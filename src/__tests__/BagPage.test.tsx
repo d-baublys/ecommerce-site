@@ -7,9 +7,14 @@ import {
 } from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { ClientProduct, ReservedItem } from "@/lib/types";
 import { buildBagItem } from "@/lib/utils";
 import { act } from "react";
+import { SINGLE_ITEM_MAX_QUANTITY } from "@/lib/constants";
+import {
+    getConsoleErrorSpy,
+    getFetchResolutionHelper,
+    wrapWithErrorBoundary,
+} from "@/lib/test-utils";
 
 jest.mock("next/navigation", () => ({
     usePathname: () => "/bag",
@@ -40,8 +45,7 @@ jest.mock("@/auth", () => ({
 }));
 
 import { useSession } from "next-auth/react";
-import { getProducts, getReservedItems } from "@/lib/actions";
-import { getConsoleErrorSpy, getFetchResolutionHelper, wrapWithErrorBoundary } from "@/lib/test-utils";
+import { getProducts } from "@/lib/actions";
 
 const { addToBag, clearBag } = useBagStore.getState();
 const testBagData = buildTestBagItemList();
@@ -250,7 +254,7 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("caps quantity options per the prescribed limit", async () => {
-        const itemLimit = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
+        const itemLimit = SINGLE_ITEM_MAX_QUANTITY;
         const testProduct = buildTestProduct({ overrides: { stock: { s: itemLimit + 5 } } });
 
         addToBag(testProduct, buildBagItem(testProduct, "s"));

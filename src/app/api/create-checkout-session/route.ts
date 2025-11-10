@@ -52,7 +52,16 @@ export async function POST(req: Request) {
         ],
     ];
 
-    const expiresAt = Date.now() + 31 * (60 * 1000); // in ms, 30 mins + 1 min buffer
+    const sessionLength = Number(process.env.NEXT_PUBLIC_CHECKOUT_SESSION_MAX_MINS);
+
+    if (!sessionLength) {
+        return NextResponse.json(
+            { error: "Checkout session length env variable not set" },
+            { status: 400 }
+        );
+    }
+
+    const expiresAt = Date.now() + (sessionLength + 1) * (60 * 1000); // in ms, + 1 min buffer
 
     try {
         const session = await stripe.checkout.sessions.create({
@@ -74,7 +83,7 @@ export async function POST(req: Request) {
             },
             success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/bag`,
-            expires_at: Math.floor(expiresAt / 1000) - 1, // in s, 30 mins
+            expires_at: Math.floor(expiresAt / 1000) - 1, // in s, max session length less buffer
         });
 
         const sessionData: CheckoutSessionCreateInput = {

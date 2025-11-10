@@ -47,6 +47,7 @@ export const SORT_OPTIONS = {
     b: { sort: { price: "desc" as Prisma.SortOrder }, label: "Price (High to Low)" },
     c: { sort: { dateAdded: "desc" as Prisma.SortOrder }, label: "Newest" },
 };
-export const FEATURED_COUNT = 5;
+export const SINGLE_ITEM_MAX_QUANTITY = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
+export const FEATURED_COUNT = Number(process.env.NEXT_PUBLIC_FEATURED_COUNT);
 export const REFUND_WINDOW = 1000 * 60 * 60 * 24 * 30; // 30 days in ms
 export const USER_ROLES = ["admin", "user"] as const;

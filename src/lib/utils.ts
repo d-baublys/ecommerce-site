@@ -12,7 +12,12 @@ import {
     UniformReservedItems,
 } from "./types";
 import bcrypt from "bcryptjs";
-import { REFUND_WINDOW, SORT_OPTIONS, VALID_CATEGORIES } from "./constants";
+import {
+    REFUND_WINDOW,
+    SINGLE_ITEM_MAX_QUANTITY,
+    SORT_OPTIONS,
+    VALID_CATEGORIES,
+} from "./constants";
 import { ZodSafeParseError } from "zod";
 import { uniformReservedItemsSchema } from "./schemas";
 
@@ -40,7 +45,7 @@ export function isBagAddPermitted(
     totalReservedItems?: number
 ) {
     return !(
-        currentBagQty >= Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY) ||
+        currentBagQty >= SINGLE_ITEM_MAX_QUANTITY ||
         currentBagQty >= stockQty - (totalReservedItems ?? 0)
     );
 }
@@ -72,10 +77,7 @@ export function checkSizeAvailable(
     const permitted = isBagAddPermitted(currentQty, stockQty, totalReservedItems);
 
     if (!permitted) {
-        const error: "nil" | "limit" =
-            currentQty >= Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY)
-                ? "limit"
-                : "nil";
+        const error: "nil" | "limit" = currentQty >= SINGLE_ITEM_MAX_QUANTITY ? "limit" : "nil";
 
         result = {
             success: false,
@@ -304,5 +306,5 @@ export function getUniformReservedItems({
     productId: ReservedItem["productId"];
     size: ReservedItem["size"];
 }): UniformReservedItems {
-    return items.filter((item) => item.productId === productId && item.size === size);
+    return items?.filter((item) => item.productId === productId && item.size === size) ?? [];
 }

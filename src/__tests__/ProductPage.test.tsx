@@ -4,13 +4,14 @@ import { buildProductUrl } from "@/lib/utils";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import ProductPage from "@/app/products/[id]/[slug]/page";
 import { useBagStore } from "@/stores/bagStore";
+import { SINGLE_ITEM_MAX_QUANTITY } from "@/lib/constants";
 
 jest.mock("@/lib/actions", () => ({
     getProducts: jest.fn(),
     getReservedItems: jest.fn(),
 }));
 
-import { getProducts, getReservedItems } from "@/lib/actions";
+import { getProducts } from "@/lib/actions";
 
 jest.mock("next/navigation", () => ({
     usePathname: () => buildProductUrl(testProduct.id, testProduct.slug),
@@ -111,7 +112,7 @@ describe("ProductPage", () => {
         await renderPage();
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });
-        const itemLimit = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
+        const itemLimit = SINGLE_ITEM_MAX_QUANTITY;
 
         fireEvent.change(screen.getByLabelText("Size selection"), { target: { value: "s" } });
 
@@ -167,7 +168,7 @@ describe("ProductPage", () => {
         await renderPage();
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });
-        const itemLimit = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
+        const itemLimit = SINGLE_ITEM_MAX_QUANTITY;
 
         fireEvent.change(screen.getByLabelText("Size selection"), { target: { value: "s" } });
 

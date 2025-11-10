@@ -1,25 +1,38 @@
 "use client";
 
-import { BagItem, ClientProduct, StateSetter } from "@/lib/types";
+import { BagItem, ClientProduct, ReservedItem, StateSetter } from "@/lib/types";
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect } from "react";
-import { stringifyConvertPrice } from "@/lib/utils";
+import {
+    calculateTotalReservedQty,
+    getUniformReservedItems,
+    stringifyConvertPrice,
+} from "@/lib/utils";
 import CloseButton from "@/ui/components/buttons/CloseButton";
 import ProductListTile from "@/ui/components/cards/ProductListTile";
+import { SINGLE_ITEM_MAX_QUANTITY } from "@/lib/constants";
 
 export default function BagTile({
     bagItem,
     productData,
+    groupedReservedItems,
     handleDelete,
     modalSetter,
-    reservedQty,
 }: {
     bagItem: BagItem;
     productData: ClientProduct;
+    groupedReservedItems: ReservedItem[];
     handleDelete?: () => void;
     modalSetter: StateSetter<boolean>;
-    reservedQty: number;
 }) {
+    const reservedQty = calculateTotalReservedQty(
+        getUniformReservedItems({
+            items: groupedReservedItems,
+            productId: bagItem.productId,
+            size: bagItem.size,
+        })
+    );
+
     const updateQuantity = useBagStore((state) => state.updateQuantity);
 
     const latestQty = Math.max(
@@ -28,7 +41,7 @@ export default function BagTile({
             ? productData.stock[bagItem.size]! - reservedQty
             : 0
     );
-    const maxQty = Math.min(latestQty, Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY));
+    const maxQty = Math.min(latestQty, SINGLE_ITEM_MAX_QUANTITY);
     const currentQty = Math.min(bagItem.quantity, latestQty);
 
     useEffect(() => {
