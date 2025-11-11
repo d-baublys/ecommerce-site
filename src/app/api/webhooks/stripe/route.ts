@@ -1,6 +1,6 @@
 import stripe from "@/lib/stripe";
 import { createOrder, deleteCheckoutSessions } from "@/lib/actions";
-import { OrderCreateInput, OrderItemCreateInput } from "@/lib/types";
+import { OrderCreateParams, OrderItemCreateParams } from "@/lib/types";
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
 
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
             return new Response("Missing items metadata", { status: 400 });
         }
 
-        let items: OrderItemCreateInput;
+        let items: OrderItemCreateParams;
 
         try {
             items = JSON.parse(session.metadata.items);
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         if (paymentIntentId === null)
             return new Response("Payment intent data not found", { status: 400 });
 
-        const orderCreateData: OrderCreateInput = {
+        const orderCreateData: OrderCreateParams = {
             items,
             subTotal,
             shippingTotal,

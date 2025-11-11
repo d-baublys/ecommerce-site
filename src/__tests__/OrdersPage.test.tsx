@@ -4,6 +4,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import OrdersPage from "@/app/orders/page";
 import { ClientOrder } from "@/lib/types";
 import { act } from "react";
+import { checkIsWithinReturnWindow } from "@/lib/utils";
 
 jest.mock("@/auth", () => ({
     auth: jest.fn(),
@@ -31,7 +32,6 @@ jest.mock("@/lib/utils", () => ({
 import { getUserOrders, updateOrder } from "@/lib/actions";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { checkIsWithinReturnWindow } from "@/lib/utils";
 
 const setUpExistingSession = () => {
     (auth as jest.Mock).mockResolvedValue({

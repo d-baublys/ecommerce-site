@@ -1,8 +1,10 @@
 import { TestOrderCypressParams } from "../../../src/lib/test-factories";
 import { CypressTestDataDeleteParams, CypressTestProductData, Order } from "../../../src/lib/types";
+import { buildProductUrl } from "../../../src/lib/utils";
 
 let orderIds: CypressTestDataDeleteParams["orderIds"] = [];
 let productIds: CypressTestDataDeleteParams["productIds"] = [];
+let testProductUrl: string = "";
 
 describe("Admin orders page base tests", () => {
     beforeEach(() => {
@@ -19,6 +21,8 @@ describe("Admin orders page seeded tests", () => {
     before(() => {
         cy.task("createCypressTestProduct").then((productData: CypressTestProductData) => {
             productIds.push(productData.id);
+
+            testProductUrl = buildProductUrl(productData.id, productData.slug);
 
             const quantityMap: TestOrderCypressParams["quantityMap"][] = [[1], [2], [3]];
             const statusMap: NonNullable<TestOrderCypressParams["overrides"]>["status"][] = [
@@ -166,5 +170,13 @@ describe("Admin orders page seeded tests", () => {
         cy.get("tbody a").first().click();
         cy.location("pathname").should("eq", `/admin/orders/${orderIds[1]}`);
         cy.contains("p", "TEST PRODUCT 1").should("be.visible");
+    });
+
+    it("navigates to extant main product page on order tile click", () => {
+        cy.awaitTableSettle();
+        cy.get("tbody a").first().click();
+        cy.location("pathname").should("eq", `/admin/orders/${orderIds[1]}`);
+        cy.contains("p", "TEST PRODUCT 1").should("be.visible").click();
+        cy.location("pathname").should("eq", testProductUrl);
     });
 });

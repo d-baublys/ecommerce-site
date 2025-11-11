@@ -340,6 +340,7 @@ describe("getReservedItems", () => {
 
 describe("createOrder", () => {
     it("creates order successfully", async () => {
+        (prisma.product.findMany as jest.Mock).mockResolvedValue([buildTestProduct()]);
         (prisma.$transaction as jest.Mock).mockResolvedValue({});
 
         const result = createOrder(buildTestOrderData());
@@ -348,6 +349,7 @@ describe("createOrder", () => {
 
     it("rejects on database error", async () => {
         const errorSpy = getConsoleErrorSpy();
+        (prisma.product.findMany as jest.Mock).mockResolvedValue([buildTestProduct()]);
         (prisma.$transaction as jest.Mock).mockRejectedValue(new Error("Database error"));
 
         const testOrder: ClientOrder = buildTestOrderData();

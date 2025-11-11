@@ -6,7 +6,6 @@ import {
     ClientProduct,
     ClientUser,
     Order,
-    OrderCreateInput,
     OrderUpdateInput,
     Product,
     ReservedItem,
@@ -17,6 +16,8 @@ import {
     GetActionResponse,
     CheckoutSessionCreateInput,
     CheckoutSession,
+    OrderCreateParams,
+    OrderItemCreateInput,
 } from "./types";
 import { prisma } from "./prisma";
 import {
@@ -30,7 +31,7 @@ import {
     checkoutSessionCreateSchema,
     clientProductSchema,
     featuredProductCreateSchema,
-    orderCreateSchema,
+    orderCreateParamsSchema,
     orderUpdateSchema,
     productCreateSchema,
     userCreateSchema,
@@ -229,8 +230,8 @@ export async function getReservedItems({
     }
 }
 
-export async function createOrder(orderData: OrderCreateInput): CreateUpdateDeleteActionResponse {
-    const parsedData = orderCreateSchema.safeParse(orderData);
+export async function createOrder(orderData: OrderCreateParams): CreateUpdateDeleteActionResponse {
+    const parsedData = orderCreateParamsSchema.safeParse(orderData);
 
     if (!parsedData.success) {
         return zodErrorResponse(parsedData);
@@ -239,30 +240,41 @@ export async function createOrder(orderData: OrderCreateInput): CreateUpdateDele
     const { items, subTotal, shippingTotal, total, sessionId, email, paymentIntentId, userId } =
         parsedData.data;
 
-    const orderCreateData: Prisma.OrderCreateArgs["data"] = {
-        items: {
-            createMany: {
-                data: items.map((item) => ({
-                    productId: item.productId,
-                    name: item.name,
-                    price: item.price,
-                    size: item.size,
-                    quantity: item.quantity,
-                })),
-            },
-        },
-        subTotal,
-        shippingTotal,
-        total,
-        sessionId,
-        email,
-        paymentIntentId,
-        userId,
-    };
-
     try {
+        const products = await prisma.product.findMany({
+            where: { id: { in: items.map((item) => item.productId) } },
+        });
+
+        const builtItems: OrderItemCreateInput = items.map((item) => {
+            const product = products.find((p) => p.id === item.productId);
+
+            if (!product) throw new Error("Product data for bag item not found");
+
+            const { id, dateAdded, ...netProduct } = product;
+
+            return {
+                ...netProduct,
+                ...item,
+            };
+        });
+
+        const orderCreateData: Prisma.OrderCreateArgs["data"] = {
+            items: {
+                createMany: {
+                    data: builtItems,
+                },
+            },
+            subTotal,
+            shippingTotal,
+            total,
+            sessionId,
+            email,
+            paymentIntentId,
+            userId,
+        };
+
         await prisma.$transaction(async (tx) => {
-            for (const item of items) {
+            for (const item of builtItems) {
                 const { productId, size, quantity } = item;
 
                 const stockItem = await tx.stock.findFirst({
@@ -319,7 +331,7 @@ export async function getOrder({
     try {
         const order = await prisma.order.findFirst({
             where: whereQuery,
-            include: { items: { include: { product: true } } },
+            include: { items: true },
         });
 
         return { data: order };
@@ -332,12 +344,12 @@ export async function getOrder({
 export async function getUserOrders({
     userId,
 }: {
-    userId: User["id"];
+    userId: Order["userId"];
 }): GetManyActionResponse<ClientOrder> {
     try {
         const orders = await prisma.order.findMany({
             where: { userId },
-            include: { items: { include: { product: true } } },
+            include: { items: true },
             orderBy: { createdAt: "desc" },
         });
 

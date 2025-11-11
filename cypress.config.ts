@@ -40,12 +40,7 @@ export default defineConfig({
                         },
                     });
 
-                    return {
-                        id: createdProduct.id,
-                        name: createdProduct.name,
-                        price: createdProduct.price,
-                        slug: createdProduct.slug,
-                    };
+                    return createdProduct;
                 },
                 async createCypressTestOrder(params: TestOrderCypressParams) {
                     const orderCreateData: OrderCreateInput = buildTestOrderDataCypress(params);

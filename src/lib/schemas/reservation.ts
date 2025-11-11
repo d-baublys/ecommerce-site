@@ -1,11 +1,9 @@
 import { z } from "zod";
-import { productIdSchema, quantitySchema, sizeSchema } from "./base";
+import { baseStockSchema } from "./stock";
 
 export const reservedItemSchema = z.object({
     id: z.uuid(),
-    productId: productIdSchema,
-    size: sizeSchema,
-    quantity: quantitySchema,
+    ...baseStockSchema.shape,
 });
 
 export const reservedItemCreateSchema = z.array(

@@ -1,6 +1,6 @@
 "use client";
 
-import { BagItem, Product, ClientProduct, Sizes, ClientOrder } from "@/lib/types";
+import { BagItem, Product, ClientProduct, Sizes, ClientOrder, OrderItem } from "@/lib/types";
 import Link from "next/link";
 import { buildProductUrl } from "@/lib/utils";
 import ProductImage from "@/ui/components/ProductImage";
@@ -22,11 +22,7 @@ export default function ProductListTile(props: ProductListTileProps) {
     const { inputData, wrapWithLink, showSize, endContent, externalOverrides, internalOverrides } =
         props;
 
-    let tileData: (
-        | ClientProduct
-        | (BagItem & { product: ClientProduct })
-        | ClientOrder["items"][number]
-    )[];
+    let tileData: (ClientProduct | (BagItem & { product: ClientProduct }) | OrderItem)[];
 
     if ("items" in inputData) {
         tileData = inputData.items;
@@ -36,7 +32,7 @@ export default function ProductListTile(props: ProductListTileProps) {
         tileData = [inputData];
     }
 
-    const renderCentralContent = (product: Product | ClientProduct, size?: Sizes) => {
+    const renderCentralContent = (product: Product | ClientProduct | OrderItem, size?: Sizes) => {
         return (
             <div className={`flex grow gap-2 sm:gap-8 ${internalOverrides ?? ""}`}>
                 <ProductImage
@@ -71,7 +67,12 @@ export default function ProductListTile(props: ProductListTileProps) {
                             {wrapWithLink ? (
                                 <Link
                                     className="w-full"
-                                    href={buildProductUrl(productData.id, productData.slug)}
+                                    href={buildProductUrl(
+                                        "productId" in productData
+                                            ? productData.productId
+                                            : productData.id,
+                                        productData.slug
+                                    )}
                                 >
                                     {renderCentralContent(
                                         productData,

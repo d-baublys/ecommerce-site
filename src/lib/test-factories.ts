@@ -163,16 +163,18 @@ type TestOrderParams = TestOrderParamsFull | TestOrderParamsSimple;
 export function buildTestOrderData(params: TestOrderParams = {}): ClientOrder {
     const { idx = 0, productList, sizeMap, quantityMap, overrides } = params;
     const products: Product[] | undefined = productList ? productList : [buildTestProduct()];
-    const items = products.map((product, prodIdx) => ({
-        name: product.name,
-        price: product.price,
-        id: `order-${idx}-${prodIdx}`,
-        productId: product.id,
-        size: productList && sizeMap ? sizeMap[prodIdx] : "m",
-        quantity: productList && quantityMap ? quantityMap[prodIdx] : 2,
-        orderId: idx,
-        product,
-    }));
+    const items = products.map((product, prodIdx) => {
+        const { id, dateAdded, ...netProduct } = product;
+
+        return {
+            id: `${getSlicedUuid(prodIdx + 1)}${prodIdx + 1}`,
+            size: productList && sizeMap ? sizeMap[prodIdx] : "m",
+            quantity: productList && quantityMap ? quantityMap[prodIdx] : 2,
+            orderId: idx,
+            productId: product.id,
+            ...netProduct,
+        };
+    });
 
     const orderCreateData = {
         id: idx,
@@ -245,15 +247,15 @@ export function buildTestOrderDataCypress({
     const shippingTotal = 500;
 
     const items: OrderCreateInput["items"] = testProductsData.map((product, prodIdx) => {
-        const price = product.price;
         const quantity: number = quantityMap ? quantityMap[prodIdx] : 2;
-        subTotal += price * quantity;
+        subTotal += product.price * quantity;
+        const { id, dateAdded, ...netProduct } = product;
+
         return {
-            productId: String(product.id),
-            name: product.name,
-            price,
+            productId: id,
             size: sizeMap ? sizeMap[prodIdx] : ("m" as Sizes),
             quantity,
+            ...netProduct,
         };
     });
 
