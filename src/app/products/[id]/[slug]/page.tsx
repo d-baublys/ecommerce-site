@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { getProducts, getReservedItems } from "@/lib/actions";
+import { getProduct, getReservedItems } from "@/lib/actions";
 import ProductPageClient from "./ProductPageClient";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { Metadata } from "next";
@@ -11,9 +11,13 @@ interface AsyncParams {
 
 export async function generateMetadata({ params }: AsyncParams): Promise<Metadata> {
     const { id } = await params;
-    const productFetch = await getProducts({ id });
+    const productFetch = await getProduct(id);
 
-    const [productData] = productFetch.data;
+    if (!productFetch.data) {
+        notFound();
+    }
+
+    const productData = productFetch.data;
     const title = productData.name;
 
     return { title };
@@ -21,13 +25,13 @@ export async function generateMetadata({ params }: AsyncParams): Promise<Metadat
 
 export default async function ProductPage({ params }: AsyncParams) {
     const { id, slug } = await params;
-    const productFetch = await getProducts({ id });
+    const productFetch = await getProduct(id);
 
-    if (!productFetch.data.length) {
+    if (!productFetch.data) {
         notFound();
     }
 
-    const [productData] = productFetch.data;
+    const productData = productFetch.data;
 
     if (productData.slug !== decodeURIComponent(slug)) {
         redirect(buildProductUrl(productData.id, productData.slug));

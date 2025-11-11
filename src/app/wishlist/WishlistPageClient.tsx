@@ -5,7 +5,7 @@ import BaseGridPage from "@/ui/pages/BaseGridPage";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { useEffect, useState } from "react";
 import { ClientProduct } from "@/lib/types";
-import { getProducts } from "@/lib/actions";
+import { getManyProducts } from "@/lib/actions";
 
 export default function WishlistPageClient() {
     const { wishlist, hasHydrated } = useWishlistStore((state) => state);
@@ -15,7 +15,7 @@ export default function WishlistPageClient() {
         if (!hasHydrated) return;
 
         const getData = async () => {
-            const productFetch = await getProducts({ id: { in: wishlist } });
+            const productFetch = await getManyProducts({ id: { in: wishlist } });
 
             setProducts(productFetch.data);
         };

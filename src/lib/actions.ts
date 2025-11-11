@@ -22,6 +22,7 @@ import {
 import { prisma } from "./prisma";
 import {
     convertMultiplePrismaProducts,
+    convertPrismaProduct,
     hashPassword,
     mapStockForProductCreate,
     mapStockForProductUpdate,
@@ -61,7 +62,25 @@ export async function createProduct(productData: ClientProduct): CreateUpdateDel
     }
 }
 
-export async function getProducts(
+export async function getProduct(id: Product["id"]): GetActionResponse<ClientProduct> {
+    try {
+        const rawProduct = await prisma.product.findUnique({
+            where: { id },
+            include: { stock: true },
+        });
+
+        if (!rawProduct) return { data: null };
+
+        const product: ClientProduct = convertPrismaProduct(rawProduct);
+
+        return { data: product };
+    } catch (error) {
+        console.error("Error fetching product data: ", error);
+        throw new Error("Error fetching product data. Please try again later.");
+    }
+}
+
+export async function getManyProducts(
     where?: Prisma.ProductWhereInput,
     orderBy?: Prisma.ProductOrderByWithRelationInput
 ): GetManyActionResponse<ClientProduct> {
@@ -314,15 +333,13 @@ export async function createOrder(orderData: OrderCreateParams): CreateUpdateDel
     }
 }
 
-interface GetOrderParams {
-    sessionId?: Order["sessionId"];
-    orderId?: Order["id"];
-}
-
 export async function getOrder({
     sessionId,
     orderId,
-}: GetOrderParams): GetActionResponse<ClientOrder> {
+}: {
+    sessionId?: Order["sessionId"];
+    orderId?: Order["id"];
+}): GetActionResponse<ClientOrder> {
     const whereQuery = {
         ...(sessionId && { sessionId }),
         ...(orderId && { id: orderId }),

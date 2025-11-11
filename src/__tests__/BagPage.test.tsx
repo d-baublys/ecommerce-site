@@ -12,7 +12,7 @@ import { act } from "react";
 import { SINGLE_ITEM_MAX_QUANTITY } from "@/lib/constants";
 import {
     getConsoleErrorSpy,
-    getFetchResolutionHelper,
+    getManyFetchResolutionHelper,
     wrapWithErrorBoundary,
 } from "@/lib/test-utils";
 
@@ -30,7 +30,7 @@ jest.mock("next/navigation", () => ({
 }));
 
 jest.mock("@/lib/actions", () => ({
-    getProducts: jest.fn(),
+    getManyProducts: jest.fn(),
     deleteCheckoutSessions: jest.fn(),
     getReservedItems: jest.fn(),
 }));
@@ -45,7 +45,7 @@ jest.mock("@/auth", () => ({
 }));
 
 import { useSession } from "next-auth/react";
-import { getProducts } from "@/lib/actions";
+import { getManyProducts } from "@/lib/actions";
 
 const { addToBag, clearBag } = useBagStore.getState();
 const testBagData = buildTestBagItemList();
@@ -79,7 +79,7 @@ const getSessionWithoutAuth = () => {
     });
 };
 
-const setUpResolvedFetch = getFetchResolutionHelper(testProducts);
+const setUpResolvedFetch = getManyFetchResolutionHelper(testProducts);
 
 const getAllTiles = () => within(screen.getByTestId("bag-tile-ul")).getAllByRole("listitem");
 
@@ -114,7 +114,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("throws an error when fetch fails", async () => {
         const errorSpy = getConsoleErrorSpy();
-        (getProducts as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
+        (getManyProducts as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
         render(wrapWithErrorBoundary(await BagPage()));
 
         await waitFor(() => {

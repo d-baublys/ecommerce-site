@@ -2,11 +2,11 @@ import { buildLongProductList, getFilteredTestProducts } from "@/lib/test-factor
 import { render, screen, waitFor, within } from "@testing-library/react";
 
 jest.mock("@/lib/actions", () => ({
-    getProducts: jest.fn(),
+    getManyProducts: jest.fn(),
     getFeaturedProducts: jest.fn(),
 }));
 
-import { getFeaturedProducts, getProducts } from "@/lib/actions";
+import { getFeaturedProducts, getManyProducts } from "@/lib/actions";
 import HomePage from "@/app/page";
 
 const renderHomePage = async () => render(await HomePage());
@@ -30,7 +30,7 @@ describe("HomePage", () => {
 
     it("displays a fallback slice of all products if featured product list doesn't exist", async () => {
         (getFeaturedProducts as jest.Mock).mockResolvedValue({ data: [] });
-        (getProducts as jest.Mock).mockResolvedValue({ data: testProductList });
+        (getManyProducts as jest.Mock).mockResolvedValue({ data: testProductList });
         renderHomePage();
 
         await waitFor(() => {
@@ -42,14 +42,14 @@ describe("HomePage", () => {
 
     it("throws an error when first fetch fails", async () => {
         (getFeaturedProducts as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
-        (getProducts as jest.Mock).mockResolvedValue({ data: testProductList });
+        (getManyProducts as jest.Mock).mockResolvedValue({ data: testProductList });
 
         expect(renderHomePage()).rejects.toThrow("Fetch failed");
     });
 
     it("displays fallback when both featured and product lists are empty", async () => {
         (getFeaturedProducts as jest.Mock).mockResolvedValue({ data: [] });
-        (getProducts as jest.Mock).mockResolvedValue({ data: [] });
+        (getManyProducts as jest.Mock).mockResolvedValue({ data: [] });
         renderHomePage();
 
         await waitFor(() => {

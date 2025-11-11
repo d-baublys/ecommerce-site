@@ -7,11 +7,11 @@ import { useBagStore } from "@/stores/bagStore";
 import { SINGLE_ITEM_MAX_QUANTITY } from "@/lib/constants";
 
 jest.mock("@/lib/actions", () => ({
-    getProducts: jest.fn(),
+    getProduct: jest.fn(),
     getReservedItems: jest.fn(),
 }));
 
-import { getProducts } from "@/lib/actions";
+import { getProduct } from "@/lib/actions";
 
 jest.mock("next/navigation", () => ({
     usePathname: () => buildProductUrl(testProduct.id, testProduct.slug),
@@ -32,7 +32,7 @@ const renderPage = async () =>
         })
     );
 
-const setUpResolvedFetch = getFetchResolutionHelper([testProduct]);
+const setUpResolvedFetch = getFetchResolutionHelper(testProduct);
 
 describe("ProductPage", () => {
     beforeEach(() => {
@@ -48,14 +48,14 @@ describe("ProductPage", () => {
     });
 
     it("invokes notFound when provided slug returns no matching products", async () => {
-        setUpResolvedFetch({ resolvedProducts: [] });
+        setUpResolvedFetch({ resolvedProduct: null });
 
         expect(renderPage()).rejects.toThrow("notFound called");
     });
 
     it("throws an error when fetch fails", async () => {
         const errorSpy = getConsoleErrorSpy();
-        (getProducts as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
+        (getProduct as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
 
         expect(renderPage()).rejects.toThrow("Fetch failed");
 

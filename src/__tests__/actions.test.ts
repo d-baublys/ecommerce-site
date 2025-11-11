@@ -6,7 +6,7 @@ import {
     getFeaturedProducts,
     getOrder,
     getAllOrders,
-    getProducts,
+    getManyProducts,
     getUser,
     getUserOrders,
     createProduct,
@@ -16,6 +16,7 @@ import {
     createCheckoutSession,
     deleteCheckoutSessions,
     getReservedItems,
+    getProduct,
 } from "@/lib/actions";
 import { prisma } from "@/lib/prisma";
 import {
@@ -39,6 +40,7 @@ jest.mock("@/lib/prisma", () => ({
         },
         product: {
             create: jest.fn(),
+            findUnique: jest.fn(),
             findMany: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
@@ -90,7 +92,42 @@ describe("createProduct", () => {
     });
 });
 
-describe("getProducts", () => {
+describe("getProduct", () => {
+    it("returns product data successfully", async () => {
+        const product: ClientProduct = buildTestProduct();
+
+        const prismaProduct: Product & { stock: Stock[] } = {
+            ...product,
+            stock: Object.entries(product.stock).map(([size, count]) => ({
+                size: size as Sizes,
+                quantity: count,
+                productId: product.id,
+                id: `${product.id}-${size}`,
+            })),
+        };
+
+        (prisma.product.findUnique as jest.Mock).mockResolvedValue(prismaProduct);
+
+        const result = getProduct(fakeUuid);
+        await expect(result).resolves.toEqual({ data: product });
+    });
+
+    it("throws an error if fetch fails", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.product.findUnique as jest.Mock).mockRejectedValue(
+            new Error("Product fetch failed")
+        );
+
+        const result = getProduct(fakeUuid);
+        await expect(result).rejects.toThrow(
+            "Error fetching product data. Please try again later."
+        );
+
+        errorSpy.mockRestore();
+    });
+});
+
+describe("getManyProducts", () => {
     it("returns product data successfully", async () => {
         const productList: ClientProduct[] = buildTestProductList();
 
@@ -106,16 +143,15 @@ describe("getProducts", () => {
 
         (prisma.product.findMany as jest.Mock).mockResolvedValue(prismaProductList);
 
-        const clientProductList = buildTestProductList();
-        const result = getProducts();
-        await expect(result).resolves.toEqual({ data: clientProductList });
+        const result = getManyProducts();
+        await expect(result).resolves.toEqual({ data: productList });
     });
 
     it("throws an error if fetch fails", async () => {
         const errorSpy = getConsoleErrorSpy();
         (prisma.product.findMany as jest.Mock).mockRejectedValue(new Error("Product fetch failed"));
 
-        const result = getProducts();
+        const result = getManyProducts();
         await expect(result).rejects.toThrow(
             "Error fetching product data. Please try again later."
         );
@@ -209,9 +245,8 @@ describe("getFeaturedProducts", () => {
 
         (prisma.featuredProduct.findMany as jest.Mock).mockResolvedValue(prismaFeaturedList);
 
-        const clientProductList = buildTestProductList();
         const result = getFeaturedProducts();
-        await expect(result).resolves.toEqual({ data: clientProductList });
+        await expect(result).resolves.toEqual({ data: productList });
     });
 
     it("throws an error if fetch fails", async () => {

@@ -5,7 +5,7 @@ import BagTile from "@/ui/components/cards/BagTile";
 import { useBagStore } from "@/stores/bagStore";
 import { loadStripe } from "@stripe/stripe-js";
 import { useEffect, useRef, useState } from "react";
-import { getReservedItems, getProducts, deleteCheckoutSessions } from "@/lib/actions";
+import { getReservedItems, getManyProducts, deleteCheckoutSessions } from "@/lib/actions";
 import { stringifyConvertPrice } from "@/lib/utils";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { useSession } from "next-auth/react";
@@ -47,7 +47,7 @@ export default function BagPageClient() {
 
         const getData = async () => {
             try {
-                const productsFetch = await getProducts({ id: { in: bagProductIds } });
+                const productsFetch = await getManyProducts({ id: { in: bagProductIds } });
                 setProducts(productsFetch.data);
 
                 const reservedFetch = await getReservedItems({

@@ -33,7 +33,7 @@ export function buildTestProduct({
         slug: slugify(name),
         src: `/nonexistent-img-${idx}.jpg`,
         alt: `Test product image ${idx}`,
-        dateAdded: new Date(),
+        dateAdded: new Date("2025-08-01"),
         stock: { s: 8, m: 3, l: 12 },
         ...overrides,
     };

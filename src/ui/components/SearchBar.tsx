@@ -1,6 +1,6 @@
 "use client";
 
-import { getProducts } from "@/lib/actions";
+import { getManyProducts } from "@/lib/actions";
 import { getFilteredProducts } from "@/lib/fetching-utils";
 import { Categories, ClientProduct, StateSetter } from "@/lib/types";
 import { debounce } from "@/lib/utils";
@@ -49,7 +49,7 @@ export default function SearchBar(props: SearchBarProps) {
         const getData = async () => {
             const productFetch = options.isGlobalSearch
                 ? await getFilteredProducts({ category: "all" })
-                : (await getProducts())?.data;
+                : (await getManyProducts())?.data;
 
             setProductList(productFetch);
             if (parentSetter) parentSetter(productFetch);

@@ -1,6 +1,6 @@
 import React from "react";
 import { ClientProduct, ReservedItem } from "./types";
-import { getProducts, getReservedItems } from "./actions";
+import { getManyProducts, getProduct, getReservedItems } from "./actions";
 
 class ErrorBoundary extends React.Component<
     { children: React.ReactNode },
@@ -52,7 +52,22 @@ export function getConsoleErrorSpy() {
     return jest.spyOn(console, "error").mockImplementation(() => {});
 }
 
-export function getFetchResolutionHelper(defaultProducts: ClientProduct[]) {
+export function getFetchResolutionHelper(defaultProduct: ClientProduct) {
+    return ({
+        resolvedProduct,
+        resolvedReserved,
+    }: {
+        resolvedProduct?: ClientProduct | null;
+        resolvedReserved?: ReservedItem[];
+    } = {}) => {
+        (getProduct as jest.Mock).mockResolvedValue({
+            data: resolvedProduct !== undefined ? resolvedProduct : defaultProduct,
+        });
+        (getReservedItems as jest.Mock).mockResolvedValue({ data: resolvedReserved ?? [] });
+    };
+}
+
+export function getManyFetchResolutionHelper(defaultProducts: ClientProduct[]) {
     return ({
         resolvedProducts,
         resolvedReserved,
@@ -60,7 +75,9 @@ export function getFetchResolutionHelper(defaultProducts: ClientProduct[]) {
         resolvedProducts?: ClientProduct[];
         resolvedReserved?: ReservedItem[];
     } = {}) => {
-        (getProducts as jest.Mock).mockResolvedValue({ data: resolvedProducts ?? defaultProducts });
+        (getManyProducts as jest.Mock).mockResolvedValue({
+            data: resolvedProducts ?? defaultProducts,
+        });
         (getReservedItems as jest.Mock).mockResolvedValue({ data: resolvedReserved ?? [] });
     };
 }
