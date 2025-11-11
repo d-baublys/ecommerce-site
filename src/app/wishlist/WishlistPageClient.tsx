@@ -15,7 +15,7 @@ export default function WishlistPageClient() {
         if (!hasHydrated) return;
 
         const getData = async () => {
-            const productFetch = await getManyProducts({ id: { in: wishlist } });
+            const productFetch = await getManyProducts({ where: { id: { in: wishlist } } });
 
             setProducts(productFetch.data);
         };

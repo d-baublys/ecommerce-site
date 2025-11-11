@@ -59,7 +59,7 @@ export function buildTestProductList(): ClientProduct[] {
 }
 
 export function buildLongProductList(): ClientProduct[] {
-    return Array.from({ length: 10 }).map((_, idx) => buildTestProduct({ idx }));
+    return Array.from({ length: 5 }).map((_, idx) => buildTestProduct({ idx }));
 }
 
 export function buildReservedItem(

@@ -20,15 +20,17 @@ describe("getFilteredProducts", () => {
         await getFilteredProducts({ category });
         expect(getManyProducts).toHaveBeenCalledWith(
             expect.objectContaining({
-                stock: {
-                    some: {
-                        quantity: {
-                            gt: 0,
+                where: {
+                    stock: {
+                        some: {
+                            quantity: {
+                                gt: 0,
+                            },
                         },
                     },
                 },
-            }),
-            undefined
+                orderBy: undefined,
+            })
         );
     });
 
@@ -38,16 +40,18 @@ describe("getFilteredProducts", () => {
         await getFilteredProducts({ category });
         expect(getManyProducts).toHaveBeenCalledWith(
             expect.objectContaining({
-                stock: {
-                    some: {
-                        quantity: {
-                            gt: 0,
+                where: {
+                    stock: {
+                        some: {
+                            quantity: {
+                                gt: 0,
+                            },
                         },
                     },
+                    gender: "mens",
                 },
-                gender: "mens",
-            }),
-            undefined
+                orderBy: undefined,
+            })
         );
     });
 
@@ -58,16 +62,18 @@ describe("getFilteredProducts", () => {
         await getFilteredProducts({ category, sizeFilters });
         expect(getManyProducts).toHaveBeenCalledWith(
             expect.objectContaining({
-                stock: {
-                    some: {
-                        quantity: {
-                            gt: 0,
+                where: {
+                    stock: {
+                        some: {
+                            quantity: {
+                                gt: 0,
+                            },
+                            size: { in: ["m"] },
                         },
-                        size: { in: ["m"] },
                     },
                 },
-            }),
-            undefined
+                orderBy: undefined,
+            })
         );
     });
 
@@ -78,23 +84,25 @@ describe("getFilteredProducts", () => {
         await getFilteredProducts({ category, priceFilters });
         expect(getManyProducts).toHaveBeenCalledWith(
             expect.objectContaining({
-                stock: {
-                    some: {
-                        quantity: {
-                            gt: 0,
+                where: {
+                    stock: {
+                        some: {
+                            quantity: {
+                                gt: 0,
+                            },
                         },
                     },
+                    OR: [
+                        {
+                            price: { gte: 0, lt: 5000 },
+                        },
+                        {
+                            price: { gte: 20000 },
+                        },
+                    ],
                 },
-                OR: [
-                    {
-                        price: { gte: 0, lt: 5000 },
-                    },
-                    {
-                        price: { gte: 20000 },
-                    },
-                ],
-            }),
-            undefined
+                orderBy: undefined,
+            })
         );
     });
 
@@ -105,16 +113,18 @@ describe("getFilteredProducts", () => {
         await getFilteredProducts({ category, query });
         expect(getManyProducts).toHaveBeenCalledWith(
             expect.objectContaining({
-                stock: {
-                    some: {
-                        quantity: {
-                            gt: 0,
+                where: {
+                    stock: {
+                        some: {
+                            quantity: {
+                                gt: 0,
+                            },
                         },
                     },
+                    name: { contains: "test", mode: "insensitive" },
                 },
-                name: { contains: "test", mode: "insensitive" },
-            }),
-            undefined
+                orderBy: undefined,
+            })
         );
     });
 
@@ -125,15 +135,17 @@ describe("getFilteredProducts", () => {
         await getFilteredProducts({ category, productSort });
         expect(getManyProducts).toHaveBeenCalledWith(
             expect.objectContaining({
-                stock: {
-                    some: {
-                        quantity: {
-                            gt: 0,
+                where: {
+                    stock: {
+                        some: {
+                            quantity: {
+                                gt: 0,
+                            },
                         },
                     },
                 },
-            }),
-            { price: "asc" }
+                orderBy: { price: "asc" },
+            })
         );
     });
 });

@@ -49,7 +49,7 @@ export async function getFilteredProducts({
     const orderBy =
         productSort && productSort !== "placeholder" ? SORT_OPTIONS[productSort].sort : undefined;
 
-    const productsFetch = await getManyProducts(filterQuery, orderBy);
+    const productsFetch = await getManyProducts({ where: filterQuery, orderBy });
 
     return productsFetch.data;
 }

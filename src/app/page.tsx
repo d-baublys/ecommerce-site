@@ -15,7 +15,7 @@ export default async function HomePage() {
     let featuredList = featuredFetch.data;
 
     if (!featuredList.length) {
-        const fallbackFetch = await getManyProducts();
+        const fallbackFetch = await getManyProducts({ take: FEATURED_COUNT });
 
         const fallbackData = fallbackFetch.data;
 
@@ -27,7 +27,7 @@ export default async function HomePage() {
             );
         }
 
-        featuredList = fallbackData.slice(0, FEATURED_COUNT);
+        featuredList = fallbackData;
     }
 
     return (

@@ -47,7 +47,9 @@ export default function BagPageClient() {
 
         const getData = async () => {
             try {
-                const productsFetch = await getManyProducts({ id: { in: bagProductIds } });
+                const productsFetch = await getManyProducts({
+                    where: { id: { in: bagProductIds } },
+                });
                 setProducts(productsFetch.data);
 
                 const reservedFetch = await getReservedItems({

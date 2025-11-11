@@ -80,15 +80,21 @@ export async function getProduct(id: Product["id"]): GetActionResponse<ClientPro
     }
 }
 
-export async function getManyProducts(
-    where?: Prisma.ProductWhereInput,
-    orderBy?: Prisma.ProductOrderByWithRelationInput
-): GetManyActionResponse<ClientProduct> {
+export async function getManyProducts({
+    where,
+    orderBy,
+    take,
+}: {
+    where?: Prisma.ProductWhereInput;
+    orderBy?: Prisma.ProductOrderByWithRelationInput;
+    take?: number;
+} = {}): GetManyActionResponse<ClientProduct> {
     try {
         const rawProducts = await prisma.product.findMany({
             where,
+            orderBy: orderBy ?? { name: "asc" },
+            take,
             include: { stock: true },
-            orderBy: orderBy ? orderBy : { name: "asc" },
         });
 
         const products: ClientProduct[] = convertMultiplePrismaProducts(rawProducts);
