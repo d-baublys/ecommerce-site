@@ -174,6 +174,7 @@ describe("Category grid page mobile viewport filtering tests", () => {
         cy.get("#loading-indicator").should("not.exist");
         cy.contains(/\d+\s*Item(s)?/).should("be.visible");
         cy.contains("button", "Filter").click();
+        cy.get(".mobile-filtering").contains("button", "Size");
         cy.get(".mobile-filtering .size-btn-container").should("be.visible");
         cy.get(".mobile-filtering .price-btn-container").should("not.be.visible");
     });

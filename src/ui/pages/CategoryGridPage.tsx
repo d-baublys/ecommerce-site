@@ -35,7 +35,7 @@ export default function CategoryGridPage({
     const paramsSetter = new URLSearchParams(paramsGetter);
     const pathname = usePathname();
     const { replace } = useRouter();
-    const [currSizeFilters, currPriceFilters, currSort] = [
+    const [urlSizeFilters, urlPriceFilters, urlSort] = [
         paramsGetter.get("s"),
         paramsGetter.get("p"),
         paramsGetter.get("sort"),
@@ -45,16 +45,16 @@ export default function CategoryGridPage({
     const [filteredProducts, setFilteredProducts] = useState<ClientProduct[]>();
 
     const [sizeFilters, setSizeFilters] = useState<Sizes[]>(
-        extractFilters<Sizes>(currSizeFilters, VALID_SIZES)
+        extractFilters<Sizes>(urlSizeFilters, VALID_SIZES)
     );
     const [priceFilters, setPriceFilters] = useState<PriceFilterId[]>(
         extractFilters<PriceFilterId>(
-            currPriceFilters,
+            urlPriceFilters,
             Object.keys(PRICE_FILTER_OPTIONS) as PriceFilterId[]
         )
     );
     const [productSort, setProductSort] = useState<ProductSortId | "placeholder">(
-        extractSort(currSort)
+        extractSort(urlSort)
     );
 
     const [error, setError] = useState<Error | null>(null);
@@ -123,17 +123,24 @@ export default function CategoryGridPage({
     }, [category, sizeFilters, priceFilters, productSort, query]);
 
     useEffect(() => {
-        setSizeFilters(extractFilters<Sizes>(currSizeFilters, VALID_SIZES));
+        const extractedSizes = extractFilters<Sizes>(urlSizeFilters, VALID_SIZES).sort();
+        const extractedPrices = extractFilters<PriceFilterId>(
+            urlPriceFilters,
+            Object.keys(PRICE_FILTER_OPTIONS) as PriceFilterId[]
+        ).sort();
 
-        setPriceFilters(
-            extractFilters<PriceFilterId>(
-                currPriceFilters,
-                Object.keys(PRICE_FILTER_OPTIONS) as PriceFilterId[]
-            )
-        );
+        if (!sizeFilters.sort().every((f, idx) => f === extractedSizes[idx])) {
+            setSizeFilters(extractedSizes);
+        }
 
-        setProductSort(extractSort(currSort));
-    }, [currSizeFilters, currPriceFilters, currSort]);
+        if (!priceFilters.sort().every((f, idx) => f === extractedPrices[idx])) {
+            setPriceFilters(extractedPrices);
+        }
+
+        if (productSort !== extractSort(urlSort)) {
+            setProductSort(extractSort(urlSort));
+        }
+    }, [urlSizeFilters, urlPriceFilters, urlSort]);
 
     useEffect(() => {
         if (sizeFilters.length) {
