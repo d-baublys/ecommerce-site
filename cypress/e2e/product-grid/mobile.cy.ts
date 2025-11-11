@@ -161,6 +161,22 @@ describe("Category grid page mobile viewport filtering tests", () => {
         cy.get("[aria-label='Close menu']").click();
         cy.contains("No products matching your filter").should("be.visible");
     });
+
+    it("opens only accordions with active filters on page load", () => {
+        cy.openSizeAccordionMobile();
+        cy.get(".mobile-filtering .size-btn-container")
+            .contains("button", matchSizeLabel(7, "XXL"))
+            .click();
+        cy.awaitFilterUpdate();
+        cy.get(".mobile-filtering .size-btn-container").should("be.visible");
+        cy.get(".mobile-filtering .price-btn-container").should("not.be.visible");
+        cy.reload();
+        cy.get("#loading-indicator").should("not.exist");
+        cy.contains(/\d+\s*Item(s)?/).should("be.visible");
+        cy.contains("button", "Filter").click();
+        cy.get(".mobile-filtering .size-btn-container").should("be.visible");
+        cy.get(".mobile-filtering .price-btn-container").should("not.be.visible");
+    });
 });
 
 describe("Category grid page mobile viewport tile touch tests", () => {

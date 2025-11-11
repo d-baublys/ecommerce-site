@@ -131,7 +131,7 @@ export default function GridAside({
 
     return (
         <div className="w-full h-min border-b-1">
-            <AccordionSection text="Size">
+            <AccordionSection text="Size" filters={sizeFilters}>
                 {generateButtonList({
                     data: sizesData,
                     filters: sizeFilters,
@@ -140,7 +140,7 @@ export default function GridAside({
                     className: "size-btn-container",
                 })}
             </AccordionSection>
-            <AccordionSection text="Price">
+            <AccordionSection text="Price" filters={priceFilters}>
                 {generateButtonList({
                     data: pricesData,
                     filters: priceFilters,

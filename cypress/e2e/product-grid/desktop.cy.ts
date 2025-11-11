@@ -136,6 +136,21 @@ describe("Product grid page desktop viewport tests", () => {
         cy.contains("No products matching your filter").should("be.visible");
     });
 
+    it("opens only accordions with active filters on page load", () => {
+        cy.openSizeAccordionDesktop();
+        cy.get(".desktop-filtering .size-btn-container")
+            .contains("button", matchSizeLabel(7, "XXL"))
+            .click();
+        cy.awaitFilterUpdate();
+        cy.get(".desktop-filtering .size-btn-container").should("be.visible");
+        cy.get(".desktop-filtering .price-btn-container").should("not.be.visible");
+        cy.reload();
+        cy.get("#loading-indicator").should("not.exist");
+        cy.contains(/\d+\s*Item(s)?/).should("be.visible");
+        cy.get(".desktop-filtering .size-btn-container").should("be.visible");
+        cy.get(".desktop-filtering .price-btn-container").should("not.be.visible");
+    });
+
     it("displays conditional product tile elements on mouse hover only", () => {
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
         cy.get("@test-tile").find("[aria-label='Add or remove from wishlist']").should("not.exist");

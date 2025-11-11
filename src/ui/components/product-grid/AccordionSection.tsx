@@ -1,17 +1,20 @@
 "use client";
 
+import { ProductGridFilters } from "@/lib/types";
 import { useState } from "react";
 import { IoChevronDown, IoChevronUp } from "react-icons/io5";
 
 export default function AccordionSection({
     children,
     text,
+    filters,
 }: {
     children: React.ReactNode;
     text: string;
+    filters: ProductGridFilters;
 }) {
-    const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [isHidden, setIsHidden] = useState<boolean>(true);
+    const [isOpen, setIsOpen] = useState<boolean>(!!filters.length);
+    const [isContentHidden, setIsContentHidden] = useState<boolean>(!filters.length);
 
     const handleSectionClick = () => {
         setTimeout(
@@ -23,9 +26,9 @@ export default function AccordionSection({
 
         setTimeout(
             () => {
-                setIsHidden((prev) => !prev);
+                setIsContentHidden((prev) => !prev);
             },
-            isHidden ? 0 : 400
+            isContentHidden ? 0 : 400
         );
     };
 
@@ -45,7 +48,7 @@ export default function AccordionSection({
                     isOpen ? "max-h-64" : "max-h-0"
                 }`}
             >
-                <div className={`${isHidden ? "hidden" : ""}`}>{children}</div>
+                <div className={`${isContentHidden ? "hidden" : ""}`}>{children}</div>
             </div>
         </>
     );
