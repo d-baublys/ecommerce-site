@@ -11,7 +11,7 @@ import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { fetchFilteredProducts } from "@/lib/fetching-utils";
+import { getFilteredProducts } from "@/lib/fetching-utils";
 import LoadingIndicator from "@/ui/components/overlays/LoadingIndicator";
 import { PRICE_FILTER_OPTIONS, SORT_OPTIONS, VALID_CATEGORIES, VALID_SIZES } from "@/lib/constants";
 
@@ -35,7 +35,7 @@ export default function CategoryGridPage({
     const paramsSetter = new URLSearchParams(paramsGetter);
     const pathname = usePathname();
     const { replace } = useRouter();
-    const [currSizeFilters, currPriceFilters, currSort] = [
+    const [urlSizeFilters, urlPriceFilters, urlSort] = [
         paramsGetter.get("s"),
         paramsGetter.get("p"),
         paramsGetter.get("sort"),
@@ -45,31 +45,28 @@ export default function CategoryGridPage({
     const [filteredProducts, setFilteredProducts] = useState<ClientProduct[]>();
 
     const [sizeFilters, setSizeFilters] = useState<Sizes[]>(
-        extractFilters<Sizes>(currSizeFilters, VALID_SIZES)
+        extractFilters<Sizes>(urlSizeFilters, VALID_SIZES)
     );
     const [priceFilters, setPriceFilters] = useState<PriceFilterId[]>(
         extractFilters<PriceFilterId>(
-            currPriceFilters,
+            urlPriceFilters,
             Object.keys(PRICE_FILTER_OPTIONS) as PriceFilterId[]
         )
     );
     const [productSort, setProductSort] = useState<ProductSortId | "placeholder">(
-        extractSort(currSort)
+        extractSort(urlSort)
     );
 
     const [error, setError] = useState<Error | null>(null);
-    const [isQueryLoading, setIsQueryLoading] = useState<boolean>(true);
+    const [isQueryLoading, setIsQueryLoading] = useState<boolean>(false);
     const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
     const isFirstLoad = useRef<boolean>(true);
 
     useEffect(() => {
         const fetchInitial = async () => {
             try {
-                setIsQueryLoading(true);
-                const products = await fetchFilteredProducts({ category, query });
-
+                const products = await getFilteredProducts({ category, query });
                 setAllCategoryProducts(products);
-                setIsQueryLoading(false);
             } catch {
                 setError(new Error("Error fetching product data. Please try again later."));
             }
@@ -79,10 +76,15 @@ export default function CategoryGridPage({
     }, [query]);
 
     useEffect(() => {
+        if (isQueryLoading) return;
+
         const fetchFiltered = async () => {
             try {
                 setIsQueryLoading(true);
-                const products = await fetchFilteredProducts({
+
+                const start = Date.now();
+
+                const filtered = await getFilteredProducts({
                     category,
                     sizeFilters,
                     priceFilters,
@@ -90,23 +92,55 @@ export default function CategoryGridPage({
                     query,
                 });
 
+                setFilteredProducts(filtered);
+
+                const now = Date.now();
+                const elapsed = now - start;
+                const MIN_LOADING_TIME = 400;
+
                 if (isFirstLoad.current) {
                     isFirstLoad.current = false;
-                    setFilteredProducts(products);
                     setIsQueryLoading(false);
                 } else {
-                    setTimeout(() => {
-                        setFilteredProducts(products);
-                        setIsQueryLoading(false);
-                    }, 400);
+                    setTimeout(
+                        () => {
+                            setIsQueryLoading(false);
+                        },
+                        elapsed < MIN_LOADING_TIME ? MIN_LOADING_TIME - elapsed : 0
+                    );
                 }
             } catch {
                 setError(new Error("Error fetching product data. Please try again later."));
+                setIsQueryLoading(false);
             }
+
+            return () => {
+                setIsQueryLoading(false);
+            };
         };
 
         fetchFiltered();
     }, [category, sizeFilters, priceFilters, productSort, query]);
+
+    useEffect(() => {
+        const extractedSizes = extractFilters<Sizes>(urlSizeFilters, VALID_SIZES).sort();
+        const extractedPrices = extractFilters<PriceFilterId>(
+            urlPriceFilters,
+            Object.keys(PRICE_FILTER_OPTIONS) as PriceFilterId[]
+        ).sort();
+
+        if (!sizeFilters.sort().every((f, idx) => f === extractedSizes[idx])) {
+            setSizeFilters(extractedSizes);
+        }
+
+        if (!priceFilters.sort().every((f, idx) => f === extractedPrices[idx])) {
+            setPriceFilters(extractedPrices);
+        }
+
+        if (productSort !== extractSort(urlSort)) {
+            setProductSort(extractSort(urlSort));
+        }
+    }, [urlSizeFilters, urlPriceFilters, urlSort]);
 
     useEffect(() => {
         if (sizeFilters.length) {

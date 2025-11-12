@@ -1,11 +1,11 @@
 "use client";
 
-import { getProducts } from "@/lib/actions";
-import { fetchFilteredProducts } from "@/lib/fetching-utils";
-import { Categories, ClientProduct } from "@/lib/types";
+import { getManyProducts } from "@/lib/actions";
+import { getFilteredProducts } from "@/lib/fetching-utils";
+import { Categories, ClientProduct, StateSetter } from "@/lib/types";
 import { debounce } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { IoCloseCircle, IoSearch } from "react-icons/io5";
 
 type SearchBarConfig = {
@@ -19,10 +19,10 @@ interface SearchBarProps {
     handleResultClick?: (product: ClientProduct) => void;
     handleSearchClose?: () => void;
     inputRef?: React.RefObject<HTMLInputElement | null>;
-    parentSetter?: React.Dispatch<SetStateAction<ClientProduct[]>>;
-    parentQuerySetter?: React.Dispatch<SetStateAction<string>>;
+    parentSetter?: StateSetter<ClientProduct[]>;
+    parentQuerySetter?: StateSetter<string>;
     parentFilter?: Categories | null;
-    parentLoadingStateSetter?: React.Dispatch<SetStateAction<boolean>>;
+    parentLoadingStateSetter?: StateSetter<boolean>;
 }
 
 export default function SearchBar(props: SearchBarProps) {
@@ -48,8 +48,8 @@ export default function SearchBar(props: SearchBarProps) {
     useEffect(() => {
         const getData = async () => {
             const productFetch = options.isGlobalSearch
-                ? await fetchFilteredProducts({ category: "all" })
-                : (await getProducts())?.data;
+                ? await getFilteredProducts({ category: "all" })
+                : (await getManyProducts())?.data;
 
             setProductList(productFetch);
             if (parentSetter) parentSetter(productFetch);

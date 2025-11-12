@@ -1,7 +1,9 @@
-import { ClientProduct } from "@/lib/types";
+import { ClientProduct, ReservedItem } from "@/lib/types";
 import { pluralise } from "@/lib/utils";
 import ProductGrid from "@/ui/components/product-grid/ProductGrid";
 import PlainRoundedButtonLink from "../components/buttons/PlainRoundedButtonLink";
+import { useEffect, useState } from "react";
+import { getReservedItems } from "@/lib/actions";
 
 interface BaseGridPageProps {
     displayedProducts: ClientProduct[];
@@ -22,6 +24,24 @@ export default function BaseGridPage({
     fixedOverlays,
     sortingUnit,
 }: BaseGridPageProps) {
+    const [groupedReservedItems, setGroupedReservedItems] = useState<ReservedItem[]>();
+
+    useEffect(() => {
+        if (!displayedProducts) return;
+
+        const fetchReserved = async () => {
+            const reserved = await getReservedItems({
+                productIds: displayedProducts.map((product) => product.id),
+            });
+
+            setGroupedReservedItems(reserved.data);
+        };
+
+        fetchReserved();
+    }, [displayedProducts]);
+
+    if (!groupedReservedItems) return null;
+
     return (
         <>
             {categoryTabs ?? null}
@@ -37,7 +57,10 @@ export default function BaseGridPage({
                     </div>
                     <div className="flex grow">
                         {displayedProducts.length > 0 ? (
-                            <ProductGrid productList={displayedProducts} />
+                            <ProductGrid
+                                productList={displayedProducts}
+                                groupedReservedItems={groupedReservedItems}
+                            />
                         ) : (
                             <div className="flex flex-col justify-center items-center w-full p-4 gap-8">
                                 <p className="text-center">{noProductMessage}</p>

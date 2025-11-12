@@ -1,6 +1,6 @@
 "use client";
 
-import { ClientProduct, ClientStock, Sizes, StockTableMode } from "@/lib/types";
+import { ClientProduct, ClientStock, Sizes, StateSetter, StockTableMode } from "@/lib/types";
 import { extractZodMessage, isUnique } from "@/lib/utils";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import StockTableInput from "@/ui/components/forms/StockTableInput";
@@ -15,9 +15,9 @@ import { clientStockSchema, sizeSchema } from "@/lib/schemas";
 interface ProductStockTableProps {
     formSavedProductData: ClientProduct;
     formProvisionalProductData: ClientProduct;
-    setFormProvisionalProductData: React.Dispatch<React.SetStateAction<ClientProduct>>;
+    setFormProvisionalProductData: StateSetter<ClientProduct>;
     tableMode: StockTableMode;
-    setTableMode: React.Dispatch<React.SetStateAction<StockTableMode>>;
+    setTableMode: StateSetter<StockTableMode>;
     addComplete: boolean;
 }
 

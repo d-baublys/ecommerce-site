@@ -7,7 +7,7 @@ export function useWishlistToggle(product: ClientProduct) {
     const [isAnimated, setIsAnimated] = useState<boolean>(false);
 
     const { wishlist, addToWishlist, removeFromWishlist } = useWishlistStore((state) => state);
-    const inWishlist = wishlist.findIndex((item) => item.id === product.id) > -1;
+    const inWishlist = wishlist.includes(product.id);
 
     const [showFilled, setShowFilled] = useState<boolean>(inWishlist);
 
@@ -24,7 +24,7 @@ export function useWishlistToggle(product: ClientProduct) {
         }, 400);
 
         if (!inWishlist) {
-            addToWishlist(product);
+            addToWishlist(product.id);
             setShowFilled(true);
         } else {
             setShowFilled(false);

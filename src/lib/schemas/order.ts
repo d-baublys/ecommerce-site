@@ -1,24 +1,20 @@
 import { z } from "zod";
 import { productSchema } from "./product";
-import {
-    incrementedIdSchema,
-    orderStatusSchema,
-    priceSchema,
-    productNameSchema,
-    quantitySchema,
-    sizeSchema,
-} from "./base";
+import { incrementedIdSchema, orderStatusSchema, priceSchema } from "./base";
+import { baseStockSchema } from "./stock";
+import { bagItemSchema } from "./bag";
 
-export const orderItemSchema = z.object({
-    id: z.uuid(),
-    productId: productSchema.shape.id,
-    name: productNameSchema,
-    price: priceSchema,
-    size: sizeSchema,
-    quantity: quantitySchema,
-});
+const { id, dateAdded, ...netProduct } = productSchema.shape;
 
-export const orderItemCreateSchema = z.array(orderItemSchema.omit({ id: true }));
+export const orderItemSchema = z
+    .object({
+        id: z.uuid(),
+        ...baseStockSchema.shape,
+    })
+    .extend(netProduct);
+
+export const orderItemCreateInputSchema = z.array(orderItemSchema.omit({ id: true }));
+export const orderItemCreateParamsSchema = z.array(bagItemSchema.omit({ productName: true }));
 
 export const orderSchema = z.object({
     id: incrementedIdSchema,
@@ -34,12 +30,11 @@ export const orderSchema = z.object({
     sessionId: z.string(),
     paymentIntentId: z.string(),
 });
-
 export const clientOrderSchema = orderSchema.extend({
-    items: z.array(orderItemSchema.extend({ product: productSchema })),
+    items: z.array(orderItemSchema),
 });
 
-export const orderCreateSchema = orderSchema
+export const orderCreateInputSchema = orderSchema
     .omit({
         id: true,
     })
@@ -49,10 +44,14 @@ export const orderCreateSchema = orderSchema
         createdAt: orderSchema.shape.createdAt.optional(),
         returnRequestedAt: orderSchema.shape.returnRequestedAt.optional(),
         refundedAt: orderSchema.shape.refundedAt.optional(),
-        items: orderItemCreateSchema,
+        items: orderItemCreateInputSchema,
     });
+
+export const orderCreateParamsSchema = orderCreateInputSchema.extend({
+    items: orderItemCreateParamsSchema,
+});
 
 export const orderUpdateSchema = z.intersection(
     orderSchema.pick({ id: true, status: true }),
-    orderCreateSchema.pick({ returnRequestedAt: true, refundedAt: true })
+    orderCreateInputSchema.pick({ returnRequestedAt: true, refundedAt: true })
 );

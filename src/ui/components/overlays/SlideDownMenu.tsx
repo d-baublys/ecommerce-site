@@ -24,7 +24,7 @@ export default function SlideDownMenu({
 
     return (
         <div
-            className={`fixed left-0 global-constraints overlay-constraints bg-white [transition:all_0.3s_ease-in-out] overflow-auto z-[9999] ${
+            className={`fixed left-0 global-constraints overlay-constraints bg-white [transition:all_0.3s_ease-in-out] overflow-auto z-[9500] ${
                 overrideClasses ?? ""
             } ${isOpenState ? "top-0" : "top-[-250%]"}`}
             {...props}

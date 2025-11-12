@@ -8,10 +8,18 @@ import {
     ClientStock,
     StockCreateInput,
     StockUpdateInput,
+    ReservedItem,
+    UniformReservedItems,
 } from "./types";
 import bcrypt from "bcryptjs";
-import { REFUND_WINDOW, SORT_OPTIONS, VALID_CATEGORIES } from "./constants";
+import {
+    REFUND_WINDOW,
+    SINGLE_ITEM_MAX_QUANTITY,
+    SORT_OPTIONS,
+    VALID_CATEGORIES,
+} from "./constants";
 import { ZodSafeParseError } from "zod";
+import { uniformReservedItemsSchema } from "./schemas";
 
 export function debounce<T extends (...args: unknown[]) => void>(func: T, delay: number) {
     let timer: ReturnType<typeof setTimeout>;
@@ -23,23 +31,61 @@ export function debounce<T extends (...args: unknown[]) => void>(func: T, delay:
     };
 }
 
-export function checkStock(
-    productData: ClientProduct,
-    productSize: Sizes,
+export function findBagItem(
+    productId: ClientProduct["id"],
+    size: Sizes,
     bag: BagItem[]
-): boolean {
-    const stock = productData.stock[productSize as keyof typeof productData.stock] ?? 0;
+): BagItem | undefined {
+    return bag.find((bagItem) => bagItem.productId === productId && bagItem.size === size);
+}
 
-    const existing = bag.find(
-        (bagItem) => bagItem.product.id === productData.id && bagItem.size === productSize
-    );
-
-    const bagQuantity = existing?.quantity ?? 0;
-
+export function isBagAddPermitted(
+    currentBagQty: BagItem["quantity"],
+    stockQty: number,
+    totalReservedItems?: number
+) {
     return !(
-        bagQuantity >= Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY) ||
-        bagQuantity >= stock
+        currentBagQty >= SINGLE_ITEM_MAX_QUANTITY ||
+        currentBagQty >= stockQty - (totalReservedItems ?? 0)
     );
+}
+
+export function calculateTotalReservedQty(items: UniformReservedItems): number {
+    return items.reduce((total, curr) => total + curr.quantity, 0);
+}
+
+type SizeCheckResult = { success: true } | { success: false; error: "nil" | "limit" };
+
+export function checkSizeAvailable(
+    productData: ClientProduct,
+    size: Sizes,
+    bag: BagItem[],
+    uniformReservedItems: UniformReservedItems
+): SizeCheckResult {
+    const parsedItems = uniformReservedItemsSchema.safeParse(uniformReservedItems);
+
+    if (!parsedItems.success) {
+        throw new Error("Reserved item data in size check is not uniform");
+    }
+
+    const stockQty = productData.stock[size as Sizes] ?? 0;
+    const itemInBag = findBagItem(productData.id, size, bag);
+    const currentQty = itemInBag?.quantity ?? 0;
+    const totalReservedItems = calculateTotalReservedQty(parsedItems.data);
+
+    let result: SizeCheckResult = { success: true };
+    const permitted = isBagAddPermitted(currentQty, stockQty, totalReservedItems);
+
+    if (!permitted) {
+        const error: "nil" | "limit" = currentQty >= SINGLE_ITEM_MAX_QUANTITY ? "limit" : "nil";
+
+        result = {
+            success: false,
+            error,
+        };
+    }
+
+    return result;
 }
 
 export function isUnique(sizeKey: Sizes, stockData: ClientStock) {
@@ -201,7 +247,13 @@ export function escapeRegExp(string: string): string {
 }
 
 export function buildBagItem(product: ClientProduct, size: Sizes): BagItem {
-    return { product, size, quantity: 1 };
+    return {
+        productId: product.id,
+        productName: product.name,
+        price: product.price,
+        size,
+        quantity: 1,
+    };
 }
 
 export function buildProductUrl(id: string, slug: string): string {
@@ -243,4 +295,16 @@ export function zodErrorResponse(safeParseError: ZodSafeParseError<unknown>): {
     error: string;
 } {
     return { success: false, error: extractZodMessage(safeParseError) };
+}
+
+export function getUniformReservedItems({
+    items,
+    productId,
+    size,
+}: {
+    items: ReservedItem[];
+    productId: ReservedItem["productId"];
+    size: ReservedItem["size"];
+}): UniformReservedItems {
+    return items?.filter((item) => item.productId === productId && item.size === size) ?? [];
 }

@@ -1,6 +1,6 @@
 describe("Search results page", () => {
     beforeEach(() => {
-        cy.visitHomeAwaitPathnameSettle();
+        cy.visitHome();
         cy.get("[aria-label='Search']").click();
         cy.get("#search-overlay-container [aria-label='Search input']").as("search-input");
     });

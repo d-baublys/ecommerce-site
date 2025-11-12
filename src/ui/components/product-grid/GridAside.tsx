@@ -1,6 +1,6 @@
 "use client";
 
-import { ClientProduct, PriceFilterId, Sizes } from "@/lib/types";
+import { ClientProduct, PriceFilterId, Sizes, StateSetter } from "@/lib/types";
 import AccordionSection from "./AccordionSection";
 import React, { useMemo } from "react";
 import FilterButton from "@/ui/components/buttons/FilterButton";
@@ -15,9 +15,9 @@ export default function GridAside({
 }: {
     allCategoryProducts: ClientProduct[];
     sizeFilters: Sizes[];
-    setSizeFilters: React.Dispatch<React.SetStateAction<Sizes[]>>;
+    setSizeFilters: StateSetter<Sizes[]>;
     priceFilters: PriceFilterId[];
-    setPriceFilters: React.Dispatch<React.SetStateAction<PriceFilterId[]>>;
+    setPriceFilters: StateSetter<PriceFilterId[]>;
 }) {
     const buildBaseRecord = <T extends string>(keys: T[]) => {
         const record: Record<T, number> = Object.fromEntries(keys.map((key) => [key, 0])) as Record<
@@ -131,7 +131,7 @@ export default function GridAside({
 
     return (
         <div className="w-full h-min border-b-1">
-            <AccordionSection text="Size">
+            <AccordionSection text="Size" filters={sizeFilters}>
                 {generateButtonList({
                     data: sizesData,
                     filters: sizeFilters,
@@ -140,7 +140,7 @@ export default function GridAside({
                     className: "size-btn-container",
                 })}
             </AccordionSection>
-            <AccordionSection text="Price">
+            <AccordionSection text="Price" filters={priceFilters}>
                 {generateButtonList({
                     data: pricesData,
                     filters: priceFilters,

@@ -1,7 +1,13 @@
-import { ClientProduct } from "@/lib/types";
+import { ClientProduct, ReservedItem } from "@/lib/types";
 import ProductGridTile from "@/ui/components/cards/ProductGridTile";
 
-export default function ProductGrid({ productList }: { productList: ClientProduct[] }) {
+export default function ProductGrid({
+    productList,
+    groupedReservedItems,
+}: {
+    productList: ClientProduct[];
+    groupedReservedItems: ReservedItem[];
+}) {
     return (
         <div
             data-testid="product-grid"
@@ -9,7 +15,10 @@ export default function ProductGrid({ productList }: { productList: ClientProduc
         >
             {productList.map((product) => (
                 <div key={product.id} className="col-span-6 xl:col-span-4 2xl:col-span-3">
-                    <ProductGridTile product={product} />
+                    <ProductGridTile
+                        product={product}
+                        groupedReservedItems={groupedReservedItems}
+                    />
                 </div>
             ))}
         </div>

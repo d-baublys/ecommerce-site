@@ -1,4 +1,4 @@
-import { CypressTestDataDeleteParams, CypressTestProductData } from "../../src/lib/types";
+import { CypressTestDataDeleteParams } from "../../src/lib/types";
 
 let orderIds: CypressTestDataDeleteParams["orderIds"] = [];
 let productIds: CypressTestDataDeleteParams["productIds"] = [];
@@ -26,9 +26,7 @@ describe("Orders page unauthenticated tests", () => {
 describe("Orders page authenticated tests", () => {
     beforeEach(() => {
         cy.logInAsStandardUser();
-        cy.visit("/orders");
-        cy.location("pathname").should("eq", "/orders");
-        cy.contains("My Orders").should("be.visible");
+        cy.visitOrdersPage();
     });
 
     it("shows correct message when logged in but no orders to show", () => {
@@ -36,11 +34,7 @@ describe("Orders page authenticated tests", () => {
     });
 
     it("redirects to login page on log out", () => {
-        cy.get("[aria-label='Account']").should("be.visible");
-        cy.get("[aria-label='Account']").click();
-        cy.contains("button", "Log Out").should("be.visible");
-        cy.contains("button", "Log Out").click();
-        cy.get("#account-menu").should("not.be.visible");
+        cy.logOut();
         cy.location("pathname").should("eq", "/login");
         cy.location("search").should("eq", "?redirect_after=orders");
     });
@@ -48,30 +42,16 @@ describe("Orders page authenticated tests", () => {
 
 describe("Orders page authenticated & seeded tests", () => {
     before(() => {
-        cy.task("createCypressTestProduct").then((productData: CypressTestProductData) => {
-            cy.task("createCypressTestOrder", { testProductsData: [productData] }).then(
-                (orderId: CypressTestDataDeleteParams["orderIds"][number]) => {
-                    orderIds.push(orderId);
-                    productIds.push(productData.id);
-                }
-            );
-        });
+        cy.createTestOrder({ productIds, orderIds });
     });
 
     beforeEach(() => {
         cy.logInAsAdmin();
-        cy.visit("/orders");
-        cy.location("pathname").should("eq", "/orders");
-        cy.contains("My Orders").should("be.visible");
+        cy.visitOrdersPage();
     });
 
     after(() => {
-        if (orderIds.length || productIds.length) {
-            cy.task("deleteTestData", {
-                orderIds,
-                productIds,
-            });
-        }
+        cy.clearTestData({ productIds, orderIds });
     });
 
     it("renders correct number of order tiles", () => {

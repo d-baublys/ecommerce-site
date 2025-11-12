@@ -28,13 +28,13 @@ describe("WishlistToggleButton", () => {
         await waitFor(() => {
             const wishlist = getLatestWishlist();
 
-            expect(wishlist.some((item) => item.id === testProduct.id)).toBe(true);
+            expect(wishlist.some((id) => id === testProduct.id)).toBe(true);
             expect(firstChild).toHaveTextContent("Remove from Wishlist");
         });
     });
 
     it("removes wishlist item clicked & shows correct text", async () => {
-        addToWishlist(testProduct);
+        addToWishlist(testProduct.id);
 
         const { container } = render(<WishlistToggleButton product={testProduct} />);
         const firstChild = container.firstChild;
@@ -49,7 +49,7 @@ describe("WishlistToggleButton", () => {
         await waitFor(() => {
             const wishlist = getLatestWishlist();
 
-            expect(wishlist.some((item) => item.id === testProduct.id)).toBe(false);
+            expect(wishlist.some((id) => id === testProduct.id)).toBe(false);
             expect(firstChild).toHaveTextContent("Add to Wishlist");
         });
     });
@@ -67,7 +67,7 @@ describe("WishlistToggleButton", () => {
         });
 
         const wishlist = getLatestWishlist();
-        const occurrences = wishlist.filter((item) => item.id === testProduct.id).length;
+        const occurrences = wishlist.filter((id) => id === testProduct.id).length;
 
         expect(occurrences).toBe(0);
     });

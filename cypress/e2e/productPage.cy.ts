@@ -62,7 +62,7 @@ describe("Product page", () => {
         cy.contains("button", "Add to Bag").click();
         cy.get(".bag-confirm-modal").should("be.visible");
         cy.get("#close-modal-button").click();
-        cy.visit("/bag");
+        cy.visitBag();
         cy.get("[data-testid='bag-tile-ul'] .bag-tile").should("have.length", 2); // 2 sizes, 3 total quantity
         cy.get(".bag-count-badge").should("have.text", "3");
     });
@@ -83,12 +83,13 @@ describe("Product page", () => {
 
     it("toggles product wishlisting on 'add to wishlist' button click", () => {
         cy.contains("button", "Add to Wishlist").click();
-        cy.visit("/wishlist");
+        cy.visitWishlist();
         cy.get(".grid-tile-container .product-tile").should("have.length", 1);
         cy.contains(/1\s*Item/).should("be.visible");
         cy.visitTestProduct(testProductLink);
         cy.contains("button", "Remove from Wishlist").click();
-        cy.go("back");
+        cy.awaitWishlistUpdate();
+        cy.visitWishlist();
         cy.get(".grid-tile-container .product-tile").should("have.length", 0);
         cy.contains(/0\s*Items/).should("be.visible");
     });

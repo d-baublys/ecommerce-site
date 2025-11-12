@@ -1,6 +1,6 @@
 import stripe from "@/lib/stripe";
-import { createOrder } from "@/lib/actions";
-import { OrderCreateInput, OrderItemCreateInput } from "@/lib/types";
+import { createOrder, deleteCheckoutSessions } from "@/lib/actions";
+import { OrderCreateParams, OrderItemCreateParams } from "@/lib/types";
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
 
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
             return new Response("Missing items metadata", { status: 400 });
         }
 
-        let items: OrderItemCreateInput;
+        let items: OrderItemCreateParams;
 
         try {
             items = JSON.parse(session.metadata.items);
@@ -42,9 +42,7 @@ export async function POST(req: NextRequest) {
         const shippingTotal = Number(session.metadata.shippingCost);
         const orderTotal = subTotal + shippingTotal;
 
-        const userId = !isNaN(Number(session.metadata.userId))
-            ? Number(session.metadata.userId)
-            : undefined;
+        const userId = Number(session.metadata.userId);
         const email = session.customer_details?.email;
         const paymentIntentId =
             typeof session.payment_intent === "string"
@@ -57,7 +55,7 @@ export async function POST(req: NextRequest) {
         if (paymentIntentId === null)
             return new Response("Payment intent data not found", { status: 400 });
 
-        const orderCreateData: OrderCreateInput = {
+        const orderCreateData: OrderCreateParams = {
             items,
             subTotal,
             shippingTotal,
@@ -68,13 +66,31 @@ export async function POST(req: NextRequest) {
             paymentIntentId,
         };
 
-        const result = await createOrder(orderCreateData);
+        const sessionDelete = await deleteCheckoutSessions(userId);
 
-        if (!result.success && result.error) {
-            console.error("Error parsing order data: ", result.error);
+        if (!sessionDelete.success) {
+            return new Response("Error deleting session", { status: 400 });
+        }
+
+        const orderResult = await createOrder(orderCreateData);
+
+        if (!orderResult.success && orderResult.error) {
+            console.error("Error parsing order data: ", orderResult.error);
             return new Response("Error parsing order data", { status: 400 });
-        } else if (!result.success) {
+        } else if (!orderResult.success) {
             return new Response("Error creating new order", { status: 400 });
+        }
+    } else if (event.type === "checkout.session.expired") {
+        const session = event.data.object;
+
+        if (!session.metadata?.items) {
+            return new Response("Missing items metadata", { status: 400 });
+        }
+
+        const sessionDelete = await deleteCheckoutSessions(Number(session.metadata.userId));
+
+        if (!sessionDelete.success) {
+            return new Response("Error deleting session", { status: 400 });
         }
     }
 

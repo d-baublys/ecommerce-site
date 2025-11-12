@@ -1,5 +1,5 @@
 import Carousel from "@/ui/components/Carousel";
-import { getFeaturedProducts, getProducts } from "@/lib/actions";
+import { getFeaturedProducts, getManyProducts } from "@/lib/actions";
 import Link from "next/link";
 import BareLayout from "@/ui/layouts/BareLayout";
 import ProductImage from "@/ui/components/ProductImage";
@@ -15,7 +15,7 @@ export default async function HomePage() {
     let featuredList = featuredFetch.data;
 
     if (!featuredList.length) {
-        const fallbackFetch = await getProducts();
+        const fallbackFetch = await getManyProducts({ take: FEATURED_COUNT });
 
         const fallbackData = fallbackFetch.data;
 
@@ -27,7 +27,7 @@ export default async function HomePage() {
             );
         }
 
-        featuredList = fallbackData.slice(0, FEATURED_COUNT);
+        featuredList = fallbackData;
     }
 
     return (

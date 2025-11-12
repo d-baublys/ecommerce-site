@@ -2,9 +2,7 @@ import { standardEmail, standardPassword } from "../support/credentials";
 
 describe("Login page", () => {
     beforeEach(() => {
-        cy.visit("/login");
-        cy.location("pathname").should("eq", "/login");
-        cy.contains("Log In").should("be.visible");
+        cy.visitLogInPage();
     });
 
     it("navigates to homepage after successful login by default", () => {

@@ -1,36 +1,37 @@
-import { matchPriceRangeLabel } from "../../../src/lib/test-utils";
+import { matchPriceRangeLabel, matchSizeLabel } from "../../../src/lib/test-utils";
 
 describe("Product grid page viewport-agnostic tests", () => {
     beforeEach(() => {
-        cy.largeBreakpoint();
-        cy.visit("/category/all");
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.breakpointLarge();
+        cy.visitCategoryPage();
     });
 
     it("toggles item wishlisting on heart icon click", () => {
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
         cy.get("@test-tile").trigger("mouseover");
         cy.get("@test-tile").find("[aria-label='Add or remove from wishlist']").click();
-        cy.visit("/wishlist");
+        cy.awaitWishlistUpdate();
+        cy.visitWishlist();
         cy.get(".grid-tile-container .product-tile").should("have.length", 1);
         cy.contains(/1\s*Item/).should("be.visible");
 
-        cy.go("back");
+        cy.visitCategoryPage();
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
         cy.get("@test-tile").trigger("mouseover");
         cy.get("@test-tile").find("[aria-label='Add or remove from wishlist']").click();
-        cy.go("forward");
+        cy.awaitWishlistUpdate();
+        cy.visitWishlist();
         cy.get(".grid-tile-container .product-tile").should("have.length", 0);
         cy.contains(/0\s*Items/).should("be.visible");
         cy.contains("Your wishlist is empty!").should("be.visible");
     });
 
     it("displays correct number of size options on quick add click", () => {
-        cy.get(".desktop-filtering").contains("button", "Price").click();
+        cy.openPriceAccordionDesktop();
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
 
         cy.get("@test-tile").trigger("mouseover");
@@ -43,11 +44,11 @@ describe("Product grid page viewport-agnostic tests", () => {
 
     it("adds product to the bag on quick add size icon click, shows modal, & updates navbar UI", () => {
         cy.get(".bag-count-badge").should("not.exist");
-        cy.get(".desktop-filtering").contains("button", "Price").click();
+        cy.openPriceAccordionDesktop();
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
 
         cy.get("@test-tile").trigger("mouseover");
@@ -56,18 +57,14 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.get(".bag-confirm-modal").should("be.visible");
         cy.get("#close-modal-button").click();
 
-        cy.visit("/bag");
+        cy.visitBag();
         cy.get("[data-testid='bag-tile-ul'] .bag-tile").should("have.length", 1);
         cy.get(".bag-count-badge").should("be.visible");
         cy.get(".bag-count-badge").should("have.text", "1");
     });
 
     it("locks scrolling when bag confirm modal is open", () => {
-        cy.get(".desktop-filtering").contains("button", "Price").click();
-        cy.get(".desktop-filtering .price-btn-container button").first().click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
-
         cy.assertNoScroll();
         cy.get("@test-tile").trigger("mouseover");
         cy.get("@test-tile").contains("button", "Quick Add").click();
@@ -83,11 +80,11 @@ describe("Product grid page viewport-agnostic tests", () => {
     });
 
     it("removes a size option in quick add if it becomes unstocked", () => {
-        cy.get(".desktop-filtering").contains("button", "Price").click();
+        cy.openPriceAccordionDesktop();
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
 
         cy.get("@test-tile").trigger("mouseover");
@@ -104,11 +101,11 @@ describe("Product grid page viewport-agnostic tests", () => {
     });
 
     it("displays quick add button substitute when product becomes completely unstocked", () => {
-        cy.get(".desktop-filtering").contains("button", "Price").click();
+        cy.openPriceAccordionDesktop();
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
 
         cy.get("@test-tile").trigger("mouseover");
@@ -145,7 +142,7 @@ describe("Product grid page viewport-agnostic tests", () => {
             expect(prices).to.not.deep.equal(sortedAsc);
         });
         cy.get("#sort-select").select("Price (Low to High)");
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".tile-price").then((tilePrices) => {
             const prices = [...tilePrices].map((price) =>
                 parseFloat(price.innerText.replace("£", ""))
@@ -166,7 +163,7 @@ describe("Product grid page viewport-agnostic tests", () => {
             expect(prices).to.not.deep.equal(sortedDesc);
         });
         cy.get("#sort-select").select("Price (High to Low)");
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".tile-price").then((tilePrices) => {
             const prices = [...tilePrices].map((price) =>
                 parseFloat(price.innerText.replace("£", ""))
@@ -185,12 +182,66 @@ describe("Product grid page viewport-agnostic tests", () => {
             expect(dates).to.not.deep.equal(sortedDates);
         });
         cy.get("#sort-select").select("Newest");
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".tile-price").then(($tiles) => {
             const dates = [...$tiles].map((tile) => new Date(tile.getAttribute("data-date-added")));
             const sortedDates = [...dates].sort((a, b) => a.getTime() - b.getTime());
 
             expect(dates).to.deep.equal(sortedDates);
+        });
+    });
+
+    it("resets size filters on client-side pathname change", () => {
+        cy.openSizeAccordionDesktop();
+        cy.get(".desktop-filtering .size-btn-container")
+            .contains("button", matchSizeLabel(7, "XXL"))
+            .click();
+        cy.awaitFilterUpdate();
+        cy.get(".grid-tile-container .product-tile").should("have.length", 7);
+        cy.contains(/7\s*Items/).should("be.visible");
+
+        cy.get("#breadcrumbs").contains("All").click();
+        cy.location("pathname").should("eq", "/category/all");
+        cy.get(".grid-tile-container .product-tile").should("have.length", 15);
+        cy.contains(/15\s*Items/).should("be.visible");
+    });
+
+    it("resets price filters on client-side pathname change", () => {
+        cy.openPriceAccordionDesktop();
+        cy.get(".desktop-filtering .price-btn-container")
+            .contains("button", matchPriceRangeLabel(1, "200"))
+            .click();
+        cy.awaitFilterUpdate();
+        cy.get(".grid-tile-container .product-tile").should("have.length", 1);
+        cy.contains(/1\s*Item/).should("be.visible");
+
+        cy.get("#breadcrumbs").contains("All").click();
+        cy.location("pathname").should("eq", "/category/all");
+        cy.get(".grid-tile-container .product-tile").should("have.length", 15);
+        cy.contains(/15\s*Items/).should("be.visible");
+    });
+
+    it("resets sort on client-side pathname change", () => {
+        cy.get("#sort-select").select("Price (Low to High)");
+        cy.awaitFilterUpdate();
+        cy.get(".tile-price").then((tilePrices) => {
+            const prices = [...tilePrices].map((price) =>
+                parseFloat(price.innerText.replace("£", ""))
+            );
+            const sortedAsc = [...prices].sort((a, b) => a - b);
+
+            expect(prices).to.deep.equal(sortedAsc);
+        });
+
+        cy.get("#breadcrumbs").contains("All").click();
+        cy.location("pathname").should("eq", "/category/all");
+        cy.get(".tile-price").then(($tilePrices) => {
+            const prices = [...$tilePrices].map((price) =>
+                parseFloat(price.innerText.replace("£", ""))
+            );
+            const sortedDesc = [...prices].sort((a, b) => b - a);
+
+            expect(prices).to.not.deep.equal(sortedDesc);
         });
     });
 });

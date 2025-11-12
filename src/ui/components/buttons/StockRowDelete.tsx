@@ -1,10 +1,10 @@
 "use client";
 
-import { ClientStock, Sizes } from "@/lib/types";
+import { ClientStock, Sizes, StateSetter } from "@/lib/types";
 import { IoTrash } from "react-icons/io5";
 
 interface StockRowDeleteProps extends React.HtmlHTMLAttributes<HTMLButtonElement> {
-    stockSetter: React.Dispatch<React.SetStateAction<ClientStock>>;
+    stockSetter: StateSetter<ClientStock>;
     size: Sizes;
 }
 

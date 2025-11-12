@@ -40,12 +40,7 @@ export default defineConfig({
                         },
                     });
 
-                    return {
-                        id: createdProduct.id,
-                        name: createdProduct.name,
-                        price: createdProduct.price,
-                        slug: createdProduct.slug,
-                    };
+                    return createdProduct;
                 },
                 async createCypressTestOrder(params: TestOrderCypressParams) {
                     const orderCreateData: OrderCreateInput = buildTestOrderDataCypress(params);
@@ -83,11 +78,7 @@ export default defineConfig({
                 },
                 async deleteTestData({ orderIds, productIds }: CypressTestDataDeleteParams) {
                     await prisma.$transaction([
-                        prisma.orderItem.deleteMany({ where: { orderId: { in: orderIds } } }),
                         prisma.order.deleteMany({ where: { id: { in: orderIds } } }),
-                        prisma.stock.deleteMany({
-                            where: { productId: { in: productIds } },
-                        }),
                         prisma.product.deleteMany({
                             where: { id: { in: productIds } },
                         }),

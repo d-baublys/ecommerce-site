@@ -2,9 +2,8 @@ import { matchPriceRangeLabel, matchSizeLabel } from "../../../src/lib/test-util
 
 describe("Product grid page desktop viewport tests", () => {
     beforeEach(() => {
-        cy.largeBreakpoint();
-        cy.visit("/category/all");
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.breakpointLarge();
+        cy.visitCategoryPage();
     });
 
     it("displays the correct number of items", () => {
@@ -18,7 +17,7 @@ describe("Product grid page desktop viewport tests", () => {
     });
 
     it("displays the correct number of size filters", () => {
-        cy.get(".desktop-filtering").contains("button", "Size").click();
+        cy.openSizeAccordionDesktop();
         cy.get(".desktop-filtering .size-btn-container li").should("have.length", 6);
         cy.get(".desktop-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XS"))
@@ -41,7 +40,7 @@ describe("Product grid page desktop viewport tests", () => {
     });
 
     it("displays the correct number of price filters", () => {
-        cy.get(".desktop-filtering").contains("button", "Price").click();
+        cy.openPriceAccordionDesktop();
         cy.get(".desktop-filtering .price-btn-container li").should("have.length", 5);
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(4, "0", "49"))
@@ -61,80 +60,95 @@ describe("Product grid page desktop viewport tests", () => {
     });
 
     it("filters correctly on single size filter selection", () => {
-        cy.get(".desktop-filtering").contains("button", "Size").click();
+        cy.openSizeAccordionDesktop();
         cy.get(".desktop-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".grid-tile-container .product-tile").should("have.length", 7);
         cy.contains(/7\s*Items/).should("be.visible");
     });
 
     it("filters correctly on compound size filter selection", () => {
-        cy.get(".desktop-filtering").contains("button", "Size").click();
+        cy.openSizeAccordionDesktop();
         cy.get(".desktop-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XS"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".desktop-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".grid-tile-container .product-tile").should("have.length", 14);
         cy.contains(/14\s*Items/).should("be.visible");
     });
 
     it("filters correctly on single price filter selection", () => {
-        cy.get(".desktop-filtering").contains("button", "Price").click();
+        cy.openPriceAccordionDesktop();
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".grid-tile-container .product-tile").should("have.length", 1);
         cy.contains(/1\s*Item/).should("be.visible");
     });
 
     it("filters correctly on compound price filter selection", () => {
-        cy.get(".desktop-filtering").contains("button", "Price").click();
+        cy.openPriceAccordionDesktop();
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(4, "0", "49"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".grid-tile-container .product-tile").should("have.length", 5);
         cy.contains(/5\s*Items/).should("be.visible");
     });
 
     it("filters correctly on combined size and price filter selection", () => {
-        cy.get(".desktop-filtering").contains("button", "Size").click();
-        cy.get(".desktop-filtering").contains("button", "Price").click();
+        cy.openSizeAccordionDesktop();
+        cy.openPriceAccordionDesktop();
         cy.get(".desktop-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".grid-tile-container .product-tile").should("have.length", 0);
         cy.contains(/0\s*Items/).should("be.visible");
     });
 
     it("displays the correct message when filtering returns no results", () => {
-        cy.get(".desktop-filtering").contains("button", "Size").click();
-        cy.get(".desktop-filtering").contains("button", "Price").click();
+        cy.openSizeAccordionDesktop();
+        cy.openPriceAccordionDesktop();
         cy.get(".desktop-filtering .size-btn-container")
             .contains("button", matchSizeLabel(7, "XXL"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.get(".desktop-filtering .price-btn-container")
             .contains("button", matchPriceRangeLabel(1, "200"))
             .click();
-        cy.get("[aria-label='Loading indicator']").should("not.exist");
+        cy.awaitFilterUpdate();
         cy.contains("No products matching your filter").should("be.visible");
+    });
+
+    it("opens only accordions with active filters on page load", () => {
+        cy.openSizeAccordionDesktop();
+        cy.get(".desktop-filtering .size-btn-container")
+            .contains("button", matchSizeLabel(7, "XXL"))
+            .click();
+        cy.awaitFilterUpdate();
+        cy.get(".desktop-filtering .size-btn-container").should("be.visible");
+        cy.get(".desktop-filtering .price-btn-container").should("not.be.visible");
+        cy.reload();
+        cy.get("#loading-indicator").should("not.exist");
+        cy.contains(/\d+\s*Item(s)?/).should("be.visible");
+        cy.get(".desktop-filtering .size-btn-container").should("be.visible");
+        cy.get(".desktop-filtering .price-btn-container").should("not.be.visible");
     });
 
     it("displays conditional product tile elements on mouse hover only", () => {

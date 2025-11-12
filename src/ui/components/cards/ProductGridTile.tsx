@@ -1,13 +1,14 @@
 "use client";
 
-import { ClientProduct, Sizes } from "@/lib/types";
+import { ClientProduct, ReservedItem, Sizes } from "@/lib/types";
 import {
     buildProductUrl,
-    checkStock,
+    checkSizeAvailable,
     buildBagItem,
     isolateInteraction,
     processDateForClient,
     stringifyConvertPrice,
+    getUniformReservedItems,
 } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { useBagStore } from "@/stores/bagStore";
@@ -18,7 +19,13 @@ import Link from "next/link";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import { VALID_SIZES } from "@/lib/constants";
 
-export default function ProductGridTile({ product }: { product: ClientProduct }) {
+export default function ProductGridTile({
+    product,
+    groupedReservedItems,
+}: {
+    product: ClientProduct;
+    groupedReservedItems: ReservedItem[];
+}) {
     const { bag, addToBag } = useBagStore((state) => state);
 
     const [isHovered, setIsHovered] = useState<boolean>(false);
@@ -28,9 +35,25 @@ export default function ProductGridTile({ product }: { product: ClientProduct })
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const tileRef = useRef<HTMLDivElement>(null);
 
-    const availableSizes = VALID_SIZES.filter(
-        (size) => size in product.stock && checkStock(product, size, bag)
-    );
+    const availableSizes = VALID_SIZES.filter((size) => {
+        try {
+            const sizeCheck = checkSizeAvailable(
+                product,
+                size,
+                bag,
+                getUniformReservedItems({
+                    items: groupedReservedItems,
+                    productId: product.id,
+                    size,
+                })
+            );
+
+            return sizeCheck.success && size in product.stock;
+        } catch (error) {
+            const e = error as Error;
+            throw new Error(e.message);
+        }
+    });
 
     const handleTouchStart = () => {
         timerRef.current = setTimeout(() => setIsHovered(true), 300);
@@ -50,8 +73,8 @@ export default function ProductGridTile({ product }: { product: ClientProduct })
 
     const handleSizeClick = (e: React.TouchEvent | React.MouseEvent, size: Sizes) => {
         isolateInteraction(e);
-        const permitted = addToBag(buildBagItem(product, size));
-        permitted && setIsModalOpen(true);
+        addToBag(product, buildBagItem(product, size));
+        setIsModalOpen(true);
     };
 
     const handleBlur = (e: React.FocusEvent) => {

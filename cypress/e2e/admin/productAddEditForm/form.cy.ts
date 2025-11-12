@@ -1,9 +1,7 @@
 describe("Product add/edit form base tests", () => {
     beforeEach(() => {
         cy.logInAsAdmin();
-        cy.visit("/admin/products/add-product");
-        cy.location("pathname").should("eq", "/admin/products/add-product");
-        cy.contains("Add Product").should("be.visible");
+        cy.visitAddProductPage();
         cy.awaitTableSettle();
     });
 

@@ -1,14 +1,11 @@
 import { z } from "zod";
-import { clientProductSchema } from "./product";
-import { quantitySchema, sizeSchema } from "./base";
+import { baseStockSchema } from "./stock";
+import { priceSchema, productNameSchema } from "./base";
 
 export const bagItemSchema = z.object({
-    product: clientProductSchema,
-    size: sizeSchema,
-    quantity: quantitySchema,
+    productName: productNameSchema,
+    price: priceSchema,
+    ...baseStockSchema.shape,
 });
 
-export const mergedBagItemSchema = z.intersection(
-    bagItemSchema,
-    z.object({ latestSizeStock: quantitySchema })
-);
+export const bagItemListSchema = z.array(bagItemSchema);

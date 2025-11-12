@@ -4,52 +4,82 @@ import GoButton from "@/ui/components/buttons/GoButton";
 import BagTile from "@/ui/components/cards/BagTile";
 import { useBagStore } from "@/stores/bagStore";
 import { loadStripe } from "@stripe/stripe-js";
-import { useEffect, useState } from "react";
-import { getProducts } from "@/lib/actions";
+import { useEffect, useRef, useState } from "react";
+import { getReservedItems, getManyProducts, deleteCheckoutSessions } from "@/lib/actions";
 import { stringifyConvertPrice } from "@/lib/utils";
 import MainLayout from "@/ui/layouts/MainLayout";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PlainRoundedButtonLink from "@/ui/components/buttons/PlainRoundedButtonLink";
 import LoadingIndicator from "@/ui/components/overlays/LoadingIndicator";
-import { ClientProduct, MergedBagItem } from "@/lib/types";
+import { ClientProduct, ReservedItem } from "@/lib/types";
+import FailureModal from "@/ui/components/overlays/FailureModal";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export default function BagPageClient() {
-    const [latestData, setLatestData] = useState<ClientProduct[]>();
+    const [products, setProducts] = useState<ClientProduct[]>();
+    const [groupedReservedItems, setGroupedReservedItems] = useState<ReservedItem[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<Error | null>(null);
+    const [isFailureModalOpen, setIsFailureModalOpen] = useState<boolean>(false);
+    const [checkoutTrigger, setCheckoutTrigger] = useState<boolean>(false);
+    const modalStateRef = useRef<boolean>(false);
 
     const { bag, removeFromBag, hasHydrated } = useBagStore((state) => state);
     const emptyBag = !bag.length;
-    const noStock = !useBagStore((state) => state.getTotalBagCount());
-    const bagProductIds = bag.map((bagItem) => bagItem.product.id);
+    const bagProductIds = bag.map((bagItem) => bagItem.productId);
     const router = useRouter();
     const session = useSession();
     const searchParams = useSearchParams();
 
     const orderSubtotal = bag.reduce(
-        (subTotal, bagItem) => subTotal + bagItem.product.price * bagItem.quantity,
+        (subTotal, bagItem) => subTotal + bagItem.price * bagItem.quantity,
         0
     );
     const shippingCost = !emptyBag && orderSubtotal ? 500 : 0;
     const orderTotal = orderSubtotal + shippingCost;
 
-    const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+    const checkoutPermitted = !(emptyBag || bag.some((item) => item.quantity === 0));
 
     useEffect(() => {
         if (!hasHydrated) return;
 
         const getData = async () => {
             try {
-                const dataFetch = await getProducts({ id: { in: bagProductIds } });
-                setLatestData(dataFetch.data);
+                const productsFetch = await getManyProducts({
+                    where: { id: { in: bagProductIds } },
+                });
+                setProducts(productsFetch.data);
+
+                const reservedFetch = await getReservedItems({
+                    productIds: bagProductIds,
+                });
+
+                setGroupedReservedItems(reservedFetch.data);
             } catch {
                 setError(new Error("Error fetching product data. Please try again later."));
             }
         };
 
         getData();
-    }, [hasHydrated]);
+    }, [hasHydrated, checkoutTrigger]);
+
+    useEffect(() => {
+        if (session.data?.user?.id === undefined) return;
+
+        const id = session.data.user.id;
+
+        const resetUserSessions = async () => {
+            await deleteCheckoutSessions(Number(id));
+        };
+
+        resetUserSessions();
+    }, [session]);
+
+    useEffect(() => {
+        modalStateRef.current = isFailureModalOpen;
+    }, [isFailureModalOpen]);
 
     const goToCheckout = async () => {
         const res = await fetch("/api/create-checkout-session", {
@@ -58,13 +88,19 @@ export default function BagPageClient() {
             body: JSON.stringify({
                 bagItems: bag,
                 shippingCost,
-                userId: session.data?.user?.id,
+                userId: Number(session.data?.user?.id),
             }),
         });
+
         const data = await res.json();
+
+        if (process.env.NEXT_PUBLIC_APP_ENV === "test") return;
+
         if (data.url) {
             await stripePromise;
             window.location.href = data.url;
+        } else if (data.error) {
+            setError(new Error(data.error));
         } else {
             setError(new Error("Error starting checkout. Please try again later."));
         }
@@ -75,31 +111,27 @@ export default function BagPageClient() {
             router.push("/login?redirect_after=bag");
             return;
         } else if (session.status === "authenticated") {
-            goToCheckout();
+            setCheckoutTrigger((prev) => !prev);
+            setIsLoading(true);
+            setTimeout(() => {
+                setIsLoading(false);
+                if (modalStateRef.current) return;
+                goToCheckout();
+            }, 1000);
         }
     };
 
     useEffect(() => {
         const redirect = searchParams.get("from_login");
 
-        if (redirect === "true" && session.status === "authenticated") {
-            setIsLoading(true);
-            setTimeout(() => {
-                goToCheckout();
-            }, 1000);
+        if (redirect === "true") {
+            handleCheckout();
         }
     }, [session]);
 
     if (error) throw error;
 
-    if (!latestData) return null;
-
-    const latestDataMap = new Map(latestData.map((item) => [item.id, item.stock]));
-    const mergedItems: MergedBagItem[] = bag.map((item) => {
-        const latestSizeStock = latestDataMap.get(item.product.id)?.[item.size] ?? 0;
-
-        return { ...item, latestSizeStock };
-    });
+    if (!products || !groupedReservedItems) return null;
 
     return (
         <>
@@ -111,19 +143,33 @@ export default function BagPageClient() {
                             data-testid="bag-tile-ul"
                             className="flex flex-col w-full lg:gap-8"
                         >
-                            {mergedItems.map((mergedItem) => (
-                                <li
-                                    key={`${mergedItem.product.id}-${mergedItem.size}`}
-                                    className="bag-tile w-full mb-8 lg:mb-0"
-                                >
-                                    <BagTile
-                                        bagItem={mergedItem}
-                                        handleDelete={() =>
-                                            removeFromBag(mergedItem.product.id, mergedItem.size)
-                                        }
-                                    />
-                                </li>
-                            ))}
+                            {bag.map((bagItem) => {
+                                const productData = products.find(
+                                    (product) => product.id === bagItem.productId
+                                );
+
+                                if (!productData)
+                                    throw new Error(
+                                        "Bag item data not found in product data fetch"
+                                    );
+
+                                return (
+                                    <li
+                                        key={`${bagItem.productId}-${bagItem.size}`}
+                                        className="bag-tile w-full mb-8 lg:mb-0"
+                                    >
+                                        <BagTile
+                                            bagItem={bagItem}
+                                            productData={productData}
+                                            groupedReservedItems={groupedReservedItems}
+                                            handleDelete={() =>
+                                                removeFromBag(bagItem.productId, bagItem.size)
+                                            }
+                                            modalSetter={setIsFailureModalOpen}
+                                        />
+                                    </li>
+                                );
+                            })}
                         </ul>
                     ) : (
                         <div className="flex flex-col justify-center items-center w-full h-full p-8 md:p-0 gap-8">
@@ -167,12 +213,12 @@ export default function BagPageClient() {
                                 <p aria-label="Bag total">£{stringifyConvertPrice(orderTotal)}</p>
                             </div>
                         </div>
-                        {!(emptyBag || noStock) && (
+                        {checkoutPermitted && (
                             <div className="flex pt-4 w-full justify-center">
                                 <GoButton
                                     onClick={handleCheckout}
-                                    predicate={!(emptyBag || noStock)}
-                                    disabled={emptyBag || noStock}
+                                    predicate={checkoutPermitted}
+                                    disabled={!checkoutPermitted}
                                 >
                                     Checkout
                                 </GoButton>
@@ -182,6 +228,20 @@ export default function BagPageClient() {
                 </div>
             </MainLayout>
             {isLoading && <LoadingIndicator />}
+            {isFailureModalOpen && (
+                <FailureModal
+                    message={
+                        <>
+                            Available stock for some of your items has changed.
+                            <br />
+                            <br />
+                            Quantity selections have been automatically updated.
+                        </>
+                    }
+                    handleClose={() => setIsFailureModalOpen(false)}
+                    isOpenState={isFailureModalOpen}
+                />
+            )}
         </>
     );
 }

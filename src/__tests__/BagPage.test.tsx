@@ -1,10 +1,20 @@
 import BagPage from "@/app/bag/page";
-import { buildTestBagItemList, buildTestProduct, getTestUpdatedData } from "@/lib/test-factories";
+import {
+    buildReservedItem,
+    buildTestBagItemList,
+    buildTestProduct,
+    getTestUpdatedData,
+} from "@/lib/test-factories";
 import { useBagStore } from "@/stores/bagStore";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { Product } from "@/lib/types";
 import { buildBagItem } from "@/lib/utils";
 import { act } from "react";
+import { SINGLE_ITEM_MAX_QUANTITY } from "@/lib/constants";
+import {
+    getConsoleErrorSpy,
+    getManyFetchResolutionHelper,
+    wrapWithErrorBoundary,
+} from "@/lib/test-utils";
 
 jest.mock("next/navigation", () => ({
     usePathname: () => "/bag",
@@ -20,7 +30,9 @@ jest.mock("next/navigation", () => ({
 }));
 
 jest.mock("@/lib/actions", () => ({
-    getProducts: jest.fn(),
+    getManyProducts: jest.fn(),
+    deleteCheckoutSessions: jest.fn(),
+    getReservedItems: jest.fn(),
 }));
 
 jest.mock("next-auth/react", () => ({
@@ -33,18 +45,19 @@ jest.mock("@/auth", () => ({
 }));
 
 import { useSession } from "next-auth/react";
-import { getProducts } from "@/lib/actions";
-import { getConsoleErrorSpy, wrapWithErrorBoundary } from "@/lib/test-utils";
+import { getManyProducts } from "@/lib/actions";
 
 const { addToBag, clearBag } = useBagStore.getState();
-const testBagItems = buildTestBagItemList();
-const bagUnchangedData = testBagItems.map((bagItem) => bagItem.product);
+const testBagData = buildTestBagItemList();
+const testBagItems = testBagData.bagItems;
+const testProducts = testBagData.products;
 const bagUpdatedData = getTestUpdatedData();
+const reservedItems = [buildReservedItem({ idx: 2 })];
 
 const renderBagPage = async () => render(await BagPage());
 const setUpTestBag = () =>
-    testBagItems.forEach((item) => {
-        addToBag(item);
+    testBagItems.forEach((item, idx) => {
+        addToBag(testProducts[idx], item);
     });
 
 const getSessionWithAuth = () => {
@@ -66,9 +79,8 @@ const getSessionWithoutAuth = () => {
     });
 };
 
-const setUpResolvedFetch = (resolvedValue: Product[]) => {
-    (getProducts as jest.Mock).mockResolvedValue({ data: resolvedValue });
-};
+const setUpResolvedFetch = getManyFetchResolutionHelper(testProducts);
+
 const getAllTiles = () => within(screen.getByTestId("bag-tile-ul")).getAllByRole("listitem");
 
 describe("BagPage auth-agnostic tests", () => {
@@ -79,7 +91,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("shows correct bag subtotal", async () => {
         setUpTestBag();
-        setUpResolvedFetch(bagUnchangedData);
+        setUpResolvedFetch();
         act(() => {
             renderBagPage();
         });
@@ -90,7 +102,7 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("shows fallback text when bag is empty", async () => {
-        setUpResolvedFetch([]);
+        setUpResolvedFetch({ resolvedProducts: [] });
         act(() => {
             renderBagPage();
         });
@@ -102,7 +114,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("throws an error when fetch fails", async () => {
         const errorSpy = getConsoleErrorSpy();
-        (getProducts as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
+        (getManyProducts as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
         render(wrapWithErrorBoundary(await BagPage()));
 
         await waitFor(() => {
@@ -112,9 +124,9 @@ describe("BagPage auth-agnostic tests", () => {
         errorSpy.mockRestore();
     });
 
-    it("updates subtotal if latest size stock has decreased to below bag quantity", async () => {
+    it("updates subtotal if available stock has decreased to below bag quantity", async () => {
         setUpTestBag();
-        setUpResolvedFetch(bagUpdatedData);
+        setUpResolvedFetch({ resolvedProducts: bagUpdatedData });
         act(() => {
             renderBagPage();
         });
@@ -126,7 +138,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("preselects correct quantities", async () => {
         setUpTestBag();
-        setUpResolvedFetch(bagUnchangedData);
+        setUpResolvedFetch();
         act(() => {
             renderBagPage();
         });
@@ -139,14 +151,18 @@ describe("BagPage auth-agnostic tests", () => {
         });
     });
 
-    it("updates preselected quantities if latest size stock has decreased to below bag quantity", async () => {
+    it("updates quantity selections & shows info modal on page load if available stock has decreased to below bag quantity", async () => {
         setUpTestBag();
-        setUpResolvedFetch(bagUpdatedData);
+        setUpResolvedFetch({ resolvedProducts: bagUpdatedData });
         act(() => {
             renderBagPage();
         });
 
         await waitFor(() => {
+            expect(
+                screen.getByText(/Available stock for some of your items has changed/)
+            ).toBeInTheDocument();
+
             const bagTiles = getAllTiles();
 
             expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
@@ -154,13 +170,32 @@ describe("BagPage auth-agnostic tests", () => {
         });
     });
 
-    it("shows 'out of stock' in place of combobox when latest size stock is nil", async () => {
+    it("updates quantity selections & shows info modal on page load if there are relevant reserved items", async () => {
+        setUpTestBag();
+        setUpResolvedFetch({ resolvedReserved: reservedItems });
+        act(() => {
+            renderBagPage();
+        });
+
+        await waitFor(() => {
+            expect(
+                screen.getByText(/Available stock for some of your items has changed/)
+            ).toBeInTheDocument();
+
+            const bagTiles = getAllTiles();
+
+            expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
+            expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("1");
+        });
+    });
+
+    it("shows 'out of stock' in place of combobox when available stock is nil", async () => {
         const testProduct = buildTestProduct({ overrides: { stock: { s: 1 } } });
         const latestTestProduct = buildTestProduct({ overrides: { stock: { s: 0 } } });
         const mockBagItem = buildBagItem(testProduct, "s");
 
-        addToBag(mockBagItem);
-        setUpResolvedFetch([latestTestProduct]);
+        addToBag(testProduct, mockBagItem);
+        setUpResolvedFetch({ resolvedProducts: [latestTestProduct] });
         act(() => {
             renderBagPage();
         });
@@ -176,8 +211,8 @@ describe("BagPage auth-agnostic tests", () => {
     it("shows all quantity options", async () => {
         const testProduct = buildTestProduct();
 
-        addToBag(buildBagItem(testProduct, "m"));
-        setUpResolvedFetch([testProduct]);
+        addToBag(testProduct, buildBagItem(testProduct, "m"));
+        setUpResolvedFetch({ resolvedProducts: [testProduct] });
         act(() => {
             renderBagPage();
         });
@@ -196,9 +231,9 @@ describe("BagPage auth-agnostic tests", () => {
     it("updates subtotal when quantity selection changes", async () => {
         const testProduct = buildTestProduct();
 
-        addToBag(buildBagItem(testProduct, "s"));
-        addToBag(buildBagItem(testProduct, "s"));
-        setUpResolvedFetch([testProduct]);
+        addToBag(testProduct, buildBagItem(testProduct, "s"));
+        addToBag(testProduct, buildBagItem(testProduct, "s"));
+        setUpResolvedFetch({ resolvedProducts: [testProduct] });
         act(() => {
             renderBagPage();
         });
@@ -219,11 +254,11 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("caps quantity options per the prescribed limit", async () => {
-        const itemLimit = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
+        const itemLimit = SINGLE_ITEM_MAX_QUANTITY;
         const testProduct = buildTestProduct({ overrides: { stock: { s: itemLimit + 5 } } });
 
-        addToBag(buildBagItem(testProduct, "s"));
-        setUpResolvedFetch([testProduct]);
+        addToBag(testProduct, buildBagItem(testProduct, "s"));
+        setUpResolvedFetch({ resolvedProducts: [testProduct] });
         act(() => {
             renderBagPage();
         });
@@ -238,7 +273,7 @@ describe("BagPage auth-agnostic tests", () => {
 
     it("removes items from bag as expected", async () => {
         setUpTestBag();
-        setUpResolvedFetch(bagUnchangedData);
+        setUpResolvedFetch();
         act(() => {
             renderBagPage();
         });
@@ -258,26 +293,27 @@ describe("BagPage auth-agnostic tests", () => {
         });
     });
 
-    it("renders checkout button & shows correct shipping when at least some bag item sizes are stocked", async () => {
+    it("doesn't render checkout button & shows correct amounts when some bag items are unstocked", async () => {
         const testProduct = buildTestProduct({ overrides: { stock: { s: 0, m: 1 } } });
 
-        addToBag(buildBagItem(testProduct, "s"));
-        addToBag(buildBagItem(testProduct, "m"));
-        setUpResolvedFetch([testProduct]);
+        addToBag(testProduct, buildBagItem(testProduct, "s"));
+        addToBag(testProduct, buildBagItem(testProduct, "m"));
+        setUpResolvedFetch({ resolvedProducts: [testProduct] });
         act(() => {
             renderBagPage();
         });
 
-        expect(await screen.findByRole("button", { name: "Checkout" })).toBeInTheDocument();
-        expect(screen.getByLabelText("Shipping cost")).not.toHaveTextContent("-");
+        expect(await screen.findByRole("button", { name: "Checkout" })).not.toBeInTheDocument();
+        expect(screen.getByLabelText("Bag subtotal")).toHaveTextContent("£25.00");
+        expect(screen.getByLabelText("Shipping cost")).toHaveTextContent("£5.00");
     });
 
-    it("doesn't render checkout button & shows correct shipping when all bag item sizes are unstocked", async () => {
+    it("doesn't render checkout button & shows correct shipping when all bag items are unstocked", async () => {
         const testProduct = buildTestProduct({ overrides: { stock: { s: 0, m: 0 } } });
 
-        addToBag(buildBagItem(testProduct, "s"));
-        addToBag(buildBagItem(testProduct, "m"));
-        setUpResolvedFetch([testProduct]);
+        addToBag(testProduct, buildBagItem(testProduct, "s"));
+        addToBag(testProduct, buildBagItem(testProduct, "m"));
+        setUpResolvedFetch({ resolvedProducts: [testProduct] });
         act(() => {
             renderBagPage();
         });
@@ -290,7 +326,7 @@ describe("BagPage auth-agnostic tests", () => {
     });
 
     it("doesn't render checkout button & shows correct shipping when bag is empty", async () => {
-        setUpResolvedFetch([]);
+        setUpResolvedFetch({ resolvedProducts: [] });
         act(() => {
             renderBagPage();
         });
@@ -317,7 +353,7 @@ describe("BagPage authenticated tests", () => {
         } as Response);
 
         setUpTestBag();
-        setUpResolvedFetch(bagUnchangedData);
+        setUpResolvedFetch();
         act(() => {
             renderBagPage();
         });
@@ -326,13 +362,76 @@ describe("BagPage authenticated tests", () => {
 
         fireEvent.click(checkoutBtn);
 
-        await waitFor(() => {
-            expect(mockFetch).toHaveBeenCalledWith(
-                "/api/create-checkout-session",
-                expect.anything()
-            );
-        });
+        await waitFor(
+            () => {
+                expect(mockFetch).toHaveBeenCalledWith(
+                    "/api/create-checkout-session",
+                    expect.anything()
+                );
+            },
+            { timeout: 2000 }
+        );
 
         mockFetch.mockRestore();
+    });
+
+    it("updates quantity selections & shows info modal on checkout click if available stock has decreased to below bag quantity", async () => {
+        setUpTestBag();
+        setUpResolvedFetch();
+        act(() => {
+            renderBagPage();
+        });
+
+        await waitFor(() => {
+            const bagTiles = getAllTiles();
+
+            expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
+            expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("2");
+        });
+
+        setUpResolvedFetch({ resolvedProducts: bagUpdatedData });
+
+        fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
+
+        await waitFor(() => {
+            expect(
+                screen.getByText(/Available stock for some of your items has changed/)
+            ).toBeInTheDocument();
+
+            const bagTiles = getAllTiles();
+
+            expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
+            expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("1");
+        });
+    });
+
+    it("updates quantity selections & shows info modal on checkout click if there are relevant reserved items", async () => {
+        setUpTestBag();
+        setUpResolvedFetch();
+        act(() => {
+            renderBagPage();
+        });
+
+        await waitFor(() => {
+            const bagTiles = getAllTiles();
+
+            expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
+            expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("2");
+        });
+
+        setUpResolvedFetch({ resolvedReserved: reservedItems });
+
+        fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
+
+        await waitFor(() => {
+            expect(
+                screen.getByText(/Available stock for some of your items has changed/)
+            ).toBeInTheDocument();
+
+            const bagTiles = getAllTiles();
+
+            expect(within(bagTiles[0]).getByRole("combobox")).toHaveValue("1");
+            expect(within(bagTiles[1]).getByRole("combobox")).toHaveValue("1");
+        });
     });
 });

@@ -25,7 +25,7 @@ export default function Modal(props: ModalProps) {
             <div
                 id="modal-container"
                 onClick={handleClose}
-                className="fixed top-0 left-0 flex flex-col justify-center items-center global-constraints overlay-constraints z-[9999] px-4"
+                className="fixed top-0 left-0 flex flex-col justify-center items-center global-constraints overlay-constraints z-[9000] px-4"
             >
                 <div
                     id="modal"
@@ -38,7 +38,7 @@ export default function Modal(props: ModalProps) {
                     aria-modal="true"
                 >
                     {hasCloseButton && (
-                        <div className="absolute top-0 right-0 p-4">
+                        <div id="close-modal-button" className="absolute top-0 right-0 p-4">
                             <CloseButton onClick={handleClose} />
                         </div>
                     )}

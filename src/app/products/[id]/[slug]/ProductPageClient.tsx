@@ -2,40 +2,59 @@
 
 import { useBagStore } from "@/stores/bagStore";
 import { useEffect, useState } from "react";
-import { ClientProduct, Sizes } from "@/lib/types";
+import { ClientProduct, ReservedItem, Sizes } from "@/lib/types";
 import GoButton from "@/ui/components/buttons/GoButton";
 import { IoBag } from "react-icons/io5";
-import { checkStock, buildBagItem } from "@/lib/utils";
+import { checkSizeAvailable, buildBagItem, getUniformReservedItems } from "@/lib/utils";
 import ZoomableImage from "@/ui/components/ZoomableImage";
 import WishlistToggleButton from "@/ui/components/buttons/WishlistToggleButton";
 import AddSuccessModal from "@/ui/components/overlays/AddSuccessModal";
 import { VALID_SIZES } from "@/lib/constants";
 
-export default function ProductPageClient({ productData }: { productData: ClientProduct }) {
+export default function ProductPageClient({
+    productData,
+    reservedItems,
+}: {
+    productData: ClientProduct;
+    reservedItems: ReservedItem[];
+}) {
     const [selectedSize, setSelectedSize] = useState<Sizes | "placeholder">("placeholder");
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const bag = useBagStore((state) => state.bag);
     const addToBag = useBagStore((state) => state.addToBag);
+    const addPermitted = !(selectedSize === "placeholder" || isButtonDisabled);
 
-    function getLocalFormatting(price: number) {
+    const getLocalFormatting = (price: number) => {
         return Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(
             price / 100
         );
-    }
+    };
 
     useEffect(() => {
-        const selectedAvailable = checkStock(
-            productData,
-            selectedSize as keyof typeof productData.stock,
-            bag
-        );
+        if (selectedSize === "placeholder") return;
 
-        setIsButtonDisabled(!selectedAvailable);
+        try {
+            const selectedSizeCheck = checkSizeAvailable(
+                productData,
+                selectedSize as Sizes,
+                bag,
+                getUniformReservedItems({
+                    items: reservedItems,
+                    productId: productData.id,
+                    size: selectedSize,
+                })
+            );
+
+            setIsButtonDisabled(!selectedSizeCheck.success);
+        } catch (error) {
+            const e = error as Error;
+            throw new Error(e.message);
+        }
     }, [selectedSize, bag, productData]);
 
     const handleAdd = () => {
-        addToBag(buildBagItem(productData, selectedSize as Sizes));
+        addToBag(productData, buildBagItem(productData, selectedSize as Sizes));
         setIsModalOpen(true);
     };
 
@@ -71,22 +90,30 @@ export default function ProductPageClient({ productData }: { productData: Client
                             </option>
                             {VALID_SIZES.filter((size) => size in productData.stock).map(
                                 (productSize) => {
-                                    const thisSizeAvailable = checkStock(
+                                    const thisSizeCheck = checkSizeAvailable(
                                         productData,
-                                        productSize as keyof typeof productData.stock,
-                                        bag
+                                        productSize as Sizes,
+                                        bag,
+                                        getUniformReservedItems({
+                                            items: reservedItems,
+                                            productId: productData.id,
+                                            size: productSize,
+                                        })
                                     );
+
                                     return (
                                         <option
                                             key={productSize}
                                             value={productSize}
                                             className={`${
-                                                !thisSizeAvailable ? "text-component-color" : ""
+                                                !thisSizeCheck.success ? "text-component-color" : ""
                                             }`}
-                                            disabled={!thisSizeAvailable}
+                                            disabled={!thisSizeCheck.success}
                                         >
                                             {productSize.toUpperCase()}
-                                            {!thisSizeAvailable && " - out of stock"}
+                                            {!thisSizeCheck.success &&
+                                                thisSizeCheck.error === "nil" &&
+                                                " - out of stock"}
                                         </option>
                                     );
                                 }
@@ -94,8 +121,8 @@ export default function ProductPageClient({ productData }: { productData: Client
                         </select>
                         <GoButton
                             onClick={handleAdd}
-                            predicate={!(selectedSize === undefined || isButtonDisabled)}
-                            disabled={selectedSize === undefined || isButtonDisabled}
+                            predicate={addPermitted}
+                            disabled={!addPermitted}
                         >
                             <span>Add to Bag</span>
                             <IoBag />

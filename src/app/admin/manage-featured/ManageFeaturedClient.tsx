@@ -11,15 +11,16 @@ import { ClientProduct } from "@/lib/types";
 
 export default function ManageFeaturedClient({ productData }: { productData: ClientProduct[] }) {
     const [savedFeaturedList, setSavedFeaturedList] = useState<ClientProduct[]>(productData);
-    const [provisionalFeaturedList, setProvisionalFeaturedList] = useState<ClientProduct[]>(productData);
+    const [provisionalFeaturedList, setProvisionalFeaturedList] =
+        useState<ClientProduct[]>(productData);
 
-    const handleResultClick = (product: ClientProduct) => {
-        const isNew = !provisionalFeaturedList.find(
-            (existingProd) => existingProd.id === product.id
-        );
+    const handleResultClick = (targetProduct: ClientProduct) => {
+        const isNew = !provisionalFeaturedList.find((product) => product.id === targetProduct.id);
 
         if (isNew && provisionalFeaturedList.length < FEATURED_COUNT) {
-            setProvisionalFeaturedList((prev) => (prev ? [...prev, product] : [product]));
+            setProvisionalFeaturedList((prev) =>
+                prev ? [...prev, targetProduct] : [targetProduct]
+            );
         }
     };
 

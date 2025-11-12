@@ -1,5 +1,6 @@
-export type CreateUpdateDeleteActionResponse = Promise<
-    { success: true } | { success: false; error?: string }
+export type CreateUpdateDeleteActionResponse<T = void> = Promise<
+    | (T extends void ? { success: true } : { success: true; data: T })
+    | { success: false; error?: string }
 >;
 
 export type GetActionResponse<T> = Promise<{ data: T | null }>;

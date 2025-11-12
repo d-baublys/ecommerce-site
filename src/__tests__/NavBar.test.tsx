@@ -21,6 +21,7 @@ jest.mock("next/navigation", () => ({
 }));
 
 import { useSession } from "next-auth/react";
+import { buildBagItem } from "@/lib/utils";
 
 const { addToBag, clearBag } = useBagStore.getState();
 const testProductList = buildTestProductList();
@@ -55,27 +56,23 @@ describe("NavBar", () => {
         renderNavBar();
 
         act(() => {
-            addToBag({
-                product: testProductList[0],
-                size: Object.keys(testProductList[0])[0] as Sizes,
-                quantity: 1,
-            });
-            addToBag({
-                product: testProductList[1],
-                size: Object.keys(testProductList[1])[0] as Sizes,
-                quantity: 1,
-            });
-            addToBag({
-                product: testProductList[2],
-                size: Object.keys(testProductList[2])[0] as Sizes,
-                quantity: 1,
-            });
+            addToBag(
+                testProductList[0],
+                buildBagItem(testProductList[0], Object.keys(testProductList[0])[0] as Sizes)
+            );
+            addToBag(
+                testProductList[1],
+                buildBagItem(testProductList[1], Object.keys(testProductList[1])[0] as Sizes)
+            );
+            addToBag(
+                testProductList[2],
+                buildBagItem(testProductList[2], Object.keys(testProductList[2])[0] as Sizes)
+            );
 
-            addToBag({
-                product: testProductList[2],
-                size: Object.keys(testProductList[2])[0] as Sizes,
-                quantity: 1,
-            });
+            addToBag(
+                testProductList[2],
+                buildBagItem(testProductList[2], Object.keys(testProductList[2])[0] as Sizes)
+            );
         });
 
         expect(screen.getByLabelText("Bag item count")).toHaveTextContent("4");

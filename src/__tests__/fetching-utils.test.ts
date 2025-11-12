@@ -1,53 +1,57 @@
 import { Categories, PriceFilterId, ProductSortId, Sizes } from "@/lib/types";
 
 jest.mock("@/lib/actions", () => ({
-    getProducts: jest.fn(),
+    getManyProducts: jest.fn(),
 }));
 
-import { getProducts } from "@/lib/actions";
-import { fetchFilteredProducts } from "@/lib/fetching-utils";
+import { getManyProducts } from "@/lib/actions";
+import { getFilteredProducts } from "@/lib/fetching-utils";
 import { buildTestProductList } from "@/lib/test-factories";
 
-describe("fetchFilteredProducts", () => {
+describe("getFilteredProducts", () => {
     beforeEach(() => {
         const productList = buildTestProductList();
-        (getProducts as jest.Mock).mockResolvedValue({ data: productList });
+        (getManyProducts as jest.Mock).mockResolvedValue({ data: productList });
     });
 
     it("calls at least with a basic stock filter", async () => {
         const category: Categories | "all" = "all";
 
-        await fetchFilteredProducts({ category });
-        expect(getProducts).toHaveBeenCalledWith(
+        await getFilteredProducts({ category });
+        expect(getManyProducts).toHaveBeenCalledWith(
             expect.objectContaining({
-                stock: {
-                    some: {
-                        quantity: {
-                            gt: 0,
+                where: {
+                    stock: {
+                        some: {
+                            quantity: {
+                                gt: 0,
+                            },
                         },
                     },
                 },
-            }),
-            undefined
+                orderBy: undefined,
+            })
         );
     });
 
     it("calls with the expected category argument", async () => {
         const category: Categories | "all" = "mens";
 
-        await fetchFilteredProducts({ category });
-        expect(getProducts).toHaveBeenCalledWith(
+        await getFilteredProducts({ category });
+        expect(getManyProducts).toHaveBeenCalledWith(
             expect.objectContaining({
-                stock: {
-                    some: {
-                        quantity: {
-                            gt: 0,
+                where: {
+                    stock: {
+                        some: {
+                            quantity: {
+                                gt: 0,
+                            },
                         },
                     },
+                    gender: "mens",
                 },
-                gender: "mens",
-            }),
-            undefined
+                orderBy: undefined,
+            })
         );
     });
 
@@ -55,19 +59,21 @@ describe("fetchFilteredProducts", () => {
         const category: Categories | "all" = "all";
         const sizeFilters: Sizes[] = ["m"];
 
-        await fetchFilteredProducts({ category, sizeFilters });
-        expect(getProducts).toHaveBeenCalledWith(
+        await getFilteredProducts({ category, sizeFilters });
+        expect(getManyProducts).toHaveBeenCalledWith(
             expect.objectContaining({
-                stock: {
-                    some: {
-                        quantity: {
-                            gt: 0,
+                where: {
+                    stock: {
+                        some: {
+                            quantity: {
+                                gt: 0,
+                            },
+                            size: { in: ["m"] },
                         },
-                        size: { in: ["m"] },
                     },
                 },
-            }),
-            undefined
+                orderBy: undefined,
+            })
         );
     });
 
@@ -75,26 +81,28 @@ describe("fetchFilteredProducts", () => {
         const category: Categories | "all" = "all";
         const priceFilters: PriceFilterId[] = ["a", "e"];
 
-        await fetchFilteredProducts({ category, priceFilters });
-        expect(getProducts).toHaveBeenCalledWith(
+        await getFilteredProducts({ category, priceFilters });
+        expect(getManyProducts).toHaveBeenCalledWith(
             expect.objectContaining({
-                stock: {
-                    some: {
-                        quantity: {
-                            gt: 0,
+                where: {
+                    stock: {
+                        some: {
+                            quantity: {
+                                gt: 0,
+                            },
                         },
                     },
+                    OR: [
+                        {
+                            price: { gte: 0, lt: 5000 },
+                        },
+                        {
+                            price: { gte: 20000 },
+                        },
+                    ],
                 },
-                OR: [
-                    {
-                        price: { gte: 0, lt: 5000 },
-                    },
-                    {
-                        price: { gte: 20000 },
-                    },
-                ],
-            }),
-            undefined
+                orderBy: undefined,
+            })
         );
     });
 
@@ -102,19 +110,21 @@ describe("fetchFilteredProducts", () => {
         const category: Categories | "all" = "all";
         const query = "test";
 
-        await fetchFilteredProducts({ category, query });
-        expect(getProducts).toHaveBeenCalledWith(
+        await getFilteredProducts({ category, query });
+        expect(getManyProducts).toHaveBeenCalledWith(
             expect.objectContaining({
-                stock: {
-                    some: {
-                        quantity: {
-                            gt: 0,
+                where: {
+                    stock: {
+                        some: {
+                            quantity: {
+                                gt: 0,
+                            },
                         },
                     },
+                    name: { contains: "test", mode: "insensitive" },
                 },
-                name: { contains: "test", mode: "insensitive" },
-            }),
-            undefined
+                orderBy: undefined,
+            })
         );
     });
 
@@ -122,18 +132,20 @@ describe("fetchFilteredProducts", () => {
         const category: Categories | "all" = "all";
         const productSort: ProductSortId = "a";
 
-        await fetchFilteredProducts({ category, productSort });
-        expect(getProducts).toHaveBeenCalledWith(
+        await getFilteredProducts({ category, productSort });
+        expect(getManyProducts).toHaveBeenCalledWith(
             expect.objectContaining({
-                stock: {
-                    some: {
-                        quantity: {
-                            gt: 0,
+                where: {
+                    stock: {
+                        some: {
+                            quantity: {
+                                gt: 0,
+                            },
                         },
                     },
                 },
-            }),
-            { price: "asc" }
+                orderBy: { price: "asc" },
+            })
         );
     });
 });

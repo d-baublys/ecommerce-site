@@ -1,9 +1,9 @@
 import { Prisma } from "@prisma/client";
-import { getProducts } from "./actions";
+import { getManyProducts } from "./actions";
 import { Categories, PriceFilterId, ProductSortId, Sizes } from "./types";
 import { PRICE_FILTER_OPTIONS, SORT_OPTIONS } from "./constants";
 
-export async function fetchFilteredProducts({
+export async function getFilteredProducts({
     category,
     sizeFilters = [],
     priceFilters = [],
@@ -49,7 +49,7 @@ export async function fetchFilteredProducts({
     const orderBy =
         productSort && productSort !== "placeholder" ? SORT_OPTIONS[productSort].sort : undefined;
 
-    const productsFetch = await getProducts(filterQuery, orderBy);
+    const productsFetch = await getManyProducts({ where: filterQuery, orderBy });
 
     return productsFetch.data;
 }

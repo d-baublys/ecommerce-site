@@ -10,8 +10,9 @@ import {
     OrderStatus,
     Order,
     OrderItem,
+    ReservedItem,
 } from "./types";
-import { slugify } from "./utils";
+import { buildBagItem, slugify } from "./utils";
 import { VALID_CATEGORIES } from "./constants";
 
 export function buildTestProduct({
@@ -25,14 +26,14 @@ export function buildTestProduct({
     const name = `Test Product ${idx}`;
 
     return {
-        id: `aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa${idx}`,
+        id: `${getSlicedUuid(idx)}${idx}`,
         name,
         gender: VALID_CATEGORIES[0].id,
         price: 2500,
         slug: slugify(name),
         src: `/nonexistent-img-${idx}.jpg`,
         alt: `Test product image ${idx}`,
-        dateAdded: new Date(),
+        dateAdded: new Date("2025-08-01"),
         stock: { s: 8, m: 3, l: 12 },
         ...overrides,
     };
@@ -57,8 +58,22 @@ export function buildTestProductList(): ClientProduct[] {
     return products;
 }
 
-export function buildLongProductList(): Product[] {
-    return Array.from({ length: 10 }).map((_, idx) => buildTestProduct({ idx }));
+export function buildLongProductList(): ClientProduct[] {
+    return Array.from({ length: 5 }).map((_, idx) => buildTestProduct({ idx }));
+}
+
+export function buildReservedItem(
+    overrides: Partial<ReservedItem & { idx: number }> = {}
+): ReservedItem {
+    const idx = overrides?.idx ?? 1;
+
+    return {
+        id: `${getSlicedUuid(idx)}${idx}`,
+        productId: `${getSlicedUuid(idx)}${idx}`,
+        size: "m",
+        quantity: 2,
+        ...overrides,
+    };
 }
 
 export function getFilteredTestProducts() {
@@ -68,10 +83,10 @@ export function getFilteredTestProducts() {
 }
 
 function buildTestBagItem(product: ClientProduct, size: Sizes, quantity: number): BagItem {
-    return { product, size, quantity };
+    return { ...buildBagItem(product, size), quantity };
 }
 
-export function buildTestBagItemList(): BagItem[] {
+export function buildTestBagItemList(): { bagItems: BagItem[]; products: ClientProduct[] } {
     const prices = [5500, 9900];
     const stocks = [
         { s: 1, m: 0, l: 0 },
@@ -97,7 +112,7 @@ export function buildTestBagItemList(): BagItem[] {
         buildTestBagItem(products[idx], sizes[idx] as Sizes, quantities[idx])
     );
 
-    return bagItems;
+    return { bagItems, products };
 }
 
 export function getTestUpdatedData(): ClientProduct[] {
@@ -148,16 +163,18 @@ type TestOrderParams = TestOrderParamsFull | TestOrderParamsSimple;
 export function buildTestOrderData(params: TestOrderParams = {}): ClientOrder {
     const { idx = 0, productList, sizeMap, quantityMap, overrides } = params;
     const products: Product[] | undefined = productList ? productList : [buildTestProduct()];
-    const items = products.map((product, prodIdx) => ({
-        name: product.name,
-        price: product.price,
-        id: `order-${idx}-${prodIdx}`,
-        productId: product.id,
-        size: productList && sizeMap ? sizeMap[prodIdx] : "m",
-        quantity: productList && quantityMap ? quantityMap[prodIdx] : 2,
-        orderId: idx,
-        product,
-    }));
+    const items = products.map((product, prodIdx) => {
+        const { id, dateAdded, ...netProduct } = product;
+
+        return {
+            id: `${getSlicedUuid(prodIdx + 1)}${prodIdx + 1}`,
+            size: productList && sizeMap ? sizeMap[prodIdx] : "m",
+            quantity: productList && quantityMap ? quantityMap[prodIdx] : 2,
+            orderId: idx,
+            productId: product.id,
+            ...netProduct,
+        };
+    });
 
     const orderCreateData = {
         id: idx,
@@ -230,15 +247,15 @@ export function buildTestOrderDataCypress({
     const shippingTotal = 500;
 
     const items: OrderCreateInput["items"] = testProductsData.map((product, prodIdx) => {
-        const price = product.price;
         const quantity: number = quantityMap ? quantityMap[prodIdx] : 2;
-        subTotal += price * quantity;
+        subTotal += product.price * quantity;
+        const { id, dateAdded, ...netProduct } = product;
+
         return {
-            productId: String(product.id),
-            name: product.name,
-            price,
+            productId: id,
             size: sizeMap ? sizeMap[prodIdx] : ("m" as Sizes),
             quantity,
+            ...netProduct,
         };
     });
 
@@ -270,4 +287,10 @@ export function buildTestOrderDataCypress({
     }
 
     return orderCreateData;
+}
+
+export const fakeUuid = "aaaaaaaa-aaaa-1aaa-aaaa-aaaaaaaaaaa1";
+
+export function getSlicedUuid(endString: string | number) {
+    return fakeUuid.slice(0, -String(endString).length);
 }

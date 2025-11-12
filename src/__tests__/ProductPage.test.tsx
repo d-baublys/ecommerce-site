@@ -1,17 +1,17 @@
-import { buildTestProduct } from "@/lib/test-factories";
-import { getConsoleErrorSpy } from "@/lib/test-utils";
+import { buildReservedItem, buildTestProduct } from "@/lib/test-factories";
+import { getConsoleErrorSpy, getFetchResolutionHelper } from "@/lib/test-utils";
 import { buildProductUrl } from "@/lib/utils";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import ProductPage from "@/app/products/[id]/[slug]/page";
 import { useBagStore } from "@/stores/bagStore";
-
-const testProduct = buildTestProduct();
-const getLatestBag = () => useBagStore.getState().bag;
-const { clearBag } = useBagStore.getState();
+import { SINGLE_ITEM_MAX_QUANTITY } from "@/lib/constants";
 
 jest.mock("@/lib/actions", () => ({
-    getProducts: jest.fn(),
+    getProduct: jest.fn(),
+    getReservedItems: jest.fn(),
 }));
+
+import { getProduct } from "@/lib/actions";
 
 jest.mock("next/navigation", () => ({
     usePathname: () => buildProductUrl(testProduct.id, testProduct.slug),
@@ -20,7 +20,10 @@ jest.mock("next/navigation", () => ({
     }),
 }));
 
-import { getProducts } from "@/lib/actions";
+const testProduct = buildTestProduct();
+const reservedItems = [buildReservedItem()];
+const getLatestBag = () => useBagStore.getState().bag;
+const { clearBag } = useBagStore.getState();
 
 const renderPage = async () =>
     render(
@@ -29,13 +32,15 @@ const renderPage = async () =>
         })
     );
 
+const setUpResolvedFetch = getFetchResolutionHelper(testProduct);
+
 describe("ProductPage", () => {
     beforeEach(() => {
         clearBag();
     });
 
     it("displays product information", async () => {
-        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
+        setUpResolvedFetch();
         await renderPage();
 
         expect(screen.getByTestId("product-detail-name")).toHaveTextContent(/Test Product 1/);
@@ -43,14 +48,14 @@ describe("ProductPage", () => {
     });
 
     it("invokes notFound when provided slug returns no matching products", async () => {
-        (getProducts as jest.Mock).mockResolvedValue({ data: [] });
+        setUpResolvedFetch({ resolvedProduct: null });
 
         expect(renderPage()).rejects.toThrow("notFound called");
     });
 
     it("throws an error when fetch fails", async () => {
         const errorSpy = getConsoleErrorSpy();
-        (getProducts as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
+        (getProduct as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
 
         expect(renderPage()).rejects.toThrow("Fetch failed");
 
@@ -58,7 +63,7 @@ describe("ProductPage", () => {
     });
 
     it("shows disabled product add button by default", async () => {
-        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
+        setUpResolvedFetch();
         await renderPage();
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });
@@ -69,7 +74,7 @@ describe("ProductPage", () => {
     });
 
     it("shows enabled product add button after selecting a size", async () => {
-        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
+        setUpResolvedFetch();
         await renderPage();
 
         fireEvent.change(screen.getByLabelText("Size selection"), { target: { value: "s" } });
@@ -80,7 +85,7 @@ describe("ProductPage", () => {
     });
 
     it("disables product add button when all remaining stock is added to bag", async () => {
-        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
+        setUpResolvedFetch();
         await renderPage();
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });
@@ -103,11 +108,11 @@ describe("ProductPage", () => {
     });
 
     it("disables product add button when added quantity reaches the prescribed limit", async () => {
-        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
+        setUpResolvedFetch();
         await renderPage();
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });
-        const itemLimit = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
+        const itemLimit = SINGLE_ITEM_MAX_QUANTITY;
 
         fireEvent.change(screen.getByLabelText("Size selection"), { target: { value: "s" } });
 
@@ -125,7 +130,7 @@ describe("ProductPage", () => {
     });
 
     it("includes all required size options", async () => {
-        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
+        setUpResolvedFetch();
         await renderPage();
 
         Object.keys(testProduct.stock).forEach((size) => {
@@ -136,7 +141,7 @@ describe("ProductPage", () => {
     });
 
     it("disables size option when all remaining stock is added to bag", async () => {
-        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
+        setUpResolvedFetch();
         await renderPage();
 
         const selectedOption = screen.getByRole("option", { name: "M" });
@@ -159,11 +164,11 @@ describe("ProductPage", () => {
     });
 
     it("caps single item bag quantity per the prescribed limit", async () => {
-        (getProducts as jest.Mock).mockResolvedValue({ data: [testProduct] });
+        setUpResolvedFetch();
         await renderPage();
 
         const btn = screen.getByRole("button", { name: "Add to Bag" });
-        const itemLimit = Number(process.env.NEXT_PUBLIC_SINGLE_ITEM_MAX_QUANTITY);
+        const itemLimit = SINGLE_ITEM_MAX_QUANTITY;
 
         fireEvent.change(screen.getByLabelText("Size selection"), { target: { value: "s" } });
 
@@ -174,5 +179,25 @@ describe("ProductPage", () => {
         });
 
         expect(getLatestBag()[0].quantity).toBe(itemLimit);
+    });
+
+    it("caps available stock if there are relevant reserved items", async () => {
+        setUpResolvedFetch({ resolvedReserved: reservedItems });
+        await renderPage();
+
+        const btn = screen.getByRole("button", { name: "Add to Bag" });
+        const selectedOption = screen.getByRole("option", { name: "M" });
+
+        expect(selectedOption).not.toBeDisabled();
+        expect(selectedOption).toHaveTextContent(`M`);
+
+        fireEvent.change(screen.getByLabelText("Size selection"), { target: { value: "m" } });
+
+        act(() => {
+            fireEvent.click(btn);
+        });
+
+        expect(selectedOption).toBeDisabled();
+        expect(selectedOption).toHaveTextContent(`M - out of stock`);
     });
 });

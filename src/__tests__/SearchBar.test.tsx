@@ -10,10 +10,10 @@ jest.mock("next/navigation", () => ({
 }));
 
 jest.mock("@/lib/actions", () => ({
-    getProducts: jest.fn(),
+    getManyProducts: jest.fn(),
 }));
 
-import { getProducts } from "@/lib/actions";
+import { getManyProducts } from "@/lib/actions";
 
 const productList = { data: buildTestProductList() };
 
@@ -28,11 +28,11 @@ const renderLocalSearch = () =>
     );
 
 const mockResolvedFetch = () => {
-    (getProducts as jest.Mock).mockResolvedValue(productList);
+    (getManyProducts as jest.Mock).mockResolvedValue(productList);
 };
 
 const mockFailedFetch = () => {
-    (getProducts as jest.Mock).mockResolvedValue(undefined);
+    (getManyProducts as jest.Mock).mockResolvedValue(undefined);
 };
 
 const getInput = () => screen.getByRole("searchbox");

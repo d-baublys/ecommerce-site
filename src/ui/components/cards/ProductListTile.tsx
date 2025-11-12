@@ -1,12 +1,16 @@
 "use client";
 
-import { BagItem, Product, ClientProduct, Sizes, ClientOrder } from "@/lib/types";
+import { BagItem, Product, ClientProduct, Sizes, ClientOrder, OrderItem } from "@/lib/types";
 import Link from "next/link";
 import { buildProductUrl } from "@/lib/utils";
 import ProductImage from "@/ui/components/ProductImage";
 
 interface ProductListTileProps {
-    inputData: ClientProduct | ClientProduct[] | BagItem | ClientOrder;
+    inputData:
+        | ClientProduct
+        | ClientProduct[]
+        | (BagItem & { product: ClientProduct })
+        | ClientOrder;
     wrapWithLink: boolean;
     showSize: boolean;
     endContent?: React.ReactNode | ((idx: number) => React.ReactNode);
@@ -18,7 +22,7 @@ export default function ProductListTile(props: ProductListTileProps) {
     const { inputData, wrapWithLink, showSize, endContent, externalOverrides, internalOverrides } =
         props;
 
-    let tileData: (ClientProduct | BagItem | ClientOrder["items"][number])[];
+    let tileData: (ClientProduct | (BagItem & { product: ClientProduct }) | OrderItem)[];
 
     if ("items" in inputData) {
         tileData = inputData.items;
@@ -28,7 +32,7 @@ export default function ProductListTile(props: ProductListTileProps) {
         tileData = [inputData];
     }
 
-    const renderCentralContent = (product: Product | ClientProduct, size?: Sizes) => {
+    const renderCentralContent = (product: Product | ClientProduct | OrderItem, size?: Sizes) => {
         return (
             <div className={`flex grow gap-2 sm:gap-8 ${internalOverrides ?? ""}`}>
                 <ProductImage
@@ -63,7 +67,12 @@ export default function ProductListTile(props: ProductListTileProps) {
                             {wrapWithLink ? (
                                 <Link
                                     className="w-full"
-                                    href={buildProductUrl(productData.id, productData.slug)}
+                                    href={buildProductUrl(
+                                        "productId" in productData
+                                            ? productData.productId
+                                            : productData.id,
+                                        productData.slug
+                                    )}
                                 >
                                     {renderCentralContent(
                                         productData,
@@ -71,10 +80,7 @@ export default function ProductListTile(props: ProductListTileProps) {
                                     )}
                                 </Link>
                             ) : (
-                                renderCentralContent(
-                                    productData,
-                                    hasSize ? item.size : undefined
-                                )
+                                renderCentralContent(productData, hasSize ? item.size : undefined)
                             )}
                             <div className="flex items-end max-w-[33%] min-h-full ml-4 md:ml-8">
                                 {typeof endContent === "function"

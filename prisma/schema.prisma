@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
     provider = "prisma-client-js"
 }
@@ -49,7 +43,12 @@ model Product {
     dateAdded       DateTime          @default(now())
     stock           Stock[]
     featuredProduct FeaturedProduct[]
-    orderItem       OrderItem[]
+}
+
+model FeaturedProduct {
+    id        String  @id @default(uuid())
+    productId String
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Stock {
@@ -57,27 +56,33 @@ model Stock {
     size      Sizes
     quantity  Int
     productId String
-    product   Product @relation(fields: [productId], references: [id])
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
     @@unique([productId, size])
 }
 
-model FeaturedProduct {
-    id        String  @id @default(uuid())
-    productId String
-    product   Product @relation(fields: [productId], references: [id])
+model ReservedItem {
+    id              String          @id @default(uuid())
+    productId       String
+    size            Sizes
+    quantity        Int
+    checkoutSession CheckoutSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+    sessionId       String
 }
 
 model OrderItem {
-    id        String  @id @default(uuid())
-    productId String
-    product   Product @relation(fields: [productId], references: [id])
-    name      String
-    price     Int
+    id        String @id @default(uuid())
     size      Sizes
     quantity  Int
     orderId   Int
-    order     Order   @relation(fields: [orderId], references: [id])
+    order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    productId String
+    name      String
+    gender    Gender
+    price     Int
+    slug      String
+    src       String
+    alt       String
 }
 
 model Order {
@@ -98,10 +103,20 @@ model Order {
 }
 
 model User {
-    id        Int       @id @default(autoincrement())
-    password  String
-    email     String    @unique
-    role      UserRoles
-    orders    Order[]
-    createdAt DateTime  @default(now())
+    id               Int               @id @default(autoincrement())
+    password         String
+    email            String            @unique
+    role             UserRoles
+    orders           Order[]
+    createdAt        DateTime          @default(now())
+    checkoutSessions CheckoutSession[]
+}
+
+model CheckoutSession {
+    id            String         @id
+    user          User           @relation(fields: [userId], references: [id])
+    userId        Int
+    reservedItems ReservedItem[]
+    createdAt     DateTime       @default(now())
+    expiresAt     DateTime
 }

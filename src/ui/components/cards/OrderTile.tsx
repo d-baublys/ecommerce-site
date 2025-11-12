@@ -10,13 +10,12 @@ import ProductListTile from "@/ui/components/cards/ProductListTile";
 import PlainRoundedButton from "@/ui/components/buttons/PlainRoundedButton";
 import { useModalStore } from "@/stores/modalStore";
 import { updateOrder } from "@/lib/actions";
-import { SetStateAction } from "react";
 import { useRouter } from "next/navigation";
-import { ClientOrder, Order } from "@/lib/types";
+import { ClientOrder, Order, StateSetter } from "@/lib/types";
 
 interface OrderTileProps {
     orderData: ClientOrder;
-    messageSetter: React.Dispatch<SetStateAction<string>>;
+    messageSetter: StateSetter<string>;
     openSuccessModal: () => void;
     openFailureModal: () => void;
 }

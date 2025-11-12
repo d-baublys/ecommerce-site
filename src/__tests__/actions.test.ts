@@ -6,20 +6,26 @@ import {
     getFeaturedProducts,
     getOrder,
     getAllOrders,
-    getProducts,
+    getManyProducts,
     getUser,
     getUserOrders,
     createProduct,
     deleteProduct,
     updateProduct,
     updateOrder,
+    createCheckoutSession,
+    deleteCheckoutSessions,
+    getReservedItems,
+    getProduct,
 } from "@/lib/actions";
 import { prisma } from "@/lib/prisma";
 import {
+    buildReservedItem,
     buildTestOrderData,
     buildTestOrderList,
     buildTestProduct,
     buildTestProductList,
+    fakeUuid,
 } from "@/lib/test-factories";
 import { getConsoleErrorSpy } from "@/lib/test-utils";
 import { ClientOrder, ClientProduct, FeaturedProduct, Product, Sizes, Stock } from "@/lib/types";
@@ -34,6 +40,7 @@ jest.mock("@/lib/prisma", () => ({
         },
         product: {
             create: jest.fn(),
+            findUnique: jest.fn(),
             findMany: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
@@ -52,6 +59,13 @@ jest.mock("@/lib/prisma", () => ({
         user: {
             create: jest.fn(),
             findFirst: jest.fn(),
+        },
+        checkoutSession: {
+            create: jest.fn(),
+            deleteMany: jest.fn(),
+        },
+        reservedItem: {
+            findMany: jest.fn(),
         },
         $transaction: jest.fn(),
     },
@@ -78,7 +92,42 @@ describe("createProduct", () => {
     });
 });
 
-describe("getProducts", () => {
+describe("getProduct", () => {
+    it("returns product data successfully", async () => {
+        const product: ClientProduct = buildTestProduct();
+
+        const prismaProduct: Product & { stock: Stock[] } = {
+            ...product,
+            stock: Object.entries(product.stock).map(([size, count]) => ({
+                size: size as Sizes,
+                quantity: count,
+                productId: product.id,
+                id: `${product.id}-${size}`,
+            })),
+        };
+
+        (prisma.product.findUnique as jest.Mock).mockResolvedValue(prismaProduct);
+
+        const result = getProduct(fakeUuid);
+        await expect(result).resolves.toEqual({ data: product });
+    });
+
+    it("throws an error if fetch fails", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.product.findUnique as jest.Mock).mockRejectedValue(
+            new Error("Product fetch failed")
+        );
+
+        const result = getProduct(fakeUuid);
+        await expect(result).rejects.toThrow(
+            "Error fetching product data. Please try again later."
+        );
+
+        errorSpy.mockRestore();
+    });
+});
+
+describe("getManyProducts", () => {
     it("returns product data successfully", async () => {
         const productList: ClientProduct[] = buildTestProductList();
 
@@ -94,16 +143,15 @@ describe("getProducts", () => {
 
         (prisma.product.findMany as jest.Mock).mockResolvedValue(prismaProductList);
 
-        const clientProductList = buildTestProductList();
-        const result = getProducts();
-        await expect(result).resolves.toEqual({ data: clientProductList });
+        const result = getManyProducts();
+        await expect(result).resolves.toEqual({ data: productList });
     });
 
     it("throws an error if fetch fails", async () => {
         const errorSpy = getConsoleErrorSpy();
         (prisma.product.findMany as jest.Mock).mockRejectedValue(new Error("Product fetch failed"));
 
-        const result = getProducts();
+        const result = getManyProducts();
         await expect(result).rejects.toThrow(
             "Error fetching product data. Please try again later."
         );
@@ -133,7 +181,7 @@ describe("updateProduct", () => {
 
 describe("deleteProduct", () => {
     it("deletes product stock successfully", async () => {
-        (prisma.$transaction as jest.Mock).mockResolvedValue(true);
+        (prisma.product.delete as jest.Mock).mockResolvedValue(true);
 
         const result = deleteProduct(buildTestProduct().id);
         await expect(result).resolves.toEqual({ success: true });
@@ -141,7 +189,9 @@ describe("deleteProduct", () => {
 
     it("resolves with expected value on transaction failure", async () => {
         const errorSpy = getConsoleErrorSpy();
-        (prisma.$transaction as jest.Mock).mockRejectedValue(new Error("Transaction failed"));
+        (prisma.product.delete as jest.Mock).mockRejectedValue(
+            new Error("Product deletion failed")
+        );
 
         const result = deleteProduct(buildTestProduct().id);
         await expect(result).resolves.toEqual({ success: false });
@@ -150,8 +200,182 @@ describe("deleteProduct", () => {
     });
 });
 
+describe("createFeaturedProducts", () => {
+    it("creates featured products successfully", async () => {
+        const productList = buildTestProductList();
+        (prisma.featuredProduct.createMany as jest.Mock).mockResolvedValue({});
+
+        const result = createFeaturedProducts(productList);
+        await expect(result).resolves.toEqual({ success: true });
+    });
+
+    it("resolves with expected value on product creation failure", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        const productList = buildTestProductList();
+        (prisma.featuredProduct.createMany as jest.Mock).mockRejectedValue(
+            new Error("Product creation failed")
+        );
+
+        const result = createFeaturedProducts(productList);
+        await expect(result).resolves.toEqual({ success: false });
+
+        errorSpy.mockRestore();
+    });
+});
+
+describe("getFeaturedProducts", () => {
+    it("returns featured product data successfully", async () => {
+        const productList: ClientProduct[] = buildTestProductList();
+
+        const prismaProductList: (Product & { stock: Stock[] })[] = productList.map((product) => ({
+            ...product,
+            stock: Object.entries(product.stock).map(([size, count]) => ({
+                size: size as Sizes,
+                quantity: count,
+                productId: product.id,
+                id: `${product.id}-${size}`,
+            })),
+        }));
+
+        const prismaFeaturedList: FeaturedProduct[] = prismaProductList.map((product, idx) => ({
+            id: `featured-product-${idx}`,
+            productId: product.id,
+            product,
+        }));
+
+        (prisma.featuredProduct.findMany as jest.Mock).mockResolvedValue(prismaFeaturedList);
+
+        const result = getFeaturedProducts();
+        await expect(result).resolves.toEqual({ data: productList });
+    });
+
+    it("throws an error if fetch fails", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.featuredProduct.findMany as jest.Mock).mockRejectedValue(
+            new Error("Product fetch failed")
+        );
+
+        const result = getFeaturedProducts();
+        await expect(result).rejects.toThrow(
+            "Error fetching featured products. Please try again later."
+        );
+
+        errorSpy.mockRestore();
+    });
+});
+
+describe("deleteFeaturedProducts", () => {
+    it("deletes featured products successfully", async () => {
+        (prisma.featuredProduct.deleteMany as jest.Mock).mockResolvedValue(true);
+
+        const result = deleteFeaturedProducts();
+        await expect(result).resolves.toEqual({ success: true });
+    });
+
+    it("resolves with expected value on deletion failure", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.featuredProduct.deleteMany as jest.Mock).mockRejectedValue(
+            new Error("Product deletion failed")
+        );
+
+        const result = deleteFeaturedProducts();
+        await expect(result).resolves.toEqual({ success: false });
+
+        errorSpy.mockRestore();
+    });
+});
+
+describe("createCheckoutSession", () => {
+    it("creates checkout session successfully", async () => {
+        const inputData = {
+            id: fakeUuid,
+            userId: 1,
+            expiresAt: new Date(),
+            items: [
+                {
+                    size: "m" as Sizes,
+                    quantity: 1,
+                    productId: fakeUuid,
+                },
+            ],
+        };
+        (prisma.checkoutSession.create as jest.Mock).mockResolvedValue({});
+
+        const result = createCheckoutSession(inputData);
+        await expect(result).resolves.toEqual({ success: true });
+    });
+
+    it("resolves with expected value on checkout session creation failure", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        const inputData = {
+            id: fakeUuid,
+            userId: 1,
+            expiresAt: new Date(),
+            items: [
+                {
+                    size: "m" as Sizes,
+                    quantity: 1,
+                    productId: fakeUuid,
+                },
+            ],
+        };
+        (prisma.checkoutSession.create as jest.Mock).mockRejectedValue(
+            new Error("Error creating checkout session")
+        );
+
+        const result = createCheckoutSession(inputData);
+        await expect(result).resolves.toEqual({ success: false });
+
+        errorSpy.mockRestore();
+    });
+});
+
+describe("deleteCheckoutSessions", () => {
+    it("deletes checkout sessions successfully", async () => {
+        (prisma.checkoutSession.deleteMany as jest.Mock).mockResolvedValue(true);
+
+        const result = deleteCheckoutSessions(1);
+        await expect(result).resolves.toEqual({ success: true });
+    });
+
+    it("resolves with expected value on deletion failure", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.checkoutSession.deleteMany as jest.Mock).mockRejectedValue(
+            new Error("Error deleting checkout session")
+        );
+
+        const result = deleteCheckoutSessions(1);
+        await expect(result).resolves.toEqual({ success: false });
+
+        errorSpy.mockRestore();
+    });
+});
+
+describe("getReservedItems", () => {
+    it("returns reserved items successfully", async () => {
+        const reservedItems = [buildReservedItem()];
+        (prisma.reservedItem.findMany as jest.Mock).mockResolvedValue(reservedItems);
+
+        const result = getReservedItems({ productIds: [fakeUuid] });
+        await expect(result).resolves.toEqual({ data: reservedItems });
+    });
+
+    it("throws an error if fetch fails", async () => {
+        const errorSpy = getConsoleErrorSpy();
+        (prisma.reservedItem.findMany as jest.Mock).mockRejectedValue(
+            new Error("Error fetching reserved items")
+        );
+
+        const result = getReservedItems({ productIds: [fakeUuid] });
+        await expect(result).rejects.toThrow("Error fetching reserved items");
+
+        errorSpy.mockRestore();
+    });
+});
+
 describe("createOrder", () => {
     it("creates order successfully", async () => {
+        (prisma.product.findMany as jest.Mock).mockResolvedValue([buildTestProduct()]);
         (prisma.$transaction as jest.Mock).mockResolvedValue({});
 
         const result = createOrder(buildTestOrderData());
@@ -160,6 +384,7 @@ describe("createOrder", () => {
 
     it("rejects on database error", async () => {
         const errorSpy = getConsoleErrorSpy();
+        (prisma.product.findMany as jest.Mock).mockResolvedValue([buildTestProduct()]);
         (prisma.$transaction as jest.Mock).mockRejectedValue(new Error("Database error"));
 
         const testOrder: ClientOrder = buildTestOrderData();
@@ -254,92 +479,6 @@ describe("updateOrder", () => {
             status: "pendingReturn",
             returnRequestedAt: new Date(),
         });
-        await expect(result).resolves.toEqual({ success: false });
-
-        errorSpy.mockRestore();
-    });
-});
-
-describe("createFeaturedProducts", () => {
-    it("creates featured products successfully", async () => {
-        const productList = buildTestProductList();
-        (prisma.featuredProduct.createMany as jest.Mock).mockResolvedValue({});
-
-        const result = createFeaturedProducts(productList);
-        await expect(result).resolves.toEqual({ success: true });
-    });
-
-    it("resolves with expected value on product creation failure", async () => {
-        const errorSpy = getConsoleErrorSpy();
-        const productList = buildTestProductList();
-        (prisma.featuredProduct.createMany as jest.Mock).mockRejectedValue(
-            new Error("Product creation failed")
-        );
-
-        const result = createFeaturedProducts(productList);
-        await expect(result).resolves.toEqual({ success: false });
-
-        errorSpy.mockRestore();
-    });
-});
-
-describe("getFeaturedProducts", () => {
-    it("returns featured product data successfully", async () => {
-        const productList: ClientProduct[] = buildTestProductList();
-
-        const prismaProductList: (Product & { stock: Stock[] })[] = productList.map((product) => ({
-            ...product,
-            stock: Object.entries(product.stock).map(([size, count]) => ({
-                size: size as Sizes,
-                quantity: count,
-                productId: product.id,
-                id: `${product.id}-${size}`,
-            })),
-        }));
-
-        const prismaFeaturedList: FeaturedProduct[] = prismaProductList.map((product, idx) => ({
-            id: `featured-product-${idx}`,
-            productId: product.id,
-            product,
-        }));
-
-        (prisma.featuredProduct.findMany as jest.Mock).mockResolvedValue(prismaFeaturedList);
-
-        const clientProductList = buildTestProductList();
-        const result = getFeaturedProducts();
-        await expect(result).resolves.toEqual({ data: clientProductList });
-    });
-
-    it("throws an error if fetch fails", async () => {
-        const errorSpy = getConsoleErrorSpy();
-        (prisma.featuredProduct.findMany as jest.Mock).mockRejectedValue(
-            new Error("Product fetch failed")
-        );
-
-        const result = getFeaturedProducts();
-        await expect(result).rejects.toThrow(
-            "Error fetching featured products. Please try again later."
-        );
-
-        errorSpy.mockRestore();
-    });
-});
-
-describe("deleteFeaturedProducts", () => {
-    it("deletes featured products successfully", async () => {
-        (prisma.featuredProduct.deleteMany as jest.Mock).mockResolvedValue(true);
-
-        const result = deleteFeaturedProducts();
-        await expect(result).resolves.toEqual({ success: true });
-    });
-
-    it("resolves with expected value on deletion failure", async () => {
-        const errorSpy = getConsoleErrorSpy();
-        (prisma.featuredProduct.deleteMany as jest.Mock).mockRejectedValue(
-            new Error("Product deletion failed")
-        );
-
-        const result = deleteFeaturedProducts();
         await expect(result).resolves.toEqual({ success: false });
 
         errorSpy.mockRestore();
