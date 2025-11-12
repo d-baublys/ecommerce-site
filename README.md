@@ -38,6 +38,7 @@ Simulated checkout details:
 
 ## Demonstrates
 - Understanding of ecommerce user flows, including purchase, auth, and simple order management
+- Careful consideration about preventing overselling stock whilst keeping the customer informed
 - Attention to detail in creating an accessible experience, such as with tab press focus "trapping" and "restore"
 - Create responsive layouts across many routes in a modular fashion
 - Ability to build a usable admin suite to visually interface with the database for product and order management
