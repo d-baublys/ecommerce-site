@@ -160,8 +160,9 @@ Cypress.Commands.add("logInAsStandardUser", () => {
 Cypress.Commands.add("logOut", () => {
     cy.intercept("/api/auth/signout").as("log-out");
 
-    cy.get("[aria-label='Account']").should("exist").click();
-    cy.contains("button", "Log Out").should("be.visible").click();
+    cy.get("#navbar [aria-label='Account']").should("exist").click();
+    cy.get("#account-menu").should("exist").and("be.visible");
+    cy.contains("button", "Log Out").should("exist").and("be.visible").click();
     cy.wait("@log-out").its("response.statusCode").should("eq", 200);
     cy.get("#account-menu").should("not.be.visible");
 });

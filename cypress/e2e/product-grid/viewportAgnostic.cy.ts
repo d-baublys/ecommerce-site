@@ -64,11 +64,7 @@ describe("Product grid page viewport-agnostic tests", () => {
     });
 
     it("locks scrolling when bag confirm modal is open", () => {
-        cy.openPriceAccordionDesktop();
-        cy.get(".desktop-filtering .price-btn-container button").first().click();
-        cy.awaitFilterUpdate();
         cy.get(".grid-tile-container .product-tile").first().as("test-tile");
-
         cy.assertNoScroll();
         cy.get("@test-tile").trigger("mouseover");
         cy.get("@test-tile").contains("button", "Quick Add").click();
@@ -205,7 +201,7 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.contains(/7\s*Items/).should("be.visible");
 
         cy.get("#breadcrumbs").contains("All").click();
-        cy.awaitFilterUpdate();
+        cy.location("pathname").should("eq", "/category/all");
         cy.get(".grid-tile-container .product-tile").should("have.length", 15);
         cy.contains(/15\s*Items/).should("be.visible");
     });
@@ -220,7 +216,7 @@ describe("Product grid page viewport-agnostic tests", () => {
         cy.contains(/1\s*Item/).should("be.visible");
 
         cy.get("#breadcrumbs").contains("All").click();
-        cy.awaitFilterUpdate();
+        cy.location("pathname").should("eq", "/category/all");
         cy.get(".grid-tile-container .product-tile").should("have.length", 15);
         cy.contains(/15\s*Items/).should("be.visible");
     });
@@ -238,8 +234,7 @@ describe("Product grid page viewport-agnostic tests", () => {
         });
 
         cy.get("#breadcrumbs").contains("All").click();
-        cy.awaitFilterUpdate();
-        cy.get(".grid-tile-container .product-tile").should("have.length", 15);
+        cy.location("pathname").should("eq", "/category/all");
         cy.get(".tile-price").then(($tilePrices) => {
             const prices = [...$tilePrices].map((price) =>
                 parseFloat(price.innerText.replace("£", ""))

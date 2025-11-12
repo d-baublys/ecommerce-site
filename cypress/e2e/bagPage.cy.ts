@@ -279,9 +279,12 @@ describe("Bag page populated tests", () => {
     });
 
     it("redirects to log in page on 'checkout' button click after logging out", () => {
+        cy.intercept({ method: "POST", url: /https:\/\/m\.stripe\.com/ }).as("stripe-init");
+
         cy.logInAsStandardUser();
         cy.visitBag();
         cy.logOut();
+        cy.wait("@stripe-init").its("response.statusCode").should("eq", 200);
         cy.contains("button", "Checkout").should("be.visible").click();
         cy.location("pathname").should("eq", "/login");
         cy.location("search").should("eq", "?redirect_after=bag");
