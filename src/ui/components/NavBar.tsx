@@ -15,7 +15,7 @@ export default function NavBar() {
     const [isScrollingUp, setIsScrollingUp] = useState(false);
     const [hasMounted, setHasMounted] = useState<boolean>(false);
     const itemCount = useBagStore((state) => state.getTotalBagCount());
-    const { isSearchOpen, isSearchLoaded, setIsSearchOpen, setIsSearchLoaded } = useSearchStore(
+    const { isSearchOpen, isSearchLoaded, openSearch, closeSearchSmooth } = useSearchStore(
         (state) => state
     );
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
@@ -46,25 +46,19 @@ export default function NavBar() {
         setIsMenuOpen(false);
     }, [pathname]);
 
-    const closeSearchAll = () => {
-        setIsSearchLoaded(false);
-        setTimeout(() => setIsSearchOpen(false), 200);
-    };
-
     const handleSearchClick = () => {
         setIsMenuOpen(false);
         if (!isSearchOpen) {
-            setIsSearchOpen(true);
-            setTimeout(() => setIsSearchLoaded(true), 0);
+            openSearch();
             elementRef.current = document.activeElement as HTMLElement;
         } else {
-            closeSearchAll();
+            closeSearchSmooth();
         }
     };
 
     const handleMenuClick = () => {
         setIsMenuOpen(true);
-        closeSearchAll();
+        closeSearchSmooth();
         if (!isMenuOpen) {
             elementRef.current = document.activeElement as HTMLElement;
         }

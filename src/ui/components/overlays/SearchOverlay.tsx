@@ -12,7 +12,7 @@ import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { buildProductUrl } from "@/lib/utils";
 
 export default function SearchOverlay() {
-    const { isSearchOpen, setIsSearchOpen, isSearchLoaded, setIsSearchLoaded } = useSearchStore(
+    const { isSearchOpen, isSearchLoaded, closeSearchSmooth, closeSearchInstant } = useSearchStore(
         (state) => state
     );
 
@@ -22,13 +22,8 @@ export default function SearchOverlay() {
     const pathname = usePathname();
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const closeOverlay = () => {
-        setIsSearchLoaded(false);
-        setTimeout(() => setIsSearchOpen(false), 200);
-    };
-
     const handleResultClick = (product: ClientProduct) => {
-        closeOverlay();
+        closeSearchSmooth();
         router.push(buildProductUrl(product.id, product.slug));
     };
 
@@ -41,18 +36,17 @@ export default function SearchOverlay() {
     }, [isSearchLoaded]);
 
     useEffect(() => {
-        setIsSearchLoaded(false);
-        setIsSearchOpen(false);
+        closeSearchInstant();
     }, [pathname]);
 
-    const trapRef = useFocusTrap(isSearchOpen, closeOverlay);
+    const trapRef = useFocusTrap(isSearchOpen, closeSearchSmooth);
 
     if (!isSearchOpen && !isSearchLoaded) return null;
 
     return (
         <>
             <DarkBackdrop
-                onClick={() => closeOverlay()}
+                onClick={closeSearchSmooth}
                 overrideClasses={`[transition:all_0.1s_ease] ${
                     isSearchLoaded ? "!opacity-75" : "!opacity-0"
                 }`}
@@ -78,14 +72,14 @@ export default function SearchOverlay() {
                         <SearchBar
                             inputRef={inputRef}
                             handleResultClick={handleResultClick}
-                            handleSearchClose={() => closeOverlay()}
+                            handleSearchClose={closeSearchSmooth}
                             options={{ isGlobalSearch: true, showSuggestions: true }}
                         />
                         <div className="flex items-center h-searchbar-height pl-0.5">
                             <CloseButton
                                 title="Close search"
                                 aria-label="Close search"
-                                onClick={() => closeOverlay()}
+                                onClick={closeSearchSmooth}
                             />
                         </div>
                     </div>
