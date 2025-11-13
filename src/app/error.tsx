@@ -12,7 +12,11 @@ export default function Error({
 }) {
     return (
         <BareLayout>
-            <p>{error ? `${error.message}` : "Something went wrong!"}</p>
+            <p>
+                {error && process.env.NODE_ENV === "development"
+                    ? `${error.message}`
+                    : "Something went wrong!"}
+            </p>
             <div>
                 <PlainRoundedButton
                     onClick={() => reset()}
