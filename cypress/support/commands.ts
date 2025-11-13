@@ -79,19 +79,21 @@ Cypress.Commands.add("visitHome", () => {
 Cypress.Commands.add("visitCategoryPage", (categoryId) => {
     cy.visit(`/category/${categoryId ?? "all"}`);
     cy.location("pathname").should("eq", `/category/${categoryId ?? "all"}`);
-    cy.get("#loading-indicator").should("not.exist");
     cy.contains(/\d+\s*Item(s)?/).should("be.visible");
+    cy.get("#loading-indicator").should("not.exist");
 });
 
 Cypress.Commands.add("visitWishlist", () => {
     cy.visit("/wishlist");
     cy.contains(/\d+\s*Item(s)?/).should("be.visible");
+    cy.get("#loading-indicator").should("not.exist");
 });
 
 Cypress.Commands.add("visitBag", () => {
     cy.visit("/bag");
     cy.location("pathname").should("eq", "/bag");
     cy.contains("My Bag").should("exist");
+    cy.get("#loading-indicator").should("not.exist");
 });
 
 Cypress.Commands.add("visitLogInPage", () => {
@@ -116,12 +118,14 @@ Cypress.Commands.add("visitOrdersPage", () => {
     cy.visit("/orders");
     cy.location("pathname").should("eq", "/orders");
     cy.contains("My Orders").should("be.visible");
+    cy.get("#loading-indicator").should("not.exist");
 });
 
 Cypress.Commands.add("visitAdminOrdersPage", () => {
     cy.visit("/admin/orders");
     cy.location("pathname").should("eq", "/admin/orders");
     cy.contains("Orders").should("be.visible");
+    cy.get("#loading-indicator").should("not.exist");
 });
 
 Cypress.Commands.add("visitTestAdminProduct", (testAdminProductUrl) => {

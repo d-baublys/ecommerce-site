@@ -319,8 +319,9 @@ describe("BagPage auth-agnostic tests", () => {
         });
 
         await waitFor(() => {
-            expect(screen.getByLabelText("Bag subtotal")).toBeInTheDocument();
+            expect(screen.getByText(/Size - S/)).toBeInTheDocument();
         });
+
         expect(screen.queryByRole("button", { name: "Checkout" })).not.toBeInTheDocument();
         expect(screen.getByLabelText("Shipping cost")).toHaveTextContent("-");
     });

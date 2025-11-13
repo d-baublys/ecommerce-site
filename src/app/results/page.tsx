@@ -19,7 +19,7 @@ export default async function SearchResultsPage({ searchParams }: AsyncParams) {
 
     return (
         <MainLayout subheaderText={subheaderText} noCrumbs>
-            <CategoryGridPage category={"all"} options={{ noCategoryTabs: true }} query={query} />
+            <CategoryGridPage category="all" options={{ noCategoryTabs: true }} query={query} />
         </MainLayout>
     );
 }

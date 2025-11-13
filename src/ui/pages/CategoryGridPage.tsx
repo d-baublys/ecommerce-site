@@ -219,10 +219,8 @@ export default function CategoryGridPage({
 
     if (error) throw error;
 
-    if (!(allCategoryProducts && filteredProducts)) return <LoadingIndicator />;
-
     const shouldRenderTabs = !options?.noCategoryTabs && category === "all";
-    const shouldRenderAside = !options?.noAside && (filteredProducts.length > 0 || !query);
+    const shouldRenderAside = !options?.noAside && (filteredProducts?.length || !query);
     const shouldRenderFilterBtn = !isFilterOpen && shouldRenderAside;
 
     const asideContent = () => {
@@ -248,8 +246,8 @@ export default function CategoryGridPage({
     const fixedOverlays = () => {
         return (
             <div data-testid="fixed-overlays">
-                {isQueryLoading && <LoadingIndicator />}
-                {shouldRenderFilterBtn && (
+                {!isFirstLoad.current && isQueryLoading ? <LoadingIndicator /> : null}
+                {shouldRenderFilterBtn ? (
                     <div className="fixed bottom-[5%] left-1/2 translate-x-[-50%] lg:hidden">
                         <PlainRoundedButton
                             overrideClasses="!bg-black !text-contrasted !border-black [filter:drop-shadow(0_0_2px_rgba(255,255,255,0.5))]"
@@ -258,7 +256,7 @@ export default function CategoryGridPage({
                             Filter
                         </PlainRoundedButton>
                     </div>
-                )}
+                ) : null}
                 <SlideDownMenu
                     aria-label="Filter menu"
                     isOpenState={isFilterOpen}
@@ -283,7 +281,7 @@ export default function CategoryGridPage({
         <BaseGridPage
             displayedProducts={filteredProducts}
             noProductMessage={
-                allCategoryProducts.length > 0
+                allCategoryProducts?.length
                     ? "No products matching your filter"
                     : query !== undefined
                     ? "No products matching your search"

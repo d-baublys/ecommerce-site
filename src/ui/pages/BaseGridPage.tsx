@@ -4,9 +4,10 @@ import ProductGrid from "@/ui/components/product-grid/ProductGrid";
 import PlainRoundedButtonLink from "../components/buttons/PlainRoundedButtonLink";
 import { useEffect, useState } from "react";
 import { getReservedItems } from "@/lib/actions";
+import LoadingIndicator from "../components/overlays/LoadingIndicator";
 
 interface BaseGridPageProps {
-    displayedProducts: ClientProduct[];
+    displayedProducts?: ClientProduct[];
     noProductMessage: string;
     linkWhenEmptyList: boolean;
     categoryTabs?: React.ReactNode;
@@ -40,7 +41,7 @@ export default function BaseGridPage({
         fetchReserved();
     }, [displayedProducts]);
 
-    if (!groupedReservedItems) return null;
+    const dataLoaded = displayedProducts && groupedReservedItems;
 
     return (
         <>
@@ -50,13 +51,19 @@ export default function BaseGridPage({
                 <div className="flex flex-col w-full overflow-clip">
                     <div className="flex justify-between w-full p-0.5 pb-4 font-semibold">
                         <p className="flex items-center gap-1">
-                            <span>{displayedProducts.length}</span>
-                            <span>{pluralise("Item", displayedProducts.length)}</span>
+                            {dataLoaded ? (
+                                <>
+                                    <span>{displayedProducts.length}</span>
+                                    <span>{pluralise("Item", displayedProducts.length)}</span>
+                                </>
+                            ) : null}
                         </p>
                         {sortingUnit ?? null}
                     </div>
                     <div className="flex grow">
-                        {displayedProducts.length > 0 ? (
+                        {!dataLoaded ? (
+                            <LoadingIndicator />
+                        ) : displayedProducts.length ? (
                             <ProductGrid
                                 productList={displayedProducts}
                                 groupedReservedItems={groupedReservedItems}

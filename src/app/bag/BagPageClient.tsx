@@ -40,7 +40,8 @@ export default function BagPageClient() {
     const shippingCost = !emptyBag && orderSubtotal ? 500 : 0;
     const orderTotal = orderSubtotal + shippingCost;
 
-    const checkoutPermitted = !(emptyBag || bag.some((item) => item.quantity === 0));
+    const dataLoaded = products && groupedReservedItems;
+    const checkoutPermitted = dataLoaded && !(emptyBag || bag.some((item) => item.quantity === 0));
 
     useEffect(() => {
         if (!hasHydrated) return;
@@ -131,13 +132,11 @@ export default function BagPageClient() {
 
     if (error) throw error;
 
-    if (!products || !groupedReservedItems) return null;
-
     return (
         <>
             <MainLayout subheaderText="My Bag">
                 <div className="flex flex-col md:flex-row w-full h-full">
-                    {!emptyBag ? (
+                    {dataLoaded && !emptyBag ? (
                         <ul
                             id="bag-tile-container"
                             data-testid="bag-tile-ul"
@@ -173,15 +172,21 @@ export default function BagPageClient() {
                         </ul>
                     ) : (
                         <div className="flex flex-col justify-center items-center w-full h-full p-8 md:p-0 gap-8">
-                            <p>{"Your bag is empty!"}</p>
-                            <div>
-                                <PlainRoundedButtonLink
-                                    href={"/category/all"}
-                                    overrideClasses="!bg-background-lightest"
-                                >
-                                    Shop
-                                </PlainRoundedButtonLink>
-                            </div>
+                            {dataLoaded ? (
+                                <>
+                                    <p>{"Your bag is empty!"}</p>
+                                    <div>
+                                        <PlainRoundedButtonLink
+                                            href={"/category/all"}
+                                            overrideClasses="!bg-background-lightest"
+                                        >
+                                            Shop
+                                        </PlainRoundedButtonLink>
+                                    </div>
+                                </>
+                            ) : (
+                                <LoadingIndicator />
+                            )}
                         </div>
                     )}
                     <div className="flex flex-col px-8 py-6 w-full h-min md:w-2/5 md:ml-8 justify-evenly bg-background-lightest rounded-sm">

@@ -13,7 +13,7 @@ export default function GridAside({
     priceFilters,
     setPriceFilters,
 }: {
-    allCategoryProducts: ClientProduct[];
+    allCategoryProducts?: ClientProduct[];
     sizeFilters: Sizes[];
     setSizeFilters: StateSetter<Sizes[]>;
     priceFilters: PriceFilterId[];
@@ -32,7 +32,7 @@ export default function GridAside({
         const sizesMap = VALID_SIZES.map((size) => size);
         const sizesData: Record<Sizes, number> = buildBaseRecord<Sizes>(sizesMap);
 
-        allCategoryProducts.forEach((product) => {
+        allCategoryProducts?.forEach((product) => {
             Object.keys(product.stock).forEach(
                 (size) => product.stock[size as Sizes] && sizesData[size as Sizes]++
             );
@@ -45,7 +45,7 @@ export default function GridAside({
         const filterIds = Object.keys(PRICE_FILTER_OPTIONS) as PriceFilterId[];
         const pricesData: Record<PriceFilterId, number> = buildBaseRecord<PriceFilterId>(filterIds);
 
-        allCategoryProducts.forEach((product) => {
+        allCategoryProducts?.forEach((product) => {
             Object.entries(PRICE_FILTER_OPTIONS).forEach(([filterId, range]) => {
                 if (range.min <= product.price && product.price < range.max) {
                     pricesData[filterId as PriceFilterId]++;
@@ -129,25 +129,31 @@ export default function GridAside({
         ) : null;
     };
 
+    const dataLoaded = allCategoryProducts;
+
     return (
         <div className="w-full h-min border-b-1">
             <AccordionSection text="Size" filters={sizeFilters}>
-                {generateButtonList({
-                    data: sizesData,
-                    filters: sizeFilters,
-                    handleClick: handleSizePress,
-                    labelCreator: createSizeLabel,
-                    className: "size-btn-container",
-                })}
+                {dataLoaded
+                    ? generateButtonList({
+                          data: sizesData,
+                          filters: sizeFilters,
+                          handleClick: handleSizePress,
+                          labelCreator: createSizeLabel,
+                          className: "size-btn-container",
+                      })
+                    : null}
             </AccordionSection>
             <AccordionSection text="Price" filters={priceFilters}>
-                {generateButtonList({
-                    data: pricesData,
-                    filters: priceFilters,
-                    handleClick: handlePricePress,
-                    labelCreator: createPriceLabel,
-                    className: "price-btn-container",
-                })}
+                {dataLoaded
+                    ? generateButtonList({
+                          data: pricesData,
+                          filters: priceFilters,
+                          handleClick: handlePricePress,
+                          labelCreator: createPriceLabel,
+                          className: "price-btn-container",
+                      })
+                    : null}
             </AccordionSection>
         </div>
     );

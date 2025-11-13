@@ -23,8 +23,6 @@ export default function WishlistPageClient() {
         getData();
     }, [wishlist, hasHydrated]);
 
-    if (!products) return null;
-
     return (
         <MainLayout subheaderText="My Wishlist">
             <BaseGridPage
