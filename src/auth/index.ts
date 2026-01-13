@@ -1,28 +1,36 @@
-import { getUser } from "@/lib/actions";
-import { comparePasswords } from "@/lib/utils";
+import { prisma } from "@/lib/prisma";
+import { compare } from "bcryptjs";
 import NextAuth, { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import baseAuthConfig from "./auth.config";
 
-export const runtime = "nodejs";
-
-const authOptions: NextAuthConfig = {
+const serverAuthConfig: NextAuthConfig = {
+    ...baseAuthConfig,
     providers: [
         Credentials({
             async authorize(credentials) {
-                const user = await getUser(credentials.email as string);
+                let user;
 
-                if (user.data) {
-                    const userData = user.data;
-                    const verifiedPassword = await comparePasswords(
+                try {
+                    user = await prisma.user.findFirst({
+                        where: { email: credentials.email as string },
+                    });
+                } catch (error) {
+                    console.error("Error fetching user data: ", error);
+                    return null;
+                }
+
+                if (user) {
+                    const verifiedPassword = await compare(
                         credentials.password as string,
-                        userData.password
+                        user.password
                     );
 
                     if (verifiedPassword) {
                         return {
-                            id: String(userData.id),
-                            email: userData.email,
-                            role: userData.role,
+                            id: String(user.id),
+                            email: user.email,
+                            role: user.role,
                         };
                     }
                 }
@@ -31,22 +39,7 @@ const authOptions: NextAuthConfig = {
             },
         }),
     ],
-    callbacks: {
-        jwt({ token, user }) {
-            if (user) {
-                token.id = user.id;
-                token.role = user.role;
-            }
-            return token;
-        },
-        session({ session, token }) {
-            session.user.id = token.id as string;
-            session.user.role = token.role as string;
-
-            return session;
-        },
-    },
     secret: process.env.AUTH_SECRET,
 };
 
-export const { handlers, auth, signIn, signOut } = NextAuth(authOptions);
+export const { handlers, auth, signIn, signOut } = NextAuth(serverAuthConfig);
