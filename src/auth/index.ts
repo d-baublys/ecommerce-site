@@ -1,11 +1,11 @@
-import { getUser } from "@/lib/actions";
-import { comparePasswords } from "@/lib/utils";
 import NextAuth, { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import baseAuthConfig from "./auth.config";
+import { getUser } from "@/lib/actions";
+import { comparePasswords } from "@/lib/utils";
 
-export const runtime = "nodejs";
-
-const authOptions: NextAuthConfig = {
+const serverAuthConfig: NextAuthConfig = {
+    ...baseAuthConfig,
     providers: [
         Credentials({
             async authorize(credentials) {
@@ -31,22 +31,7 @@ const authOptions: NextAuthConfig = {
             },
         }),
     ],
-    callbacks: {
-        jwt({ token, user }) {
-            if (user) {
-                token.id = user.id;
-                token.role = user.role;
-            }
-            return token;
-        },
-        session({ session, token }) {
-            session.user.id = token.id as string;
-            session.user.role = token.role as string;
-
-            return session;
-        },
-    },
     secret: process.env.AUTH_SECRET,
 };
 
-export const { handlers, auth, signIn, signOut } = NextAuth(authOptions);
+export const { handlers, auth, signIn, signOut } = NextAuth(serverAuthConfig);
