@@ -1,36 +1,28 @@
-import { prisma } from "@/lib/prisma";
-import { compare } from "bcryptjs";
 import NextAuth, { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import baseAuthConfig from "./auth.config";
+import { getUser } from "@/lib/actions";
+import { comparePasswords } from "@/lib/utils";
 
 const serverAuthConfig: NextAuthConfig = {
     ...baseAuthConfig,
     providers: [
         Credentials({
             async authorize(credentials) {
-                let user;
+                const user = await getUser(credentials.email as string);
 
-                try {
-                    user = await prisma.user.findFirst({
-                        where: { email: credentials.email as string },
-                    });
-                } catch (error) {
-                    console.error("Error fetching user data: ", error);
-                    return null;
-                }
-
-                if (user) {
-                    const verifiedPassword = await compare(
+                if (user.data) {
+                    const userData = user.data;
+                    const verifiedPassword = await comparePasswords(
                         credentials.password as string,
-                        user.password
+                        userData.password
                     );
 
                     if (verifiedPassword) {
                         return {
-                            id: String(user.id),
-                            email: user.email,
-                            role: user.role,
+                            id: String(userData.id),
+                            email: userData.email,
+                            role: userData.role,
                         };
                     }
                 }
